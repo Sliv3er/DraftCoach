@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { BuildResponse, Role } from 'shared/types';
+import { BuildResponse, Role } from '../types';
 import { ChampionPicker } from './components/ChampionPicker';
 import { BuildOutput } from './components/BuildOutput';
 

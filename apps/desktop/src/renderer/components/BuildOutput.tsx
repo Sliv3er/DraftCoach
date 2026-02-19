@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { BuildResponse } from 'shared/types';
+import { BuildResponse } from '../../types';
 
 interface Props {
   result: BuildResponse | null;

@@ -85,5 +85,5 @@ Error response:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `GEMINI_API_KEY` | — | Google Gemini API key |
-| `GEMINI_MODEL` | `gemini-2.0-flash` | Model ID (`gemini-2.0-flash` or `gemini-2.0-pro`) |
+| `GEMINI_MODEL` | `gemini-3-flash-preview` | Model ID (`gemini-3-flash-preview` or `gemini-3.1-pro-preview`) |
 | `BACKEND_PORT` | `3210` | Backend server port |

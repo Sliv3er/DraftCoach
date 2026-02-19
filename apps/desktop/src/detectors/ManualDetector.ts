@@ -1,4 +1,4 @@
-import { Detector, DraftState, Role } from '../../../shared/types';
+import { Detector, DraftState } from '../types';
 
 export class ManualDetector implements Detector {
   private state: DraftState | null = null;

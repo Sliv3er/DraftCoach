@@ -6,7 +6,7 @@ const SYSTEM_PROMPT = `You are a League of Legends Draft & Itemization Engine fo
 const SHORT_SYSTEM_PROMPT = `You are a League of Legends build advisor. Return ONLY: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD, SITUATIONAL ITEMS. Keep names exactly as in-game. Adapt to enemy comp.`;
 
 function getModel(): string {
-  return process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  return process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview';
 }
 
 export async function generateBuild(

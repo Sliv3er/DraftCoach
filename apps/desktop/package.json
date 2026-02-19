@@ -1,6 +1,8 @@
 {
   "name": "draftcoach-desktop",
   "version": "1.0.0",
+  "description": "DraftCoach - League of Legends Champ Select Assistant",
+  "author": "DraftCoach",
   "private": true,
   "main": "src/main/main.js",
   "scripts": {
@@ -11,16 +13,27 @@
     "appId": "com.draftcoach.app",
     "productName": "DraftCoach",
     "win": {
-      "target": "nsis",
-      "icon": "assets/icon.png"
+      "target": [
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ],
+      "signAndEditExecutable": false,
+      "requestedExecutionLevel": "asInvoker"
     },
     "directories": {
       "output": "dist-electron"
     },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false
+    },
+    "asar": true,
     "files": [
       "src/main/**/*",
-      "dist/**/*",
-      "assets/**/*"
+      "dist/**/*"
     ]
   },
   "dependencies": {
@@ -34,7 +47,7 @@
     "concurrently": "^8.2.2",
     "css-loader": "^6.9.1",
     "electron": "^28.2.0",
-    "electron-builder": "^24.9.1",
+    "electron-builder": "^26.8.1",
     "html-webpack-plugin": "^5.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

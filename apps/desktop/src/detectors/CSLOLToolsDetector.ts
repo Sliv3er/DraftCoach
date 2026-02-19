@@ -1,4 +1,4 @@
-import { Detector, DraftState } from '../../../shared/types';
+import { Detector, DraftState } from '../types';
 
 /**
  * Placeholder stub for CS LOL Tools integration.

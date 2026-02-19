@@ -1,10 +1,4 @@
-export interface DraftState {
-  myChampion: string;
-  role: Role;
-  allies: string[];
-  enemies: string[];
-}
-
+// Re-export shared types for use in renderer
 export type Role = 'top' | 'jungle' | 'mid' | 'adc' | 'support';
 
 export interface BuildRequest {
@@ -31,17 +25,11 @@ export interface BuildErrorResponse {
 
 export type BuildResponse = BuildSuccessResponse | BuildErrorResponse;
 
-export interface CacheEntry {
-  key: string;
-  timestamp: number;
-  text: string;
-  patchDetected: string;
-  source: 'grounded' | 'cache';
-}
-
-export interface AppConfig {
-  geminiModel: 'gemini-3-flash-preview' | 'gemini-3.1-pro-preview';
-  backendPort: number;
+export interface DraftState {
+  myChampion: string;
+  role: Role;
+  allies: string[];
+  enemies: string[];
 }
 
 export interface Detector {

@@ -1,0 +1,309 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, sans-serif;
+  background: #0f0f1a;
+  color: #e0e0e0;
+  overflow-x: hidden;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.header h1 {
+  font-size: 20px;
+  color: #c9a84c;
+  font-weight: 700;
+}
+
+.header .patch {
+  font-size: 13px;
+  color: #888;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Left Panel */
+.left-panel {
+  width: 380px;
+  min-width: 320px;
+  padding: 20px;
+  background: #12121f;
+  border-right: 1px solid #2a2a4a;
+  overflow-y: auto;
+}
+
+.left-panel h2 {
+  font-size: 15px;
+  color: #c9a84c;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.field-group {
+  margin-bottom: 16px;
+}
+
+.field-group label {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.role-select, .champ-search {
+  width: 100%;
+  padding: 8px 12px;
+  background: #1e1e35;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+  outline: none;
+}
+
+.role-select:focus, .champ-search:focus {
+  border-color: #c9a84c;
+}
+
+.champ-picker {
+  position: relative;
+}
+
+.champ-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #1e1e35;
+  border: 1px solid #444;
+  border-radius: 0 0 6px 6px;
+  z-index: 100;
+}
+
+.champ-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.champ-option:hover {
+  background: #2a2a4a;
+}
+
+.champ-option img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.champ-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2a2a4a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 2px;
+  font-size: 12px;
+}
+
+.champ-tag img {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+}
+
+.champ-tag .remove {
+  cursor: pointer;
+  color: #f44;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.selected-champ {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.selected-champ img {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.team-section {
+  margin-bottom: 16px;
+}
+
+.team-section h3 {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.btn-generate {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #c9a84c, #a07c2a);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: opacity 0.2s;
+}
+
+.btn-generate:hover {
+  opacity: 0.9;
+}
+
+.btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Right Panel */
+.right-panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.idle { background: #555; }
+.status-dot.fetching { background: #f0c040; animation: pulse 1s infinite; }
+.status-dot.grounded { background: #4caf50; }
+.status-dot.cache { background: #2196f3; }
+.status-dot.stale-cache { background: #ff9800; }
+.status-dot.error { background: #f44336; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.build-output {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.build-section {
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.build-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.build-section-header h3 {
+  font-size: 14px;
+  color: #c9a84c;
+  text-transform: uppercase;
+}
+
+.btn-copy {
+  padding: 4px 10px;
+  background: #2a2a4a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.btn-copy:hover {
+  background: #3a3a5a;
+}
+
+.btn-copy-all {
+  padding: 8px 16px;
+  background: #2a2a4a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.btn-copy-all:hover {
+  background: #3a3a5a;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60%;
+  color: #555;
+  font-size: 16px;
+  text-align: center;
+}
+
+.placeholder-icon {
+  width: 24px;
+  height: 24px;
+  background: #333;
+  border-radius: 4px;
+  display: inline-block;
+}

@@ -1,0 +1,49 @@
+{
+  "name": "draftcoach-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/main/main.js",
+  "scripts": {
+    "dev": "concurrently \"webpack serve --config webpack.config.js\" \"wait-on http://localhost:9000 && electron .\"",
+    "build": "webpack --mode production && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.draftcoach.app",
+    "productName": "DraftCoach",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "src/main/**/*",
+      "dist/**/*",
+      "assets/**/*"
+    ]
+  },
+  "dependencies": {
+    "electron-is-dev": "^2.0.0",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "concurrently": "^8.2.2",
+    "css-loader": "^6.9.1",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1",
+    "html-webpack-plugin": "^5.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "style-loader": "^3.3.4",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "wait-on": "^7.2.0",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.2"
+  }
+}

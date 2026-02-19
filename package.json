@@ -1,0 +1,16 @@
+{
+  "name": "draftcoach",
+  "version": "1.0.0",
+  "private": true,
+  "description": "League of Legends champ select assistance app",
+  "scripts": {
+    "dev:backend": "cd apps/backend && npx ts-node src/index.ts",
+    "dev:desktop": "cd apps/desktop && npx concurrently \"npx webpack serve --config webpack.config.js\" \"npx wait-on http://localhost:9000 && npx electron .\"",
+    "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:desktop\"",
+    "build:backend": "cd apps/backend && npx tsc",
+    "build:desktop": "cd apps/desktop && npx webpack --mode production && npx electron-builder --win",
+    "postinstall": "cd apps/backend && npm install && cd ../desktop && npm install"
+  },
+  "author": "",
+  "license": "MIT"
+}

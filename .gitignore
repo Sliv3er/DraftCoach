@@ -1,0 +1,9 @@
+node_modules/
+dist/
+dist-electron/
+.env
+*.log
+apps/desktop/dist/
+apps/backend/dist/
+icon-cache/
+build-cache.json

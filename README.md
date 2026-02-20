@@ -1,5 +1,6 @@
 <p align="center">
-  <h1 align="center">⚔️ DraftCoach</h1>
+  <img src="assets/icon.png" alt="DraftCoach Logo" width="120" />
+  <h1 align="center">DraftCoach</h1>
   <p align="center">
     <strong>AI-powered League of Legends draft assistant with real-time build recommendations</strong>
   </p>

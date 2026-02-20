@@ -74,8 +74,10 @@ body {
   letter-spacing: 0.5px;
 }
 
-.header-brand .brand-icon {
-  font-size: 18px;
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
 }
 
 .header-meta {

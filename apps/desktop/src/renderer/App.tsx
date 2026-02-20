@@ -157,7 +157,7 @@ export function App() {
     <div className="app">
       <header className="header">
         <div className="header-brand">
-          <span className="brand-icon">⚔️</span>
+          <img src="http://127.0.0.1:3210/logo" alt="DraftCoach" className="brand-logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
           <h1>DraftCoach</h1>
         </div>
         <div className="header-meta">

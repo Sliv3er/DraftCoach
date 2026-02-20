@@ -291,6 +291,17 @@ Rules:
       }
     });
     
+    backendApp.get('/logo', (_req, res) => {
+      const logoPath = isDev
+        ? path.resolve(__dirname, '../../../../assets/icon.png')
+        : path.join(process.resourcesPath, 'icon.png');
+      if (fs.existsSync(logoPath)) {
+        res.sendFile(logoPath);
+      } else {
+        res.status(404).send('Not found');
+      }
+    });
+    
     backendApp.get('/health', (_req, res) => {
       res.json({ status: 'ok' });
     });
@@ -310,12 +321,19 @@ Rules:
 function createWindow() {
   Menu.setApplicationMenu(null);
   const isDev = !app.isPackaged;
+  // Resolve icon path
+  const isDev2 = !app.isPackaged;
+  const iconPath = isDev2
+    ? path.resolve(__dirname, '../../../../assets/icon.png')
+    : path.join(process.resourcesPath, 'icon.png');
+  
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 900,
     minHeight: 600,
     backgroundColor: '#0f0f1a',
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

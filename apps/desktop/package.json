@@ -16,6 +16,7 @@
       "target": [
         { "target": "dir", "arch": ["x64"] }
       ],
+      "icon": "../../assets/icon.ico",
       "signAndEditExecutable": false,
       "requestedExecutionLevel": "asInvoker"
     },
@@ -28,6 +29,9 @@
       "allowElevation": false
     },
     "asar": true,
+    "extraResources": [
+      { "from": "../../assets/icon.png", "to": "icon.png" }
+    ],
     "files": [
       "src/main/**/*",
       "dist/**/*"

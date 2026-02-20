@@ -83,73 +83,109 @@ function findIcon(name: string, map?: Map<string, string>): string | undefined {
 
 function renderRunes(content: string, lookups: IconLookups | null) {
   const lines = content.split('\n').filter(l => l.trim());
-  const elements: React.ReactNode[] = [];
-  let currentTree: 'primary' | 'secondary' | null = null;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+  // Parse into structured data
+  let primaryTree = '';
+  let secondaryTree = '';
+  let keystone = '';
+  const primaryRunes: string[] = [];
+  const secondaryRunes: string[] = [];
+  const shards: string[] = [];
+  let section: 'primary' | 'secondary' | 'shards' = 'primary';
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
 
     if (/^primary:/i.test(line)) {
-      const treeName = line.replace(/^primary:\s*/i, '').trim();
-      currentTree = 'primary';
-      elements.push(
-        <div key={`pt-${i}`} className="rune-tree">
-          <div className="rune-tree-label">
-            <IconImg src={findIcon(treeName, lookups?.runes)} alt={treeName} className="rune-icon" />
-            {' '}Primary: {treeName}
-          </div>
-        </div>
-      );
+      primaryTree = line.replace(/^primary:\s*/i, '').trim();
+      section = 'primary';
       continue;
     }
-
     if (/^secondary:/i.test(line)) {
-      const treeName = line.replace(/^secondary:\s*/i, '').trim();
-      currentTree = 'secondary';
-      elements.push(
-        <div key={`st-${i}`} className="rune-tree" style={{ marginTop: 12 }}>
-          <div className="rune-tree-label">
-            <IconImg src={findIcon(treeName, lookups?.runes)} alt={treeName} className="rune-icon" />
-            {' '}Secondary: {treeName}
-          </div>
-        </div>
-      );
+      secondaryTree = line.replace(/^secondary:\s*/i, '').trim();
+      section = 'secondary';
       continue;
     }
-
     if (/^shards?:/i.test(line)) {
-      const shards = line.replace(/^shards?:\s*/i, '').split(',').map(s => s.trim());
-      elements.push(
-        <div key={`sh-${i}`} className="rune-shards">
-          {shards.map((s, j) => <span key={j} className="rune-shard">{s}</span>)}
-        </div>
-      );
+      const s = line.replace(/^shards?:\s*/i, '').split(',').map(x => x.trim()).filter(Boolean);
+      shards.push(...s);
+      section = 'shards';
+      continue;
+    }
+    if (/^keystone:/i.test(line)) {
+      keystone = line.replace(/^keystone:\s*/i, '').replace(/\s*\(.*\)$/, '').trim();
       continue;
     }
 
-    // Keystone or regular rune
-    const isKeystone = /^keystone:/i.test(line);
-    let runeName = line;
-    let reason = '';
+    const name = line.replace(/\s*\(.*\)$/, '').trim();
+    if (!name) continue;
 
-    if (isKeystone) runeName = line.replace(/^keystone:\s*/i, '');
-    const parenMatch = runeName.match(/^([^(]+)\((.+)\)\s*$/);
-    if (parenMatch) { runeName = parenMatch[1].trim(); reason = parenMatch[2].trim(); }
-
-    const displayName = runeName.trim();
-    // Try full name first (e.g. "Legend: Tenacity"), then without prefix
-    const cleanName = displayName.replace(/^(Legend|Rune):\s*/i, '').trim();
-
-    elements.push(
-      <div key={`r-${i}`} className={`rune-row ${isKeystone ? 'keystone' : ''}`}>
-        <IconImg src={findIcon(displayName, lookups?.runes) || findIcon(cleanName, lookups?.runes)} alt={displayName} className="rune-icon" />
-        <span>{displayName}</span>
-        {reason && <span className="reason">({reason})</span>}
-      </div>
-    );
+    if (section === 'primary') primaryRunes.push(name);
+    else if (section === 'secondary') secondaryRunes.push(name);
   }
 
-  return <div>{elements}</div>;
+  // If keystone was listed but also in primaryRunes, separate it
+  if (!keystone && primaryRunes.length > 0) {
+    keystone = primaryRunes.shift()!;
+  }
+
+  const RuneCell = ({ name, isKeystone: ks }: { name: string; isKeystone?: boolean }) => {
+    const cleanName = name.replace(/^(Legend|Rune):\s*/i, '').trim();
+    const src = findIcon(name, lookups?.runes) || findIcon(cleanName, lookups?.runes);
+    return (
+      <div className={`rune-cell ${ks ? 'rune-cell-keystone' : ''}`}>
+        {src ? (
+          <img src={src} alt={name} className="rune-cell-icon" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        ) : (
+          <div className="rune-cell-placeholder" />
+        )}
+        <span className="rune-cell-name">{name}</span>
+      </div>
+    );
+  };
+
+  const TreeHeader = ({ label, treeName }: { label: string; treeName: string }) => {
+    const src = findIcon(treeName, lookups?.runes);
+    return (
+      <div className="rune-tree-header">
+        {src && <img src={src} alt={treeName} className="rune-tree-icon" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
+        <div>
+          <div className="rune-tree-label-text">{label}</div>
+          <div className="rune-tree-name">{treeName}</div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="runes-grid">
+      {/* Primary tree */}
+      <div className="rune-tree-column">
+        <TreeHeader label="Primary" treeName={primaryTree} />
+        {keystone && <RuneCell name={keystone} isKeystone />}
+        {primaryRunes.map((r, i) => <RuneCell key={`p${i}`} name={r} />)}
+      </div>
+      {/* Secondary tree */}
+      <div className="rune-tree-column">
+        <TreeHeader label="Secondary" treeName={secondaryTree} />
+        {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
+      </div>
+      {/* Shards */}
+      {shards.length > 0 && (
+        <div className="rune-tree-column rune-shards-column">
+          <div className="rune-tree-header">
+            <div className="rune-tree-label-text">Shards</div>
+          </div>
+          {shards.map((s, i) => (
+            <div key={`sh${i}`} className="rune-shard-cell">
+              <span className="rune-shard-dot" />
+              <span>{s}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function renderSummoners(content: string, lookups: IconLookups | null) {
@@ -222,22 +258,26 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
 function renderSituational(content: string, lookups: IconLookups | null) {
   const lines = content.split('\n').filter(l => l.trim());
   return (
-    <div>
+    <div className="situational-grid">
       {lines.map((line, i) => {
-        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '').replace(/^\d+\.\s*/, '');
         const colonIdx = cleaned.indexOf(':');
         if (colonIdx > 0 && colonIdx < 40) {
           const name = cleaned.slice(0, colonIdx).trim();
           const condition = cleaned.slice(colonIdx + 1).trim();
           return (
-            <div key={i} className="item-row">
-              <IconImg src={findIcon(name, lookups?.items)} alt={name} className="item-icon" />
-              <span className="sit-name" style={{ fontWeight: 600, color: 'var(--gold)' }}>{name}:</span>
-              <span className="sit-condition" style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{condition}</span>
+            <div key={i} className="sit-card">
+              <div className="sit-card-icon-wrap">
+                <IconImg src={findIcon(name, lookups?.items)} alt={name} className="sit-card-icon" />
+              </div>
+              <div className="sit-card-info">
+                <div className="sit-card-name">{name}</div>
+                <div className="sit-card-condition">{condition}</div>
+              </div>
             </div>
           );
         }
-        return <div key={i} className="item-row" style={{ fontSize: 13 }}>{cleaned}</div>;
+        return <div key={i} className="sit-card"><div className="sit-card-info"><div className="sit-card-name">{cleaned}</div></div></div>;
       })}
     </div>
   );

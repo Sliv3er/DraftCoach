@@ -152,9 +152,58 @@ function startEmbeddedBackend() {
     }
     
     // Gemini
-    const SYSTEM_PROMPT = `You are a League of Legends Draft & Itemization Engine for Season 2026. You MUST use Google Search grounding to verify current live patch data (Patch 26.4). If you cannot confirm current patch-relevant details via grounding, output exactly: NEED_RETRY. Return ONLY these sections: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD (in order), SITUATIONAL ITEMS (conditional swaps). Rules: Never suggest removed items or removed runes. If unsure, output NEED_RETRY. Adapt to enemy comp: CC, tanks, poke, assassins, mobility, splitpush. For jungle, include the jungle companion start. Keep names exactly as in-game.`;
+    const SYSTEM_PROMPT = `You are a League of Legends Draft & Itemization Engine for Season 2026. You MUST use Google Search grounding to verify current live patch data (Patch 26.4). If you cannot confirm current patch-relevant details via grounding, output exactly: NEED_RETRY.
+
+Return ONLY these sections in this exact format:
+
+RUNES
+Primary: <TreeName>
+Keystone: <RuneName>
+<Rune1>
+<Rune2>
+<Rune3>
+Secondary: <TreeName>
+<Rune1>
+<Rune2>
+Shards: <Shard1>, <Shard2>, <Shard3>
+
+SUMMONERS
+<Spell1>
+<Spell2>
+
+SKILL ORDER
+<Key> > <Key> > <Key> > <Key>
+
+STARTING ITEMS
+<Item1>
+<Item2>
+
+CORE BUILD
+1. <Item1>
+2. <Item2>
+3. <Item3>
+4. <Item4>
+5. <Item5>
+6. <Item6>
+
+SITUATIONAL ITEMS
+<ItemName>: <when to buy condition>
+<ItemName>: <when to buy condition>
+<ItemName>: <when to buy condition>
+<ItemName>: <when to buy condition>
+
+Rules:
+- CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).
+- SITUATIONAL ITEMS must ALWAYS have at least 4 items with clear conditions (e.g. "vs heavy AP", "if behind", "vs tanks").
+- Boots count as a core item. Include them in CORE BUILD.
+- Never suggest removed items or removed runes.
+- If unsure, output NEED_RETRY.
+- Adapt to enemy comp.
+- For jungle, include jungle companion start.
+- Keep names exactly as in-game.
+- Do NOT add explanations or extra text outside the sections.`;
     
-    const SHORT_SYSTEM_PROMPT = `You are a League of Legends build advisor. Return ONLY: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD, SITUATIONAL ITEMS. Keep names exactly as in-game. Adapt to enemy comp.`;
+    const SHORT_SYSTEM_PROMPT = `You are a League of Legends build advisor. Return ONLY: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD, SITUATIONAL ITEMS. Keep names exactly as in-game. Adapt to enemy comp. CORE BUILD must have exactly 6 items (7 for Bottom/ADC role). SITUATIONAL ITEMS must have at least 4 items with conditions. Boots count as a core item.`;
     
     async function generateBuild(body, shortPrompt) {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -171,7 +220,9 @@ function startEmbeddedBackend() {
         tools: [{ googleSearch: {} }],
       });
       
-      const userMessage = `Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: 26.4 (Season 2026). Task: Generate optimized build for this specific game. Output only the sections.`;
+      const isBot = /^(bottom|adc|bot)$/i.test(body.role);
+      const itemSlots = isBot ? 7 : 6;
+      const userMessage = `Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: 26.4 (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Generate optimized build. Output only the sections.`;
       
       const result = await model.generateContent(userMessage);
       const response = result.response;

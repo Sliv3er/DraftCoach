@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -308,6 +308,7 @@ Rules:
 }
 
 function createWindow() {
+  Menu.setApplicationMenu(null);
   const isDev = !app.isPackaged;
   const win = new BrowserWindow({
     width: 1200,
@@ -342,8 +343,92 @@ function createWindow() {
 }
 
 // IPC: export item set to League of Legends
-ipcMain.handle('export-item-set', async (_event, { championId, title, blocks, lolPath }) => {
-  // blocks = [{ type: "Starting Items", items: [{ id: "1055", count: 1 }] }, ...]
+// Receives raw build text + itemIds map + championId, does all parsing server-side
+ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, itemIdMap }) => {
+  // itemIdMap: { "infinity edge": "3031", ... } from renderer's DDragon data
+  console.log('[export] Starting export for', championId);
+  console.log('[export] Raw text length:', rawText?.length);
+  console.log('[export] ItemIdMap size:', Object.keys(itemIdMap || {}).length);
+
+  // Parse sections from raw text
+  const sectionPattern = /(?:^|\n)\s*(?:\*\*)?(?:#{0,3}\s*)?(STARTING ITEMS|CORE BUILD|SITUATIONAL ITEMS)\s*(?:\*\*)?:?\s*\n([\s\S]*?)(?=\n\s*(?:\*\*)?(?:#{0,3}\s*)?(?:RUNES|SUMMONERS|SKILL ORDER|STARTING ITEMS|CORE BUILD|SITUATIONAL ITEMS)|\s*$)/gi;
+  
+  const blocks = [];
+  let match;
+  while ((match = sectionPattern.exec(rawText)) !== null) {
+    const sectionName = match[1].toUpperCase().trim();
+    const sectionContent = match[2];
+    console.log(`[export] Found section: ${sectionName}`);
+    
+    const lines = sectionContent.split('\n').filter(l => l.trim());
+    const items = [];
+    
+    for (const line of lines) {
+      let text = line.trim()
+        .replace(/\*\*/g, '')
+        .replace(/^\*\s*/, '')
+        .replace(/^-\s*/, '')
+        .replace(/^•\s*/, '');
+      
+      // Remove number prefix
+      text = text.replace(/^\d+\.\s*/, '');
+      
+      // For situational: take only before colon
+      if (sectionName === 'SITUATIONAL ITEMS') {
+        const ci = text.indexOf(':');
+        if (ci > 0 && ci < 40) text = text.substring(0, ci);
+      }
+      
+      // Remove parenthesized reason
+      text = text.replace(/\s*\([^)]*\)\s*$/, '').trim();
+      
+      if (!text || text.length < 2) continue;
+      
+      // Resolve item ID
+      const searchName = text.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+      let itemId = itemIdMap[searchName];
+      
+      if (!itemId) {
+        // Fuzzy: find key that contains or is contained by search
+        for (const [key, id] of Object.entries(itemIdMap)) {
+          if (key === searchName || key.includes(searchName) || searchName.includes(key)) {
+            // Prefer exact or longer matches
+            itemId = id;
+            if (key === searchName) break;
+          }
+        }
+      }
+      
+      if (!itemId) {
+        // Try first word match
+        const fw = searchName.split(' ')[0];
+        if (fw.length >= 4) {
+          for (const [key, id] of Object.entries(itemIdMap)) {
+            if (key.startsWith(fw)) { itemId = id; break; }
+          }
+        }
+      }
+      
+      console.log(`[export]   "${text}" -> ${itemId || 'NOT FOUND'}`);
+      if (itemId) {
+        items.push({ id: String(itemId), count: 1 });
+      }
+    }
+    
+    if (items.length > 0) {
+      const label = sectionName === 'STARTING ITEMS' ? 'Starting Items' 
+                   : sectionName === 'CORE BUILD' ? 'Core Build' 
+                   : 'Situational';
+      blocks.push({ type: label, items });
+    }
+  }
+  
+  console.log('[export] Total blocks:', blocks.length, 'Total items:', blocks.reduce((s, b) => s + b.items.length, 0));
+  
+  if (blocks.length === 0) {
+    return { ok: false, error: 'No items could be parsed from the build' };
+  }
+
   const itemSet = {
     title: title || 'DraftCoach Build',
     type: 'custom',
@@ -351,19 +436,18 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, blocks, lo
     mode: 'any',
     priority: true,
     sortrank: 0,
-    blocks: blocks,
+    blocks,
   };
 
   // Try common LoL install paths
   const possiblePaths = [
-    lolPath,
     'C:\\Riot Games\\League of Legends',
     'D:\\Riot Games\\League of Legends',
     'C:\\Program Files\\Riot Games\\League of Legends',
     'D:\\Program Files\\Riot Games\\League of Legends',
     'C:\\Games\\Riot Games\\League of Legends',
     'D:\\Games\\Riot Games\\League of Legends',
-  ].filter(Boolean);
+  ];
 
   let targetDir = null;
   for (const base of possiblePaths) {
@@ -375,15 +459,14 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, blocks, lo
   }
 
   if (!targetDir) {
-    // Fallback: save to userData and let user know
     targetDir = path.join(app.getPath('userData'), 'item-sets', championId);
   }
 
   fs.mkdirSync(targetDir, { recursive: true });
   const filePath = path.join(targetDir, 'DraftCoach.json');
   fs.writeFileSync(filePath, JSON.stringify(itemSet, null, 2), 'utf-8');
-  console.log('[main] Exported item set to:', filePath);
-  return { ok: true, path: filePath };
+  console.log('[export] Wrote item set to:', filePath);
+  return { ok: true, path: filePath, itemCount: blocks.reduce((s, b) => s + b.items.length, 0) };
 });
 
 // IPC: fetch and cache icon

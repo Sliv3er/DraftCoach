@@ -12,59 +12,7 @@ interface Props {
 
 import { ipcRenderer } from 'electron';
 
-function resolveItemId(name: string, itemIds?: Map<string, string>): string | null {
-  if (!itemIds || !name) return null;
-  const n = name.toLowerCase().trim()
-    .replace(/['']/g, "'")
-    .replace(/\s+/g, ' ');
-
-  // Exact
-  if (itemIds.has(n)) return itemIds.get(n)!;
-
-  // Normalize both sides (remove 's for possessives, etc.)
-  const normalize = (s: string) => s.replace(/'/g, "'").replace(/\s+/g, ' ').trim();
-  for (const [key, id] of itemIds.entries()) {
-    if (normalize(key) === normalize(n)) return id;
-  }
-
-  // Contains match (prefer shorter key that fully contains search or vice versa)
-  for (const [key, id] of itemIds.entries()) {
-    if (key.includes(n) || n.includes(key)) return id;
-  }
-
-  // First word match for compound names
-  const firstWord = n.split(' ')[0];
-  if (firstWord.length >= 4) {
-    for (const [key, id] of itemIds.entries()) {
-      if (key.startsWith(firstWord)) return id;
-    }
-  }
-
-  console.warn('[export] Could not resolve item:', name);
-  return null;
-}
-
-function extractItemNames(content: string, isSituational?: boolean): string[] {
-  return content.split('\n').filter(l => l.trim()).map(line => {
-    let text = line.trim()
-      .replace(/\*\*/g, '')
-      .replace(/^\*\s*/, '')
-      .replace(/^-\s*/, '')
-      .replace(/^•\s*/, '');
-    // Remove number prefix: "1. Item"
-    const numMatch = text.match(/^(\d+)\.\s*(.+)$/);
-    if (numMatch) text = numMatch[2];
-    // For situational: "ItemName: condition"
-    if (isSituational) {
-      const colonIdx = text.indexOf(':');
-      if (colonIdx > 0 && colonIdx < 40) text = text.slice(0, colonIdx).trim();
-    }
-    // Remove parenthesized reason at end
-    const reasonMatch = text.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
-    if (reasonMatch) text = reasonMatch[1].trim();
-    return text.trim();
-  }).filter(Boolean);
-}
+// Item name resolution and extraction now handled in main process
 
 const SECTION_KEYS = [
   'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
@@ -367,46 +315,27 @@ export function BuildOutput({ result, iconLookups, loading, championId, role }: 
 
   const handleExport = React.useCallback(async () => {
     if (!result?.ok || !result.text || !championId || !iconLookups?.itemIds) return;
-    const sections = parseSections(result.text);
-    const blocks: { type: string; items: { id: string; count: number }[] }[] = [];
 
-    for (const s of sections) {
-      if (s.title === 'STARTING ITEMS' || s.title === 'CORE BUILD' || s.title === 'SITUATIONAL ITEMS') {
-        const isSit = s.title === 'SITUATIONAL ITEMS';
-        const names = extractItemNames(s.content, isSit);
-        console.log(`[export] ${s.title} names:`, names);
-        const items = names
-          .map(n => {
-            const id = resolveItemId(n, iconLookups.itemIds);
-            if (!id) console.warn(`[export] Failed to resolve: "${n}"`);
-            return id;
-          })
-          .filter((id): id is string => id !== null)
-          .map(id => ({ id, count: 1 }));
-        if (items.length > 0) {
-          const label = s.title === 'STARTING ITEMS' ? 'Starting Items' : s.title === 'CORE BUILD' ? 'Core Build' : 'Situational';
-          blocks.push({ type: label, items });
-        }
-      }
-    }
-
-    if (blocks.length === 0) { setExportStatus('No items found to export'); return; }
+    // Convert Map to plain object for IPC serialization
+    const itemIdMap: Record<string, string> = {};
+    iconLookups.itemIds.forEach((id, name) => { itemIdMap[name] = id; });
 
     try {
-      if (ipcRenderer) {
-        const res = await ipcRenderer.invoke('export-item-set', {
-          championId,
-          title: `DraftCoach - ${championId} ${role || ''}`.trim(),
-          blocks,
-        });
-        setExportStatus(res.ok ? `✓ Exported to ${res.path}` : 'Export failed');
+      const res = await ipcRenderer.invoke('export-item-set', {
+        championId,
+        title: `DraftCoach - ${championId} ${role || ''}`.trim(),
+        rawText: result.text,
+        itemIdMap,
+      });
+      if (res.ok) {
+        setExportStatus(`✓ Exported ${res.itemCount} items → ${res.path}`);
       } else {
-        setExportStatus('Export not available in browser');
+        setExportStatus(res.error || 'Export failed');
       }
     } catch (err: any) {
       setExportStatus(`Export failed: ${err.message}`);
     }
-    setTimeout(() => setExportStatus(null), 5000);
+    setTimeout(() => setExportStatus(null), 6000);
   }, [result, championId, role, iconLookups]);
   if (loading) {
     return (

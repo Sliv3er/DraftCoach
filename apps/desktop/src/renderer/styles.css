@@ -368,10 +368,44 @@ body {
   transition: all 0.15s;
 }
 
-.btn-copy-all:hover {
+.btn-copy-all:hover, .btn-export:hover {
   background: var(--bg-card);
   border-color: var(--border-hover);
   color: var(--text-primary);
+}
+
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: linear-gradient(135deg, rgba(200,170,110,0.12) 0%, rgba(200,170,110,0.04) 100%);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  color: var(--gold);
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-export:hover {
+  background: rgba(200,170,110,0.15);
+  border-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+.export-status {
+  font-size: 11px;
+  color: var(--accent-green);
+  align-self: center;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Section Cards */

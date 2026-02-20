@@ -341,6 +341,51 @@ function createWindow() {
   });
 }
 
+// IPC: export item set to League of Legends
+ipcMain.handle('export-item-set', async (_event, { championId, title, blocks, lolPath }) => {
+  // blocks = [{ type: "Starting Items", items: [{ id: "1055", count: 1 }] }, ...]
+  const itemSet = {
+    title: title || 'DraftCoach Build',
+    type: 'custom',
+    map: 'any',
+    mode: 'any',
+    priority: true,
+    sortrank: 0,
+    blocks: blocks,
+  };
+
+  // Try common LoL install paths
+  const possiblePaths = [
+    lolPath,
+    'C:\\Riot Games\\League of Legends',
+    'D:\\Riot Games\\League of Legends',
+    'C:\\Program Files\\Riot Games\\League of Legends',
+    'D:\\Program Files\\Riot Games\\League of Legends',
+    'C:\\Games\\Riot Games\\League of Legends',
+    'D:\\Games\\Riot Games\\League of Legends',
+  ].filter(Boolean);
+
+  let targetDir = null;
+  for (const base of possiblePaths) {
+    const configDir = path.join(base, 'Config');
+    if (fs.existsSync(configDir)) {
+      targetDir = path.join(configDir, 'Champions', championId, 'Recommended');
+      break;
+    }
+  }
+
+  if (!targetDir) {
+    // Fallback: save to userData and let user know
+    targetDir = path.join(app.getPath('userData'), 'item-sets', championId);
+  }
+
+  fs.mkdirSync(targetDir, { recursive: true });
+  const filePath = path.join(targetDir, 'DraftCoach.json');
+  fs.writeFileSync(filePath, JSON.stringify(itemSet, null, 2), 'utf-8');
+  console.log('[main] Exported item set to:', filePath);
+  return { ok: true, path: filePath };
+});
+
 // IPC: fetch and cache icon
 ipcMain.handle('get-icon', async (_event, url, cacheKey) => {
   ensureIconCache();

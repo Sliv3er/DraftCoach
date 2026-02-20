@@ -6,6 +6,41 @@ interface Props {
   result: BuildResponse | null;
   iconLookups: IconLookups | null;
   loading?: boolean;
+  championId?: string;
+  role?: string;
+}
+
+const { ipcRenderer } = (window as any).require ? (window as any).require('electron') : { ipcRenderer: null };
+
+function resolveItemId(name: string, itemIds?: Map<string, string>): string | null {
+  if (!itemIds || !name) return null;
+  const n = name.toLowerCase().trim();
+  if (itemIds.has(n)) return itemIds.get(n)!;
+  // Partial match
+  for (const [key, id] of itemIds.entries()) {
+    if (key.includes(n) || n.includes(key)) return id;
+  }
+  const firstWord = n.split(' ')[0];
+  if (firstWord.length >= 4) {
+    for (const [key, id] of itemIds.entries()) {
+      if (key.startsWith(firstWord)) return id;
+    }
+  }
+  return null;
+}
+
+function extractItemNames(content: string): string[] {
+  return content.split('\n').filter(l => l.trim()).map(line => {
+    let text = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+    const numMatch = text.match(/^(\d+)\.\s*(.+)$/);
+    if (numMatch) text = numMatch[2];
+    const reasonMatch = text.match(/^([^(]+)\((.+)\)\s*$/);
+    if (reasonMatch) text = reasonMatch[1].trim();
+    // For situational: "ItemName: condition"
+    const colonIdx = text.indexOf(':');
+    if (colonIdx > 0 && colonIdx < 40) text = text.slice(0, colonIdx).trim();
+    return text.trim();
+  }).filter(Boolean);
 }
 
 const SECTION_KEYS = [
@@ -304,7 +339,45 @@ function renderSection(title: string, content: string, lookups: IconLookups | nu
   }
 }
 
-export function BuildOutput({ result, iconLookups, loading }: Props) {
+export function BuildOutput({ result, iconLookups, loading, championId, role }: Props) {
+  const [exportStatus, setExportStatus] = React.useState<string | null>(null);
+
+  const handleExport = React.useCallback(async () => {
+    if (!result?.ok || !result.text || !championId || !iconLookups?.itemIds) return;
+    const sections = parseSections(result.text);
+    const blocks: { type: string; items: { id: string; count: number }[] }[] = [];
+
+    for (const s of sections) {
+      if (s.title === 'STARTING ITEMS' || s.title === 'CORE BUILD' || s.title === 'SITUATIONAL ITEMS') {
+        const names = extractItemNames(s.content);
+        const items = names
+          .map(n => resolveItemId(n, iconLookups.itemIds))
+          .filter((id): id is string => id !== null)
+          .map(id => ({ id, count: 1 }));
+        if (items.length > 0) {
+          blocks.push({ type: s.title === 'STARTING ITEMS' ? 'Starting Items' : s.title === 'CORE BUILD' ? 'Core Build' : 'Situational', items });
+        }
+      }
+    }
+
+    if (blocks.length === 0) { setExportStatus('No items found to export'); return; }
+
+    try {
+      if (ipcRenderer) {
+        const res = await ipcRenderer.invoke('export-item-set', {
+          championId,
+          title: `DraftCoach - ${championId} ${role || ''}`.trim(),
+          blocks,
+        });
+        setExportStatus(res.ok ? `✓ Exported to ${res.path}` : 'Export failed');
+      } else {
+        setExportStatus('Export not available in browser');
+      }
+    } catch (err: any) {
+      setExportStatus(`Export failed: ${err.message}`);
+    }
+    setTimeout(() => setExportStatus(null), 5000);
+  }, [result, championId, role, iconLookups]);
   if (loading) {
     return (
       <div className="loading-spinner">
@@ -344,6 +417,10 @@ export function BuildOutput({ result, iconLookups, loading }: Props) {
         <button className="btn-copy-all" onClick={() => copyToClipboard(result.text)}>
           📋 Copy All
         </button>
+        <button className="btn-export" onClick={handleExport}>
+          🎮 Export to LoL
+        </button>
+        {exportStatus && <span className="export-status">{exportStatus}</span>}
       </div>
 
       {sections.length > 0 ? (

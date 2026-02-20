@@ -17,6 +17,7 @@ interface ChampionData {
 
 export interface IconLookups {
   items: Map<string, string>;    // normalized name -> icon url
+  itemIds: Map<string, string>;  // normalized name -> item id
   spells: Map<string, string>;   // normalized name -> icon url
   runes: Map<string, string>;    // normalized name -> icon url
   version: string;
@@ -62,8 +63,11 @@ export function App() {
         // Build item lookup: name -> icon URL
         const iData = await iRes.json();
         const items = new Map<string, string>();
+        const itemIds = new Map<string, string>();
         for (const [id, item] of Object.entries<any>(iData.data)) {
-          items.set(item.name.toLowerCase(), `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${id}.png`);
+          const normName = item.name.toLowerCase();
+          items.set(normName, `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${id}.png`);
+          itemIds.set(normName, id);
         }
 
         // Build spell lookup
@@ -104,7 +108,7 @@ export function App() {
           runes.set(name, `https://ddragon.leagueoflegends.com/cdn/img/${iconPath}`);
         }
 
-        setIconLookups({ items, spells, runes, version });
+        setIconLookups({ items, itemIds, spells, runes, version });
       } catch (err) {
         console.error('Failed to load DDragon data:', err);
       }
@@ -215,7 +219,7 @@ export function App() {
             </span>
           </div>
 
-          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} />
+          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} />
         </div>
       </div>
     </div>

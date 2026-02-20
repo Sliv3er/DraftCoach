@@ -5,7 +5,13 @@ import { BuildOutput } from './components/BuildOutput';
 
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
-const ROLE_ICONS: Record<Role, string> = { top: '🗡️', jungle: '🌿', mid: '⚡', adc: '🏹', support: '🛡️' };
+const ROLE_ICON_URLS: Record<Role, string> = {
+  top: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png',
+  jungle: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png',
+  mid: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png',
+  adc: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png',
+  support: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png',
+};
 
 type Status = 'idle' | 'fetching' | 'grounded' | 'cache' | 'stale-cache' | 'error';
 
@@ -165,11 +171,19 @@ export function App() {
 
           <div className="field-group">
             <label>Role</label>
-            <select className="role-select" value={role} onChange={(e) => setRole(e.target.value as Role)}>
+            <div className="role-picker">
               {ROLES.map((r) => (
-                <option key={r} value={r}>{ROLE_ICONS[r]} {r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                <button
+                  key={r}
+                  className={`role-btn ${role === r ? 'role-btn-active' : ''}`}
+                  onClick={() => setRole(r)}
+                  title={r.charAt(0).toUpperCase() + r.slice(1)}
+                >
+                  <img src={ROLE_ICON_URLS[r]} alt={r} className="role-icon-img" />
+                  <span className="role-label">{r === 'adc' ? 'ADC' : r.charAt(0).toUpperCase() + r.slice(1)}</span>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="field-group">

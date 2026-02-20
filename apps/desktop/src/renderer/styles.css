@@ -160,6 +160,61 @@ body {
   font-weight: 600;
 }
 
+/* Role Picker */
+.role-picker {
+  display: flex;
+  gap: 4px;
+}
+
+.role-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.role-btn:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-elevated);
+}
+
+.role-btn-active {
+  border-color: var(--gold);
+  background: rgba(200, 170, 110, 0.08);
+}
+
+.role-btn-active .role-label {
+  color: var(--gold);
+}
+
+.role-icon-img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0.7);
+  transition: filter 0.15s;
+}
+
+.role-btn:hover .role-icon-img,
+.role-btn-active .role-icon-img {
+  filter: brightness(1);
+}
+
+.role-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: inherit;
+}
+
 .role-select, .champ-search {
   width: 100%;
   padding: 9px 12px;

@@ -20,7 +20,7 @@ function parseSections(text: string): { title: string; content: string }[] {
   let curLines: string[] = [];
 
   for (const line of lines) {
-    const trimmed = line.trim();
+    const trimmed = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
     if (!trimmed) { if (curTitle) curLines.push(''); continue; }
     const upper = trimmed.toUpperCase().replace(/[#*\-:]/g, '').trim();
     const matched = SECTION_KEYS.find(s => upper.startsWith(s));
@@ -48,8 +48,37 @@ function IconImg({ src, alt, className }: { src?: string; alt: string; className
 
 function findIcon(name: string, map?: Map<string, string>): string | undefined {
   if (!map || !name) return undefined;
-  const n = name.toLowerCase().trim();
-  return map.get(n);
+  const n = name.toLowerCase().trim()
+    .replace(/['']/g, "'")  // normalize quotes
+    .replace(/\s+/g, ' ');  // normalize spaces
+
+  // Exact match
+  if (map.has(n)) return map.get(n);
+
+  // Try without leading markers like "Legend: "
+  const colonIdx = n.indexOf(':');
+  if (colonIdx > 0 && colonIdx < 15) {
+    const afterColon = n.slice(colonIdx + 1).trim();
+    if (map.has(afterColon)) return map.get(afterColon);
+    // Also try full "legend: tenacity" form
+    const fullForm = n;
+    if (map.has(fullForm)) return map.get(fullForm);
+  }
+
+  // Try partial/substring match (find the first key that contains or is contained by the search)
+  for (const [key, val] of map.entries()) {
+    if (key.includes(n) || n.includes(key)) return val;
+  }
+
+  // Try matching just the first word (e.g., "Gustwalker" matches "Gustwalker Hatchling")
+  const firstWord = n.split(' ')[0];
+  if (firstWord.length >= 4) {
+    for (const [key, val] of map.entries()) {
+      if (key.startsWith(firstWord)) return val;
+    }
+  }
+
+  return undefined;
 }
 
 function renderRunes(content: string, lookups: IconLookups | null) {
@@ -58,7 +87,7 @@ function renderRunes(content: string, lookups: IconLookups | null) {
   let currentTree: 'primary' | 'secondary' | null = null;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i].trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
 
     if (/^primary:/i.test(line)) {
       const treeName = line.replace(/^primary:\s*/i, '').trim();
@@ -107,13 +136,13 @@ function renderRunes(content: string, lookups: IconLookups | null) {
     const parenMatch = runeName.match(/^([^(]+)\((.+)\)\s*$/);
     if (parenMatch) { runeName = parenMatch[1].trim(); reason = parenMatch[2].trim(); }
 
-    // Clean leading markers like "Legend: Tenacity"
-    const cleanName = runeName.replace(/^(Legend|Rune):\s*/i, '').trim();
     const displayName = runeName.trim();
+    // Try full name first (e.g. "Legend: Tenacity"), then without prefix
+    const cleanName = displayName.replace(/^(Legend|Rune):\s*/i, '').trim();
 
     elements.push(
       <div key={`r-${i}`} className={`rune-row ${isKeystone ? 'keystone' : ''}`}>
-        <IconImg src={findIcon(cleanName, lookups?.runes) || findIcon(displayName, lookups?.runes)} alt={displayName} className="rune-icon" />
+        <IconImg src={findIcon(displayName, lookups?.runes) || findIcon(cleanName, lookups?.runes)} alt={displayName} className="rune-icon" />
         <span>{displayName}</span>
         {reason && <span className="reason">({reason})</span>}
       </div>
@@ -128,7 +157,8 @@ function renderSummoners(content: string, lookups: IconLookups | null) {
   return (
     <div>
       {lines.map((line, i) => {
-        const match = line.match(/^([A-Za-z\s]+?)(?:\s*\((.+)\))?\s*$/);
+        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+        const match = cleaned.match(/^([A-Za-z\s]+?)(?:\s*\((.+)\))?\s*$/);
         const name = match ? match[1].trim() : line.trim();
         const reason = match ? match[2] : undefined;
         return (
@@ -163,7 +193,7 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
   return (
     <div>
       {lines.map((line, i) => {
-        let text = line.trim();
+        let text = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
         let num = '';
         let reason = '';
 
@@ -194,10 +224,11 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   return (
     <div>
       {lines.map((line, i) => {
-        const colonIdx = line.indexOf(':');
+        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+        const colonIdx = cleaned.indexOf(':');
         if (colonIdx > 0 && colonIdx < 40) {
-          const name = line.slice(0, colonIdx).trim();
-          const condition = line.slice(colonIdx + 1).trim();
+          const name = cleaned.slice(0, colonIdx).trim();
+          const condition = cleaned.slice(colonIdx + 1).trim();
           return (
             <div key={i} className="item-row">
               <IconImg src={findIcon(name, lookups?.items)} alt={name} className="item-icon" />
@@ -206,7 +237,7 @@ function renderSituational(content: string, lookups: IconLookups | null) {
             </div>
           );
         }
-        return <div key={i} className="item-row" style={{ fontSize: 13 }}>{line}</div>;
+        return <div key={i} className="item-row" style={{ fontSize: 13 }}>{cleaned}</div>;
       })}
     </div>
   );

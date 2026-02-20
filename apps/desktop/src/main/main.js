@@ -374,6 +374,9 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
     const searchName = name.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
     if (!searchName || searchName.length < 2) return null;
     
+    // Helper: prefer shortest (real) ID from value
+    const preferReal = (id) => id; // IDs already filtered in renderer
+    
     // Exact match
     if (itemIdMap[searchName]) return itemIdMap[searchName];
     
@@ -439,8 +442,16 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
     
     const itemId = resolveItem(text);
     if (itemId) {
-      currentItems.push({ id: String(itemId), count: 1 });
-      console.log(`[export]   "${text}" -> ${itemId}`);
+      // Ensure we use the real 4-digit item ID, not Ornn upgrade (6-digit 22xxxx/32xxxx)
+      let realId = String(itemId);
+      if (realId.length >= 6) {
+        // Strip prefix: 223031 -> 3031, 226631 -> 6631
+        realId = realId.slice(-4);
+        // If still not valid (>= 7000 etc), try slice(-5)
+        if (parseInt(realId) > 7000) realId = String(itemId).slice(-5);
+      }
+      currentItems.push({ id: realId, count: 1 });
+      console.log(`[export]   "${text}" -> ${itemId} (using: ${realId})`);
     }
   }
   flushSection(); // flush last section

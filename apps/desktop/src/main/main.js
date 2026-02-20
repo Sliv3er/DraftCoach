@@ -350,78 +350,100 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
   console.log('[export] Raw text length:', rawText?.length);
   console.log('[export] ItemIdMap size:', Object.keys(itemIdMap || {}).length);
 
-  // Parse sections from raw text
-  const sectionPattern = /(?:^|\n)\s*(?:\*\*)?(?:#{0,3}\s*)?(STARTING ITEMS|CORE BUILD|SITUATIONAL ITEMS)\s*(?:\*\*)?:?\s*\n([\s\S]*?)(?=\n\s*(?:\*\*)?(?:#{0,3}\s*)?(?:RUNES|SUMMONERS|SKILL ORDER|STARTING ITEMS|CORE BUILD|SITUATIONAL ITEMS)|\s*$)/gi;
+  // Parse sections with simple line-by-line approach
+  const ITEM_SECTIONS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS'];
+  const ALL_SECTIONS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS'];
   
   const blocks = [];
-  let match;
-  while ((match = sectionPattern.exec(rawText)) !== null) {
-    const sectionName = match[1].toUpperCase().trim();
-    const sectionContent = match[2];
-    console.log(`[export] Found section: ${sectionName}`);
+  const lines = rawText.split('\n');
+  let currentSection = null;
+  let currentItems = [];
+  
+  function flushSection() {
+    if (currentSection && currentItems.length > 0) {
+      const label = currentSection === 'STARTING ITEMS' ? 'Starting Items'
+                   : currentSection === 'CORE BUILD' ? 'Core Build'
+                   : 'Situational';
+      blocks.push({ type: label, items: [...currentItems] });
+      console.log(`[export] Flushed ${label}: ${currentItems.length} items`);
+    }
+    currentItems = [];
+  }
+  
+  function resolveItem(name) {
+    const searchName = name.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+    if (!searchName || searchName.length < 2) return null;
     
-    const lines = sectionContent.split('\n').filter(l => l.trim());
-    const items = [];
+    // Exact match
+    if (itemIdMap[searchName]) return itemIdMap[searchName];
     
-    for (const line of lines) {
-      let text = line.trim()
-        .replace(/\*\*/g, '')
-        .replace(/^\*\s*/, '')
-        .replace(/^-\s*/, '')
-        .replace(/^•\s*/, '');
+    // Try removing "s" at end (plurals)
+    if (itemIdMap[searchName.replace(/s$/, '')]) return itemIdMap[searchName.replace(/s$/, '')];
+    
+    // Score-based fuzzy match: prefer exact substring matches with shortest key
+    let bestId = null;
+    let bestScore = 0;
+    for (const [key, id] of Object.entries(itemIdMap)) {
+      if (key === searchName) return id; // exact
       
-      // Remove number prefix
-      text = text.replace(/^\d+\.\s*/, '');
-      
-      // For situational: take only before colon
-      if (sectionName === 'SITUATIONAL ITEMS') {
-        const ci = text.indexOf(':');
-        if (ci > 0 && ci < 40) text = text.substring(0, ci);
+      let score = 0;
+      if (key.includes(searchName)) {
+        score = searchName.length / key.length; // higher = more of the key is matched
+      } else if (searchName.includes(key) && key.length >= 4) {
+        score = key.length / searchName.length * 0.8; // slightly lower priority
       }
-      
-      // Remove parenthesized reason
-      text = text.replace(/\s*\([^)]*\)\s*$/, '').trim();
-      
-      if (!text || text.length < 2) continue;
-      
-      // Resolve item ID
-      const searchName = text.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
-      let itemId = itemIdMap[searchName];
-      
-      if (!itemId) {
-        // Fuzzy: find key that contains or is contained by search
-        for (const [key, id] of Object.entries(itemIdMap)) {
-          if (key === searchName || key.includes(searchName) || searchName.includes(key)) {
-            // Prefer exact or longer matches
-            itemId = id;
-            if (key === searchName) break;
-          }
-        }
-      }
-      
-      if (!itemId) {
-        // Try first word match
-        const fw = searchName.split(' ')[0];
-        if (fw.length >= 4) {
-          for (const [key, id] of Object.entries(itemIdMap)) {
-            if (key.startsWith(fw)) { itemId = id; break; }
-          }
-        }
-      }
-      
-      console.log(`[export]   "${text}" -> ${itemId || 'NOT FOUND'}`);
-      if (itemId) {
-        items.push({ id: String(itemId), count: 1 });
+      if (score > bestScore) {
+        bestScore = score;
+        bestId = id;
       }
     }
     
-    if (items.length > 0) {
-      const label = sectionName === 'STARTING ITEMS' ? 'Starting Items' 
-                   : sectionName === 'CORE BUILD' ? 'Core Build' 
-                   : 'Situational';
-      blocks.push({ type: label, items });
+    if (bestId && bestScore > 0.4) return bestId;
+    
+    console.log(`[export]   UNRESOLVED: "${name}" (normalized: "${searchName}")`);
+    return null;
+  }
+  
+  for (const rawLine of lines) {
+    const stripped = rawLine.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').replace(/^[-*•]\s*/, '');
+    const upperStripped = stripped.toUpperCase().replace(/[^A-Z\s]/g, '').trim();
+    
+    // Check if this line is a section header
+    const matchedSection = ALL_SECTIONS.find(s => upperStripped === s || upperStripped.startsWith(s));
+    if (matchedSection) {
+      flushSection();
+      currentSection = ITEM_SECTIONS.includes(matchedSection) ? matchedSection : null;
+      console.log(`[export] Section: ${matchedSection} (tracking: ${!!currentSection})`);
+      continue;
+    }
+    
+    // If we're in an item section, try to extract item
+    if (!currentSection) continue;
+    
+    let text = stripped;
+    if (!text) continue;
+    
+    // Remove number prefix: "1. Item"
+    text = text.replace(/^\d+\.\s*/, '');
+    
+    // For situational: take only before colon (but colon must not be in first 2 chars)
+    if (currentSection === 'SITUATIONAL ITEMS') {
+      const ci = text.indexOf(':');
+      if (ci > 2 && ci < 45) text = text.substring(0, ci);
+    }
+    
+    // Remove parenthesized reason at end (greedy from last open paren)
+    text = text.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    
+    if (!text || text.length < 3) continue;
+    
+    const itemId = resolveItem(text);
+    if (itemId) {
+      currentItems.push({ id: String(itemId), count: 1 });
+      console.log(`[export]   "${text}" -> ${itemId}`);
     }
   }
+  flushSection(); // flush last section
   
   console.log('[export] Total blocks:', blocks.length, 'Total items:', blocks.reduce((s, b) => s + b.items.length, 0));
   

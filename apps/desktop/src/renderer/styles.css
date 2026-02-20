@@ -547,7 +547,76 @@ body {
   flex-shrink: 0;
 }
 
-/* Item Row */
+.rune-shard-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Item Cards */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+
+.item-card:hover {
+  border-color: var(--border-hover);
+}
+
+.item-card-icon-wrap {
+  flex-shrink: 0;
+}
+
+.item-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.item-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.item-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.item-card-reason {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.item-number {
+  color: var(--gold-dim);
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 18px;
+  flex-shrink: 0;
+}
+
+/* Legacy item-row for spell rows */
 .item-row {
   display: flex;
   align-items: center;
@@ -556,30 +625,13 @@ body {
   font-size: 13px;
 }
 
-.item-row .item-icon, .rune-row .rune-icon, .spell-row .spell-icon {
+.spell-row .spell-icon {
   width: 28px;
   height: 28px;
   border-radius: 4px;
   border: 1px solid var(--border);
   flex-shrink: 0;
   background: var(--bg-elevated);
-}
-
-.item-row .item-name {
-  font-weight: 500;
-}
-
-.item-row .item-reason {
-  color: var(--text-muted);
-  font-size: 11px;
-  font-style: italic;
-}
-
-.item-row .item-number {
-  color: var(--gold-dim);
-  font-weight: 700;
-  font-size: 12px;
-  min-width: 18px;
 }
 
 /* Spell Row */

@@ -85,6 +85,25 @@ export function App() {
           }
         }
 
+        // Add stat shard icons (not in runesReforged.json)
+        const shardIcons: Record<string, string> = {
+          'adaptive force': 'perk-images/StatMods/StatModsAdaptiveForceIcon.png',
+          'attack speed': 'perk-images/StatMods/StatModsAttackSpeedIcon.png',
+          'ability haste': 'perk-images/StatMods/StatModsCDRScalingIcon.png',
+          'cooldown reduction': 'perk-images/StatMods/StatModsCDRScalingIcon.png',
+          'armor': 'perk-images/StatMods/StatModsArmorIcon.png',
+          'magic resist': 'perk-images/StatMods/StatModsMagicResIcon.png',
+          'magic resistance': 'perk-images/StatMods/StatModsMagicResIcon.png',
+          'health': 'perk-images/StatMods/StatModsHealthScalingIcon.png',
+          'health scaling': 'perk-images/StatMods/StatModsHealthScalingIcon.png',
+          'move speed': 'perk-images/StatMods/StatModsMovementSpeedIcon.png',
+          'movement speed': 'perk-images/StatMods/StatModsMovementSpeedIcon.png',
+          'tenacity': 'perk-images/StatMods/StatModsTenacityIcon.png',
+        };
+        for (const [name, iconPath] of Object.entries(shardIcons)) {
+          runes.set(name, `https://ddragon.leagueoflegends.com/cdn/img/${iconPath}`);
+        }
+
         setIconLookups({ items, spells, runes, version });
       } catch (err) {
         console.error('Failed to load DDragon data:', err);

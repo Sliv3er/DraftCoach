@@ -176,12 +176,19 @@ function renderRunes(content: string, lookups: IconLookups | null) {
           <div className="rune-tree-header">
             <div className="rune-tree-label-text">Shards</div>
           </div>
-          {shards.map((s, i) => (
-            <div key={`sh${i}`} className="rune-shard-cell">
-              <span className="rune-shard-dot" />
-              <span>{s}</span>
-            </div>
-          ))}
+          {shards.map((s, i) => {
+            const shardSrc = findIcon(s, lookups?.runes);
+            return (
+              <div key={`sh${i}`} className="rune-shard-cell">
+                {shardSrc ? (
+                  <img src={shardSrc} alt={s} className="rune-shard-icon" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                ) : (
+                  <span className="rune-shard-dot" />
+                )}
+                <span>{s}</span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -227,27 +234,29 @@ function renderSkillOrder(content: string) {
 function renderItems(content: string, lookups: IconLookups | null, numbered: boolean) {
   const lines = content.split('\n').filter(l => l.trim());
   return (
-    <div>
+    <div className="items-list">
       {lines.map((line, i) => {
         let text = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
         let num = '';
         let reason = '';
 
-        // Extract number prefix
         const numMatch = text.match(/^(\d+)\.\s*(.+)$/);
         if (numMatch) { num = numMatch[1]; text = numMatch[2]; }
 
-        // Extract parenthesized reason
         const reasonMatch = text.match(/^([^(]+)\((.+)\)\s*$/);
         if (reasonMatch) { text = reasonMatch[1].trim(); reason = reasonMatch[2].trim(); }
 
         const itemName = text.trim();
         return (
-          <div key={i} className="item-row">
+          <div key={i} className="item-card">
             {numbered && num && <span className="item-number">{num}.</span>}
-            <IconImg src={findIcon(itemName, lookups?.items)} alt={itemName} className="item-icon" />
-            <span className="item-name">{itemName}</span>
-            {reason && <span className="item-reason">({reason})</span>}
+            <div className="item-card-icon-wrap">
+              <IconImg src={findIcon(itemName, lookups?.items)} alt={itemName} className="item-card-icon" />
+            </div>
+            <div className="item-card-info">
+              <span className="item-card-name">{itemName}</span>
+              {reason && <span className="item-card-reason">{reason}</span>}
+            </div>
           </div>
         );
       })}

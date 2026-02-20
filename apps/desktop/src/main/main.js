@@ -179,18 +179,18 @@ STARTING ITEMS
 <Item2>
 
 CORE BUILD
-1. <Item1>
-2. <Item2>
-3. <Item3>
-4. <Item4>
-5. <Item5>
-6. <Item6>
+1. <Item1> (<why this item>)
+2. <Item2> (<why this item>)
+3. <Item3> (<why this item>)
+4. <Item4> (<why this item>)
+5. <Item5> (<why this item>)
+6. <Item6> (<why this item>)
 
 SITUATIONAL ITEMS
-<ItemName>: <when to buy condition>
-<ItemName>: <when to buy condition>
-<ItemName>: <when to buy condition>
-<ItemName>: <when to buy condition>
+<ItemName>: <when to buy and why>
+<ItemName>: <when to buy and why>
+<ItemName>: <when to buy and why>
+<ItemName>: <when to buy and why>
 
 Rules:
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).

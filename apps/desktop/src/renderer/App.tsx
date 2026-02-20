@@ -73,7 +73,12 @@ export function App() {
         for (const [id, item] of Object.entries<any>(iData.data)) {
           const normName = item.name.toLowerCase();
           items.set(normName, `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${id}.png`);
-          itemIds.set(normName, id);
+          // Only store real item IDs (4-digit) for export — skip Ornn upgrades (6-digit 22xxxx, 32xxxx)
+          // Prefer shorter IDs (real items) over longer ones (upgrades)
+          const existing = itemIds.get(normName);
+          if (!existing || id.length < existing.length) {
+            itemIds.set(normName, id);
+          }
         }
 
         // Build spell lookup

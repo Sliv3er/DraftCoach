@@ -1,6 +1,7 @@
 import { getChallengerLeague, uIRegionToPlatform, LeagueItem, getDDragonSplash, getAccountByPuuid, getSummonerById } from "@/lib/riot";
 import { Card } from "@/components/ui/Card";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function LeaderboardsPage(props: { searchParams: Promise<{ region?: string }> }) {
   const searchParams = await props.searchParams;
@@ -124,9 +125,18 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                         </td>
                         <td className="px-8 py-8">
                           <div className="flex flex-col gap-1">
-                            <span className="text-lg font-bold text-white group-hover:text-hextech-gold transition-colors tracking-tight">
-                              {displayName}
-                            </span>
+                            {entry.account ? (
+                              <Link 
+                                href={`/summoner/${region}/${entry.account.gameName}-${entry.account.tagLine}`}
+                                className="text-lg font-bold text-white group-hover:text-hextech-gold transition-colors tracking-tight hover:underline underline-offset-4 decoration-hextech-gold/30"
+                              >
+                                {displayName}
+                              </Link>
+                            ) : (
+                              <span className="text-lg font-bold text-white transition-colors tracking-tight">
+                                {displayName}
+                              </span>
+                            )}
                             <div className="flex items-center gap-2">
                               {sId && (
                                 <div className="px-1.5 py-0.5 bg-hextech-gold/10 text-hextech-gold/60 text-[10px] font-bold uppercase rounded border border-hextech-gold/20">

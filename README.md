@@ -2,13 +2,14 @@
   <img src="assets/icon.png" alt="DraftCoach Logo" width="120" />
   <h1 align="center">DraftCoach</h1>
   <p align="center">
-    <strong>AI-powered League of Legends draft assistant with real-time build recommendations</strong>
+    <strong>AI-powered League of Legends companion — real-time builds, live scouting, cooldown tracking, and performance analytics</strong>
   </p>
   <p align="center">
     <img src="https://img.shields.io/badge/Season-2026-gold?style=flat-square" alt="Season 2026" />
-    <img src="https://img.shields.io/badge/Patch-26.4-blue?style=flat-square" alt="Patch 26.4" />
+    <img src="https://img.shields.io/badge/Patch-26.5-blue?style=flat-square" alt="Patch 26.5" />
     <img src="https://img.shields.io/badge/Gemini_AI-Grounded-green?style=flat-square" alt="Gemini AI" />
     <img src="https://img.shields.io/badge/Platform-Windows-lightgrey?style=flat-square" alt="Windows" />
+    <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT" />
   </p>
 </p>
 
@@ -16,23 +17,82 @@
 
 ## What is DraftCoach?
 
-DraftCoach is a desktop companion app for League of Legends that generates **optimized builds tailored to your exact draft**. Unlike static tier lists, DraftCoach uses **Google Gemini AI with Search Grounding** to analyze your champion, role, allies, and enemies — then produces a complete build plan verified against live patch data.
+DraftCoach is a full-featured desktop companion for League of Legends that goes far beyond simple build recommendations. It connects to the League Client and Live Game APIs to provide **real-time intelligence** throughout every phase of the game — from champion select to post-game analysis.
 
-### Key Features
-
-- 🧠 **AI-Grounded Builds** — Gemini 3.1 Pro with Google Search grounding ensures recommendations reflect the current meta, not stale training data
-- 🎮 **In-Game Export** — One-click export to League's Item Sets tab. Your build appears directly in the shop during the game
-- 🖼️ **Full DDragon Integration** — Champion portraits, item icons, rune icons, spell icons, and stat shard images pulled from Riot's official CDN
-- ⚡ **Draft-Aware** — Input your allies and enemies to get comp-specific itemization (anti-tank, anti-burst, etc.)
-- 💾 **Smart Caching** — Builds cached for 24h with stale-cache fallback if the API is unreachable
-- 🔄 **Retry Logic** — Exponential backoff with 3 attempts + NEED_RETRY detection for unreliable AI responses
-- 🎨 **Dark Theme UI** — Clean, League-inspired dark interface with gold accents
+Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini AI with Search Grounding** to analyze your draft, scout your opponents, track enemy cooldowns, and adapt your build live during the game.
 
 ---
 
-## Screenshots
+## ✨ Features
 
-> *Coming soon*
+### 🧠 AI-Grounded Builds
+- **Draft-aware build generation** — input your champion, role, allies, and enemies to get comp-specific itemization
+- **Gemini 3.1 Pro with Google Search Grounding** ensures recommendations reflect the current meta
+- Complete builds: runes, summoner spells, skill order, starting items, core build (6-7 items), and situationals
+- **Local Decision Engine** — instant (<30ms) build recommendations from a rules-based knowledge base, with AI fallback
+
+### 🎮 In-Game Overlay
+- **Transparent HUD overlay** that sits on top of the game
+- **Next Item Tracker** — shows what to buy next with gold tracking and "READY TO BUY" alerts
+- **Component breakdown** — see which component to purchase when you can't afford the full item
+- **Build progress strip** — visual checklist of your entire build order
+- **Jungle path overlay** — numbered route displayed directly on the minimap for junglers
+
+### 🔍 Live Scouting (Pre-Game)
+- **Auto-generated scout reports** during loading screen via Riot API
+- Player ranks (Solo/Duo + Flex), win rates, recent match history, and KDA
+- **Threat ratings** (1-10) for each enemy with AI-generated notes
+- **Smurf detection** and **mental state analysis** (ON FIRE / TILTED / etc.)
+- **Lane matchup breakdown** — early game assessment, power spikes, play tips, and danger windows
+- **Team strategy** — win condition, focus targets, avoid targets, and objective priority
+- **Win probability** estimate
+
+### ⏱️ Cooldown Tracker
+- **Click-to-track** enemy summoner spells and ultimates from the scoreboard
+- **Real-time countdown** with sweep animation on spell icons
+- Cooldowns account for **Cosmic Insight**, **Ionian Boots**, and **Summoner Spell Haste** items
+- **Overlay integration** — active timers appear as a strip on the in-game HUD
+- **Tracker panel** — compact side panel for quick cooldown monitoring
+
+### 📊 Live Scoreboard
+- **Real-time scoreboard window** with all 10 players' KDA, items, CS, and levels
+- Click enemy champion portraits to track their ultimate cooldown
+- Click enemy summoner spells to start cooldown timers
+- **Kill score** and game timer displayed in the title bar
+
+### 📈 Performance Stats
+- **Personal stats dashboard** powered by Riot API — rank, LP, win rate, champion pool
+- **LP progress chart** — interactive graph tracking Solo/Duo and Flex LP over 7d/30d
+- **Match history** with expandable scoreboards, per-game DPM bars, and KP stats
+- **AI performance analysis** — queue health, consistency grade, mental state, improvement areas
+- **Per-champion ratings** with AI-generated grades and notes
+- **Mode filtering** — filter by Ranked, Flex, ARAM, Draft, or Normal
+- **Player profile lookup** — click any player name in match history to view their stats
+- **LP prediction** — estimated games to promotion based on current win rate
+
+### 🔄 Live Advisor (Mid-Game)
+- **Real-time build adaptation** during the game via Gemini Flash
+- Monitors enemy items, KDA, and gold to suggest build pivots
+- Identifies **fed threats** and recommends counters
+- Suggests **next purchase** based on current game state, not just the pre-game plan
+
+### 📦 In-Game Item Set & Rune Export
+- **One-click item set export** — writes directly to League's item sets folder
+- Auto-detects League install path across common locations
+- **Rune page auto-import** via LCU API — creates/updates a DraftCoach rune page directly in the client
+
+### 🔌 League Client Integration (LCU)
+- **WebSocket connection** to the League Client for instant champ select updates
+- **Exponential backoff reconnect** (0.5s → 8s max) with polling fallback
+- **Status indicator** — connected / disconnected / reconnecting
+- Auto-detects lockfile from common installation paths
+
+### 🗃️ Knowledge Base System
+- **Structured KB** with champion data, build templates, matchups, synergies, and scoring weights
+- **Hot-reload** — file watcher auto-reloads KB when JSON files change
+- **Atomic updates** with archive and rollback support for patch transitions
+- **Validation pipeline** — validates all KB files before loading with detailed error reporting
+- **Meta-builder CLI** — generates champion/item data from DDragon + CommunityDragon
 
 ---
 
@@ -41,21 +101,68 @@ DraftCoach is a desktop companion app for League of Legends that generates **opt
 ```
 DraftCoach/
 ├── apps/
-│   ├── desktop/          # Electron + React frontend
+│   ├── desktop/                  # Electron + React frontend
 │   │   ├── src/
-│   │   │   ├── main/     # Electron main process (embedded Express backend)
-│   │   │   └── renderer/ # React UI (ChampionPicker, BuildOutput, etc.)
-│   │   └── dist/         # Webpack production bundle
-│   └── backend/          # Standalone Express backend (for development)
+│   │   │   ├── main/
+│   │   │   │   ├── main.js       # Electron main process (embedded Express + LCU + overlay)
+│   │   │   │   ├── engine-js.js  # Local decision engine bridge
+│   │   │   │   ├── settings.js   # User settings persistence
+│   │   │   │   ├── crash-logger.js
+│   │   │   │   └── cooldowns/    # Cooldown timer manager
+│   │   │   └── renderer/
+│   │   │       ├── App.tsx           # Main React app (build UI, champion picker)
+│   │   │       ├── Overlay.tsx       # In-game transparent HUD overlay
+│   │   │       ├── ScoreboardWindow.tsx  # Live scoreboard with cooldown tracking
+│   │   │       ├── ScoutWindow.tsx   # Pre-game scouting report
+│   │   │       ├── StatsWindow.tsx   # Performance analytics dashboard
+│   │   │       ├── TrackerPanel.tsx   # Compact cooldown tracker
+│   │   │       ├── components/
+│   │   │       │   └── BuildOutput.tsx  # Build display with runes, items, spells
+│   │   │       ├── validateBuild.ts  # Build validation logic
+│   │   │       └── styles.css        # All UI styles (dark theme)
+│   │   └── dist/                 # Webpack production bundle
+│   └── backend/                  # Express backend (embedded in production)
 │       └── src/
-│           ├── routes/    # /api/build, /api/version
-│           └── services/  # Gemini AI, DDragon, file cache
-└── shared/               # Shared TypeScript types
+│           ├── routes/
+│           │   └── build.ts      # /api/build, /api/version, /api/stats
+│           └── services/
+│               ├── gemini.ts     # Gemini AI integration
+│               ├── live-advisor.ts   # Real-time build advisor (Gemini Flash)
+│               ├── rag-updater.ts    # RAG context updater
+│               ├── stats.ts      # Player stats service
+│               ├── ddragon.ts    # DDragon version fetcher
+│               └── cache.ts      # File-based response cache
+├── shared/                       # Shared TypeScript modules
+│   ├── engine/                   # Local decision engine (<30ms builds)
+│   │   ├── engine.ts             # Main orchestrator
+│   │   ├── scoring.ts            # Multi-factor item/rune scoring
+│   │   ├── resolver.ts           # Item/rune resolver from KB
+│   │   ├── rule-engine.ts        # Triggered rules system
+│   │   ├── rules.ts              # Rule definitions
+│   │   ├── comp-profiler.ts      # Team composition profiler
+│   │   └── explainer.ts          # Human-readable explanation generator
+│   ├── kb/                       # Knowledge Base system
+│   │   ├── kb-loader.ts          # KB data loader
+│   │   ├── kb-manager.ts         # Lifecycle manager (hot-reload, rollback)
+│   │   ├── kb-validator.ts       # Validation pipeline
+│   │   └── data/                 # Champion, item, matchup JSON files
+│   ├── lcu/
+│   │   └── lcu-adapter.ts        # League Client WebSocket adapter
+│   ├── export/
+│   │   └── rune-export.ts        # Rune page LCU export
+│   ├── cooldowns/
+│   │   └── cooldown-data.js      # Summoner spell & ult cooldown database
+│   ├── types.ts                  # Shared type definitions
+│   └── engine-types.ts           # Engine-specific types
+└── tools/
+    ├── generate-champions.js     # DDragon champion data scraper
+    ├── generate-items.js         # DDragon item data scraper
+    └── meta-builder/             # KB builder CLI (generate, validate, deep-gen)
 ```
 
 **Production:** The Electron main process embeds a full Express server — no separate backend process needed. The renderer communicates with `http://127.0.0.1:3210`.
 
-**Development:** Backend runs standalone (`npm run dev` in `apps/backend`), desktop connects to it via the same port.
+**Development:** Backend runs standalone, desktop connects to it via the same port.
 
 ---
 
@@ -69,19 +176,9 @@ Each generated build includes:
 | **Summoner Spells** | Optimal spells for role and matchup |
 | **Skill Order** | Priority leveling (e.g. R > Q > W > E) |
 | **Starting Items** | Opening purchase with reasoning |
-| **Core Build** | 6 items (7 for ADC — Season 2026 has 7 item slots for bot lane) with explanations |
+| **Core Build** | 6-7 items with explanations |
 | **Situational Items** | 4+ conditional swaps with buy conditions |
-
----
-
-## In-Game Item Set Export
-
-Click **🎮 Export to LoL** and the build appears in-game under the **Item Sets** tab in the shop:
-
-1. DraftCoach writes a `DraftCoach.json` file to `<LoL Install>/Config/Champions/<Champion>/Recommended/`
-2. Auto-detects League install path (C:\, D:\ common locations)
-3. Sections: Starting Items → Core Build → Situational
-4. Works immediately — no game restart needed (open/close shop to refresh)
+| **Jungle Path** | Optimized clear route for junglers (displayed on minimap overlay) |
 
 ---
 
@@ -98,9 +195,8 @@ Click **🎮 Export to LoL** and the build appears in-game under the **Item Sets
 git clone https://github.com/Sliv3er/DraftCoach.git
 cd DraftCoach
 
-# Install dependencies
-cd apps/backend && npm install && cd ../..
-cd apps/desktop && npm install && cd ../..
+# Install all dependencies
+npm install
 
 # Configure API key
 cp .env.example .env
@@ -110,25 +206,33 @@ cp .env.example .env
 ### Development
 
 ```bash
-# Terminal 1: Start backend
-cd apps/backend && npm run dev
+# Start desktop app (webpack dev server + Electron)
+npm run dev
 
-# Terminal 2: Start desktop (webpack dev server + electron)
-cd apps/desktop && npm run dev
+# Or run backend standalone
+cd apps/backend && npm run dev
 ```
 
 ### Production Build
 
 ```bash
-cd apps/desktop
+# Build everything + package Electron app
+npm run build:desktop
 
-# Build renderer
-npx webpack --mode production
+# Output: apps/desktop/dist-electron/win-unpacked/DraftCoach.exe
+```
 
-# Build Electron app (unpacked)
-npx electron-builder --dir
+### Running Tests
 
-# Output: dist-electron/win-unpacked/DraftCoach.exe
+```bash
+# Run engine unit tests
+npm test
+
+# Run engine-only tests
+npm run test:engine
+
+# Validate Knowledge Base
+npm run validate:kb
 ```
 
 ### Configuration
@@ -136,7 +240,7 @@ npx electron-builder --dir
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `GEMINI_API_KEY` | *(required)* | Google Gemini API key |
-| `GEMINI_MODEL` | `gemini-3.1-pro-preview` | AI model (must support grounding) |
+| `GEMINI_MODEL` | `gemini-3.1-pro-preview` | AI model for builds (must support grounding) |
 | `BACKEND_PORT` | `3210` | Local backend port |
 
 In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next to the `.exe`, or the `resources/` folder.
@@ -150,20 +254,32 @@ In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next t
 | Desktop | Electron 28 |
 | Frontend | React 18 + TypeScript |
 | Backend | Express (embedded in main process) |
-| AI | Google Gemini 3.1 Pro with Search Grounding |
+| AI (Builds) | Google Gemini 3.1 Pro with Search Grounding |
+| AI (Live) | Google Gemini 3 Flash (real-time advisor) |
+| Local Engine | Custom rules-based scoring engine (<30ms) |
 | Build | Webpack 5 + electron-builder |
 | Data | Riot DDragon CDN + CommunityDragon |
+| Client API | League Client Update (LCU) WebSocket |
+| Game API | Riot Live Client Data API |
+| Testing | Jest + ts-jest |
 
 ---
 
 ## Roadmap
 
-- [ ] Auto-detect champ select via League Client API (LCU)
-- [ ] Rune page auto-import
-- [ ] Match history analysis
+- [x] ~~Auto-detect champ select via League Client API (LCU)~~ ✅
+- [x] ~~Rune page auto-import~~ ✅
+- [x] ~~In-game overlay~~ ✅
+- [x] ~~Live cooldown tracking~~ ✅
+- [x] ~~Player scouting~~ ✅
+- [x] ~~Performance stats dashboard~~ ✅
+- [x] ~~Local decision engine~~ ✅
+- [x] ~~Live build advisor~~ ✅
+- [x] ~~App icon and installer~~ ✅
+- [ ] Match history analysis with AI coaching
 - [ ] Multi-language support
 - [ ] macOS / Linux builds
-- [ ] App icon and installer
+- [ ] Auto-updater
 
 ---
 

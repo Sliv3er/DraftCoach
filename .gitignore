@@ -1,9 +1,39 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 dist-electron/
-.env
-*.log
 apps/desktop/dist/
 apps/backend/dist/
+shared/engine/dist/
+release/
+
+# Environment
+.env
+
+# Logs and temp output
+*.log
+out*.txt
+compile_err.txt
+tsc_output.txt
+build_log.txt
+test-results.txt
+
+# Cache
 icon-cache/
 build-cache.json
+
+# Data files (generated at runtime)
+apps/backend/data/
+
+# Non-project files (school TPs, etc.)
+TP*.png
+exercice_*.png
+tps_content.txt
+
+# Python scripts (non-project)
+convert_*.py
+
+# Package lock at root (monorepo — each app has its own)
+package-lock.json

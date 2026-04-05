@@ -1,7 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { BuildRequest } from '../../../shared/types';
+import { BuildRequest } from '../../../../shared/types';
+import { fetchDDragonVersion } from './ddragon';
+import { getLocalRagContext, getRagStatus } from './rag-updater';
 
-const SYSTEM_PROMPT = `You are a League of Legends Draft & Itemization Engine for Season 2026. You MUST use Google Search grounding to verify current live patch data (Patch 26.4). If you cannot confirm current patch-relevant details via grounding, output exactly: NEED_RETRY.
+type GeminiModel = 'gemini-3-pro-preview' | 'gemini-3.1-pro-preview' | 'gemini-3-flash-preview';
+
+// ── System prompt — NO hardcoded patch. Patch is injected at runtime. ──
+
+function buildSystemPrompt(patch: string): string {
+  return `You are a League of Legends Draft & Itemization Engine for Season 2026, Patch ${patch}.
+
+You will receive RAG context containing verified patch data. Use it as your PRIMARY knowledge source for champion balance, item stats, and meta shifts. Only use Google Search grounding to supplement if the RAG context is insufficient for a specific matchup detail.
 
 Return ONLY these sections in this exact format:
 
@@ -41,40 +50,85 @@ SITUATIONAL ITEMS
 <ItemName>: <when to buy and why>
 <ItemName>: <when to buy and why>
 
+JUNGLE PATH (ONLY include this section if the role is Jungle)
+<Camp1> ➔ <Camp2> ➔ <Camp3> ➔ <Camp4> ➔ <Action>
+
+ENEMY POWER SPIKES
+<EnemyChampion>: <Level/Item spike — what to watch for>
+<EnemyChampion>: <Level/Item spike — what to watch for>
+
+WIN CONDITION
+<One or two sentences describing how to win this specific draft/matchup>
+
 Rules:
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).
 - SITUATIONAL ITEMS must ALWAYS have at least 4 items with clear conditions (e.g. "vs heavy AP", "if behind", "vs tanks").
-- Boots count as a core item. Include them in CORE BUILD.
+- Boots are mandatory. ONE pair of upgraded boots MUST be in CORE BUILD for all roles. ALWAYS place the upgraded boots as the FIRST or SECOND item in the CORE BUILD list. For Bottom/ADC: list 7 items total, but still place boots as the 1st or 2nd item.
 - Never suggest removed items or removed runes.
-- If unsure, output NEED_RETRY.
 - Adapt to enemy comp.
 - For jungle, include jungle companion start.
 - Keep names exactly as in-game.
-- Do NOT add explanations or extra text outside the sections.`;
+- Do NOT add explanations or extra text outside the sections.
+- If role is Jungle, you MUST include a JUNGLE PATH section with the optimal first clear route.
+- ALWAYS include ENEMY POWER SPIKES with at least one entry per enemy champion provided.
+- ALWAYS include WIN CONDITION with a concise strategy for winning the game with this draft.
+- Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.`;
+}
 
-const SHORT_SYSTEM_PROMPT = `You are a League of Legends build advisor. Return ONLY: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD, SITUATIONAL ITEMS. Keep names exactly as in-game. Adapt to enemy comp. CORE BUILD must have exactly 6 items (7 for Bottom/ADC role). SITUATIONAL ITEMS must have at least 4 items with conditions. Boots count as a core item.`;
+function buildShortPrompt(patch: string): string {
+  return `You are a League of Legends build advisor for Patch ${patch}. Return ONLY: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD, SITUATIONAL ITEMS, JUNGLE PATH (if Jungle), ENEMY POWER SPIKES, WIN CONDITION. Keep names exactly as in-game. Adapt to enemy comp. CORE BUILD must have exactly 6 items (7 for Bottom/ADC role). ALWAYS place boots as the 1st or 2nd item in CORE BUILD. SITUATIONAL ITEMS must have at least 4 items with conditions. JUNGLE PATH only if role is Jungle. ENEMY POWER SPIKES must have at least one entry per enemy. WIN CONDITION must be a concise 1-2 sentence strategy. Only output NEED_RETRY if champion name or role is invalid.`;
+}
 
-function getModel(): string {
+const VALID_MODELS: GeminiModel[] = [
+  'gemini-3-pro-preview',
+  'gemini-3.1-pro-preview',
+  'gemini-3-flash-preview',
+];
+
+function getModel(requested?: string): string {
+  if (requested && VALID_MODELS.includes(requested as GeminiModel)) {
+    return requested;
+  }
   return process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview';
 }
 
 export async function generateBuild(
   req: BuildRequest,
   shortPrompt: boolean
-): Promise<{ text: string; patchDetected: string }> {
+): Promise<{ text: string; patchUsed: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not set');
 
+  // ── Get live patch from DDragon (never hardcoded) ──
+  let livePatch: string;
+  try {
+    livePatch = await fetchDDragonVersion();
+  } catch {
+    livePatch = 'unknown';
+  }
+
+  // Parse to major.minor for display (e.g., "26.5.1" → "26.5")
+  const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
+
+  // ── Get RAG context for this champion/role/enemies ──
+  const ragContext = getLocalRagContext(req.myChampion, req.role, req.enemies);
+
   const genAI = new GoogleGenerativeAI(apiKey);
+  const systemPrompt = shortPrompt ? buildShortPrompt(patchDisplay) : buildSystemPrompt(patchDisplay);
+
   const model = genAI.getGenerativeModel({
-    model: getModel(),
-    systemInstruction: shortPrompt ? SHORT_SYSTEM_PROMPT : SYSTEM_PROMPT,
+    model: getModel(req.model),
+    systemInstruction: systemPrompt,
     tools: [{ googleSearch: {} } as any],
   });
 
   const isBot = /^(bottom|adc|bot)$/i.test(req.role);
   const itemSlots = isBot ? 7 : 6;
-  const userMessage = `Champion: ${req.myChampion}, Role: ${req.role}, Allies: ${req.allies.join(', ') || 'none'}, Enemies: ${req.enemies.join(', ') || 'none'}, Patch: 26.4 (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Generate optimized build. Output only the sections.`;
+
+  // ── Build user message with RAG context injected ──
+  const userMessage = `${ragContext}
+
+Champion: ${req.myChampion}, Role: ${req.role}, Allies: ${req.allies.join(', ') || 'none'}, Enemies: ${req.enemies.join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Make sure to place upgraded boots as the 1st or 2nd item in the CORE BUILD. Generate optimized build. Output only the sections.`;
 
   const result = await model.generateContent(userMessage);
   const response = result.response;
@@ -82,6 +136,6 @@ export async function generateBuild(
 
   return {
     text,
-    patchDetected: req.patch || '26.4',
+    patchUsed: patchDisplay,
   };
 }

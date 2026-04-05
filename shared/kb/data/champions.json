@@ -1,0 +1,6040 @@
+{
+    "meta": {
+        "patch": "26.5",
+        "buildHash": "kb-ai-1772684692180",
+        "createdAt": "2026-03-05T03:20:56.348Z",
+        "source": "ai-meta-builder-gemini-2.5-flash",
+        "checksum": "sha256:generated",
+        "previousPatch": "26.3",
+        "rollbackAvailable": true
+    },
+    "data": {
+        "Aatrox": {
+            "id": "Aatrox",
+            "name": "Aatrox",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 20,
+                "frontline": 70,
+                "burst": 50,
+                "sustained": 75,
+                "poke": 15,
+                "healShield": 30,
+                "splitpush": 60,
+                "ccDensity": 2,
+                "mobility": 40,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 53,
+                    "sustain": 38
+                }
+            }
+        },
+        "Ahri": {
+            "id": "Ahri",
+            "name": "Ahri",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 75,
+                "sustained": 40,
+                "poke": 60,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 2,
+                "mobility": 70,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 60,
+                    "allIn": 73,
+                    "sustain": 12
+                }
+            }
+        },
+        "Akali": {
+            "id": "Akali",
+            "name": "Akali",
+            "roles": [
+                "MID",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 5,
+                "frontline": 10,
+                "burst": 90,
+                "sustained": 30,
+                "poke": 20,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 1.5,
+                "mobility": 85,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 20,
+                    "allIn": 88,
+                    "sustain": 9
+                },
+                "TOP": {
+                    "poke": 20,
+                    "allIn": 60,
+                    "sustain": 9
+                }
+            }
+        },
+        "Akshan": {
+            "id": "Akshan",
+            "name": "Akshan",
+            "roles": [
+                "MID",
+                "BOT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 65,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 1,
+                "mobility": 70,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 65,
+                    "sustain": 20
+                },
+                "BOT": {
+                    "poke": 40,
+                    "allIn": 63,
+                    "sustain": 20
+                }
+            }
+        },
+        "Alistar": {
+            "id": "Alistar",
+            "name": "Alistar",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 85,
+                "peel": 70,
+                "frontline": 80,
+                "burst": 15,
+                "sustained": 10,
+                "poke": 5,
+                "healShield": 10,
+                "splitpush": 5,
+                "ccDensity": 4.5,
+                "mobility": 50,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 50,
+                    "sustain": 9
+                }
+            }
+        },
+        "Amumu": {
+            "id": "Amumu",
+            "name": "Amumu",
+            "roles": [
+                "JUNGLE",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 75,
+                "peel": 50,
+                "frontline": 65,
+                "burst": 40,
+                "sustained": 30,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 4,
+                "mobility": 30,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 12
+                },
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 58,
+                    "sustain": 6
+                }
+            }
+        },
+        "Anivia": {
+            "id": "Anivia",
+            "name": "Anivia",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 55,
+                "frontline": 10,
+                "burst": 70,
+                "sustained": 70,
+                "poke": 50,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 10,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 50,
+                    "allIn": 40,
+                    "sustain": 21
+                }
+            }
+        },
+        "Annie": {
+            "id": "Annie",
+            "name": "Annie",
+            "roles": [
+                "MID",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 20,
+                "frontline": 10,
+                "burst": 90,
+                "sustained": 30,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 20,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 30,
+                    "allIn": 55,
+                    "sustain": 9
+                },
+                "SUPPORT": {
+                    "poke": 30,
+                    "allIn": 75,
+                    "sustain": 6
+                }
+            }
+        },
+        "Aphelios": {
+            "id": "Aphelios",
+            "name": "Aphelios",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 5,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 85,
+                "poke": 40,
+                "healShield": 10,
+                "splitpush": 15,
+                "ccDensity": 1,
+                "mobility": 15,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 40,
+                    "allIn": 73,
+                    "sustain": 29
+                }
+            }
+        },
+        "Ashe": {
+            "id": "Ashe",
+            "name": "Ashe",
+            "roles": [
+                "BOT",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 30,
+                "frontline": 5,
+                "burst": 30,
+                "sustained": 70,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3,
+                "mobility": 10,
+                "range": 75,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 55,
+                    "allIn": 50,
+                    "sustain": 21
+                },
+                "SUPPORT": {
+                    "poke": 55,
+                    "allIn": 35,
+                    "sustain": 14
+                }
+            }
+        },
+        "AurelionSol": {
+            "id": "AurelionSol",
+            "name": "Aurelion Sol",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 65,
+                "poke": 50,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 2.5,
+                "mobility": 30,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 50,
+                    "allIn": 50,
+                    "sustain": 20
+                }
+            }
+        },
+        "Aurora": {
+            "id": "Aurora",
+            "name": "Aurora",
+            "roles": [
+                "MID",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 25,
+                "frontline": 10,
+                "burst": 70,
+                "sustained": 40,
+                "poke": 45,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 2,
+                "mobility": 65,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 45,
+                    "allIn": 68,
+                    "sustain": 12
+                },
+                "TOP": {
+                    "poke": 45,
+                    "allIn": 50,
+                    "sustain": 12
+                }
+            }
+        },
+        "Azir": {
+            "id": "Azir",
+            "name": "Azir",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 30,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 80,
+                "poke": 65,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 2,
+                "mobility": 50,
+                "range": 75,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 65,
+                    "allIn": 53,
+                    "sustain": 24
+                }
+            }
+        },
+        "Bard": {
+            "id": "Bard",
+            "name": "Bard",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 60,
+                "frontline": 15,
+                "burst": 30,
+                "sustained": 20,
+                "poke": 50,
+                "healShield": 30,
+                "splitpush": 10,
+                "ccDensity": 3,
+                "mobility": 70,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 50,
+                    "allIn": 33,
+                    "sustain": 25
+                }
+            }
+        },
+        "BelVeth": {
+            "id": "BelVeth",
+            "name": "Bel'Veth",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 10,
+                "frontline": 30,
+                "burst": 50,
+                "sustained": 85,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 55,
+                "ccDensity": 1.5,
+                "mobility": 75,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 40,
+                    "sustain": 34
+                }
+            }
+        },
+        "Blitzcrank": {
+            "id": "Blitzcrank",
+            "name": "Blitzcrank",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 80,
+                "peel": 40,
+                "frontline": 50,
+                "burst": 30,
+                "sustained": 15,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 4,
+                "mobility": 30,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 10,
+                    "allIn": 55,
+                    "sustain": 3
+                }
+            }
+        },
+        "Brand": {
+            "id": "Brand",
+            "name": "Brand",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 80,
+                "sustained": 65,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 2.5,
+                "mobility": 10,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 55,
+                    "allIn": 48,
+                    "sustain": 13
+                },
+                "MID": {
+                    "poke": 55,
+                    "allIn": 45,
+                    "sustain": 20
+                }
+            }
+        },
+        "Braum": {
+            "id": "Braum",
+            "name": "Braum",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 85,
+                "frontline": 80,
+                "burst": 10,
+                "sustained": 10,
+                "poke": 5,
+                "healShield": 15,
+                "splitpush": 5,
+                "ccDensity": 4.5,
+                "mobility": 30,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 35,
+                    "sustain": 13
+                }
+            }
+        },
+        "Briar": {
+            "id": "Briar",
+            "name": "Briar",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 5,
+                "frontline": 30,
+                "burst": 75,
+                "sustained": 60,
+                "poke": 5,
+                "healShield": 15,
+                "splitpush": 30,
+                "ccDensity": 2,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 70,
+                    "sustain": 32
+                }
+            }
+        },
+        "Caitlyn": {
+            "id": "Caitlyn",
+            "name": "Caitlyn",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 5,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 70,
+                "poke": 60,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 2,
+                "mobility": 25,
+                "range": 80,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 60,
+                    "allIn": 63,
+                    "sustain": 21
+                }
+            }
+        },
+        "Camille": {
+            "id": "Camille",
+            "name": "Camille",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 50,
+                "peel": 15,
+                "frontline": 30,
+                "burst": 70,
+                "sustained": 50,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 75,
+                "ccDensity": 2.5,
+                "mobility": 70,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 60,
+                    "sustain": 15
+                }
+            }
+        },
+        "Cassiopeia": {
+            "id": "Cassiopeia",
+            "name": "Cassiopeia",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 30,
+                "frontline": 10,
+                "burst": 55,
+                "sustained": 90,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 3,
+                "mobility": 15,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 35,
+                    "sustain": 27
+                }
+            }
+        },
+        "ChoGath": {
+            "id": "ChoGath",
+            "name": "Cho'Gath",
+            "roles": [
+                "TOP",
+                "MID"
+            ],
+            "tags": {
+                "engage": 45,
+                "peel": 40,
+                "frontline": 80,
+                "burst": 60,
+                "sustained": 30,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 4,
+                "mobility": 15,
+                "range": 25,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 25,
+                    "allIn": 53,
+                    "sustain": 9
+                },
+                "MID": {
+                    "poke": 25,
+                    "allIn": 38,
+                    "sustain": 9
+                }
+            }
+        },
+        "Corki": {
+            "id": "Corki",
+            "name": "Corki",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 55,
+                "poke": 65,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 1,
+                "mobility": 60,
+                "range": 70,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 65,
+                    "allIn": 65,
+                    "sustain": 17
+                }
+            }
+        },
+        "Darius": {
+            "id": "Darius",
+            "name": "Darius",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 15,
+                "frontline": 70,
+                "burst": 75,
+                "sustained": 60,
+                "poke": 10,
+                "healShield": 30,
+                "splitpush": 55,
+                "ccDensity": 2.5,
+                "mobility": 30,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 58,
+                    "sustain": 21
+                }
+            }
+        },
+        "Diana": {
+            "id": "Diana",
+            "name": "Diana",
+            "roles": [
+                "JUNGLE",
+                "MID"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 10,
+                "frontline": 30,
+                "burst": 80,
+                "sustained": 45,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 2.5,
+                "mobility": 60,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 73,
+                    "sustain": 18
+                },
+                "MID": {
+                    "poke": 15,
+                    "allIn": 70,
+                    "sustain": 14
+                }
+            }
+        },
+        "Draven": {
+            "id": "Draven",
+            "name": "Draven",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 75,
+                "sustained": 80,
+                "poke": 20,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 1,
+                "mobility": 30,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 20,
+                    "allIn": 78,
+                    "sustain": 24
+                }
+            }
+        },
+        "DrMundo": {
+            "id": "DrMundo",
+            "name": "Dr. Mundo",
+            "roles": [
+                "TOP",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 10,
+                "frontline": 85,
+                "burst": 20,
+                "sustained": 70,
+                "poke": 20,
+                "healShield": 0,
+                "splitpush": 50,
+                "ccDensity": 1,
+                "mobility": 30,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 20,
+                    "allIn": 23,
+                    "sustain": 21
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 23,
+                    "sustain": 28
+                }
+            }
+        },
+        "Ekko": {
+            "id": "Ekko",
+            "name": "Ekko",
+            "roles": [
+                "MID",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 15,
+                "frontline": 10,
+                "burst": 85,
+                "sustained": 35,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 35,
+                "ccDensity": 2,
+                "mobility": 80,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 30,
+                    "allIn": 83,
+                    "sustain": 11
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 60,
+                    "sustain": 14
+                }
+            }
+        },
+        "Elise": {
+            "id": "Elise",
+            "name": "Elise",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 15,
+                "frontline": 15,
+                "burst": 70,
+                "sustained": 30,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3,
+                "mobility": 60,
+                "range": 50,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 55,
+                    "sustain": 12
+                }
+            }
+        },
+        "Evelynn": {
+            "id": "Evelynn",
+            "name": "Evelynn",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 5,
+                "frontline": 5,
+                "burst": 95,
+                "sustained": 20,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 1.5,
+                "mobility": 70,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 8
+                }
+            }
+        },
+        "Ezreal": {
+            "id": "Ezreal",
+            "name": "Ezreal",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 5,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 65,
+                "poke": 70,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 1,
+                "mobility": 75,
+                "range": 75,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 65,
+                    "allIn": 60,
+                    "sustain": 20
+                }
+            }
+        },
+        "Fiddlesticks": {
+            "id": "Fiddlesticks",
+            "name": "Fiddlesticks",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 30,
+                "frontline": 10,
+                "burst": 75,
+                "sustained": 50,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 5,
+                "mobility": 25,
+                "range": 50,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 65,
+                    "sustain": 20
+                }
+            }
+        },
+        "Fiora": {
+            "id": "Fiora",
+            "name": "Fiora",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 10,
+                "frontline": 20,
+                "burst": 65,
+                "sustained": 70,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 90,
+                "ccDensity": 1.5,
+                "mobility": 70,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 43,
+                    "sustain": 21
+                }
+            }
+        },
+        "Fizz": {
+            "id": "Fizz",
+            "name": "Fizz",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 5,
+                "frontline": 5,
+                "burst": 95,
+                "sustained": 25,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 2,
+                "mobility": 85,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 90,
+                    "sustain": 8
+                }
+            }
+        },
+        "Galio": {
+            "id": "Galio",
+            "name": "Galio",
+            "roles": [
+                "MID",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 55,
+                "frontline": 65,
+                "burst": 50,
+                "sustained": 25,
+                "poke": 20,
+                "healShield": 10,
+                "splitpush": 10,
+                "ccDensity": 4,
+                "mobility": 45,
+                "range": 25,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 20,
+                    "allIn": 48,
+                    "sustain": 11
+                },
+                "SUPPORT": {
+                    "poke": 20,
+                    "allIn": 58,
+                    "sustain": 12
+                }
+            }
+        },
+        "Gangplank": {
+            "id": "Gangplank",
+            "name": "Gangplank",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 15,
+                "burst": 70,
+                "sustained": 55,
+                "poke": 55,
+                "healShield": 10,
+                "splitpush": 60,
+                "ccDensity": 1.5,
+                "mobility": 25,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 55,
+                    "allIn": 43,
+                    "sustain": 22
+                }
+            }
+        },
+        "Garen": {
+            "id": "Garen",
+            "name": "Garen",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 10,
+                "frontline": 75,
+                "burst": 55,
+                "sustained": 50,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 60,
+                "ccDensity": 1,
+                "mobility": 35,
+                "range": 10,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 43,
+                    "sustain": 15
+                }
+            }
+        },
+        "Gnar": {
+            "id": "Gnar",
+            "name": "Gnar",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 35,
+                "frontline": 55,
+                "burst": 40,
+                "sustained": 50,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 45,
+                "ccDensity": 3.5,
+                "mobility": 55,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 40,
+                    "allIn": 50,
+                    "sustain": 15
+                }
+            }
+        },
+        "Gragas": {
+            "id": "Gragas",
+            "name": "Gragas",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 45,
+                "frontline": 50,
+                "burst": 65,
+                "sustained": 30,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 3.5,
+                "mobility": 50,
+                "range": 30,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 63,
+                    "sustain": 12
+                },
+                "TOP": {
+                    "poke": 30,
+                    "allIn": 63,
+                    "sustain": 9
+                }
+            }
+        },
+        "Graves": {
+            "id": "Graves",
+            "name": "Graves",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 25,
+                "burst": 60,
+                "sustained": 65,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 1,
+                "mobility": 55,
+                "range": 45,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 38,
+                    "sustain": 26
+                }
+            }
+        },
+        "Gwen": {
+            "id": "Gwen",
+            "name": "Gwen",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 10,
+                "frontline": 25,
+                "burst": 55,
+                "sustained": 80,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 70,
+                "ccDensity": 1,
+                "mobility": 55,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 38,
+                    "sustain": 24
+                }
+            }
+        },
+        "Hecarim": {
+            "id": "Hecarim",
+            "name": "Hecarim",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 75,
+                "peel": 15,
+                "frontline": 50,
+                "burst": 55,
+                "sustained": 50,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 2.5,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 65,
+                    "sustain": 20
+                }
+            }
+        },
+        "Heimerdinger": {
+            "id": "Heimerdinger",
+            "name": "Heimerdinger",
+            "roles": [
+                "MID",
+                "TOP",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 35,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 75,
+                "poke": 50,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 3,
+                "mobility": 10,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 50,
+                    "allIn": 33,
+                    "sustain": 23
+                },
+                "TOP": {
+                    "poke": 50,
+                    "allIn": 35,
+                    "sustain": 23
+                },
+                "SUPPORT": {
+                    "poke": 50,
+                    "allIn": 35,
+                    "sustain": 15
+                }
+            }
+        },
+        "Hwei": {
+            "id": "Hwei",
+            "name": "Hwei",
+            "roles": [
+                "MID",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 40,
+                "frontline": 5,
+                "burst": 65,
+                "sustained": 55,
+                "poke": 65,
+                "healShield": 20,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 30,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 65,
+                    "allIn": 48,
+                    "sustain": 23
+                },
+                "SUPPORT": {
+                    "poke": 65,
+                    "allIn": 45,
+                    "sustain": 25
+                }
+            }
+        },
+        "Illaoi": {
+            "id": "Illaoi",
+            "name": "Illaoi",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 20,
+                "frontline": 70,
+                "burst": 50,
+                "sustained": 80,
+                "poke": 20,
+                "healShield": 20,
+                "splitpush": 55,
+                "ccDensity": 2,
+                "mobility": 15,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 20,
+                    "allIn": 40,
+                    "sustain": 34
+                }
+            }
+        },
+        "Irelia": {
+            "id": "Irelia",
+            "name": "Irelia",
+            "roles": [
+                "TOP",
+                "MID"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 15,
+                "frontline": 30,
+                "burst": 60,
+                "sustained": 75,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 65,
+                "ccDensity": 2,
+                "mobility": 80,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 50,
+                    "sustain": 23
+                },
+                "MID": {
+                    "poke": 10,
+                    "allIn": 70,
+                    "sustain": 23
+                }
+            }
+        },
+        "Ivern": {
+            "id": "Ivern",
+            "name": "Ivern",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 70,
+                "frontline": 10,
+                "burst": 10,
+                "sustained": 10,
+                "poke": 20,
+                "healShield": 65,
+                "splitpush": 5,
+                "ccDensity": 4,
+                "mobility": 40,
+                "range": 50,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 15,
+                    "sustain": 37
+                }
+            }
+        },
+        "Janna": {
+            "id": "Janna",
+            "name": "Janna",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 95,
+                "frontline": 5,
+                "burst": 20,
+                "sustained": 95,
+                "poke": 50,
+                "healShield": 95,
+                "splitpush": 95,
+                "ccDensity": 3.5,
+                "mobility": 40,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 35,
+                    "allIn": 18,
+                    "sustain": 59
+                }
+            }
+        },
+        "JarvanIV": {
+            "id": "JarvanIV",
+            "name": "Jarvan IV",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 80,
+                "peel": 30,
+                "frontline": 60,
+                "burst": 50,
+                "sustained": 40,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3.5,
+                "mobility": 60,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 65,
+                    "sustain": 16
+                },
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 65,
+                    "sustain": 12
+                }
+            }
+        },
+        "Jax": {
+            "id": "Jax",
+            "name": "Jax",
+            "roles": [
+                "TOP",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 45,
+                "peel": 20,
+                "frontline": 55,
+                "burst": 55,
+                "sustained": 75,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 80,
+                "ccDensity": 2,
+                "mobility": 50,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 50,
+                    "sustain": 23
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 50,
+                    "sustain": 30
+                }
+            }
+        },
+        "Jayce": {
+            "id": "Jayce",
+            "name": "Jayce",
+            "roles": [
+                "TOP",
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 15,
+                "frontline": 10,
+                "burst": 65,
+                "sustained": 50,
+                "poke": 70,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 1.5,
+                "mobility": 50,
+                "range": 65,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 60,
+                    "allIn": 43,
+                    "sustain": 15
+                },
+                "MID": {
+                    "poke": 70,
+                    "allIn": 58,
+                    "sustain": 15
+                }
+            }
+        },
+        "Jhin": {
+            "id": "Jhin",
+            "name": "Jhin",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 25,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 50,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 3,
+                "mobility": 15,
+                "range": 70,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 55,
+                    "allIn": 60,
+                    "sustain": 15
+                }
+            }
+        },
+        "Jinx": {
+            "id": "Jinx",
+            "name": "Jinx",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 5,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 50,
+                "sustained": 90,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 1,
+                "mobility": 20,
+                "range": 70,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 30,
+                    "allIn": 70,
+                    "sustain": 27
+                }
+            }
+        },
+        "KSante": {
+            "id": "KSante",
+            "name": "K'Sante",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 50,
+                "peel": 40,
+                "frontline": 75,
+                "burst": 40,
+                "sustained": 45,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 3.5,
+                "mobility": 65,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 45,
+                    "sustain": 14
+                }
+            }
+        },
+        "KaiSa": {
+            "id": "KaiSa",
+            "name": "Kai'Sa",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 75,
+                "sustained": 75,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 1,
+                "mobility": 65,
+                "range": 55,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 30,
+                    "allIn": 75,
+                    "sustain": 23
+                }
+            }
+        },
+        "Kalista": {
+            "id": "Kalista",
+            "name": "Kalista",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 30,
+                "sustained": 80,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 1.5,
+                "mobility": 80,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 25,
+                    "allIn": 55,
+                    "sustain": 24
+                }
+            }
+        },
+        "Karma": {
+            "id": "Karma",
+            "name": "Karma",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 65,
+                "frontline": 10,
+                "burst": 35,
+                "sustained": 30,
+                "poke": 55,
+                "healShield": 55,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 35,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 55,
+                    "allIn": 30,
+                    "sustain": 45
+                },
+                "MID": {
+                    "poke": 55,
+                    "allIn": 35,
+                    "sustain": 26
+                }
+            }
+        },
+        "Karthus": {
+            "id": "Karthus",
+            "name": "Karthus",
+            "roles": [
+                "JUNGLE",
+                "MID"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 80,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 1.5,
+                "mobility": 10,
+                "range": 80,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 33,
+                    "sustain": 32
+                },
+                "MID": {
+                    "poke": 30,
+                    "allIn": 33,
+                    "sustain": 24
+                }
+            }
+        },
+        "Kassadin": {
+            "id": "Kassadin",
+            "name": "Kassadin",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 5,
+                "frontline": 10,
+                "burst": 90,
+                "sustained": 40,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 2,
+                "mobility": 85,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 88,
+                    "sustain": 12
+                }
+            }
+        },
+        "Katarina": {
+            "id": "Katarina",
+            "name": "Katarina",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 5,
+                "frontline": 5,
+                "burst": 90,
+                "sustained": 40,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 1,
+                "mobility": 85,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 88,
+                    "sustain": 12
+                }
+            }
+        },
+        "Kayle": {
+            "id": "Kayle",
+            "name": "Kayle",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 15,
+                "frontline": 15,
+                "burst": 50,
+                "sustained": 80,
+                "poke": 25,
+                "healShield": 20,
+                "splitpush": 50,
+                "ccDensity": 0.5,
+                "mobility": 25,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "LATE",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 25,
+                    "allIn": 30,
+                    "sustain": 34
+                }
+            }
+        },
+        "Kayn": {
+            "id": "Kayn",
+            "name": "Kayn",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 45,
+                "peel": 10,
+                "frontline": 40,
+                "burst": 70,
+                "sustained": 55,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 1.5,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 22
+                }
+            }
+        },
+        "Kennen": {
+            "id": "Kennen",
+            "name": "Kennen",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 70,
+                "peel": 20,
+                "frontline": 15,
+                "burst": 65,
+                "sustained": 40,
+                "poke": 50,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 3.5,
+                "mobility": 60,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 50,
+                    "allIn": 68,
+                    "sustain": 12
+                }
+            }
+        },
+        "KhaZix": {
+            "id": "KhaZix",
+            "name": "Kha'Zix",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 5,
+                "frontline": 5,
+                "burst": 90,
+                "sustained": 35,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 1,
+                "mobility": 80,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 55,
+                    "sustain": 14
+                }
+            }
+        },
+        "Kindred": {
+            "id": "Kindred",
+            "name": "Kindred",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 75,
+                "poke": 35,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 1,
+                "mobility": 65,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 33,
+                    "sustain": 30
+                }
+            }
+        },
+        "Kled": {
+            "id": "Kled",
+            "name": "Kled",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 80,
+                "peel": 10,
+                "frontline": 55,
+                "burst": 55,
+                "sustained": 60,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 50,
+                "ccDensity": 2.5,
+                "mobility": 70,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 68,
+                    "sustain": 18
+                }
+            }
+        },
+        "KogMaw": {
+            "id": "KogMaw",
+            "name": "Kog'Maw",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 5,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 40,
+                "sustained": 90,
+                "poke": 45,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 1,
+                "mobility": 10,
+                "range": 75,
+                "damageType": "MIXED",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 45,
+                    "allIn": 65,
+                    "sustain": 27
+                }
+            }
+        },
+        "LeBlanc": {
+            "id": "LeBlanc",
+            "name": "LeBlanc",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 95,
+                "sustained": 20,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 2,
+                "mobility": 85,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 90,
+                    "sustain": 6
+                }
+            }
+        },
+        "LeeSin": {
+            "id": "LeeSin",
+            "name": "Lee Sin",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 30,
+                "frontline": 25,
+                "burst": 60,
+                "sustained": 40,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 3,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 16
+                },
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 58,
+                    "sustain": 12
+                }
+            }
+        },
+        "Leona": {
+            "id": "Leona",
+            "name": "Leona",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 90,
+                "peel": 55,
+                "frontline": 80,
+                "burst": 15,
+                "sustained": 10,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 5.5,
+                "mobility": 40,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 53,
+                    "sustain": 2
+                }
+            }
+        },
+        "Lillia": {
+            "id": "Lillia",
+            "name": "Lillia",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 15,
+                "frontline": 15,
+                "burst": 45,
+                "sustained": 65,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 3.5,
+                "mobility": 65,
+                "range": 35,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 35,
+                    "sustain": 26
+                },
+                "TOP": {
+                    "poke": 40,
+                    "allIn": 35,
+                    "sustain": 20
+                }
+            }
+        },
+        "Lissandra": {
+            "id": "Lissandra",
+            "name": "Lissandra",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 45,
+                "frontline": 20,
+                "burst": 70,
+                "sustained": 35,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 4,
+                "mobility": 50,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 60,
+                    "sustain": 11
+                }
+            }
+        },
+        "Lucian": {
+            "id": "Lucian",
+            "name": "Lucian",
+            "roles": [
+                "BOT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 70,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 1,
+                "mobility": 60,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 30,
+                    "allIn": 70,
+                    "sustain": 21
+                },
+                "MID": {
+                    "poke": 30,
+                    "allIn": 65,
+                    "sustain": 21
+                }
+            }
+        },
+        "Lulu": {
+            "id": "Lulu",
+            "name": "Lulu",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 85,
+                "frontline": 5,
+                "burst": 20,
+                "sustained": 20,
+                "poke": 40,
+                "healShield": 75,
+                "splitpush": 5,
+                "ccDensity": 4,
+                "mobility": 25,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 40,
+                    "allIn": 18,
+                    "sustain": 57
+                }
+            }
+        },
+        "Lux": {
+            "id": "Lux",
+            "name": "Lux",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 40,
+                "frontline": 5,
+                "burst": 75,
+                "sustained": 35,
+                "poke": 70,
+                "healShield": 30,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 15,
+                "range": 75,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 70,
+                    "allIn": 48,
+                    "sustain": 28
+                },
+                "MID": {
+                    "poke": 70,
+                    "allIn": 45,
+                    "sustain": 20
+                }
+            }
+        },
+        "Malphite": {
+            "id": "Malphite",
+            "name": "Malphite",
+            "roles": [
+                "TOP",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 85,
+                "peel": 30,
+                "frontline": 80,
+                "burst": 50,
+                "sustained": 20,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 4,
+                "mobility": 40,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 25,
+                    "allIn": 68,
+                    "sustain": 6
+                },
+                "SUPPORT": {
+                    "poke": 25,
+                    "allIn": 68,
+                    "sustain": 4
+                }
+            }
+        },
+        "Malzahar": {
+            "id": "Malzahar",
+            "name": "Malzahar",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 35,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 70,
+                "poke": 45,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3.5,
+                "mobility": 10,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 45,
+                    "allIn": 35,
+                    "sustain": 21
+                }
+            }
+        },
+        "Maokai": {
+            "id": "Maokai",
+            "name": "Maokai",
+            "roles": [
+                "SUPPORT",
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 55,
+                "frontline": 75,
+                "burst": 15,
+                "sustained": 25,
+                "poke": 20,
+                "healShield": 10,
+                "splitpush": 10,
+                "ccDensity": 4.5,
+                "mobility": 40,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 20,
+                    "allIn": 40,
+                    "sustain": 12
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 40,
+                    "sustain": 15
+                },
+                "TOP": {
+                    "poke": 20,
+                    "allIn": 40,
+                    "sustain": 13
+                }
+            }
+        },
+        "MasterYi": {
+            "id": "MasterYi",
+            "name": "Master Yi",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 5,
+                "frontline": 10,
+                "burst": 55,
+                "sustained": 90,
+                "poke": 5,
+                "healShield": 10,
+                "splitpush": 70,
+                "ccDensity": 0.5,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 33,
+                    "sustain": 41
+                }
+            }
+        },
+        "Mel": {
+            "id": "Mel",
+            "name": "Mel",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 35,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 50,
+                "poke": 55,
+                "healShield": 30,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 30,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 55,
+                    "allIn": 45,
+                    "sustain": 24
+                }
+            }
+        },
+        "Milio": {
+            "id": "Milio",
+            "name": "Milio",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 80,
+                "frontline": 5,
+                "burst": 15,
+                "sustained": 20,
+                "poke": 40,
+                "healShield": 80,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 25,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 40,
+                    "allIn": 13,
+                    "sustain": 60
+                }
+            }
+        },
+        "MissFortune": {
+            "id": "MissFortune",
+            "name": "Miss Fortune",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 65,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 2,
+                "mobility": 15,
+                "range": 65,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 55,
+                    "allIn": 68,
+                    "sustain": 20
+                }
+            }
+        },
+        "Mordekaiser": {
+            "id": "Mordekaiser",
+            "name": "Mordekaiser",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 10,
+                "frontline": 65,
+                "burst": 55,
+                "sustained": 70,
+                "poke": 15,
+                "healShield": 15,
+                "splitpush": 45,
+                "ccDensity": 1.5,
+                "mobility": 25,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 45,
+                    "sustain": 29
+                }
+            }
+        },
+        "Morgana": {
+            "id": "Morgana",
+            "name": "Morgana",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 70,
+                "frontline": 10,
+                "burst": 40,
+                "sustained": 40,
+                "poke": 40,
+                "healShield": 10,
+                "splitpush": 5,
+                "ccDensity": 4.5,
+                "mobility": 15,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 40,
+                    "allIn": 35,
+                    "sustain": 15
+                },
+                "MID": {
+                    "poke": 40,
+                    "allIn": 28,
+                    "sustain": 15
+                }
+            }
+        },
+        "Naafiri": {
+            "id": "Naafiri",
+            "name": "Naafiri",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 5,
+                "frontline": 10,
+                "burst": 85,
+                "sustained": 35,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 1,
+                "mobility": 75,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 80,
+                    "sustain": 11
+                }
+            }
+        },
+        "Nami": {
+            "id": "Nami",
+            "name": "Nami",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 75,
+                "frontline": 5,
+                "burst": 30,
+                "sustained": 25,
+                "poke": 50,
+                "healShield": 70,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 30,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 50,
+                    "allIn": 33,
+                    "sustain": 54
+                }
+            }
+        },
+        "Nasus": {
+            "id": "Nasus",
+            "name": "Nasus",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 15,
+                "frontline": 70,
+                "burst": 30,
+                "sustained": 75,
+                "poke": 5,
+                "healShield": 10,
+                "splitpush": 80,
+                "ccDensity": 2,
+                "mobility": 20,
+                "range": 10,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "LATE",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 28,
+                    "sustain": 28
+                }
+            }
+        },
+        "Nautilus": {
+            "id": "Nautilus",
+            "name": "Nautilus",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 85,
+                "peel": 60,
+                "frontline": 70,
+                "burst": 20,
+                "sustained": 15,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 5.5,
+                "mobility": 35,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 10,
+                    "allIn": 53,
+                    "sustain": 3
+                }
+            }
+        },
+        "Neeko": {
+            "id": "Neeko",
+            "name": "Neeko",
+            "roles": [
+                "MID",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 30,
+                "frontline": 10,
+                "burst": 70,
+                "sustained": 40,
+                "poke": 50,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 3.5,
+                "mobility": 40,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 50,
+                    "allIn": 55,
+                    "sustain": 12
+                },
+                "SUPPORT": {
+                    "poke": 50,
+                    "allIn": 63,
+                    "sustain": 8
+                }
+            }
+        },
+        "Nidalee": {
+            "id": "Nidalee",
+            "name": "Nidalee",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 40,
+                "poke": 70,
+                "healShield": 20,
+                "splitpush": 20,
+                "ccDensity": 1,
+                "mobility": 75,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 33,
+                    "sustain": 26
+                }
+            }
+        },
+        "Nilah": {
+            "id": "Nilah",
+            "name": "Nilah",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 20,
+                "frontline": 15,
+                "burst": 60,
+                "sustained": 80,
+                "poke": 5,
+                "healShield": 15,
+                "splitpush": 20,
+                "ccDensity": 2,
+                "mobility": 75,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 5,
+                    "allIn": 70,
+                    "sustain": 29
+                }
+            }
+        },
+        "Nocturne": {
+            "id": "Nocturne",
+            "name": "Nocturne",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 5,
+                "frontline": 25,
+                "burst": 70,
+                "sustained": 55,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 1.5,
+                "mobility": 75,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 63,
+                    "sustain": 22
+                }
+            }
+        },
+        "Nunu": {
+            "id": "Nunu",
+            "name": "Nunu & Willump",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 30,
+                "frontline": 55,
+                "burst": 40,
+                "sustained": 40,
+                "poke": 10,
+                "healShield": 15,
+                "splitpush": 10,
+                "ccDensity": 3.5,
+                "mobility": 65,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 48,
+                    "sustain": 24
+                }
+            }
+        },
+        "Olaf": {
+            "id": "Olaf",
+            "name": "Olaf",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 5,
+                "frontline": 55,
+                "burst": 35,
+                "sustained": 80,
+                "poke": 10,
+                "healShield": 15,
+                "splitpush": 45,
+                "ccDensity": 1,
+                "mobility": 55,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 38,
+                    "sustain": 40
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 38,
+                    "sustain": 32
+                }
+            }
+        },
+        "Orianna": {
+            "id": "Orianna",
+            "name": "Orianna",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 45,
+                "frontline": 5,
+                "burst": 65,
+                "sustained": 60,
+                "poke": 55,
+                "healShield": 15,
+                "splitpush": 10,
+                "ccDensity": 3,
+                "mobility": 25,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 55,
+                    "allIn": 45,
+                    "sustain": 23
+                }
+            }
+        },
+        "Ornn": {
+            "id": "Ornn",
+            "name": "Ornn",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 45,
+                "frontline": 85,
+                "burst": 30,
+                "sustained": 30,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 4.5,
+                "mobility": 30,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 45,
+                    "sustain": 9
+                }
+            }
+        },
+        "Pantheon": {
+            "id": "Pantheon",
+            "name": "Pantheon",
+            "roles": [
+                "SUPPORT",
+                "MID",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 15,
+                "frontline": 35,
+                "burst": 70,
+                "sustained": 35,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 2.5,
+                "mobility": 55,
+                "range": 25,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 25,
+                    "allIn": 68,
+                    "sustain": 7
+                },
+                "MID": {
+                    "poke": 25,
+                    "allIn": 63,
+                    "sustain": 11
+                },
+                "TOP": {
+                    "poke": 25,
+                    "allIn": 68,
+                    "sustain": 11
+                }
+            }
+        },
+        "Poppy": {
+            "id": "Poppy",
+            "name": "Poppy",
+            "roles": [
+                "JUNGLE",
+                "TOP",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 50,
+                "peel": 60,
+                "frontline": 70,
+                "burst": 40,
+                "sustained": 30,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3.5,
+                "mobility": 45,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 45,
+                    "sustain": 12
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 45,
+                    "sustain": 9
+                },
+                "SUPPORT": {
+                    "poke": 10,
+                    "allIn": 45,
+                    "sustain": 6
+                }
+            }
+        },
+        "Pyke": {
+            "id": "Pyke",
+            "name": "Pyke",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 80,
+                "sustained": 15,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 80,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 15,
+                    "allIn": 68,
+                    "sustain": 3
+                }
+            }
+        },
+        "Qiyana": {
+            "id": "Qiyana",
+            "name": "Qiyana",
+            "roles": [
+                "MID",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 90,
+                "sustained": 25,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 2.5,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 85,
+                    "sustain": 8
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 65,
+                    "sustain": 10
+                }
+            }
+        },
+        "Quinn": {
+            "id": "Quinn",
+            "name": "Quinn",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 55,
+                "poke": 45,
+                "healShield": 0,
+                "splitpush": 55,
+                "ccDensity": 1.5,
+                "mobility": 75,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 45,
+                    "allIn": 38,
+                    "sustain": 17
+                }
+            }
+        },
+        "Rakan": {
+            "id": "Rakan",
+            "name": "Rakan",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 85,
+                "peel": 65,
+                "frontline": 25,
+                "burst": 25,
+                "sustained": 15,
+                "poke": 15,
+                "healShield": 30,
+                "splitpush": 5,
+                "ccDensity": 4,
+                "mobility": 80,
+                "range": 30,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 15,
+                    "allIn": 55,
+                    "sustain": 24
+                }
+            }
+        },
+        "Rammus": {
+            "id": "Rammus",
+            "name": "Rammus",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 35,
+                "frontline": 85,
+                "burst": 20,
+                "sustained": 40,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 4,
+                "mobility": 70,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 38,
+                    "sustain": 16
+                }
+            }
+        },
+        "RekSai": {
+            "id": "RekSai",
+            "name": "Rek'Sai",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 10,
+                "frontline": 40,
+                "burst": 65,
+                "sustained": 50,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 2.5,
+                "mobility": 65,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 60,
+                    "sustain": 20
+                }
+            }
+        },
+        "Rell": {
+            "id": "Rell",
+            "name": "Rell",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 80,
+                "peel": 60,
+                "frontline": 65,
+                "burst": 15,
+                "sustained": 15,
+                "poke": 5,
+                "healShield": 10,
+                "splitpush": 5,
+                "ccDensity": 4.5,
+                "mobility": 50,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 48,
+                    "sustain": 10
+                }
+            }
+        },
+        "Renata": {
+            "id": "Renata",
+            "name": "Renata Glasc",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 65,
+                "frontline": 10,
+                "burst": 25,
+                "sustained": 25,
+                "poke": 35,
+                "healShield": 45,
+                "splitpush": 5,
+                "ccDensity": 4,
+                "mobility": 20,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 35,
+                    "allIn": 30,
+                    "sustain": 37
+                }
+            }
+        },
+        "Renekton": {
+            "id": "Renekton",
+            "name": "Renekton",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 15,
+                "frontline": 55,
+                "burst": 65,
+                "sustained": 55,
+                "poke": 10,
+                "healShield": 10,
+                "splitpush": 50,
+                "ccDensity": 2.5,
+                "mobility": 55,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 60,
+                    "sustain": 22
+                }
+            }
+        },
+        "Rengar": {
+            "id": "Rengar",
+            "name": "Rengar",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 5,
+                "frontline": 10,
+                "burst": 90,
+                "sustained": 40,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 1.5,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 16
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 58,
+                    "sustain": 12
+                }
+            }
+        },
+        "Riven": {
+            "id": "Riven",
+            "name": "Riven",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 10,
+                "frontline": 20,
+                "burst": 75,
+                "sustained": 60,
+                "poke": 10,
+                "healShield": 10,
+                "splitpush": 65,
+                "ccDensity": 2.5,
+                "mobility": 80,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 58,
+                    "sustain": 23
+                }
+            }
+        },
+        "Rumble": {
+            "id": "Rumble",
+            "name": "Rumble",
+            "roles": [
+                "TOP",
+                "MID"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 15,
+                "frontline": 30,
+                "burst": 65,
+                "sustained": 65,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 2,
+                "mobility": 35,
+                "range": 30,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 30,
+                    "allIn": 48,
+                    "sustain": 20
+                },
+                "MID": {
+                    "poke": 30,
+                    "allIn": 50,
+                    "sustain": 20
+                }
+            }
+        },
+        "Ryze": {
+            "id": "Ryze",
+            "name": "Ryze",
+            "roles": [
+                "MID",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 15,
+                "frontline": 10,
+                "burst": 55,
+                "sustained": 70,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 35,
+                "ccDensity": 2.5,
+                "mobility": 30,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 30,
+                    "allIn": 43,
+                    "sustain": 21
+                },
+                "TOP": {
+                    "poke": 30,
+                    "allIn": 38,
+                    "sustain": 21
+                }
+            }
+        },
+        "Samira": {
+            "id": "Samira",
+            "name": "Samira",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 10,
+                "frontline": 10,
+                "burst": 80,
+                "sustained": 70,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 1.5,
+                "mobility": 75,
+                "range": 30,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 10,
+                    "allIn": 75,
+                    "sustain": 21
+                }
+            }
+        },
+        "Sejuani": {
+            "id": "Sejuani",
+            "name": "Sejuani",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 75,
+                "peel": 50,
+                "frontline": 80,
+                "burst": 25,
+                "sustained": 30,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 5,
+                "mobility": 40,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 50,
+                    "sustain": 12
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 50,
+                    "sustain": 9
+                }
+            }
+        },
+        "Senna": {
+            "id": "Senna",
+            "name": "Senna",
+            "roles": [
+                "SUPPORT",
+                "BOT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 30,
+                "frontline": 5,
+                "burst": 40,
+                "sustained": 55,
+                "poke": 65,
+                "healShield": 40,
+                "splitpush": 10,
+                "ccDensity": 2,
+                "mobility": 20,
+                "range": 80,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 65,
+                    "allIn": 28,
+                    "sustain": 39
+                },
+                "BOT": {
+                    "poke": 65,
+                    "allIn": 48,
+                    "sustain": 29
+                }
+            }
+        },
+        "Seraphine": {
+            "id": "Seraphine",
+            "name": "Seraphine",
+            "roles": [
+                "SUPPORT",
+                "MID",
+                "BOT"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 55,
+                "frontline": 5,
+                "burst": 40,
+                "sustained": 50,
+                "poke": 55,
+                "healShield": 55,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 20,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 55,
+                    "allIn": 33,
+                    "sustain": 49
+                },
+                "MID": {
+                    "poke": 55,
+                    "allIn": 30,
+                    "sustain": 32
+                },
+                "BOT": {
+                    "poke": 55,
+                    "allIn": 45,
+                    "sustain": 32
+                }
+            }
+        },
+        "Sett": {
+            "id": "Sett",
+            "name": "Sett",
+            "roles": [
+                "TOP",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 30,
+                "frontline": 75,
+                "burst": 55,
+                "sustained": 60,
+                "poke": 5,
+                "healShield": 10,
+                "splitpush": 45,
+                "ccDensity": 2.5,
+                "mobility": 45,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 60,
+                    "sustain": 23
+                },
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 60,
+                    "sustain": 19
+                }
+            }
+        },
+        "Shaco": {
+            "id": "Shaco",
+            "name": "Shaco",
+            "roles": [
+                "JUNGLE",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 75,
+                "sustained": 30,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 2,
+                "mobility": 70,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 48,
+                    "sustain": 12
+                },
+                "SUPPORT": {
+                    "poke": 15,
+                    "allIn": 48,
+                    "sustain": 6
+                }
+            }
+        },
+        "Shen": {
+            "id": "Shen",
+            "name": "Shen",
+            "roles": [
+                "TOP",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 65,
+                "frontline": 70,
+                "burst": 20,
+                "sustained": 35,
+                "poke": 5,
+                "healShield": 30,
+                "splitpush": 35,
+                "ccDensity": 3,
+                "mobility": 50,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 38,
+                    "sustain": 26
+                },
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 38,
+                    "sustain": 28
+                }
+            }
+        },
+        "Shyvana": {
+            "id": "Shyvana",
+            "name": "Shyvana",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 5,
+                "frontline": 55,
+                "burst": 55,
+                "sustained": 65,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 45,
+                "ccDensity": 1,
+                "mobility": 50,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 43,
+                    "sustain": 26
+                }
+            }
+        },
+        "Singed": {
+            "id": "Singed",
+            "name": "Singed",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 15,
+                "frontline": 55,
+                "burst": 15,
+                "sustained": 65,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 50,
+                "ccDensity": 2,
+                "mobility": 45,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 23,
+                    "sustain": 20
+                }
+            }
+        },
+        "Sion": {
+            "id": "Sion",
+            "name": "Sion",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 55,
+                "peel": 25,
+                "frontline": 90,
+                "burst": 40,
+                "sustained": 95,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 75,
+                "ccDensity": 3.5,
+                "mobility": 30,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 25,
+                    "allIn": 48,
+                    "sustain": 11
+                }
+            }
+        },
+        "Sivir": {
+            "id": "Sivir",
+            "name": "Sivir",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 40,
+                "sustained": 80,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 1,
+                "mobility": 30,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 40,
+                    "allIn": 60,
+                    "sustain": 24
+                }
+            }
+        },
+        "Skarner": {
+            "id": "Skarner",
+            "name": "Skarner",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 75,
+                "peel": 40,
+                "frontline": 70,
+                "burst": 25,
+                "sustained": 40,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 4,
+                "mobility": 50,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 50,
+                    "sustain": 16
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 50,
+                    "sustain": 12
+                }
+            }
+        },
+        "Smolder": {
+            "id": "Smolder",
+            "name": "Smolder",
+            "roles": [
+                "BOT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 70,
+                "poke": 60,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 1.5,
+                "mobility": 40,
+                "range": 70,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "LATE",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 60,
+                    "allIn": 63,
+                    "sustain": 21
+                },
+                "MID": {
+                    "poke": 60,
+                    "allIn": 48,
+                    "sustain": 21
+                }
+            }
+        },
+        "Sona": {
+            "id": "Sona",
+            "name": "Sona",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 65,
+                "frontline": 5,
+                "burst": 30,
+                "sustained": 35,
+                "poke": 40,
+                "healShield": 80,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 15,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 40,
+                    "allIn": 23,
+                    "sustain": 63
+                }
+            }
+        },
+        "Soraka": {
+            "id": "Soraka",
+            "name": "Soraka",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 70,
+                "frontline": 5,
+                "burst": 15,
+                "sustained": 25,
+                "poke": 45,
+                "healShield": 90,
+                "splitpush": 5,
+                "ccDensity": 2.5,
+                "mobility": 15,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 45,
+                    "allIn": 13,
+                    "sustain": 68
+                }
+            }
+        },
+        "Swain": {
+            "id": "Swain",
+            "name": "Swain",
+            "roles": [
+                "SUPPORT",
+                "MID",
+                "BOT"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 25,
+                "frontline": 45,
+                "burst": 50,
+                "sustained": 70,
+                "poke": 35,
+                "healShield": 15,
+                "splitpush": 10,
+                "ccDensity": 3.5,
+                "mobility": 20,
+                "range": 50,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 35,
+                    "allIn": 45,
+                    "sustain": 25
+                },
+                "MID": {
+                    "poke": 35,
+                    "allIn": 35,
+                    "sustain": 26
+                },
+                "BOT": {
+                    "poke": 35,
+                    "allIn": 60,
+                    "sustain": 26
+                }
+            }
+        },
+        "Sylas": {
+            "id": "Sylas",
+            "name": "Sylas",
+            "roles": [
+                "MID",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 15,
+                "frontline": 25,
+                "burst": 75,
+                "sustained": 50,
+                "poke": 25,
+                "healShield": 15,
+                "splitpush": 25,
+                "ccDensity": 2.5,
+                "mobility": 60,
+                "range": 20,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 25,
+                    "allIn": 68,
+                    "sustain": 20
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 28
+                }
+            }
+        },
+        "Syndra": {
+            "id": "Syndra",
+            "name": "Syndra",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 30,
+                "frontline": 5,
+                "burst": 90,
+                "sustained": 45,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 20,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 55,
+                    "allIn": 55,
+                    "sustain": 14
+                }
+            }
+        },
+        "TahmKench": {
+            "id": "TahmKench",
+            "name": "Tahm Kench",
+            "roles": [
+                "TOP",
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 60,
+                "frontline": 85,
+                "burst": 20,
+                "sustained": 45,
+                "poke": 15,
+                "healShield": 20,
+                "splitpush": 25,
+                "ccDensity": 3.5,
+                "mobility": 25,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 30,
+                    "sustain": 24
+                },
+                "SUPPORT": {
+                    "poke": 15,
+                    "allIn": 30,
+                    "sustain": 23
+                }
+            }
+        },
+        "Taliyah": {
+            "id": "Taliyah",
+            "name": "Taliyah",
+            "roles": [
+                "MID",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 30,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 55,
+                "poke": 50,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3.5,
+                "mobility": 50,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 50,
+                    "allIn": 55,
+                    "sustain": 17
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 43,
+                    "sustain": 22
+                }
+            }
+        },
+        "Talon": {
+            "id": "Talon",
+            "name": "Talon",
+            "roles": [
+                "MID",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 5,
+                "frontline": 5,
+                "burst": 90,
+                "sustained": 25,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 35,
+                "ccDensity": 1,
+                "mobility": 85,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 88,
+                    "sustain": 8
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 58,
+                    "sustain": 10
+                }
+            }
+        },
+        "Taric": {
+            "id": "Taric",
+            "name": "Taric",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 50,
+                "peel": 75,
+                "frontline": 60,
+                "burst": 15,
+                "sustained": 20,
+                "poke": 5,
+                "healShield": 55,
+                "splitpush": 10,
+                "ccDensity": 3.5,
+                "mobility": 25,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 5,
+                    "allIn": 33,
+                    "sustain": 43
+                }
+            }
+        },
+        "Teemo": {
+            "id": "Teemo",
+            "name": "Teemo",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 50,
+                "sustained": 55,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 45,
+                "ccDensity": 2,
+                "mobility": 40,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 55,
+                    "allIn": 30,
+                    "sustain": 17
+                }
+            }
+        },
+        "Thresh": {
+            "id": "Thresh",
+            "name": "Thresh",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 70,
+                "peel": 75,
+                "frontline": 40,
+                "burst": 20,
+                "sustained": 15,
+                "poke": 20,
+                "healShield": 20,
+                "splitpush": 5,
+                "ccDensity": 4.5,
+                "mobility": 40,
+                "range": 30,
+                "damageType": "AP",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 20,
+                    "allIn": 45,
+                    "sustain": 17
+                }
+            }
+        },
+        "Tristana": {
+            "id": "Tristana",
+            "name": "Tristana",
+            "roles": [
+                "BOT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 65,
+                "sustained": 80,
+                "poke": 20,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 1.5,
+                "mobility": 60,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 20,
+                    "allIn": 73,
+                    "sustain": 24
+                },
+                "MID": {
+                    "poke": 20,
+                    "allIn": 63,
+                    "sustain": 24
+                }
+            }
+        },
+        "Trundle": {
+            "id": "Trundle",
+            "name": "Trundle",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 15,
+                "frontline": 60,
+                "burst": 30,
+                "sustained": 75,
+                "poke": 5,
+                "healShield": 10,
+                "splitpush": 75,
+                "ccDensity": 2,
+                "mobility": 45,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 33,
+                    "sustain": 35
+                },
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 33,
+                    "sustain": 28
+                }
+            }
+        },
+        "Tryndamere": {
+            "id": "Tryndamere",
+            "name": "Tryndamere",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 5,
+                "frontline": 20,
+                "burst": 55,
+                "sustained": 85,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 95,
+                "ccDensity": 0.5,
+                "mobility": 70,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 38,
+                    "sustain": 26
+                }
+            }
+        },
+        "TwistedFate": {
+            "id": "TwistedFate",
+            "name": "Twisted Fate",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 50,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 2.5,
+                "mobility": 40,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 48,
+                    "sustain": 15
+                }
+            }
+        },
+        "Twitch": {
+            "id": "Twitch",
+            "name": "Twitch",
+            "roles": [
+                "BOT",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 55,
+                "sustained": 85,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 20,
+                "ccDensity": 1,
+                "mobility": 40,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 30,
+                    "allIn": 70,
+                    "sustain": 26
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 33,
+                    "sustain": 34
+                }
+            }
+        },
+        "Udyr": {
+            "id": "Udyr",
+            "name": "Udyr",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 45,
+                "peel": 25,
+                "frontline": 60,
+                "burst": 30,
+                "sustained": 65,
+                "poke": 10,
+                "healShield": 10,
+                "splitpush": 55,
+                "ccDensity": 3,
+                "mobility": 55,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 38,
+                    "sustain": 31
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 38,
+                    "sustain": 25
+                }
+            }
+        },
+        "Urgot": {
+            "id": "Urgot",
+            "name": "Urgot",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 35,
+                "peel": 15,
+                "frontline": 70,
+                "burst": 45,
+                "sustained": 70,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 45,
+                "ccDensity": 2,
+                "mobility": 25,
+                "range": 45,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 25,
+                    "allIn": 40,
+                    "sustain": 21
+                }
+            }
+        },
+        "Varus": {
+            "id": "Varus",
+            "name": "Varus",
+            "roles": [
+                "BOT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 65,
+                "sustained": 70,
+                "poke": 65,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 2,
+                "mobility": 15,
+                "range": 75,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 65,
+                    "allIn": 68,
+                    "sustain": 21
+                },
+                "MID": {
+                    "poke": 65,
+                    "allIn": 40,
+                    "sustain": 21
+                }
+            }
+        },
+        "Vayne": {
+            "id": "Vayne",
+            "name": "Vayne",
+            "roles": [
+                "BOT",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 60,
+                "sustained": 90,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 50,
+                "ccDensity": 1,
+                "mobility": 55,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 10,
+                    "allIn": 75,
+                    "sustain": 27
+                },
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 35,
+                    "sustain": 27
+                }
+            }
+        },
+        "Veigar": {
+            "id": "Veigar",
+            "name": "Veigar",
+            "roles": [
+                "MID",
+                "BOT"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 35,
+                "frontline": 5,
+                "burst": 95,
+                "sustained": 30,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 10,
+                "range": 60,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "LATE",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 53,
+                    "sustain": 9
+                },
+                "BOT": {
+                    "poke": 40,
+                    "allIn": 63,
+                    "sustain": 9
+                }
+            }
+        },
+        "VelKoz": {
+            "id": "VelKoz",
+            "name": "Vel'Koz",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 25,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 60,
+                "poke": 75,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 3,
+                "mobility": 10,
+                "range": 75,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 75,
+                    "allIn": 43,
+                    "sustain": 12
+                },
+                "MID": {
+                    "poke": 75,
+                    "allIn": 40,
+                    "sustain": 18
+                }
+            }
+        },
+        "Vex": {
+            "id": "Vex",
+            "name": "Vex",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 40,
+                "peel": 25,
+                "frontline": 10,
+                "burst": 80,
+                "sustained": 35,
+                "poke": 40,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 3,
+                "mobility": 50,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 40,
+                    "allIn": 65,
+                    "sustain": 11
+                }
+            }
+        },
+        "Vi": {
+            "id": "Vi",
+            "name": "Vi",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 70,
+                "peel": 15,
+                "frontline": 45,
+                "burst": 65,
+                "sustained": 45,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 3,
+                "mobility": 65,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 68,
+                    "sustain": 18
+                }
+            }
+        },
+        "Viego": {
+            "id": "Viego",
+            "name": "Viego",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 10,
+                "frontline": 25,
+                "burst": 65,
+                "sustained": 65,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 35,
+                "ccDensity": 1.5,
+                "mobility": 70,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 48,
+                    "sustain": 26
+                }
+            }
+        },
+        "Viktor": {
+            "id": "Viktor",
+            "name": "Viktor",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 25,
+                "peel": 30,
+                "frontline": 5,
+                "burst": 70,
+                "sustained": 65,
+                "poke": 55,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 3,
+                "mobility": 25,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 55,
+                    "allIn": 48,
+                    "sustain": 20
+                }
+            }
+        },
+        "Vladimir": {
+            "id": "Vladimir",
+            "name": "Vladimir",
+            "roles": [
+                "MID",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 10,
+                "frontline": 25,
+                "burst": 65,
+                "sustained": 75,
+                "poke": 30,
+                "healShield": 20,
+                "splitpush": 35,
+                "ccDensity": 1,
+                "mobility": 30,
+                "range": 55,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "LATE",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 30,
+                    "allIn": 48,
+                    "sustain": 29
+                },
+                "TOP": {
+                    "poke": 30,
+                    "allIn": 40,
+                    "sustain": 33
+                }
+            }
+        },
+        "Volibear": {
+            "id": "Volibear",
+            "name": "Volibear",
+            "roles": [
+                "TOP",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 60,
+                "peel": 20,
+                "frontline": 75,
+                "burst": 40,
+                "sustained": 55,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 30,
+                "ccDensity": 3,
+                "mobility": 55,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 50,
+                    "sustain": 17
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 50,
+                    "sustain": 22
+                }
+            }
+        },
+        "Warwick": {
+            "id": "Warwick",
+            "name": "Warwick",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 50,
+                "peel": 15,
+                "frontline": 50,
+                "burst": 35,
+                "sustained": 70,
+                "poke": 5,
+                "healShield": 20,
+                "splitpush": 40,
+                "ccDensity": 2.5,
+                "mobility": 65,
+                "range": 15,
+                "damageType": "MIXED",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 43,
+                    "sustain": 38
+                },
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 43,
+                    "sustain": 31
+                }
+            }
+        },
+        "Wukong": {
+            "id": "Wukong",
+            "name": "Wukong",
+            "roles": [
+                "TOP",
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 15,
+                "frontline": 40,
+                "burst": 60,
+                "sustained": 55,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 35,
+                "ccDensity": 3,
+                "mobility": 65,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 10,
+                    "allIn": 63,
+                    "sustain": 17
+                },
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 63,
+                    "sustain": 22
+                }
+            }
+        },
+        "Xayah": {
+            "id": "Xayah",
+            "name": "Xayah",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 65,
+                "sustained": 75,
+                "poke": 25,
+                "healShield": 0,
+                "splitpush": 15,
+                "ccDensity": 2,
+                "mobility": 40,
+                "range": 55,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 25,
+                    "allIn": 70,
+                    "sustain": 23
+                }
+            }
+        },
+        "Xerath": {
+            "id": "Xerath",
+            "name": "Xerath",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 40,
+                "frontline": 0,
+                "burst": 65,
+                "sustained": 75,
+                "poke": 90,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 2.5,
+                "mobility": 5,
+                "range": 85,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 80,
+                    "allIn": 38,
+                    "sustain": 15
+                },
+                "MID": {
+                    "poke": 75,
+                    "allIn": 35,
+                    "sustain": 23
+                }
+            }
+        },
+        "XinZhao": {
+            "id": "XinZhao",
+            "name": "Xin Zhao",
+            "roles": [
+                "JUNGLE"
+            ],
+            "tags": {
+                "engage": 65,
+                "peel": 20,
+                "frontline": 45,
+                "burst": 55,
+                "sustained": 55,
+                "poke": 10,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 2.5,
+                "mobility": 65,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "EARLY",
+                "threatWindow": {
+                    "start": "EARLY",
+                    "end": "MID"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 60,
+                    "sustain": 22
+                }
+            }
+        },
+        "Yasuo": {
+            "id": "Yasuo",
+            "name": "Yasuo",
+            "roles": [
+                "MID",
+                "BOT",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 15,
+                "frontline": 15,
+                "burst": 70,
+                "sustained": 80,
+                "poke": 5,
+                "healShield": 0,
+                "splitpush": 55,
+                "ccDensity": 1,
+                "mobility": 80,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 5,
+                    "allIn": 75,
+                    "sustain": 24
+                },
+                "BOT": {
+                    "poke": 5,
+                    "allIn": 75,
+                    "sustain": 24
+                },
+                "TOP": {
+                    "poke": 5,
+                    "allIn": 50,
+                    "sustain": 24
+                }
+            }
+        },
+        "Yone": {
+            "id": "Yone",
+            "name": "Yone",
+            "roles": [
+                "MID",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 50,
+                "peel": 10,
+                "frontline": 15,
+                "burst": 75,
+                "sustained": 75,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 50,
+                "ccDensity": 2,
+                "mobility": 75,
+                "range": 20,
+                "damageType": "MIXED",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 15,
+                    "allIn": 75,
+                    "sustain": 23
+                },
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 63,
+                    "sustain": 23
+                }
+            }
+        },
+        "Yorick": {
+            "id": "Yorick",
+            "name": "Yorick",
+            "roles": [
+                "TOP"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 10,
+                "frontline": 50,
+                "burst": 35,
+                "sustained": 65,
+                "poke": 15,
+                "healShield": 0,
+                "splitpush": 95,
+                "ccDensity": 2,
+                "mobility": 20,
+                "range": 15,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 28,
+                    "sustain": 20
+                }
+            }
+        },
+        "Yuumi": {
+            "id": "Yuumi",
+            "name": "Yuumi",
+            "roles": [
+                "SUPPORT"
+            ],
+            "tags": {
+                "engage": 5,
+                "peel": 60,
+                "frontline": 0,
+                "burst": 15,
+                "sustained": 15,
+                "poke": 30,
+                "healShield": 90,
+                "splitpush": 0,
+                "ccDensity": 2,
+                "mobility": 30,
+                "range": 80,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 30,
+                    "allIn": 10,
+                    "sustain": 66
+                }
+            }
+        },
+        "Zac": {
+            "id": "Zac",
+            "name": "Zac",
+            "roles": [
+                "JUNGLE",
+                "TOP"
+            ],
+            "tags": {
+                "engage": 80,
+                "peel": 40,
+                "frontline": 75,
+                "burst": 30,
+                "sustained": 40,
+                "poke": 15,
+                "healShield": 10,
+                "splitpush": 10,
+                "ccDensity": 4.5,
+                "mobility": 60,
+                "range": 15,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "JUNGLE": {
+                    "poke": 0,
+                    "allIn": 55,
+                    "sustain": 21
+                },
+                "TOP": {
+                    "poke": 15,
+                    "allIn": 55,
+                    "sustain": 17
+                }
+            }
+        },
+        "Zed": {
+            "id": "Zed",
+            "name": "Zed",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 20,
+                "peel": 5,
+                "frontline": 5,
+                "burst": 95,
+                "sustained": 30,
+                "poke": 30,
+                "healShield": 0,
+                "splitpush": 45,
+                "ccDensity": 1,
+                "mobility": 85,
+                "range": 20,
+                "damageType": "AD",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 30,
+                    "allIn": 90,
+                    "sustain": 9
+                }
+            }
+        },
+        "Zeri": {
+            "id": "Zeri",
+            "name": "Zeri",
+            "roles": [
+                "BOT"
+            ],
+            "tags": {
+                "engage": 10,
+                "peel": 10,
+                "frontline": 5,
+                "burst": 45,
+                "sustained": 80,
+                "poke": 35,
+                "healShield": 0,
+                "splitpush": 25,
+                "ccDensity": 1,
+                "mobility": 80,
+                "range": 60,
+                "damageType": "AD",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "BOT": {
+                    "poke": 35,
+                    "allIn": 63,
+                    "sustain": 24
+                }
+            }
+        },
+        "Ziggs": {
+            "id": "Ziggs",
+            "name": "Ziggs",
+            "roles": [
+                "MID",
+                "BOT"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 20,
+                "frontline": 5,
+                "burst": 65,
+                "sustained": 55,
+                "poke": 85,
+                "healShield": 0,
+                "splitpush": 40,
+                "ccDensity": 2.5,
+                "mobility": 20,
+                "range": 80,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 75,
+                    "allIn": 43,
+                    "sustain": 17
+                },
+                "BOT": {
+                    "poke": 65,
+                    "allIn": 60,
+                    "sustain": 17
+                }
+            }
+        },
+        "Zilean": {
+            "id": "Zilean",
+            "name": "Zilean",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 70,
+                "frontline": 5,
+                "burst": 30,
+                "sustained": 30,
+                "poke": 40,
+                "healShield": 40,
+                "splitpush": 5,
+                "ccDensity": 3.5,
+                "mobility": 45,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "LATE",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 40,
+                    "allIn": 23,
+                    "sustain": 34
+                },
+                "MID": {
+                    "poke": 40,
+                    "allIn": 38,
+                    "sustain": 21
+                }
+            }
+        },
+        "Zoe": {
+            "id": "Zoe",
+            "name": "Zoe",
+            "roles": [
+                "MID"
+            ],
+            "tags": {
+                "engage": 15,
+                "peel": 15,
+                "frontline": 5,
+                "burst": 90,
+                "sustained": 25,
+                "poke": 70,
+                "healShield": 0,
+                "splitpush": 5,
+                "ccDensity": 2.5,
+                "mobility": 50,
+                "range": 70,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "MID": {
+                    "poke": 70,
+                    "allIn": 70,
+                    "sustain": 8
+                }
+            }
+        },
+        "Zyra": {
+            "id": "Zyra",
+            "name": "Zyra",
+            "roles": [
+                "SUPPORT",
+                "MID"
+            ],
+            "tags": {
+                "engage": 30,
+                "peel": 35,
+                "frontline": 10,
+                "burst": 55,
+                "sustained": 55,
+                "poke": 60,
+                "healShield": 0,
+                "splitpush": 10,
+                "ccDensity": 3.5,
+                "mobility": 15,
+                "range": 65,
+                "damageType": "AP",
+                "scalingCurve": "MID",
+                "threatWindow": {
+                    "start": "MID",
+                    "end": "LATE"
+                }
+            },
+            "laneStrengths": {
+                "SUPPORT": {
+                    "poke": 60,
+                    "allIn": 43,
+                    "sustain": 11
+                },
+                "MID": {
+                    "poke": 60,
+                    "allIn": 35,
+                    "sustain": 17
+                }
+            }
+        }
+    }
+}

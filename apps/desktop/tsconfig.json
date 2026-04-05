@@ -6,12 +6,22 @@
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "shared/*": ["../../shared/*"]
+      "shared/*": [
+        "../../shared/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "../../shared/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../shared/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

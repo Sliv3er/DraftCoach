@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { CacheEntry } from '../../../shared/types';
+import { CacheEntry } from '../../../../shared/types';
 
 const CACHE_DIR = process.env.APPDATA
   ? path.join(process.env.APPDATA, 'DraftCoach')
@@ -34,13 +34,13 @@ export function getCache(key: string): CacheEntry | null {
   return all[key] || null;
 }
 
-export function setCache(key: string, text: string, patchDetected: string): void {
+export function setCache(key: string, text: string, patchUsed: string): void {
   const all = readAll();
   all[key] = {
     key,
     timestamp: Date.now(),
     text,
-    patchDetected,
+    patchDetected: patchUsed,
     source: 'grounded',
   };
   writeAll(all);

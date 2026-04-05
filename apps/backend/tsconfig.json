@@ -5,12 +5,16 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "resolveJsonModule": true,
     "paths": {
-      "shared/*": ["../../shared/*"]
+      "shared/*": [
+        "../../shared/*"
+      ]
     },
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "../../shared/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "../../shared/**/*.ts"
+  ]
 }

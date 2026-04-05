@@ -5,6 +5,10 @@ let versionFetchedAt = 0;
 const VERSION_TTL = 60 * 60 * 1000; // 1 hour
 
 export async function fetchDDragonVersion(): Promise<string> {
+  if (process.env.MOCK_LIVE_PATCH) {
+    return process.env.MOCK_LIVE_PATCH;
+  }
+
   if (cachedVersion && Date.now() - versionFetchedAt < VERSION_TTL) {
     return cachedVersion;
   }

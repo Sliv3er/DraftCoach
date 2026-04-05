@@ -13,6 +13,7 @@ export interface BuildRequest {
   role: Role;
   allies: string[];
   enemies: string[];
+  model?: string;
 }
 
 export interface BuildSuccessResponse {

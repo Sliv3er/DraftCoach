@@ -16,7 +16,8 @@ import { ipcRenderer } from 'electron';
 
 const SECTION_KEYS = [
   'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
-  'CORE BUILD', 'SITUATIONAL ITEMS',
+  'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
+  'ENEMY POWER SPIKES', 'WIN CONDITION',
 ];
 
 function parseSections(text: string): { title: string; content: string }[] {
@@ -44,7 +45,7 @@ function parseSections(text: string): { title: string; content: string }[] {
 }
 
 function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text).catch(() => {});
+  navigator.clipboard.writeText(text).catch(() => { });
 }
 
 function IconImg({ src, alt, className }: { src?: string; alt: string; className: string }) {
@@ -298,6 +299,80 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   );
 }
 
+function renderJunglePath(content: string) {
+  const path = content.trim()
+    .replace(/\s*-+>\s*/g, ' ➔ ')
+    .replace(/\s*->+\s*/g, ' ➔ ')
+    .replace(/\s*→\s*/g, ' ➔ ');
+  const camps = path.split(/\s*➔\s*/);
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', padding: '4px 0' }}>
+      {camps.map((camp, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>➔</span>}
+          <span style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border)',
+            padding: '5px 10px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: 600,
+            color: 'var(--accent-green)',
+          }}>{camp.trim()}</span>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+function renderPowerSpikes(content: string) {
+  const lines = content.split('\n').filter(l => l.trim());
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      {lines.map((line, i) => {
+        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^[-*•]\s*/, '');
+        const colonIdx = cleaned.indexOf(':');
+        const champName = colonIdx > 0 ? cleaned.slice(0, colonIdx).trim() : '';
+        const spike = colonIdx > 0 ? cleaned.slice(colonIdx + 1).trim() : cleaned;
+        return (
+          <div key={i} style={{
+            display: 'flex',
+            gap: '8px',
+            alignItems: 'flex-start',
+            padding: '6px 10px',
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+          }}>
+            <span style={{ color: '#e74c3c', fontWeight: 700, fontSize: '13px', flexShrink: 0 }}>⚠</span>
+            <div>
+              {champName && <span style={{ fontWeight: 600, color: 'var(--gold)', fontSize: '12px' }}>{champName}: </span>}
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{spike}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderWinCondition(content: string) {
+  return (
+    <div style={{
+      padding: '10px 14px',
+      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
+      border: '1px solid rgba(59, 130, 246, 0.2)',
+      borderRadius: '8px',
+      fontSize: '13px',
+      lineHeight: '1.6',
+      color: 'var(--text-primary)',
+      fontWeight: 500,
+    }}>
+      {content.replace(/\*\*/g, '').trim()}
+    </div>
+  );
+}
+
 function renderSection(title: string, content: string, lookups: IconLookups | null) {
   switch (title) {
     case 'RUNES': return renderRunes(content, lookups);
@@ -306,6 +381,9 @@ function renderSection(title: string, content: string, lookups: IconLookups | nu
     case 'STARTING ITEMS': return renderItems(content, lookups, false);
     case 'CORE BUILD': return renderItems(content, lookups, true);
     case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
+    case 'JUNGLE PATH': return renderJunglePath(content);
+    case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
+    case 'WIN CONDITION': return renderWinCondition(content);
     default: return <div className="build-output" style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
   }
 }
@@ -316,21 +394,34 @@ export function BuildOutput({ result, iconLookups, loading, championId, role }: 
   const handleExport = React.useCallback(async () => {
     if (!result?.ok || !result.text || !championId || !iconLookups?.itemIds) return;
 
-    // Convert Map to plain object for IPC serialization
-    const itemIdMap: Record<string, string> = {};
-    iconLookups.itemIds.forEach((id, name) => { itemIdMap[name] = id; });
+    setExportStatus('Exporting...');
 
     try {
-      const res = await ipcRenderer.invoke('export-item-set', {
+      // 1. Export Items
+      const itemIdMap: Record<string, string> = {};
+      iconLookups.itemIds.forEach((id, name) => { itemIdMap[name] = id; });
+
+      const itemRes = await ipcRenderer.invoke('export-item-set', {
         championId,
-        title: `DraftCoach - ${championId} ${role || ''}`.trim(),
+        title: `DC: ${championId} ${role || ''}`.trim(),
         rawText: result.text,
         itemIdMap,
       });
-      if (res.ok) {
-        setExportStatus(`✓ Exported ${res.itemCount} items → ${res.path}`);
+
+      // 2. Export Runes
+      const runeRes = await ipcRenderer.invoke('export-runes', {
+        championName: championId,
+        rawText: result.text,
+      });
+
+      if (itemRes.ok && runeRes.ok) {
+        setExportStatus('✓ Items & Runes Exported');
+      } else if (itemRes.ok) {
+        setExportStatus('✓ Items Exported (Runes failed)');
+      } else if (runeRes.ok) {
+        setExportStatus('✓ Runes Exported (Items failed)');
       } else {
-        setExportStatus(res.error || 'Export failed');
+        setExportStatus('✗ Export failed');
       }
     } catch (err: any) {
       setExportStatus(`Export failed: ${err.message}`);

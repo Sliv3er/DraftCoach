@@ -1,0 +1,22 @@
+{
+    "meta": {
+        "patch": "26.5",
+        "buildHash": "kb-ai-1772684692180",
+        "createdAt": "2026-03-05T03:00:00Z",
+        "source": "cascade-generator",
+        "checksum": "sha256:updated",
+        "previousPatch": "26.3",
+        "rollbackAvailable": false
+    },
+    "data": {
+        "laneMatchup": 0.2,
+        "teamNeeds": 0.15,
+        "teamDmgBalance": 0.1,
+        "enemyThreat": 0.15,
+        "synergy": 0.1,
+        "scalingMatch": 0.08,
+        "ccDensity": 0.07,
+        "rangeAdvantage": 0.08,
+        "mobilityGap": 0.07
+    }
+}

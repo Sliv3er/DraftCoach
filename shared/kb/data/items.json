@@ -1,0 +1,2047 @@
+{
+    "meta": {
+        "patch": "26.5",
+        "buildHash": "kb-ai-1772684692180",
+        "createdAt": "2026-03-05T03:26:39.227Z",
+        "source": "cascade-generator",
+        "checksum": "sha256:generated",
+        "previousPatch": "26.3",
+        "rollbackAvailable": true
+    },
+    "data": {
+        "1054": {
+            "id": "1054",
+            "name": "Doran's Shield",
+            "tags": [
+                "TANK",
+                "STARTING",
+                "DEFENSIVE"
+            ],
+            "cost": 450,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "health": 80
+            },
+            "passiveKeywords": [
+                "REGEN_ON_HIT"
+            ]
+        },
+        "1055": {
+            "id": "1055",
+            "name": "Doran's Blade",
+            "tags": [
+                "AD",
+                "STARTING"
+            ],
+            "cost": 450,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "ad": 10,
+                "health": 100
+            },
+            "passiveKeywords": [
+                "OMNIVAMP"
+            ]
+        },
+        "1056": {
+            "id": "1056",
+            "name": "Doran's Ring",
+            "tags": [
+                "AP",
+                "STARTING"
+            ],
+            "cost": 400,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "ap": 15,
+                "health": 70
+            },
+            "passiveKeywords": [
+                "MANA_REGEN"
+            ]
+        },
+        "1083": {
+            "id": "1083",
+            "name": "Cull",
+            "tags": [
+                "AD",
+                "STARTING",
+                "SCALING"
+            ],
+            "cost": 450,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "ad": 7
+            },
+            "passiveKeywords": [
+                "GOLD_ON_KILL"
+            ]
+        },
+        "1101": {
+            "id": "1101",
+            "name": "Scorchclaw Pup",
+            "tags": [
+                "JUNGLE",
+                "STARTING"
+            ],
+            "cost": 450,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "BURN_SMITE"
+            ]
+        },
+        "1102": {
+            "id": "1102",
+            "name": "Gustwalker Hatchling",
+            "tags": [
+                "JUNGLE",
+                "STARTING"
+            ],
+            "cost": 450,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "SPEED_SMITE"
+            ]
+        },
+        "1103": {
+            "id": "1103",
+            "name": "Mosstomper Seedling",
+            "tags": [
+                "JUNGLE",
+                "STARTING"
+            ],
+            "cost": 450,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "SHIELD_SMITE"
+            ]
+        },
+        "2003": {
+            "id": "2003",
+            "name": "Health Potion",
+            "tags": [
+                "CONSUMABLE",
+                "STARTING"
+            ],
+            "cost": 50,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "HEAL"
+            ]
+        },
+        "2031": {
+            "id": "2031",
+            "name": "Refillable Potion",
+            "tags": [
+                "CONSUMABLE",
+                "STARTING"
+            ],
+            "cost": 150,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "HEAL"
+            ]
+        },
+        "2055": {
+            "id": "2055",
+            "name": "Control Ward",
+            "tags": [
+                "CONSUMABLE",
+                "VISION"
+            ],
+            "cost": 75,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "VISION_CONTROL"
+            ]
+        },
+        "2065": {
+            "id": "2065",
+            "name": "Shurelya's Battlesong",
+            "tags": [
+                "SUPPORT",
+                "UTILITY",
+                "ENGAGE",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 40,
+                "abilityHaste": 20,
+                "health": 200
+            },
+            "passiveKeywords": [
+                "SPEED_ACTIVE"
+            ]
+        },
+        "3001": {
+            "id": "3001",
+            "name": "Evenshroud",
+            "tags": [
+                "TANK",
+                "SUPPORT",
+                "ARMOR",
+                "MR",
+                "ENGAGE"
+            ],
+            "cost": 2400,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 30,
+                "mr": 30,
+                "health": 300,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "EXPOSE_WEAKNESS"
+            ]
+        },
+        "3003": {
+            "id": "3003",
+            "name": "Archangel's Staff",
+            "tags": [
+                "AP",
+                "MANA",
+                "SCALING"
+            ],
+            "cost": 2600,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ap": 60,
+                "mana": 860
+            },
+            "passiveKeywords": [
+                "MANA_TO_AP"
+            ]
+        },
+        "3004": {
+            "id": "3004",
+            "name": "Manamune",
+            "tags": [
+                "AD",
+                "MANA",
+                "SCALING"
+            ],
+            "cost": 2900,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ad": 35,
+                "mana": 860
+            },
+            "passiveKeywords": [
+                "MANA_TO_AD"
+            ]
+        },
+        "3006": {
+            "id": "3006",
+            "name": "Berserker's Greaves",
+            "tags": [
+                "BOOTS",
+                "AD",
+                "ATTACK_SPEED"
+            ],
+            "cost": 1100,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "attackSpeed": 35
+            },
+            "passiveKeywords": [
+                "ATTACK_SPEED"
+            ]
+        },
+        "3009": {
+            "id": "3009",
+            "name": "Boots of Swiftness",
+            "tags": [
+                "BOOTS",
+                "UTILITY",
+                "MOBILITY"
+            ],
+            "cost": 900,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "SLOW_RESIST"
+            ]
+        },
+        "3011": {
+            "id": "3011",
+            "name": "Chemtech Putrifier",
+            "tags": [
+                "SUPPORT",
+                "AP",
+                "ANTI_HEAL",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 55,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "GRIEVOUS_WOUNDS_ALLY"
+            ]
+        },
+        "3013": {
+            "id": "3013",
+            "name": "Symbiotic Soles",
+            "tags": [
+                "BOOTS",
+                "UTILITY"
+            ],
+            "cost": 900,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "ADAPTIVE_MOVESPEED"
+            ]
+        },
+        "3020": {
+            "id": "3020",
+            "name": "Sorcerer's Shoes",
+            "tags": [
+                "BOOTS",
+                "AP",
+                "PENETRATION"
+            ],
+            "cost": 1100,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "magicPen": 18
+            },
+            "passiveKeywords": [
+                "FLAT_MAGIC_PEN"
+            ]
+        },
+        "3026": {
+            "id": "3026",
+            "name": "Guardian Angel",
+            "tags": [
+                "AD",
+                "SAFETY",
+                "ARMOR",
+                "DEFENSIVE",
+                "ANTI_DIVE"
+            ],
+            "cost": 3200,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ad": 45,
+                "armor": 40
+            },
+            "passiveKeywords": [
+                "REVIVE"
+            ]
+        },
+        "3031": {
+            "id": "3031",
+            "name": "Infinity Edge",
+            "tags": [
+                "AD",
+                "CRIT",
+                "DAMAGE",
+                "SCALING"
+            ],
+            "cost": 3400,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ad": 70,
+                "critChance": 25
+            },
+            "passiveKeywords": [
+                "CRIT_MULTIPLIER"
+            ]
+        },
+        "3033": {
+            "id": "3033",
+            "name": "Mortal Reminder",
+            "tags": [
+                "AD",
+                "ANTI_HEAL",
+                "CRIT",
+                "PENETRATION"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 35,
+                "critChance": 25,
+                "armorPenPercent": 25
+            },
+            "passiveKeywords": [
+                "GRIEVOUS_WOUNDS"
+            ]
+        },
+        "3036": {
+            "id": "3036",
+            "name": "Lord Dominik's Regards",
+            "tags": [
+                "AD",
+                "PENETRATION",
+                "ANTI_TANK"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 35,
+                "critChance": 25,
+                "armorPenPercent": 35
+            },
+            "passiveKeywords": [
+                "GIANT_SLAYER"
+            ]
+        },
+        "3040": {
+            "id": "3040",
+            "name": "Seraph's Embrace",
+            "tags": [
+                "AP",
+                "MANA",
+                "SCALING",
+                "HEALTH"
+            ],
+            "cost": 2600,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ap": 80,
+                "mana": 860
+            },
+            "passiveKeywords": [
+                "MANA_SHIELD"
+            ]
+        },
+        "3042": {
+            "id": "3042",
+            "name": "Muramana",
+            "tags": [
+                "AD",
+                "MANA",
+                "SCALING",
+                "ONHIT"
+            ],
+            "cost": 2900,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ad": 35,
+                "mana": 860
+            },
+            "passiveKeywords": [
+                "MANA_ONHIT"
+            ]
+        },
+        "3046": {
+            "id": "3046",
+            "name": "Phantom Dancer",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "CRIT"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "attackSpeed": 30,
+                "critChance": 25
+            },
+            "passiveKeywords": [
+                "GHOSTING"
+            ]
+        },
+        "3047": {
+            "id": "3047",
+            "name": "Plated Steelcaps",
+            "tags": [
+                "BOOTS",
+                "ARMOR",
+                "DEFENSIVE",
+                "TANK"
+            ],
+            "cost": 1100,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "armor": 20
+            },
+            "passiveKeywords": [
+                "BLOCK_AUTOS"
+            ]
+        },
+        "3053": {
+            "id": "3053",
+            "name": "Sterak's Gage",
+            "tags": [
+                "AD",
+                "HEALTH",
+                "DEFENSIVE",
+                "ANTI_BURST"
+            ],
+            "cost": 3100,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 45,
+                "health": 400
+            },
+            "passiveKeywords": [
+                "LIFELINE_SHIELD"
+            ]
+        },
+        "3065": {
+            "id": "3065",
+            "name": "Spirit Visage",
+            "tags": [
+                "TANK",
+                "MR",
+                "HEALTH",
+                "DEFENSIVE"
+            ],
+            "cost": 2900,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "mr": 60,
+                "health": 450,
+                "abilityHaste": 10
+            },
+            "passiveKeywords": [
+                "HEAL_AMPLIFIER"
+            ]
+        },
+        "3068": {
+            "id": "3068",
+            "name": "Sunfire Aegis",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "HEALTH",
+                "DAMAGE"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 40,
+                "health": 400,
+                "mr": 40
+            },
+            "passiveKeywords": [
+                "IMMOLATE"
+            ]
+        },
+        "3071": {
+            "id": "3071",
+            "name": "Black Cleaver",
+            "tags": [
+                "AD",
+                "HEALTH",
+                "PENETRATION",
+                "UTILITY"
+            ],
+            "cost": 3100,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 40,
+                "health": 450,
+                "abilityHaste": 25
+            },
+            "passiveKeywords": [
+                "ARMOR_SHRED"
+            ]
+        },
+        "3072": {
+            "id": "3072",
+            "name": "Bloodthirster",
+            "tags": [
+                "AD",
+                "LIFESTEAL",
+                "CRIT"
+            ],
+            "cost": 3400,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ad": 55,
+                "critChance": 20
+            },
+            "passiveKeywords": [
+                "OVERHEAL_SHIELD",
+                "LIFESTEAL"
+            ]
+        },
+        "3074": {
+            "id": "3074",
+            "name": "Ravenous Hydra",
+            "tags": [
+                "AD",
+                "LIFESTEAL",
+                "DAMAGE"
+            ],
+            "cost": 3400,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 65,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "OMNIVAMP",
+                "AOE_CLEAVE"
+            ]
+        },
+        "3075": {
+            "id": "3075",
+            "name": "Thornmail",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "ANTI_HEAL",
+                "DEFENSIVE"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 60,
+                "health": 350
+            },
+            "passiveKeywords": [
+                "REFLECT_DAMAGE",
+                "GRIEVOUS_WOUNDS"
+            ]
+        },
+        "3078": {
+            "id": "3078",
+            "name": "Trinity Force",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "HEALTH"
+            ],
+            "cost": 3333,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 35,
+                "attackSpeed": 30,
+                "health": 300,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "SPELLBLADE",
+                "THREEFOLD"
+            ]
+        },
+        "3082": {
+            "id": "3082",
+            "name": "Warden's Mail",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "DEFENSIVE"
+            ],
+            "cost": 1000,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "armor": 40
+            },
+            "passiveKeywords": [
+                "ATTACK_SPEED_SLOW"
+            ]
+        },
+        "3083": {
+            "id": "3083",
+            "name": "Warmog's Armor",
+            "tags": [
+                "TANK",
+                "HEALTH",
+                "REGEN",
+                "DEFENSIVE"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "health": 800
+            },
+            "passiveKeywords": [
+                "REGEN_PASSIVE"
+            ]
+        },
+        "3085": {
+            "id": "3085",
+            "name": "Runaan's Hurricane",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "CRIT"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "attackSpeed": 40,
+                "critChance": 25
+            },
+            "passiveKeywords": [
+                "BOLT_SPREAD"
+            ]
+        },
+        "3087": {
+            "id": "3087",
+            "name": "Statikk Shiv",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "CRIT",
+                "WAVECLEAR"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "attackSpeed": 40,
+                "critChance": 25
+            },
+            "passiveKeywords": [
+                "ENERGIZED_AOE"
+            ]
+        },
+        "3089": {
+            "id": "3089",
+            "name": "Rabadon's Deathcap",
+            "tags": [
+                "AP",
+                "BURST",
+                "SCALING"
+            ],
+            "cost": 3600,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ap": 130
+            },
+            "passiveKeywords": [
+                "AP_MULTIPLIER"
+            ]
+        },
+        "3091": {
+            "id": "3091",
+            "name": "Wit's End",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "MR",
+                "ONHIT"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "attackSpeed": 40,
+                "mr": 40
+            },
+            "passiveKeywords": [
+                "MAGIC_DAMAGE_ONHIT"
+            ]
+        },
+        "3094": {
+            "id": "3094",
+            "name": "Rapid Firecannon",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "CRIT"
+            ],
+            "cost": 2500,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "attackSpeed": 30,
+                "critChance": 25
+            },
+            "passiveKeywords": [
+                "ENERGIZED_RANGE"
+            ]
+        },
+        "3100": {
+            "id": "3100",
+            "name": "Lich Bane",
+            "tags": [
+                "AP",
+                "BURST",
+                "ONHIT"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 85,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "SPELLBLADE"
+            ]
+        },
+        "3102": {
+            "id": "3102",
+            "name": "Banshee's Veil",
+            "tags": [
+                "AP",
+                "ANTI_BURST",
+                "MR",
+                "SAFETY",
+                "DEFENSIVE"
+            ],
+            "cost": 2500,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 80,
+                "mr": 45
+            },
+            "passiveKeywords": [
+                "SPELL_SHIELD"
+            ]
+        },
+        "3107": {
+            "id": "3107",
+            "name": "Redemption",
+            "tags": [
+                "SUPPORT",
+                "UTILITY",
+                "HEAL_SHIELD",
+                "HEAL_SHIELD_AMP",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "health": 200,
+                "healShieldPower": 15
+            },
+            "passiveKeywords": [
+                "AOE_HEAL"
+            ]
+        },
+        "3109": {
+            "id": "3109",
+            "name": "Knight's Vow",
+            "tags": [
+                "SUPPORT",
+                "TANK",
+                "HEALTH",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "health": 400,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "BOND_REDIRECT"
+            ]
+        },
+        "3110": {
+            "id": "3110",
+            "name": "Frozen Heart",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "HASTE",
+                "MANA",
+                "DEFENSIVE"
+            ],
+            "cost": 2500,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 80,
+                "mana": 400,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "ATTACK_SPEED_SLOW_AURA"
+            ]
+        },
+        "3111": {
+            "id": "3111",
+            "name": "Mercury's Treads",
+            "tags": [
+                "BOOTS",
+                "MR",
+                "ANTI_CC",
+                "DEFENSIVE",
+                "TANK"
+            ],
+            "cost": 1100,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "mr": 25
+            },
+            "passiveKeywords": [
+                "TENACITY"
+            ]
+        },
+        "3115": {
+            "id": "3115",
+            "name": "Nashor's Tooth",
+            "tags": [
+                "AP",
+                "ATTACK_SPEED",
+                "ONHIT"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 90,
+                "attackSpeed": 50
+            },
+            "passiveKeywords": [
+                "AP_ONHIT"
+            ]
+        },
+        "3116": {
+            "id": "3116",
+            "name": "Rylai's Crystal Scepter",
+            "tags": [
+                "AP",
+                "UTILITY",
+                "HEALTH",
+                "SLOW"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 75,
+                "health": 350
+            },
+            "passiveKeywords": [
+                "SLOW_ON_HIT"
+            ]
+        },
+        "3118": {
+            "id": "3118",
+            "name": "Malignance",
+            "tags": [
+                "AP",
+                "BURST",
+                "HASTE"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 80,
+                "abilityHaste": 25,
+                "mana": 600
+            },
+            "passiveKeywords": [
+                "ULT_HASTE"
+            ]
+        },
+        "3119": {
+            "id": "3119",
+            "name": "Winter's Approach",
+            "tags": [
+                "TANK",
+                "MANA",
+                "HEALTH"
+            ],
+            "cost": 2600,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "health": 400,
+                "mana": 860
+            },
+            "passiveKeywords": [
+                "MANA_SHIELD"
+            ]
+        },
+        "3124": {
+            "id": "3124",
+            "name": "Guinsoo's Rageblade",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "ONHIT"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "attackSpeed": 45
+            },
+            "passiveKeywords": [
+                "PHANTOM_HIT"
+            ]
+        },
+        "3135": {
+            "id": "3135",
+            "name": "Void Staff",
+            "tags": [
+                "AP",
+                "PENETRATION"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 65,
+                "magicPenPercent": 40
+            },
+            "passiveKeywords": [
+                "MAGIC_PEN_PERCENT"
+            ]
+        },
+        "3139": {
+            "id": "3139",
+            "name": "Mercurial Scimitar",
+            "tags": [
+                "AD",
+                "ANTI_CC",
+                "MR"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 40,
+                "mr": 50,
+                "critChance": 20
+            },
+            "passiveKeywords": [
+                "QSS_CLEANSE"
+            ]
+        },
+        "3142": {
+            "id": "3142",
+            "name": "Youmuu's Ghostblade",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "DAMAGE"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "lethality": 18
+            },
+            "passiveKeywords": [
+                "MOVESPEED_ACTIVE"
+            ]
+        },
+        "3143": {
+            "id": "3143",
+            "name": "Randuin's Omen",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "ANTI_CRIT",
+                "DEFENSIVE"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 60,
+                "health": 400
+            },
+            "passiveKeywords": [
+                "SLOW_ACTIVE",
+                "CRIT_REDUCTION"
+            ]
+        },
+        "3152": {
+            "id": "3152",
+            "name": "Hextech Rocketbelt",
+            "tags": [
+                "AP",
+                "BURST",
+                "DASH",
+                "ENGAGE"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 80,
+                "health": 250
+            },
+            "passiveKeywords": [
+                "DASH_ACTIVE"
+            ]
+        },
+        "3153": {
+            "id": "3153",
+            "name": "Blade of the Ruined King",
+            "tags": [
+                "AD",
+                "ATTACK_SPEED",
+                "ONHIT",
+                "ANTI_TANK"
+            ],
+            "cost": 3200,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 30,
+                "attackSpeed": 30
+            },
+            "passiveKeywords": [
+                "PERCENT_HP_ONHIT"
+            ]
+        },
+        "3156": {
+            "id": "3156",
+            "name": "Maw of Malmortius",
+            "tags": [
+                "AD",
+                "ANTI_BURST",
+                "MR",
+                "DEFENSIVE"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "mr": 45,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "MAGIC_SHIELD"
+            ]
+        },
+        "3157": {
+            "id": "3157",
+            "name": "Zhonya's Hourglass",
+            "tags": [
+                "AP",
+                "ANTI_DIVE",
+                "ANTI_BURST",
+                "SAFETY",
+                "ARMOR",
+                "DEFENSIVE"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 80,
+                "armor": 45
+            },
+            "passiveKeywords": [
+                "STASIS"
+            ]
+        },
+        "3158": {
+            "id": "3158",
+            "name": "Ionian Boots of Lucidity",
+            "tags": [
+                "BOOTS",
+                "UTILITY",
+                "HASTE"
+            ],
+            "cost": 900,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "SUMMONER_HASTE"
+            ]
+        },
+        "3161": {
+            "id": "3161",
+            "name": "Spear of Shojin",
+            "tags": [
+                "AD",
+                "HASTE",
+                "HEALTH"
+            ],
+            "cost": 3300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "health": 300,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "ABILITY_SPAM"
+            ]
+        },
+        "3165": {
+            "id": "3165",
+            "name": "Morellonomicon",
+            "tags": [
+                "AP",
+                "ANTI_HEAL",
+                "HEALTH"
+            ],
+            "cost": 2500,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 80,
+                "health": 300
+            },
+            "passiveKeywords": [
+                "GRIEVOUS_WOUNDS"
+            ]
+        },
+        "3179": {
+            "id": "3179",
+            "name": "Umbral Glaive",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "VISION"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 50,
+                "lethality": 15,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "WARD_KILLER"
+            ]
+        },
+        "3181": {
+            "id": "3181",
+            "name": "Hullbreaker",
+            "tags": [
+                "AD",
+                "HEALTH",
+                "SPLITPUSH"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 50,
+                "health": 400
+            },
+            "passiveKeywords": [
+                "SIEGE_BUFF"
+            ]
+        },
+        "3190": {
+            "id": "3190",
+            "name": "Locket of the Iron Solari",
+            "tags": [
+                "SUPPORT",
+                "TANK",
+                "ANTI_BURST",
+                "DEFENSIVE",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 30,
+                "mr": 30,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "SHIELD_ACTIVE_TEAM"
+            ]
+        },
+        "3193": {
+            "id": "3193",
+            "name": "Gargoyle Stoneplate",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "MR",
+                "DEFENSIVE",
+                "ANTI_BURST"
+            ],
+            "cost": 3200,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "armor": 40,
+                "mr": 40
+            },
+            "passiveKeywords": [
+                "SHIELD_ACTIVE"
+            ]
+        },
+        "3194": {
+            "id": "3194",
+            "name": "Kaenic Rookern",
+            "tags": [
+                "TANK",
+                "MR",
+                "HEALTH",
+                "DEFENSIVE",
+                "ANTI_BURST"
+            ],
+            "cost": 2900,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "mr": 80,
+                "health": 350
+            },
+            "passiveKeywords": [
+                "MAGIC_SHIELD"
+            ]
+        },
+        "3222": {
+            "id": "3222",
+            "name": "Mikael's Blessing",
+            "tags": [
+                "SUPPORT",
+                "UTILITY",
+                "ANTI_CC",
+                "MR",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "mr": 50,
+                "healShieldPower": 15
+            },
+            "passiveKeywords": [
+                "CLEANSE_ALLY"
+            ]
+        },
+        "3285": {
+            "id": "3285",
+            "name": "Luden's Companion",
+            "tags": [
+                "AP",
+                "BURST",
+                "MANA"
+            ],
+            "cost": 2900,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 90,
+                "mana": 600,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "ECHO_DAMAGE"
+            ]
+        },
+        "3302": {
+            "id": "3302",
+            "name": "Terminus",
+            "tags": [
+                "AD",
+                "ONHIT",
+                "ARMOR",
+                "MR"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 35,
+                "attackSpeed": 30
+            },
+            "passiveKeywords": [
+                "ADAPTIVE_RESIST"
+            ]
+        },
+        "3340": {
+            "id": "3340",
+            "name": "Stealth Ward",
+            "tags": [
+                "TRINKET"
+            ],
+            "cost": 0,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "WARD"
+            ]
+        },
+        "3364": {
+            "id": "3364",
+            "name": "Oracle Lens",
+            "tags": [
+                "TRINKET"
+            ],
+            "cost": 0,
+            "spikeTiming": "EARLY",
+            "statProfile": {},
+            "passiveKeywords": [
+                "REVEAL"
+            ]
+        },
+        "3504": {
+            "id": "3504",
+            "name": "Ardent Censer",
+            "tags": [
+                "SUPPORT",
+                "UTILITY",
+                "HEAL_SHIELD",
+                "HEAL_SHIELD_AMP",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 60,
+                "healShieldPower": 10
+            },
+            "passiveKeywords": [
+                "ON_SHIELD_BUFF"
+            ]
+        },
+        "3508": {
+            "id": "3508",
+            "name": "Essence Reaver",
+            "tags": [
+                "AD",
+                "CRIT",
+                "MANA"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 45,
+                "critChance": 25,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "SPELLBLADE",
+                "MANA_RESTORE"
+            ]
+        },
+        "3742": {
+            "id": "3742",
+            "name": "Dead Man's Plate",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "HEALTH",
+                "MOBILITY"
+            ],
+            "cost": 2900,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 45,
+                "health": 400
+            },
+            "passiveKeywords": [
+                "MOMENTUM"
+            ]
+        },
+        "3748": {
+            "id": "3748",
+            "name": "Titanic Hydra",
+            "tags": [
+                "AD",
+                "HEALTH",
+                "DAMAGE"
+            ],
+            "cost": 3300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 40,
+                "health": 500
+            },
+            "passiveKeywords": [
+                "HP_TO_DAMAGE",
+                "AOE_CLEAVE"
+            ]
+        },
+        "3814": {
+            "id": "3814",
+            "name": "Edge of Night",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "DEFENSIVE",
+                "SAFETY"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 50,
+                "lethality": 15,
+                "health": 250
+            },
+            "passiveKeywords": [
+                "SPELL_SHIELD"
+            ]
+        },
+        "3850": {
+            "id": "3850",
+            "name": "Spellthief's Edge",
+            "tags": [
+                "SUPPORT",
+                "AP",
+                "STARTING",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 400,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "ap": 8
+            },
+            "passiveKeywords": [
+                "GOLD_GENERATION"
+            ]
+        },
+        "3853": {
+            "id": "3853",
+            "name": "Shard of True Ice",
+            "tags": [
+                "SUPPORT",
+                "AP",
+                "STARTING",
+                "WARD",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 0,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "ap": 40
+            },
+            "passiveKeywords": [
+                "WARDS"
+            ]
+        },
+        "3855": {
+            "id": "3855",
+            "name": "Runesteel Spaulders",
+            "tags": [
+                "SUPPORT",
+                "AD",
+                "STARTING",
+                "WARD",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 0,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "ad": 12
+            },
+            "passiveKeywords": [
+                "WARDS"
+            ]
+        },
+        "3857": {
+            "id": "3857",
+            "name": "Pauldrons of Whiterock",
+            "tags": [
+                "SUPPORT",
+                "TANK",
+                "STARTING",
+                "WARD",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 0,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "health": 100
+            },
+            "passiveKeywords": [
+                "WARDS"
+            ]
+        },
+        "3858": {
+            "id": "3858",
+            "name": "World Atlas",
+            "tags": [
+                "SUPPORT",
+                "STARTING",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 400,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "health": 50
+            },
+            "passiveKeywords": [
+                "GOLD_GENERATION"
+            ]
+        },
+        "3860": {
+            "id": "3860",
+            "name": "Celestial Opposition",
+            "tags": [
+                "SUPPORT",
+                "TANK",
+                "SLOW",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "health": 200,
+                "armor": 30,
+                "mr": 30
+            },
+            "passiveKeywords": [
+                "SLOW_ZONE"
+            ]
+        },
+        "3862": {
+            "id": "3862",
+            "name": "Relic Shield",
+            "tags": [
+                "SUPPORT",
+                "TANK",
+                "STARTING",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 400,
+            "spikeTiming": "EARLY",
+            "statProfile": {
+                "health": 30
+            },
+            "passiveKeywords": [
+                "GOLD_GENERATION"
+            ]
+        },
+        "4005": {
+            "id": "4005",
+            "name": "Shadowflame",
+            "tags": [
+                "AP",
+                "BURST",
+                "PENETRATION"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 100,
+                "magicPen": 10
+            },
+            "passiveKeywords": [
+                "CRIT_MAGIC",
+                "FLAT_MAGIC_PEN"
+            ]
+        },
+        "4401": {
+            "id": "4401",
+            "name": "Force of Nature",
+            "tags": [
+                "TANK",
+                "MR",
+                "HEALTH",
+                "MOBILITY",
+                "DEFENSIVE"
+            ],
+            "cost": 2900,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "mr": 70,
+                "health": 400
+            },
+            "passiveKeywords": [
+                "MAGIC_DAMAGE_REDUCTION"
+            ]
+        },
+        "4628": {
+            "id": "4628",
+            "name": "Horizon Focus",
+            "tags": [
+                "AP",
+                "BURST",
+                "DAMAGE"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 85,
+                "health": 150
+            },
+            "passiveKeywords": [
+                "HYPERSHOT"
+            ]
+        },
+        "4629": {
+            "id": "4629",
+            "name": "Cosmic Drive",
+            "tags": [
+                "AP",
+                "HASTE",
+                "UTILITY"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 80,
+                "health": 250,
+                "abilityHaste": 25
+            },
+            "passiveKeywords": [
+                "MOVESPEED_ON_HIT"
+            ]
+        },
+        "4643": {
+            "id": "4643",
+            "name": "Vigilant Wardstone",
+            "tags": [
+                "SUPPORT",
+                "UTILITY",
+                "VISION",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 1100,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "abilityHaste": 10
+            },
+            "passiveKeywords": [
+                "EXTRA_WARDS"
+            ]
+        },
+        "6333": {
+            "id": "6333",
+            "name": "Death's Dance",
+            "tags": [
+                "AD",
+                "SAFETY",
+                "ARMOR",
+                "DEFENSIVE"
+            ],
+            "cost": 3300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "armor": 45,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "DAMAGE_DELAY"
+            ]
+        },
+        "6609": {
+            "id": "6609",
+            "name": "Chempunk Chainsword",
+            "tags": [
+                "AD",
+                "ANTI_HEAL",
+                "HEALTH"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 40,
+                "health": 250,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "GRIEVOUS_WOUNDS"
+            ]
+        },
+        "6616": {
+            "id": "6616",
+            "name": "Staff of Flowing Water",
+            "tags": [
+                "SUPPORT",
+                "AP",
+                "UTILITY",
+                "HEAL_SHIELD",
+                "HEAL_SHIELD_AMP",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 60,
+                "healShieldPower": 8
+            },
+            "passiveKeywords": [
+                "ON_SHIELD_HASTE"
+            ]
+        },
+        "6621": {
+            "id": "6621",
+            "name": "Dawncore",
+            "tags": [
+                "SUPPORT",
+                "HEAL_SHIELD",
+                "HEAL_SHIELD_AMP",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "healShieldPower": 20,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "MEGA_HEAL_SHIELD"
+            ]
+        },
+        "6632": {
+            "id": "6632",
+            "name": "Divine Sunderer",
+            "tags": [
+                "AD",
+                "HEALTH",
+                "PENETRATION"
+            ],
+            "cost": 3300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 40,
+                "health": 400,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "SPELLBLADE_PERCENT_HP"
+            ]
+        },
+        "6653": {
+            "id": "6653",
+            "name": "Liandry's Torment",
+            "tags": [
+                "AP",
+                "BURN",
+                "HEALTH"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 90,
+                "health": 300
+            },
+            "passiveKeywords": [
+                "BURN_PERCENT_HP"
+            ]
+        },
+        "6655": {
+            "id": "6655",
+            "name": "Imperial Mandate",
+            "tags": [
+                "SUPPORT",
+                "AP",
+                "UTILITY",
+                "CC_REWARD",
+                "SUPPORT_ECONOMY"
+            ],
+            "cost": 2300,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ap": 60,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "MARK_DAMAGE"
+            ]
+        },
+        "6665": {
+            "id": "6665",
+            "name": "Jak'Sho, The Protean",
+            "tags": [
+                "TANK",
+                "ARMOR",
+                "MR",
+                "HEALTH",
+                "DEFENSIVE"
+            ],
+            "cost": 3200,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "armor": 40,
+                "mr": 40,
+                "health": 400
+            },
+            "passiveKeywords": [
+                "DRAIN_TANK"
+            ]
+        },
+        "6667": {
+            "id": "6667",
+            "name": "Hollow Radiance",
+            "tags": [
+                "TANK",
+                "MR",
+                "HEALTH",
+                "DAMAGE"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "mr": 50,
+                "health": 350,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "IMMOLATE"
+            ]
+        },
+        "6672": {
+            "id": "6672",
+            "name": "Kraken Slayer",
+            "tags": [
+                "AD",
+                "DAMAGE",
+                "ATTACK_SPEED",
+                "ONHIT"
+            ],
+            "cost": 3100,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 40,
+                "attackSpeed": 35
+            },
+            "passiveKeywords": [
+                "TRUE_DAMAGE_ONHIT"
+            ]
+        },
+        "6673": {
+            "id": "6673",
+            "name": "Immortal Shieldbow",
+            "tags": [
+                "AD",
+                "CRIT",
+                "SAFETY",
+                "LIFESTEAL",
+                "DEFENSIVE",
+                "ANTI_BURST"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 50,
+                "critChance": 25
+            },
+            "passiveKeywords": [
+                "LIFELINE_SHIELD"
+            ]
+        },
+        "6675": {
+            "id": "6675",
+            "name": "Navori Flickerblade",
+            "tags": [
+                "AD",
+                "CRIT",
+                "HASTE"
+            ],
+            "cost": 3400,
+            "spikeTiming": "LATE",
+            "statProfile": {
+                "ad": 60,
+                "critChance": 25,
+                "abilityHaste": 20
+            },
+            "passiveKeywords": [
+                "ABILITY_RESET"
+            ]
+        },
+        "6676": {
+            "id": "6676",
+            "name": "The Collector",
+            "tags": [
+                "AD",
+                "CRIT",
+                "BURST",
+                "LETHALITY"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 50,
+                "critChance": 25,
+                "lethality": 10
+            },
+            "passiveKeywords": [
+                "EXECUTE"
+            ]
+        },
+        "6693": {
+            "id": "6693",
+            "name": "Prowler's Claw",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "BURST"
+            ],
+            "cost": 2800,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "lethality": 18,
+                "abilityHaste": 15
+            },
+            "passiveKeywords": [
+                "DASH_TO_TARGET"
+            ]
+        },
+        "6694": {
+            "id": "6694",
+            "name": "Serylda's Grudge",
+            "tags": [
+                "AD",
+                "PENETRATION",
+                "SLOW",
+                "UTILITY"
+            ],
+            "cost": 3200,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 45,
+                "abilityHaste": 20,
+                "armorPenPercent": 30
+            },
+            "passiveKeywords": [
+                "SLOW_ON_ABILITY"
+            ]
+        },
+        "6695": {
+            "id": "6695",
+            "name": "Serpent's Fang",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "ANTI_SHIELD"
+            ],
+            "cost": 2600,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "lethality": 15
+            },
+            "passiveKeywords": [
+                "SHIELD_REAVER"
+            ]
+        },
+        "6696": {
+            "id": "6696",
+            "name": "Axiom Arc",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "HASTE"
+            ],
+            "cost": 3000,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "lethality": 18,
+                "abilityHaste": 25
+            },
+            "passiveKeywords": [
+                "ULT_REFUND"
+            ]
+        },
+        "6698": {
+            "id": "6698",
+            "name": "Voltaic Cyclosword",
+            "tags": [
+                "AD",
+                "LETHALITY",
+                "ENERGIZED"
+            ],
+            "cost": 2900,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "lethality": 18
+            },
+            "passiveKeywords": [
+                "ENERGIZED_SLOW"
+            ]
+        },
+        "6701": {
+            "id": "6701",
+            "name": "Opportunity",
+            "tags": [
+                "AD",
+                "LETHALITY"
+            ],
+            "cost": 2700,
+            "spikeTiming": "MID",
+            "statProfile": {
+                "ad": 55,
+                "lethality": 18
+            },
+            "passiveKeywords": [
+                "AMBUSH_DAMAGE"
+            ]
+        }
+    }
+}

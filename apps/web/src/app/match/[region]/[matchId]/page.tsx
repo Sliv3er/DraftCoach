@@ -1,10 +1,8 @@
-import React from 'react';
-import Image from 'next/image';
-import { getMatchDetails, getRoutingRegion, getLatestDDragonVersion, getChampions, getItems, Match, MatchParticipant, ItemMap, ChampionMap } from '@/lib/riot';
-import { Card } from '@/components/ui/Card';
-import { ItemTooltip } from '@/components/ItemTooltip';
 import Link from 'next/link';
 import { MatchTabs } from '@/components/MatchTabs';
+
+import { getMatchDetails, getRoutingRegion, getLatestDDragonVersion, getItems } from '@/lib/riot';
+
 
 interface MatchPageProps {
   params: Promise<{

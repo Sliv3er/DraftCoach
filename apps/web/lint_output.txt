@@ -1,0 +1,18 @@
+
+> web@0.1.0 lint
+> eslint
+
+
+D:\Dev\DraftCoach\apps\web\src\app\summoner\[region]\[name]\page.tsx
+   46:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Dev\DraftCoach\apps\web\src\lib\riot.test.ts
+  49:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  66:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 7 problems (7 errors, 0 warnings)
+

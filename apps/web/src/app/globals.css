@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@theme {
+  /* Hextech Elite Colors - Tonal Depth */
+  --color-hextech-gold: #f0bf5c; 
+  --color-hextech-gold-dark: #c89b3c; 
+  --color-hextech-blue: #08151e; 
+  --color-hextech-blue-light: #15212a; 
+  --color-hextech-blue-lighter: #1f2b35; 
+  --color-hextech-blue-bright: #2f3a45; 
+  --color-hextech-accent-success: #35e193; 
+  --color-hextech-accent-error: #ffb4ab; 
+  
+  /* Archive Specifics */
+  --color-archive-dark: #050a0e;
+  --color-silver: #a0a0a8;
+  
+  --color-surface: var(--color-hextech-blue);
+  --color-surface-container: var(--color-hextech-blue-light);
+  --color-surface-container-high: var(--color-hextech-blue-lighter);
+  --color-surface-bright: var(--color-hextech-blue-bright);
+
+  /* Typography */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Shadows - Ambient & Deep */
+  --shadow-hextech-ambient: 0 40px 40px -10px rgba(8, 21, 30, 0.06);
+  
+  /* Custom Animations */
+  @keyframes scan {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+  }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    /* The "No-Line" Fallback - suggested edge glint */
+    border-color: rgba(78, 70, 55, 0.1);
+  }
+
+  body {
+    @apply bg-surface text-slate-200 antialiased selection:bg-hextech-gold selection:text-hextech-blue;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, .display-text {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  /* Metallic Sheen Gradient Utility */
+  .hextech-gold-gradient {
+    background: linear-gradient(135deg, var(--color-hextech-gold) 0%, var(--color-hextech-gold-dark) 100%);
+  }
+
+  /* Glassmorphism - The Kinetic Glass */
+  .hextech-glass {
+    @apply bg-hextech-blue-lighter/60 backdrop-blur-xl border border-white/5;
+  }
+
+  /* Editorial Contrast Rule */
+  .editorial-header {
+    @apply flex flex-col gap-1;
+  }
+  .editorial-header h1 {
+    @apply text-5xl font-bold tracking-tight uppercase;
+  }
+  .editorial-header span {
+    @apply text-xs uppercase tracking-widest text-hextech-gold/80 font-bold;
+  }
+
+  /* Victory/Defeat Accents */
+  .card-victory {
+    @apply border-l-4 border-l-hextech-accent-success;
+  }
+  .card-defeat {
+    @apply border-l-4 border-l-hextech-accent-error;
+  }
+
+  /* Kinetic Archive Utilities */
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(240, 191, 92, 0.3);
+    color: transparent;
+  }
+
+  .scanning-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--color-hextech-gold), transparent);
+    box-shadow: 0 0 15px var(--color-hextech-gold);
+    animation: scan 3s linear infinite;
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  .archive-grid {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 30px rgba(240, 191, 92, 0.15);
+  }
+
+  /* Tailwind Animate Shorthands (if plugin missing) */
+  .animate-in {
+    animation-duration: 500ms;
+    animation-fill-mode: both;
+  }
+  .fade-in {
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    animation-name: fadeIn;
+  }
+  .slide-in-from-bottom-4 {
+    @keyframes slideInFromBottom {
+      from { transform: translateY(1rem); }
+      to { transform: translateY(0); }
+    }
+    animation-name: slideInFromBottom;
+  }
+}

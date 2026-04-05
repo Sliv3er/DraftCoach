@@ -39,7 +39,15 @@ export const uIRegionToPlatform: Record<string, string> = {
 };
 
 export const getRoutingRegion = (platform: string) => {
-  return platformToRegionMap[platform] || "americas";
+  const normalized = platform.toLowerCase();
+  
+  // Handlers for UI labels like NA, EUW
+  if (normalized === "na") return "americas";
+  if (normalized === "euw") return "europe";
+  if (normalized === "kr") return "asia";
+  if (normalized === "eune") return "europe";
+
+  return platformToRegionMap[normalized] || "americas";
 };
 
 // --- TYPES ---
@@ -144,6 +152,8 @@ export interface MatchParticipant {
   deaths: number;
   assists: number;
   totalDamageDealtToChampions: number;
+  totalDamageTaken: number;
+  goldEarned: number;
   totalMinionsKilled: number;
   neutralMinionsKilled: number;
   item0: number;
@@ -153,6 +163,10 @@ export interface MatchParticipant {
   item4: number;
   item5: number;
   item6: number;
+  summoner1Id: number;
+  summoner2Id: number;
+  teamPosition: string;
+  teamId: number;
 }
 
 export interface Match {
@@ -161,10 +175,31 @@ export interface Match {
     participants: string[];
   };
   info: {
+    gameCreation: number;
     gameDuration: number;
     gameMode: string;
+    gameType: string;
+    gameVersion: string;
+    mapId: number;
     participants: MatchParticipant[];
+    queueId: number;
   };
+}
+
+export interface Item {
+  name: string;
+  description: string;
+  plaintext: string;
+  gold: {
+    base: number;
+    total: number;
+    sell: number;
+    purchasable: boolean;
+  };
+}
+
+export interface ItemMap {
+  [key: string]: Item;
 }
 
 // --- DATA DRAGON & CDrAGON ASSETS ---
@@ -179,6 +214,13 @@ export async function getLatestDDragonVersion() {
 export async function getChampions(version: string): Promise<ChampionMap> {
   const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`, { next: { revalidate: 86400 } });
   if (!res.ok) throw new Error('Failed to fetch champions from DDragon');
+  const data = await res.json();
+  return data.data;
+}
+
+export async function getItems(version: string): Promise<ItemMap> {
+  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`, { next: { revalidate: 86400 } });
+  if (!res.ok) throw new Error('Failed to fetch items from DDragon');
   const data = await res.json();
   return data.data;
 }
@@ -276,8 +318,8 @@ export async function getTopChampionMasteries(puuid: string, platformId: string,
 
 // --- MATCHES ---
 
-export async function getRecentMatchIds(puuid: string, routingRegion: string, count: number = 5): Promise<string[]> {
-  const url = `https://${routingRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=${count}`;
+export async function getRecentMatchIds(puuid: string, routingRegion: string, count: number = 5, start: number = 0): Promise<string[]> {
+  const url = `https://${routingRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`;
   const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 300 } });
   
   if (!res.ok) {

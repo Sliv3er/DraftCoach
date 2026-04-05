@@ -7,10 +7,13 @@
     "build": "npx tsc"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^9.3.4",
     "@google/generative-ai": "^0.21.0",
+    "@types/mongoose": "^5.11.96",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "mongoose": "^9.4.1",
     "node-fetch": "^2.7.0"
   },
   "devDependencies": {

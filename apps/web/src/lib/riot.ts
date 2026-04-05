@@ -307,6 +307,27 @@ export async function getChallengerLeague(platformId: string, queue: string = 'R
   return res.json();
 }
 
+export async function getGrandmasterLeague(platformId: string, queue: string = 'RANKED_SOLO_5x5'): Promise<LeagueList> {
+  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/grandmasterleagues/by-queue/${queue}`;
+  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 600 } });
+  if (!res.ok) throw new Error(`Grandmaster League Fetch Error: ${res.status}`);
+  return res.json();
+}
+
+export async function getMasterLeague(platformId: string, queue: string = 'RANKED_SOLO_5x5'): Promise<LeagueList> {
+  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/masterleagues/by-queue/${queue}`;
+  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 600 } });
+  if (!res.ok) throw new Error(`Master League Fetch Error: ${res.status}`);
+  return res.json();
+}
+
+export async function getLeagueEntriesByTier(platformId: string, tier: string, division: string, queue: string = 'RANKED_SOLO_5x5', page: number = 1): Promise<LeagueItem[]> {
+  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/entries/${queue}/${tier}/${division}?page=${page}`;
+  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
+  if (!res.ok) throw new Error(`League Entries Fetch Error: ${res.status}`);
+  return res.json();
+}
+
 // --- CHAMPION MASTERY ---
 
 export async function getTopChampionMasteries(puuid: string, platformId: string, count: number = 5): Promise<ChampionMastery[]> {

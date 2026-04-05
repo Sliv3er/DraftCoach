@@ -21,6 +21,8 @@ import {
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import { MatchList } from "@/components/MatchList";
+import { getItems } from "@/lib/riot";
 
 interface SummonerPageProps {
   params: Promise<{ region: string; name: string }>;
@@ -69,12 +71,13 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
     }
 
     const puuid = accountRes.puuid;
-    const [summonerInfo, leagueInfo, matchIds, topMastery, allChampions] = await Promise.all([
+    const [summonerInfo, leagueInfo, matchIds, topMastery, allChampions, items] = await Promise.all([
       getSummonerByPuuid(puuid, platformId),
       getLeagueEntries(puuid, platformId),
       getRecentMatchIds(puuid, routingRegion, 10),
       getTopChampionMasteries(puuid, platformId, 3),
-      getChampions(version)
+      getChampions(version),
+      getItems(version)
     ]);
 
     if (!summonerInfo) {
@@ -253,87 +256,16 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                </div>
 
                <div className="space-y-4">
-                  {matches.length > 0 ? matches.map((matchData: Match) => {
-                    const participant = matchData.info.participants.find((p: MatchParticipant) => p.puuid === puuid);
-                    if (!participant) return null;
-                    const isWin = participant.win;
-                    
-                    return (
-                      <Card 
-                        key={matchData.metadata.matchId} 
-                        variant="glass"
-                        status={isWin ? 'victory' : 'defeat'} 
-                        interactive 
-                        className="p-8 flex flex-wrap md:flex-nowrap items-center gap-10"
-                      >
-                         {/* Outcome Status Block */}
-                         <div className="w-24 hidden md:block">
-                            <span className={`block text-[11px] font-bold uppercase tracking-[0.3em] mb-1 ${isWin ? 'text-hextech-accent-success' : 'text-hextech-accent-error'}`}>
-                               {isWin ? 'VIC // SYNC' : 'DEF // DROP'}
-                            </span>
-                            <span className="text-[11px] text-slate-500 uppercase font-bold tracking-widest opacity-60">
-                               {matchData.info.gameMode === 'CLASSIC' ? 'Draft Pulse' : 'Signal Interference'}
-                            </span>
-                         </div>
-
-                         {/* Hex Champion Icon */}
-                         <div className="relative group/champ">
-                            <div className={`w-20 h-20 rounded-sm border-2 p-1 bg-surface transition-all group-hover:p-0 ${isWin ? 'border-hextech-accent-success/20 group-hover:border-hextech-accent-success/50' : 'border-hextech-accent-error/20 group-hover:border-hextech-accent-error/50'}`}>
-                               <div className="w-full h-full relative overflow-hidden rounded-sm bg-surface-bright">
-                                  <Image 
-                                    src={getCDragonChampionIcon(participant.championId)}
-                                    alt={participant.championName}
-                                    fill
-                                    className="object-cover group-hover:scale-110 transition-transform"
-                                  />
-                               </div>
-                            </div>
-                        </div>
-
-                        {/* Performance Matrix */}
-                        <div className="flex-1">
-                           <div className="flex items-baseline space-x-3 mb-2">
-                              <span className="text-2xl font-display font-bold text-white tracking-tighter">{participant.kills}</span>
-                              <span className="text-slate-600 text-sm">/</span>
-                              <span className="text-2xl font-display font-bold text-hextech-accent-error tracking-tighter">{participant.deaths}</span>
-                              <span className="text-slate-600 text-sm">/</span>
-                              <span className="text-2xl font-display font-bold text-white tracking-tighter">{participant.assists}</span>
-                           </div>
-                           <div className="flex items-center gap-3">
-                              <span className="text-[10px] uppercase font-bold tracking-widest text-hextech-gold">
-                                 {((participant.kills + participant.assists) / Math.max(1, participant.deaths)).toFixed(2)} KDA Ratio
-                              </span>
-                              <div className="w-1 h-1 rounded-full bg-white/10" />
-                              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                                 {participant.totalMinionsKilled + participant.neutralMinionsKilled} Kinetic Debris
-                              </span>
-                           </div>
-                        </div>
-
-                        {/* Item Grid */}
-                        <div className="grid grid-cols-4 gap-1.5 p-1.5 bg-black/20 rounded-sm border border-white/5">
-                           {[participant.item0, participant.item1, participant.item2, participant.item6, participant.item3, participant.item4, participant.item5].map((item, i) => (
-                             <div key={i} className={`w-8 h-8 rounded-sm border border-white/5 overflow-hidden bg-surface-bright/50 relative`}>
-                               {item !== 0 ? (
-                                 <Image 
-                                   src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${item}.png`}
-                                   alt="Item"
-                                   fill
-                                   className="object-cover"
-                                 />
-                               ) : null}
-                             </div>
-                           ))}
-                        </div>
-
-                        {/* Combat Statistics */}
-                        <div className="text-right hidden xl:block min-w-[100px]">
-                           <span className="block text-sm font-display text-white font-bold tracking-tighter">{Math.round(participant.totalDamageDealtToChampions / 1000)}K Output</span>
-                           <span className="text-[10px] text-slate-500 font-bold tracking-[0.2em] uppercase">Combat Rating</span>
-                        </div>
-                      </Card>
-                    );
-                  }) : (
+                   {matches.length > 0 ? (
+                     <MatchList 
+                        initialMatches={matches}
+                        puuid={puuid}
+                        region={resolvedParams.region}
+                        routingRegion={routingRegion}
+                        version={version}
+                        items={items}
+                     />
+                   ) : (
                     <div className="p-20 text-center border-2 border-dashed border-white/5 bg-surface/30">
                        <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/20 block mb-4">Integrity Check Failed // Logs Empty</span>
                        <p className="text-slate-600 text-sm font-light max-w-xs mx-auto">The kinetic archive returned no active combat records for this subject in the recent cycle.</p>

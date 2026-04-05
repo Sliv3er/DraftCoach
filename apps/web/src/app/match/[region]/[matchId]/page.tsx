@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { MatchTabs } from '@/components/MatchTabs';
+
 import { getMatchDetails, getRoutingRegion, getLatestDDragonVersion, getItems } from '@/lib/riot';
+
 
 interface MatchPageProps {
   params: Promise<{

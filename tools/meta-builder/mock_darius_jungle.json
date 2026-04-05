@@ -1,0 +1,63 @@
+{
+  "variants": {
+    "DAMAGE": {
+      "bootChoice": {
+        "id": "3047",
+        "name": "Plated Steelcaps"
+      },
+      "coreItems": [
+        {
+          "id": "6630",
+          "name": "Stridebreaker",
+          "reason": "Crucial for Darius to stick to targets, offering an active slow, mobility, and essential stats like AD, Health, and Ability Haste for ganks and sustained damage."
+        },
+        {
+          "id": "3071",
+          "name": "Black Cleaver",
+          "reason": "A core item for Darius, providing AD, Health, and Ability Haste. The armor shred passive synergizes perfectly with his bleed stacks, amplifying damage against all targets, especially tanks and bruisers."
+        },
+        {
+          "id": "3075",
+          "name": "Sterak's Gage",
+          "reason": "Essential for a primary carry bruiser, offering significant AD and Health. The passive shield provides crucial burst survivability, allowing Darius to stay in the fight longer and continue dealing damage."
+        },
+        {
+          "id": "3046",
+          "name": "Death's Dance",
+          "reason": "Provides excellent survivability against physical damage bursts with its damage deferral passive. Combined with AD, Armor, and Ability Haste, it significantly increases Darius's sustain in extended teamfights and skirmishes, especially with its heal on takedowns."
+        },
+        {
+          "id": "3065",
+          "name": "Spirit Visage",
+          "reason": "Boosts Darius's healing and shields, synergizing with his Q heal and Sterak's Gage shield. Offers substantial Magic Resist and Health, making him incredibly durable against AP threats and highly sustainable in prolonged engagements."
+        }
+      ],
+      "skillOrder": {
+        "first3": [
+          "Q",
+          "W",
+          "E"
+        ],
+        "maxOrder": [
+          "Q",
+          "E",
+          "W"
+        ]
+      },
+      "startingItems": [
+        {
+          "id": "3801",
+          "name": "Mosstomper Seedling"
+        },
+        {
+          "id": "2031",
+          "name": "Refillable Potion"
+        }
+      ],
+      "summonerSpells": [
+        "Flash",
+        "Smite"
+      ]
+    }
+  }
+}

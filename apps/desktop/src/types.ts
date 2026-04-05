@@ -1,12 +1,18 @@
 // Re-export shared types for use in renderer
 export type Role = 'top' | 'jungle' | 'mid' | 'adc' | 'support';
 
+export type GeminiModel =
+  | 'gemini-3-pro-preview'
+  | 'gemini-3.1-pro-preview'
+  | 'gemini-3-flash-preview';
+
 export interface BuildRequest {
   patch: string;
   myChampion: string;
   role: Role;
   allies: string[];
   enemies: string[];
+  model?: GeminiModel;
 }
 
 export interface BuildSuccessResponse {

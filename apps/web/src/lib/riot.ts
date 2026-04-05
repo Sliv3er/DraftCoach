@@ -78,6 +78,7 @@ export interface LeagueEntry {
 export interface LeagueItem {
   summonerId: string;
   summonerName?: string;
+  puuid?: string; // Added to support Riot ID migration
   leaguePoints: number;
   rank: string;
   tier: string;
@@ -195,6 +196,9 @@ export const getCDragonItemIcon = (itemId: number | string) =>
 export const getCDragonSplash = (championId: number | string) => 
   `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/${championId}/${championId}000.png`;
 
+export const getDDragonSplash = (championName: string) =>
+  `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg`;
+
 // --- ACCOUNT & SUMMONER ---
 
 export async function getAccountByRiotId(gameName: string, tagLine: string, routingRegion: string = "americas"): Promise<Account | null> {
@@ -204,6 +208,29 @@ export async function getAccountByRiotId(gameName: string, tagLine: string, rout
   if (!res.ok) {
     if (res.status === 404) return null;
     throw new Error(`Riot ID Fetch Error: ${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function getAccountByPuuid(puuid: string, platformId: string): Promise<Account | null> {
+  const routingRegion = platformToRegionMap[platformId] || "americas";
+  const url = `https://${routingRegion}.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`;
+  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 86400 } });
+  
+  if (!res.ok) {
+    if (res.status === 404) return null;
+    throw new Error(`Account by PUUID Fetch Error: ${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function getSummonerById(summonerId: string, platformId: string): Promise<Summoner | null> {
+  const url = `https://${platformId}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`;
+  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
+  
+  if (!res.ok) {
+    if (res.status === 404) return null;
+    throw new Error(`Summoner by ID Fetch Error: ${res.status} ${res.statusText}`);
   }
   return res.json();
 }

@@ -39,6 +39,7 @@ export default async function ChampionsPage() {
                  src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.id}_0.jpg`}
                  alt={champ.name}
                  fill
+                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
                  className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-80"
                />
             </div>

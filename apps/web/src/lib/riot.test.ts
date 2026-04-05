@@ -8,7 +8,9 @@ import {
   uIRegionToPlatform, 
   getAccountByRiotId, 
   getSummonerByPuuid, 
-  getLeagueEntries 
+  getLeagueEntries,
+  getAccountByPuuid,
+  getSummonerById
 } from './riot';
 
 // Mock global fetch
@@ -104,6 +106,42 @@ describe('Riot API lib', () => {
         'https://na1.api.riotgames.com/lol/league/v4/entries/by-puuid/test-puuid',
         expect.objectContaining({
           headers: expect.any(Object)
+        })
+      );
+      expect(result).toEqual(mockData);
+    });
+
+    it('getAccountByPuuid constructs the right URL and returns data', async () => {
+      const mockData = { gameName: 'Test', tagLine: '123' };
+      (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: async () => mockData
+      });
+
+      const result = await getAccountByPuuid('test-puuid', 'na1');
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://americas.api.riotgames.com/riot/account/v1/accounts/by-puuid/test-puuid',
+        expect.objectContaining({
+          headers: { 'X-Riot-Token': expect.any(String) }
+        })
+      );
+      expect(result).toEqual(mockData);
+    });
+
+    it('getSummonerById constructs the right URL and returns data', async () => {
+      const mockData = { id: 'summoner-1', puuid: 'test-puuid' };
+      (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: async () => mockData
+      });
+
+      const result = await getSummonerById('summoner-1', 'euw1');
+
+      expect(fetch).toHaveBeenCalledWith(
+        'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/summoner-1',
+        expect.objectContaining({
+          headers: { 'X-Riot-Token': expect.any(String) }
         })
       );
       expect(result).toEqual(mockData);

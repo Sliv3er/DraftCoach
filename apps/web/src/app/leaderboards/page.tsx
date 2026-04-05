@@ -1,5 +1,6 @@
-import { getChallengerLeague, uIRegionToPlatform, LeagueItem } from "@/lib/riot";
+import { getChallengerLeague, uIRegionToPlatform, LeagueItem, getDDragonSplash, getAccountByPuuid, getSummonerById } from "@/lib/riot";
 import { Card } from "@/components/ui/Card";
+import Image from "next/image";
 
 export default async function LeaderboardsPage(props: { searchParams: Promise<{ region?: string }> }) {
   const searchParams = await props.searchParams;
@@ -8,16 +9,42 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
   const leagueData = await getChallengerLeague(platform);
 
   // Sort by LP and take top 20
-  const entries = leagueData.entries
-    .sort((a: LeagueItem, b: LeagueItem) => b.leaguePoints - a.leaguePoints)
-    .slice(0, 20);
+  const rawEntries = leagueData?.entries
+    ? leagueData.entries
+        .sort((a: LeagueItem, b: LeagueItem) => b.leaguePoints - a.leaguePoints)
+        .slice(0, 20)
+    : [];
+
+  // Fetch Riot Account details (gameName#tagLine) for each entry
+  // This is necessary because league-v4 often omits names now.
+  const entries = await Promise.all(
+    rawEntries.map(async (entry) => {
+      try {
+        let puuid = entry.puuid;
+        const sId = entry.summonerId || (entry as any).summonerID;
+
+        // Fallback: If puuid is missing, resolve it via summonerId
+        if (!puuid && sId) {
+          const summoner = await getSummonerById(sId, platform);
+          puuid = summoner?.puuid;
+        }
+
+        if (puuid) {
+          const account = await getAccountByPuuid(puuid, platform);
+          return { ...entry, account };
+        }
+      } catch (err) {
+        console.error(`Failed to fetch account for ${entry.summonerId}:`, err);
+      }
+      return entry;
+    })
+  );
 
   return (
     <div className="relative min-h-screen pt-12 pb-24 bg-archive-dark overflow-hidden">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-hextech-blue/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-[url('/grid.svg')] bg-repeat opacity-[0.03] pointer-events-none" />
-
+      
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -57,8 +84,16 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
 
         {/* Ranking List */}
         <div className="animate-in fade-in duration-1000 delay-300">
-          <Card variant="glass" className="overflow-hidden border border-white/5 bg-white/[0.02]">
-            <div className="overflow-x-auto">
+          <Card variant="glass" className="relative overflow-hidden border border-white/5 bg-white/[0.02]">
+            <Image 
+              src={getDDragonSplash('RekSai')} 
+              alt="Leaderboard Background" 
+              fill 
+              sizes="100vw"
+              className="object-cover opacity-10 blur-xl scale-110"
+              priority
+            />
+            <div className="relative overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/[0.03]">
@@ -69,14 +104,20 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5 font-display">
-                  {entries.map((entry: LeagueItem, index: number) => {
+                  {entries.map((entry: any, index: number) => {
                     const winRate = Math.round((entry.wins / (entry.wins + entry.losses)) * 100);
+                    const sId = entry.summonerId || entry.summonerID || "";
+                    
+                    // Priority: Riot ID (gameName#tagLine) > Summoner Name > Fallback ID
+                    const riotName = entry.account ? `${entry.account.gameName}#${entry.account.tagLine}` : "";
+                    const displayName = riotName || entry.summonerName || (sId ? `Subject // ${sId.slice(0, 12)}...` : 'CLASSIFIED SUBJECT');
+                    
                     return (
                       <tr 
-                        key={entry.summonerId} 
+                        key={sId || index} 
                         className="hover:bg-hextech-gold/[0.03] transition-all group duration-300"
                       >
-                        <td className="px-8 py-8">
+                        <td className="px-8 py-8 w-20">
                           <span className="text-3xl font-black text-slate-700 group-hover:text-hextech-gold/40 transition-colors">
                             {String(index + 1).padStart(2, '0')}
                           </span>
@@ -84,11 +125,16 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                         <td className="px-8 py-8">
                           <div className="flex flex-col gap-1">
                             <span className="text-lg font-bold text-white group-hover:text-hextech-gold transition-colors tracking-tight">
-                              {entry.summonerName || entry.summonerId}
+                              {displayName}
                             </span>
                             <div className="flex items-center gap-2">
-                              <span className="px-1.5 py-0.5 bg-silver/10 text-silver/60 text-[8px] font-bold uppercase rounded border border-silver/10">
-                                Veteran Status: {entry.veteran ? 'ACTIVE' : 'INACTIVE'}
+                              {sId && (
+                                <div className="px-1.5 py-0.5 bg-hextech-gold/10 text-hextech-gold/60 text-[10px] font-bold uppercase rounded border border-hextech-gold/20">
+                                  Vanguard ID: {sId.slice(0, 8)}
+                                </div>
+                              )}
+                              <span className="px-1.5 py-0.5 bg-silver/10 text-silver/60 text-[10px] font-bold uppercase rounded border border-silver/10">
+                                Status: {entry.veteran ? 'VETERAN' : 'ASPIRANT'}
                               </span>
                             </div>
                           </div>
@@ -127,18 +173,14 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
         </div>
 
         {/* Footer info */}
-        <div className="mt-16 flex items-center justify-between border-t border-white/5 pt-8 animate-in fade-in duration-1000 delay-500">
+        <div className="relative z-10 mt-16 flex items-center justify-between border-t border-white/5 pt-8 animate-in fade-in duration-1000 delay-500">
           <div className="flex flex-col">
             <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-500 italic">
               Data synchronized with standard Riot Network protocols.
             </span>
             <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-700 italic">
-              Cycle completion: Estimated 120s.
+              Archive Status: <span className="text-green-500">Node Sync Complete</span>
             </span>
-          </div>
-          <div className="hidden md:flex items-center gap-4 opacity-50">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Archive Status: Online</span>
           </div>
         </div>
       </div>

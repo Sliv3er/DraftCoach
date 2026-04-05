@@ -37,3 +37,6 @@ convert_*.py
 
 # Package lock at root (monorepo — each app has its own)
 package-lock.json
+
+
+gemini.md

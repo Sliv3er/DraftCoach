@@ -1,0 +1,47 @@
+﻿
+> draftcoach-desktop@1.0.0 build
+> webpack --mode production && electron-builder --win
+
+asset [1m[32mrenderer.js[39m[22m 330 KiB [1m[33m[compared for emit][39m[22m [1m[32m[minimized][39m[22m (name: main) 1 related asset
+asset [1m[32mindex.html[39m[22m 250 bytes [1m[33m[compared for emit][39m[22m
+orphan modules 196 KiB [1m[33m[orphan][39m[22m 10 modules
+runtime modules 698 bytes 4 modules
+cacheable modules 228 KiB
+  modules by path [1m./node_modules/style-loader/dist/runtime/*.js[39m[22m 5.84 KiB 6 modules
+  modules by path [1m./node_modules/react/[39m[22m 8 KiB 4 modules
+  modules by path [1m./node_modules/react-dom/[39m[22m 131 KiB 3 modules
+  modules by path [1m./node_modules/css-loader/dist/runtime/*.js[39m[22m 2.31 KiB
+    [1m./node_modules/css-loader/dist/runtime/noSourceMaps.js[39m[22m 64 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./node_modules/css-loader/dist/runtime/api.js[39m[22m 2.25 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  modules by path [1m./node_modules/scheduler/[39m[22m 4.33 KiB
+    [1m./node_modules/scheduler/index.js[39m[22m 198 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./node_modules/scheduler/cjs/scheduler.production.min.js[39m[22m 4.14 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  ./node_modules/css-loader/dist/cjs.js![1m./src/renderer/styles.css[39m[22m 77.1 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1m./src/renderer/index.tsx + 10 modules[39m[22m 197 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.105.2 compiled [1m[32msuccessfully[39m[22m in 15496 ms
+  ÔÇó electron-builder  version=26.8.1 os=10.0.26100
+  ÔÇó loaded configuration  file=package.json ("build" field)
+  ÔÇó executing @electron/rebuild  electronVersion=28.3.3 arch=x64 buildFromSource=false workspaceRoot=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop projectDir=./ appDir=./
+  ÔÇó installing native dependencies  arch=x64
+  ÔÇó completed installing native dependencies
+  ÔÇó packaging       platform=win32 arch=x64 electron=28.3.3 appOutDir=dist-electron\win-unpacked
+  Ô¿» remove C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\dist-electron\win-unpacked\DraftCoach.exe: The process cannot access the file because it is being used by another process.
+github.com/develar/go-fs-util.EnsureEmptyDir
+	/Users/runner/go/pkg/mod/github.com/develar/go-fs-util@v0.0.0-20190620175131-69a2d4542206/fs.go:98
+github.com/develar/app-builder/pkg/electron.UnpackElectron.func1.1
+	/Users/runner/work/app-builder/app-builder/pkg/electron/electronUnpack.go:38
+github.com/develar/app-builder/pkg/util.MapAsyncConcurrency.func2
+	/Users/runner/work/app-builder/app-builder/pkg/util/async.go:68
+runtime.goexit
+	/Users/runner/hostedtoolcache/go/1.21.13/arm64/src/runtime/asm_amd64.s:1650  
+  Ô¿» C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\node_modules\app-builder-bin\win\x64\app-builder.exe process failed ERR_ELECTRON_BUILDER_CANNOT_EXECUTE
+Exit code:
+1  failedTask=build stackTrace=Error: C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\node_modules\app-builder-bin\win\x64\app-builder.exe process failed ERR_ELECTRON_BUILDER_CANNOT_EXECUTE
+Exit code:
+1
+    at ChildProcess.<anonymous> (C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\node_modules\builder-util\src\util.ts:272:14)
+    at Object.onceWrapper (node:events:623:26)
+    at ChildProcess.emit (node:events:508:28)
+    at ChildProcess.cp.emit (C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\node_modules\cross-spawn\lib\enoent.js:34:29)
+    at maybeClose (node:internal/child_process:1101:16)
+    at Process.ChildProcess._handle.onexit (node:internal/child_process:305:5)

@@ -33,24 +33,17 @@
       "requestedExecutionLevel": "asInvoker"
     },
     "directories": {
-      "output": "dist-electron"
+      "output": "dist-installer"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
       "installerIcon": "../../assets/icon.ico",
       "uninstallerIcon": "../../assets/icon.ico",
-      "installerHeaderIcon": "../../assets/icon.ico",
-      "installerSidebar": "../../assets/installer/installer-sidebar.bmp",
-      "installerHeader": "../../assets/installer/installer-header.bmp",
-      "include": "build/installer.nsh",
-      "deleteAppDataOnUninstall": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "DraftCoach",
-      "perMachine": false,
-      "allowElevation": true,
-      "menuCategory": "DraftCoach"
+      "shortcutName": "DraftCoach"
     },
     "asar": true,
     "extraResources": [

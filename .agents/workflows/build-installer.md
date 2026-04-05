@@ -4,7 +4,10 @@ description: How to build the DraftCoach production installer (.exe)
 
 # Build DraftCoach Installer
 
-This workflow produces a branded Windows installer for DraftCoach using electron-builder + NSIS.
+This workflow produces a branded Windows installer for DraftCoach using **electron-builder + Squirrel.Windows**. 
+
+## Why Squirrel?
+Squirrel provides a "silent", 1-click install experience similar to Discord, Spotify, and VS Code. It completely bypasses the native Windows wizard UI in favor of a sleek, animated splash screen.
 
 ## Prerequisites
 
@@ -36,58 +39,45 @@ npm run build
 
 This runs:
 1. `webpack --mode production` → compiles React renderer to `apps/desktop/dist/`
-2. `electron-builder --win` → packages Electron app + creates NSIS installer
+2. `electron-builder --win` → packages Electron app + creates Squirrel installer
 
 **Output:** `apps/desktop/dist-electron/DraftCoach Setup *.exe`
 
 ## Architecture of the Installer
 
-### NSIS Configuration
+### Configuration (`package.json`)
 
-The installer is configured in `apps/desktop/package.json` under the `build.nsis` section:
+The installer is configured in `apps/desktop/package.json`:
 
 ```json
-{
-  "nsis": {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "installerSidebar": "../../assets/installer/installer-sidebar.bmp",
-    "installerHeader": "../../assets/installer/installer-header.bmp",
-    "include": "build/installer.nsh",
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true,
-    "shortcutName": "DraftCoach"
-  }
+"target": ["squirrel"],
+"squirrelWindows": {
+  "iconUrl": "https://raw.githubusercontent.com/Sliv3er/DraftCoach/main/assets/icon.ico",
+  "setupIcon": "../../assets/icon.ico",
+  "loadingGif": "../../assets/splash.gif",
+  "remoteReleases": "https://github.com/Sliv3er/DraftCoach"
 }
 ```
 
 **Key settings:**
-- `oneClick: false` — Uses assisted (wizard) installer with Welcome → Directory → Install → Finish pages
-- Custom BMP images for sidebar (164×314) and header (150×57) branding
-- `build/installer.nsh` — Custom NSIS script with dark theme colors and branded text
+- `target`: `squirrel` creates the silent installer executable.
+- `iconUrl`: An absolute URL to the remote `.ico` file, which Windows uses in the Add/Remove Programs panel.
+- `setupIcon`: The icon used for the `Setup.exe` file itself.
+- `loadingGif`: The animated splash screen that plays in the center of the screen while installing.
+- `remoteReleases`: URL to the GitHub repo to enable automatic delta updates via Squirrel.
 
-### Custom NSIS Script (`build/installer.nsh`)
+### Branding Assets (`assets/`)
 
-This file is automatically included by electron-builder. It defines:
-- **MUI2 dark theme** — Background `#010A13`, text `#F0E6D2` (matching the LoL client palette)
-- **Welcome page** — Branded text describing DraftCoach features
-- **Finish page** — "Launch DraftCoach" checkbox + GitHub link
-- **Shortcuts** — Desktop and Start Menu shortcuts created in `customInstall` macro
-- **Uninstaller** — Cleans up shortcuts in `customUnInstall` macro
-
-### Branding Assets (`assets/installer/`)
-
-| File | Size | Purpose |
-|------|------|---------|
-| `installer-sidebar.bmp` | 164×314 | Welcome/Finish page left sidebar |
-| `installer-header.bmp` | 150×57 | All wizard pages header bar |
-| `uninstaller-sidebar.bmp` | 164×314 | Uninstaller sidebar |
-| `uninstaller-header.bmp` | 150×57 | Uninstaller header |
+| File | Purpose |
+|------|---------|
+| `icon.png` | Source high-res logo used in the app |
+| `icon.ico` | Multi-resolution icon for Windows taskbar and executables |
+| `splash.gif` | The animated pulsing logo + precise loading bar shown during installation |
 
 **To regenerate these images** (if logo changes):
 
 ```bash
-python tools/gen-installer-images.py
+python tools/gen-squirrel-assets.py
 ```
 
 Requires Python 3 + Pillow (`pip install Pillow`).
@@ -109,21 +99,8 @@ In production, the app loads `.env` from (checked in order):
 
 ## Installer Flow (User Experience)
 
-1. **Welcome Page** — DraftCoach logo, sidebar image, description text
-2. **Directory Selection** — Default: `%LOCALAPPDATA%/Programs/DraftCoach/`
-3. **Installation Progress** — Standard NSIS progress bar
-4. **Finish Page** — "Launch DraftCoach" checkbox (checked by default), GitHub link
-
-## Common Issues
-
-### "Cannot find module" errors during build
-Run `npm install` in both the root and `apps/desktop/` directories.
-
-### NSIS images not loading
-Ensure images are valid BMP format at exact dimensions (164×314 sidebar, 150×57 header). Regenerate using `python tools/gen-installer-images.py`.
-
-### electron-builder version
-The project uses `electron-builder ^26.8.1`. Check `apps/desktop/package.json` for the current version.
-
-### Icon format
-The `.ico` file at `assets/icon.ico` must be a valid multi-resolution ICO file. The current one includes 16, 32, 48, 64, 128, and 256px sizes.
+1. User clicks `DraftCoach Setup 1.0.0.exe`
+2. A borderless window opens in the center of the screen playing `splash.gif`.
+3. DraftCoach installs silently in the background into `%LOCALAPPDATA%/DraftCoach`.
+4. A desktop shortcut and start menu shortcut are automatically created.
+5. The splash screen closes, and DraftCoach launches automatically.

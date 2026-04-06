@@ -8,7 +8,11 @@ import {
   ChampionMastery,
   Champion,
   getItems,
-  uIRegionToPlatform
+  getSummonerSpellMap,
+  getRuneMap,
+  uIRegionToPlatform,
+  getDDragonProfileIcon,
+  getRankEmblem
 } from "@/lib/riot";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +20,8 @@ import Link from "next/link";
 import { MatchList } from "@/components/MatchList";
 import { getSummonerFull, getTopMastery, fetchMoreMatches } from "@/app/actions";
 import { ArchiveUpdateButton } from "@/components/ArchiveUpdateButton";
+import { PastRanks } from "@/components/PastRanks";
+import { RecentPlayersSidebar } from "@/components/RecentPlayersSidebar";
 
 interface SummonerPageProps {
   params: Promise<{ region: string; name: string }>;
@@ -38,10 +44,12 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
 
   try {
     const version = await getLatestDDragonVersion();
-    const [profileData, allChampions, items] = await Promise.all([
+    const [profileData, allChampions, items, spellMap, runeMap] = await Promise.all([
       getSummonerFull(region, gameName, tagLine),
       getChampions(version),
-      getItems(version)
+      getItems(version),
+      getSummonerSpellMap(version),
+      getRuneMap(version)
     ]);
     
     if (!profileData || !profileData.summoner) {
@@ -65,7 +73,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
       );
     }
 
-    const { summoner, leagues } = profileData;
+    const { summoner, leagues, player } = profileData;
     const puuid = summoner.puuid;
 
     const [topMastery, matches] = await Promise.all([
@@ -105,7 +113,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                   <div className="w-40 h-40 rounded-sm overflow-hidden border-2 border-hextech-gold p-1 bg-surface-container shadow-[0_0_40px_rgba(240,191,92,0.15)] transition-all group-hover:shadow-[0_0_60px_rgba(240,191,92,0.25)]">
                      <div className="w-full h-full relative overflow-hidden rounded-sm bg-surface-bright">
                         <Image 
-                          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`}
+                          src={getDDragonProfileIcon(version, summoner.profileIconId)}
                           alt="Profile Icon"
                           fill
                           sizes="160px"
@@ -175,11 +183,20 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                  <div className="absolute top-0 right-0 w-32 h-32 bg-hextech-gold/5 blur-3xl -mr-16 -mt-16" />
                  <h3 className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/40 mb-10">Archive Ranking</h3>
                  
-                 <div className="flex items-center gap-8 mb-10">
-                    <div className="w-24 h-24 bg-surface-bright flex items-center justify-center border border-hextech-gold/30 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-                       <span className="text-5xl font-display font-light text-hextech-gold group-hover:scale-110 transition-transform">
-                          {soloQueue ? soloQueue.tier.charAt(0) : "U"}
-                       </span>
+                  <PastRanks rankHistory={player?.rankHistory} />
+
+                  <div className="flex items-center gap-8 mb-10">
+                    <div className="w-24 h-24 bg-surface-bright flex items-center justify-center border border-hextech-gold/30 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                       {soloQueue ? (
+                         <Image 
+                           src={getRankEmblem(soloQueue.tier)} 
+                           alt={soloQueue.tier} 
+                           fill 
+                           className="object-contain p-2 group-hover:scale-110 transition-transform duration-500" 
+                         />
+                       ) : (
+                         <span className="text-5xl font-display font-light text-hextech-gold group-hover:scale-110 transition-transform">U</span>
+                       )}
                     </div>
                     <div>
                       <h4 className="text-2xl font-bold text-white uppercase tracking-tighter mb-1">
@@ -236,6 +253,9 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                     })}
                  </div>
               </div>
+
+              {/* Recent Players Sidebar */}
+              <RecentPlayersSidebar matches={matches} puuid={puuid} />
             </aside>
 
             {/* Right Main Content: Logs */}
@@ -250,13 +270,15 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
 
                <div className="space-y-4">
                    {matches.length > 0 ? (
-               <MatchList 
-                 initialMatches={matches} 
-                 puuid={puuid} 
-                 region={region}
-                 version={version}
-                 items={items}
-               />
+                <MatchList 
+                  initialMatches={matches} 
+                  puuid={puuid} 
+                  region={region}
+                  version={version}
+                  items={items}
+                  spellMap={spellMap}
+                  runeMap={runeMap}
+                />
                    ) : (
                     <div className="p-20 text-center border-2 border-dashed border-white/5 bg-surface/30">
                        <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/20 block mb-4">Integrity Check Failed // Logs Empty</span>

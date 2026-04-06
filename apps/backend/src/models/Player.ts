@@ -10,6 +10,11 @@ export interface IPlayer extends Document {
   summonerLevel: number;
   rank: string;
   lp: number;
+  rankHistory?: {
+    season: string;
+    tier: string;
+    rank: string;
+  }[];
   lastUpdated: Date;
 }
 
@@ -23,6 +28,11 @@ const PlayerSchema: Schema = new Schema({
   summonerLevel: { type: Number, default: 0 },
   rank: { type: String, default: 'Unranked' },
   lp: { type: Number, default: 0 },
+  rankHistory: [{
+    season: { type: String, required: true },
+    tier: { type: String, required: true },
+    rank: { type: String, required: true }
+  }],
   lastUpdated: { type: Date, default: Date.now }
 });
 

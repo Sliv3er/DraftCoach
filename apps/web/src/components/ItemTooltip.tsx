@@ -8,22 +8,23 @@ interface ItemTooltipProps {
   item: Item | null;
   itemId: number;
   version: string;
+  className?: string;
 }
 
-export const ItemTooltip: React.FC<ItemTooltipProps> = ({ item, itemId, version }) => {
+export const ItemTooltip: React.FC<ItemTooltipProps> = ({ item, itemId, version, className }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   if (itemId === 0) {
-    return <div className="w-8 h-8 rounded-sm border border-white/5 bg-surface-bright/50" />;
+    return <div className={`${className || 'w-8 h-8'} rounded-sm border border-white/5 bg-surface-bright/50`} />;
   }
 
   return (
     <div 
-      className="relative group"
+      className="relative group shrink-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`w-8 h-8 rounded-sm border border-white/5 overflow-hidden bg-surface-bright/50 relative transition-transform group-hover:scale-105 group-hover:border-hextech-gold/50`}>
+      <div className={`${className || 'w-8 h-8'} rounded-sm border border-white/5 overflow-hidden bg-surface-bright/50 relative transition-transform group-hover:scale-105 group-hover:border-hextech-gold/50`}>
         <Image 
           src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`}
           alt={item?.name || 'Item'}

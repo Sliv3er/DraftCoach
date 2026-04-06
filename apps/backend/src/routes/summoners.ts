@@ -42,7 +42,7 @@ summonerRouter.get("/:region/:riotId", async (req: Request, res: Response) => {
     // Fetch league entries
     const leagues = await getLeagueEntries(summoner.puuid, platformId);
 
-    res.json({ summoner, leagues });
+    res.json({ summoner, leagues, player: summoner });
   } catch (err: any) {
     console.error("[Summoner Route] Error details:");
     console.error("Message:", err.message);

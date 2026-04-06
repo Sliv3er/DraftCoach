@@ -100,10 +100,26 @@ export async function getSummoner(region: string, gameName: string, tagLine: str
   const leagueEntries = await getLeagueEntries(puuid, region);
   const soloQueue = leagueEntries.find((l: any) => l.queueType === "RANKED_SOLO_5x5");
   
-  const rank = soloQueue ? `${soloQueue.tier} ${soloQueue.rank}` : 'Unranked';
+  const rank = soloQueue ? soloQueue.tier : 'UNRANKED';
+  const tierRank = soloQueue ? soloQueue.rank : '';
   const lp = soloQueue ? soloQueue.leaguePoints : 0;
+  
+  const currentSeason = "S2026"; // Dynamic season detection would be better but this works for now
 
-  // 4. Update Cache (Player model)
+  // 4. Update/Get Current Player to check history
+  let player = await Player.findOne({ puuid });
+  let rankHistory = player?.rankHistory || [];
+
+  const existsInHistory = rankHistory.some(h => h.season === currentSeason);
+  if (!existsInHistory) {
+    rankHistory.push({
+      season: currentSeason,
+      tier: rank,
+      rank: tierRank
+    });
+  }
+
+  // 5. Update Cache (Player model)
   const playerData = {
     puuid,
     summonerId: sumRes.data.id,
@@ -112,8 +128,9 @@ export async function getSummoner(region: string, gameName: string, tagLine: str
     region,
     profileIconId: sumRes.data.profileIconId,
     summonerLevel: sumRes.data.summonerLevel,
-    rank,
+    rank: soloQueue ? `${rank} ${tierRank}` : 'Unranked',
     lp,
+    rankHistory,
     lastUpdated: new Date()
   };
 

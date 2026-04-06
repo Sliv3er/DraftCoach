@@ -1,28 +1,21 @@
 import Image from "next/image";
 import { 
-  getAccountByRiotId, 
-  getSummonerByPuuid, 
-  getLeagueEntries, 
-  getRoutingRegion, 
-  uIRegionToPlatform, 
-  getRecentMatchIds, 
-  getMatchDetails,
   getLatestDDragonVersion,
-  getTopChampionMasteries,
   getChampions,
   getCDragonChampionIcon,
-  getCDragonSplash,
+  getChampionSplash,
   LeagueItem,
   Match,
-  MatchParticipant,
   ChampionMastery,
-  Champion
+  Champion,
+  getItems,
+  uIRegionToPlatform
 } from "@/lib/riot";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { MatchList } from "@/components/MatchList";
-import { getItems } from "@/lib/riot";
+import { getSummonerFull, getTopMastery, fetchMoreMatches } from "@/app/actions";
 
 interface SummonerPageProps {
   params: Promise<{ region: string; name: string }>;
@@ -30,14 +23,12 @@ interface SummonerPageProps {
 
 export default async function SummonerProfile({ params }: SummonerPageProps) {
   const resolvedParams = await params;
-  
-  const regionDropdown = resolvedParams.region.toUpperCase();
-  const platformId = uIRegionToPlatform[regionDropdown] || "na1";
-  const routingRegion = getRoutingRegion(platformId);
+  const regionInput = resolvedParams.region.toUpperCase();
+  const region = uIRegionToPlatform[regionInput] || regionInput.toLowerCase();
   
   const decodedString = decodeURIComponent(resolvedParams.name);
   let gameName = decodedString;
-  let tagLine = regionDropdown;
+  let tagLine = region;
   
   if (decodedString.includes('-')) {
     const parts = decodedString.split('-');
@@ -47,9 +38,13 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
 
   try {
     const version = await getLatestDDragonVersion();
-    const accountRes = await getAccountByRiotId(gameName, tagLine, routingRegion);
+    const [profileData, allChampions, items] = await Promise.all([
+      getSummonerFull(region, gameName, tagLine),
+      getChampions(version),
+      getItems(version)
+    ]);
     
-    if (!accountRes || !accountRes.puuid) {
+    if (!profileData || !profileData.summoner) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
           <Card variant="glass" className="max-w-md p-10 border-red-500/20">
@@ -60,7 +55,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
             </div>
             <h2 className="text-2xl font-display font-bold uppercase tracking-widest text-white mb-2">Subject Not Found</h2>
             <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-              The archive has no record of {gameName}#{tagLine} in the {regionDropdown} cluster.
+              The archive has no record of {gameName}#{tagLine} in the {region} cluster.
             </p>
             <Link href="/" className="w-full">
                <Button variant="secondary" fullWidth>Initiate Return Trace</Button>
@@ -70,29 +65,21 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
       );
     }
 
-    const puuid = accountRes.puuid;
-    const [summonerInfo, leagueInfo, matchIds, topMastery, allChampions, items] = await Promise.all([
-      getSummonerByPuuid(puuid, platformId),
-      getLeagueEntries(puuid, platformId),
-      getRecentMatchIds(puuid, routingRegion, 10),
-      getTopChampionMasteries(puuid, platformId, 3),
-      getChampions(version),
-      getItems(version)
+    const { summoner, leagues } = profileData;
+    const puuid = summoner.puuid;
+
+    const [topMastery, matches] = await Promise.all([
+      getTopMastery(puuid, region, 3),
+      fetchMoreMatches(puuid, region, 0, 10)
     ]);
 
-    if (!summonerInfo) {
-      throw new Error("Summoner data could not be retrieved even with a valid PUUID.");
-    }
-
-    const matches = await Promise.all(
-      matchIds.map((id: string) => getMatchDetails(id, routingRegion))
-    );
-
-    const soloQueue = leagueInfo.find((l: LeagueItem) => l.queueType === "RANKED_SOLO_5x5") || null;
+    const soloQueue = leagues.find((l: LeagueItem) => l.queueType === "RANKED_SOLO_5x5") || null;
     const winRate = soloQueue ? Math.round((soloQueue.wins / (soloQueue.wins + soloQueue.losses)) * 100) : 0;
     
     // Predetermined favorite champ for background based on top mastery
     const favoriteChampId = topMastery[0]?.championId || 421; 
+    const favoriteChamp = Object.values(allChampions).find(c => Number(c.key) === favoriteChampId);
+    const favoriteChampName = (favoriteChamp as any)?.id || "RekSai";
 
     return (
       <div className="relative min-h-screen bg-surface">
@@ -100,9 +87,10 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
         <div className="absolute top-0 left-0 right-0 h-[500px] z-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-surface/0 via-surface/80 to-surface z-10" />
           <Image 
-            src={getCDragonSplash(favoriteChampId)}
+            src={getChampionSplash(favoriteChampId, favoriteChampName)}
             alt="Favorite Champ Background" 
             fill 
+            sizes="100vw"
             className="object-cover opacity-20 blur-md scale-110"
             priority
           />
@@ -117,15 +105,16 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                   <div className="w-40 h-40 rounded-sm overflow-hidden border-2 border-hextech-gold p-1 bg-surface-container shadow-[0_0_40px_rgba(240,191,92,0.15)] transition-all group-hover:shadow-[0_0_60px_rgba(240,191,92,0.25)]">
                      <div className="w-full h-full relative overflow-hidden rounded-sm bg-surface-bright">
                         <Image 
-                          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summonerInfo.profileIconId}.png`}
+                          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`}
                           alt="Profile Icon"
                           fill
+                          sizes="160px"
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                      </div>
                   </div>
                   <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-hextech-gold text-hextech-blue font-display font-bold text-sm rounded-sm shadow-xl tracking-tighter">
-                     LVL {summonerInfo.summonerLevel}
+                     LVL {summoner.summonerLevel}
                   </div>
                 </div>
 
@@ -133,8 +122,8 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                   <div className="editorial-header mb-4">
                      <span>Kinetic Archive Detected // Signal High</span>
                      <h1 className="text-4xl md:text-7xl leading-none">
-                       {accountRes.gameName}
-                       <span className="text-hextech-gold opacity-40 ml-2">#{accountRes.tagLine}</span>
+                       {gameName}
+                       <span className="text-hextech-gold opacity-40 ml-2">#{tagLine}</span>
                      </h1>
                   </div>
                   
@@ -257,14 +246,13 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
 
                <div className="space-y-4">
                    {matches.length > 0 ? (
-                     <MatchList 
-                        initialMatches={matches}
-                        puuid={puuid}
-                        region={resolvedParams.region}
-                        routingRegion={routingRegion}
-                        version={version}
-                        items={items}
-                     />
+               <MatchList 
+                 initialMatches={matches} 
+                 puuid={puuid} 
+                 region={region}
+                 version={version}
+                 items={items}
+               />
                    ) : (
                     <div className="p-20 text-center border-2 border-dashed border-white/5 bg-surface/30">
                        <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/20 block mb-4">Integrity Check Failed // Logs Empty</span>
@@ -290,7 +278,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
           <h2 className="text-xl font-display font-bold uppercase tracking-widest text-white mb-2">Signal Interference</h2>
           <p className="text-slate-400 text-sm mb-4 leading-relaxed">External Riot networks are currently unstable or inaccessible from this terminal.</p>
           <code className="text-[10px] text-amber-500/60 uppercase tracking-widest block py-2 px-4 bg-black/20 rounded-sm mb-8">{error.message}</code>
-          <Button variant="secondary" fullWidth onClick={() => typeof window !== 'undefined' && window.location.reload()}>Re-Initiate Handshake</Button>
+          <Button variant="secondary" fullWidth>Retry Trace</Button>
         </Card>
       </div>
     );

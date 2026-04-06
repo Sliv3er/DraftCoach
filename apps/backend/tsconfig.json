@@ -15,6 +15,9 @@
   },
   "include": [
     "src/**/*.ts",
-    "../../shared/**/*.ts"
+    "../../shared/engine/**/*.ts"
+  ],
+  "exclude": [
+    "../../shared/__tests__"
   ]
 }

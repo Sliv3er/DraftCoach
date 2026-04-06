@@ -1,36 +1,9 @@
 // src/lib/riot.ts
 
-const getHeaders = () => {
-  const API_KEY = process.env.RIOT_API_KEY;
-  if (!API_KEY) {
-    throw new Error("RIOT_API_KEY is not defined in environment variables.");
-  }
-  return {
-    "X-Riot-Token": API_KEY,
-  };
-};
-
-// Mapping standard regions to API subdomains
-const platformToRegionMap: Record<string, string> = {
-  na1: "americas",
-  br1: "americas",
-  la1: "americas",
-  la2: "americas",
-  kr: "asia",
-  jp1: "asia",
-  eun1: "europe",
-  euw1: "europe",
-  tr1: "europe",
-  ru: "europe",
-  oc1: "sea",
-  ph2: "sea",
-  sg2: "sea",
-  th2: "sea",
-  tw2: "sea",
-  vn2: "sea",
-};
-
-// UI dropdown region to Riot Platform ID
+/**
+ * Mapping standard regions to API subdomains.
+ * UI dropdown region to Riot Platform ID.
+ */
 export const uIRegionToPlatform: Record<string, string> = {
   NA: "na1",
   EUW: "euw1",
@@ -38,17 +11,27 @@ export const uIRegionToPlatform: Record<string, string> = {
   EUNE: "eun1",
 };
 
-export const getRoutingRegion = (platform: string) => {
-  const normalized = platform.toLowerCase();
-  
-  // Handlers for UI labels like NA, EUW
-  if (normalized === "na") return "americas";
-  if (normalized === "euw") return "europe";
-  if (normalized === "kr") return "asia";
-  if (normalized === "eune") return "europe";
-
-  return platformToRegionMap[normalized] || "americas";
-};
+export function getRoutingRegion(platformId: string) {
+  const mapping: Record<string, string> = {
+    na1: 'americas',
+    br1: 'americas',
+    la1: 'americas',
+    la2: 'americas',
+    kr: 'asia',
+    jp1: 'asia',
+    euw1: 'europe',
+    eun1: 'europe',
+    tr1: 'europe',
+    ru: 'europe',
+    oc1: 'sea',
+    ph2: 'sea',
+    sg2: 'sea',
+    th2: 'sea',
+    tw2: 'sea',
+    vn2: 'sea',
+  };
+  return mapping[platformId.toLowerCase()] || 'americas';
+}
 
 // --- TYPES ---
 
@@ -60,6 +43,8 @@ export interface Summoner {
   profileIconId: number;
   revisionDate: number;
   summonerLevel: number;
+  gameName?: string;
+  tagLine?: string;
 }
 
 export interface Account {
@@ -86,7 +71,7 @@ export interface LeagueEntry {
 export interface LeagueItem {
   summonerId: string;
   summonerName?: string;
-  puuid?: string; // Added to support Riot ID migration
+  puuid?: string;
   leaguePoints: number;
   rank: string;
   tier: string;
@@ -167,6 +152,9 @@ export interface MatchParticipant {
   summoner2Id: number;
   teamPosition: string;
   teamId: number;
+  champLevel: number;
+  riotIdGameName?: string;
+  riotIdTagline?: string;
 }
 
 export interface Match {
@@ -205,21 +193,21 @@ export interface ItemMap {
 // --- DATA DRAGON & CDrAGON ASSETS ---
 
 export async function getLatestDDragonVersion() {
-  const res = await fetch('https://ddragon.leagueoflegends.com/api/versions.json', { next: { revalidate: 3600 } });
+  const res = await fetch('https://ddragon.leagueoflegends.com/api/versions.json', { next: { revalidate: 3600 } } as any);
   if (!res.ok) throw new Error('Failed to fetch DDragon versions');
   const versions = await res.json();
   return versions[0];
 }
 
 export async function getChampions(version: string): Promise<ChampionMap> {
-  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`, { next: { revalidate: 86400 } });
+  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`, { next: { revalidate: 86400 } } as any);
   if (!res.ok) throw new Error('Failed to fetch champions from DDragon');
   const data = await res.json();
   return data.data;
 }
 
 export async function getItems(version: string): Promise<ItemMap> {
-  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`, { next: { revalidate: 86400 } });
+  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`, { next: { revalidate: 86400 } } as any);
   if (!res.ok) throw new Error('Failed to fetch items from DDragon');
   const data = await res.json();
   return data.data;
@@ -227,7 +215,6 @@ export async function getItems(version: string): Promise<ItemMap> {
 
 /**
  * Community Dragon (CDragon) Asset Helpers
- * Use these for high-quality, up-to-date icons and splashes.
  */
 export const getCDragonChampionIcon = (championId: number | string) => 
   `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${championId}.png`;
@@ -235,126 +222,10 @@ export const getCDragonChampionIcon = (championId: number | string) =>
 export const getCDragonItemIcon = (itemId: number | string) => 
   `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/items/${itemId}.png`;
 
-export const getCDragonSplash = (championId: number | string) => 
-  `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/${championId}/${championId}000.png`;
+export const getChampionSplash = (championId: number | string, championName: string) => {
+  return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/uncentered/${championId}/${championId}000.png`;
+};
 
-export const getDDragonSplash = (championName: string) =>
-  `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg`;
-
-// --- ACCOUNT & SUMMONER ---
-
-export async function getAccountByRiotId(gameName: string, tagLine: string, routingRegion: string = "americas"): Promise<Account | null> {
-  const url = `https://${routingRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
-  
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`Riot ID Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
-
-export async function getAccountByPuuid(puuid: string, platformId: string): Promise<Account | null> {
-  const routingRegion = platformToRegionMap[platformId] || "americas";
-  const url = `https://${routingRegion}.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 86400 } });
-  
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`Account by PUUID Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
-
-export async function getSummonerById(summonerId: string, platformId: string): Promise<Summoner | null> {
-  const url = `https://${platformId}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
-  
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`Summoner by ID Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
-
-export async function getSummonerByPuuid(puuid: string, platformId: string): Promise<Summoner | null> {
-  const url = `https://${platformId}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
-  
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`Summoner Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
-
-// --- LEAGUE & RANKINGS ---
-
-export async function getLeagueEntries(puuid: string, platformId: string): Promise<LeagueEntry[]> {
-  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 300 } });
-  
-  if (!res.ok) {
-    throw new Error(`League Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
-
-export async function getChallengerLeague(platformId: string, queue: string = 'RANKED_SOLO_5x5'): Promise<LeagueList> {
-  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/${queue}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 600 } });
-  if (!res.ok) throw new Error(`Challenger League Fetch Error: ${res.status}`);
-  return res.json();
-}
-
-export async function getGrandmasterLeague(platformId: string, queue: string = 'RANKED_SOLO_5x5'): Promise<LeagueList> {
-  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/grandmasterleagues/by-queue/${queue}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 600 } });
-  if (!res.ok) throw new Error(`Grandmaster League Fetch Error: ${res.status}`);
-  return res.json();
-}
-
-export async function getMasterLeague(platformId: string, queue: string = 'RANKED_SOLO_5x5'): Promise<LeagueList> {
-  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/masterleagues/by-queue/${queue}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 600 } });
-  if (!res.ok) throw new Error(`Master League Fetch Error: ${res.status}`);
-  return res.json();
-}
-
-export async function getLeagueEntriesByTier(platformId: string, tier: string, division: string, queue: string = 'RANKED_SOLO_5x5', page: number = 1): Promise<LeagueItem[]> {
-  const url = `https://${platformId}.api.riotgames.com/lol/league/v4/entries/${queue}/${tier}/${division}?page=${page}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
-  if (!res.ok) throw new Error(`League Entries Fetch Error: ${res.status}`);
-  return res.json();
-}
-
-// --- CHAMPION MASTERY ---
-
-export async function getTopChampionMasteries(puuid: string, platformId: string, count: number = 5): Promise<ChampionMastery[]> {
-  const url = `https://${platformId}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=${count}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
-  if (!res.ok) throw new Error(`Champion Mastery Fetch Error: ${res.status}`);
-  return res.json();
-}
-
-// --- MATCHES ---
-
-export async function getRecentMatchIds(puuid: string, routingRegion: string, count: number = 5, start: number = 0): Promise<string[]> {
-  const url = `https://${routingRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 300 } });
-  
-  if (!res.ok) {
-    throw new Error(`Match IDs Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
-
-export async function getMatchDetails(matchId: string, routingRegion: string): Promise<Match> {
-  const url = `https://${routingRegion}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
-  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 86400 } });
-  
-  if (!res.ok) {
-    throw new Error(`Match Detail Fetch Error: ${res.status} ${res.statusText}`);
-  }
-  return res.json();
-}
+export const getDDragonSplash = (championName: string) => {
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg`;
+};

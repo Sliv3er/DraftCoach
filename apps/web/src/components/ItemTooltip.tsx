@@ -28,6 +28,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({ item, itemId, version 
           src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`}
           alt={item?.name || 'Item'}
           fill
+          sizes="32px"
           className="object-cover"
         />
       </div>
@@ -41,6 +42,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({ item, itemId, version 
                   src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`}
                   alt={item.name}
                   fill
+                  sizes="40px"
                   className="object-cover"
                 />
               </div>

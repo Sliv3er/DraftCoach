@@ -1,4 +1,5 @@
-import { getChallengerLeague, uIRegionToPlatform, LeagueItem, getDDragonSplash, getAccountByPuuid, getSummonerById } from "@/lib/riot";
+import { uIRegionToPlatform, LeagueItem, getDDragonSplash } from "@/lib/riot";
+import { getLeaderboard, getAccountByPuuid, getSummonerById } from "@/app/actions";
 import { Card } from "@/components/ui/Card";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,13 +8,13 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
   const searchParams = await props.searchParams;
   const region = searchParams.region || 'NA';
   const platform = uIRegionToPlatform[region];
-  const leagueData = await getChallengerLeague(platform);
+  const leagueData = await getLeaderboard(region);
 
   // Sort by LP and take top 20
   const rawEntries = leagueData?.entries
     ? leagueData.entries
-        .sort((a: LeagueItem, b: LeagueItem) => b.leaguePoints - a.leaguePoints)
-        .slice(0, 20)
+      .sort((a: LeagueItem, b: LeagueItem) => b.leaguePoints - a.leaguePoints)
+      .slice(0, 20)
     : [];
 
   // Fetch Riot Account details (gameName#tagLine) for each entry
@@ -26,12 +27,12 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
 
         // Fallback: If puuid is missing, resolve it via summonerId
         if (!puuid && sId) {
-          const summoner = await getSummonerById(sId, platform);
+          const summoner = await getSummonerById(sId, region);
           puuid = summoner?.puuid;
         }
 
         if (puuid) {
-          const account = await getAccountByPuuid(puuid, platform);
+          const account = await getAccountByPuuid(puuid, region);
           return { ...entry, account };
         }
       } catch (err) {
@@ -45,7 +46,7 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
     <div className="relative min-h-screen pt-12 pb-24 bg-archive-dark overflow-hidden">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-hextech-blue/10 to-transparent pointer-events-none" />
-      
+
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -67,13 +68,13 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
           {/* Region Selection Interface */}
           <div className="flex p-1 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
             {['NA', 'EUW', 'KR', 'EUNE'].map((r) => (
-              <a 
-                key={r} 
+              <a
+                key={r}
                 href={`/leaderboards?region=${r}`}
                 className={`
                   px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all
-                  ${r === region 
-                    ? 'bg-hextech-gold text-hextech-blue shadow-[0_0_20px_rgba(196,151,85,0.4)]' 
+                  ${r === region
+                    ? 'bg-hextech-gold text-hextech-blue shadow-[0_0_20px_rgba(196,151,85,0.4)]'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'}
                 `}
               >
@@ -86,10 +87,10 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
         {/* Ranking List */}
         <div className="animate-in fade-in duration-1000 delay-300">
           <Card variant="glass" className="relative overflow-hidden border border-white/5 bg-white/[0.02]">
-            <Image 
-              src={getDDragonSplash('RekSai')} 
-              alt="Leaderboard Background" 
-              fill 
+            <Image
+              src={getDDragonSplash('RekSai')}
+              alt="Leaderboard Background"
+              fill
               sizes="100vw"
               className="object-cover opacity-10 blur-xl scale-110"
               priority
@@ -106,16 +107,17 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                 </thead>
                 <tbody className="divide-y divide-white/5 font-display">
                   {entries.map((entry: any, index: number) => {
+                    console.log(entry)
                     const winRate = Math.round((entry.wins / (entry.wins + entry.losses)) * 100);
                     const sId = entry.summonerId || entry.summonerID || "";
-                    
+
                     // Priority: Riot ID (gameName#tagLine) > Summoner Name > Fallback ID
                     const riotName = entry.account ? `${entry.account.gameName}#${entry.account.tagLine}` : "";
                     const displayName = riotName || entry.summonerName || (sId ? `Subject // ${sId.slice(0, 12)}...` : 'CLASSIFIED SUBJECT');
-                    
+
                     return (
-                      <tr 
-                        key={sId || index} 
+                      <tr
+                        key={sId || index}
                         className="hover:bg-hextech-gold/[0.03] transition-all group duration-300"
                       >
                         <td className="px-8 py-8 w-20">
@@ -126,7 +128,7 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                         <td className="px-8 py-8">
                           <div className="flex flex-col gap-1">
                             {entry.account ? (
-                              <Link 
+                              <Link
                                 href={`/summoner/${region}/${entry.account.gameName}-${entry.account.tagLine}`}
                                 className="text-lg font-bold text-white group-hover:text-hextech-gold transition-colors tracking-tight hover:underline underline-offset-4 decoration-hextech-gold/30"
                               >
@@ -166,8 +168,8 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                               </span>
                             </div>
                             <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
-                              <div 
-                                className="absolute top-0 left-0 h-full bg-gradient-to-r from-hextech-gold/40 to-hextech-gold transition-all duration-1000 ease-out" 
+                              <div
+                                className="absolute top-0 left-0 h-full bg-gradient-to-r from-hextech-gold/40 to-hextech-gold transition-all duration-1000 ease-out"
                                 style={{ width: `${winRate}%` }}
                               />
                             </div>

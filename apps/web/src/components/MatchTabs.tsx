@@ -60,6 +60,7 @@ export const MatchTabs: React.FC<MatchTabsProps> = ({ match, items, version, reg
                     src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`}
                     alt={p.championName}
                     fill
+                    sizes="64px"
                     className="object-cover"
                   />
                   <div className="absolute bottom-0 right-0 bg-black/80 px-1.5 py-0.5 text-[8px] font-bold text-white">
@@ -70,13 +71,13 @@ export const MatchTabs: React.FC<MatchTabsProps> = ({ match, items, version, reg
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <Link 
-                      href={`/summoner/${region}/${p.gameName}-${p.tagLine}`}
-                      className="text-sm font-bold text-white hover:text-hextech-gold transition-colors"
+                      href={`/summoner/${region}/${p.riotIdGameName}-${p.riotIdTagline}`}
+                      className="text-sm font-bold text-white hover:text-hextech-gold transition-colors truncate max-w-[120px]"
                     >
-                      {p.gameName}
+                      {p.riotIdGameName}
                     </Link>
                     <span className="text-[10px] text-slate-500 font-bold opacity-40 uppercase tracking-widest">
-                       #{p.tagLine}
+                       #{p.riotIdTagline}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">

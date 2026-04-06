@@ -1,4 +1,5 @@
-import { getChallengerLeague, uIRegionToPlatform, getRoutingRegion, getAccountByPuuid, getLatestDDragonVersion, LeagueItem } from "@/lib/riot";
+import { uIRegionToPlatform, getRoutingRegion, getLatestDDragonVersion, LeagueItem } from "@/lib/riot";
+import { getLeaderboard, getAccountByPuuid } from "@/app/actions";
 import { Card } from "@/components/ui/Card";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,9 +15,11 @@ export default async function LeaderboardPage({ params }: LeaderboardPageProps) 
 
   try {
     const [league, version] = await Promise.all([
-      getChallengerLeague(platformId),
+      getLeaderboard(region),
       getLatestDDragonVersion()
     ]);
+
+    if (!league) throw new Error("Leaderboard data missing");
 
     const topPlayers = league.entries
       .sort((a, b) => b.leaguePoints - a.leaguePoints)
@@ -25,7 +28,7 @@ export default async function LeaderboardPage({ params }: LeaderboardPageProps) 
     // Fetch account details for top players to get GameName and TagLine
     const playersWithNames = await Promise.all(
       topPlayers.map(async (entry) => {
-        const account = await getAccountByPuuid(entry.summonerId, routingRegion);
+        const account = await getAccountByPuuid(entry.summonerId, region);
         return { ...entry, account };
       })
     );

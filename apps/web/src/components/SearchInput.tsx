@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/Button';
 import { searchElitePlayers, SearchResult } from '@/app/actions';
+import { uIRegionToPlatform } from '@/lib/riot';
 
 export default function SearchInput({ variant = 'hero' }: { variant?: 'hero' | 'nav' }) {
   const [summonerName, setSummonerName] = useState('');
-  const [region, setRegion] = useState('NA');
+  const [region, setRegion] = useState('na1');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [recentSearches, setRecentSearches] = useState<{ name: string, region: string }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -126,10 +127,11 @@ export default function SearchInput({ variant = 'hero' }: { variant?: 'hero' | '
       gameName = parts[0];
       tagLine = parts[1] || tagLine;
     } else {
-       if (region === 'NA') tagLine = 'NA1';
-       if (region === 'EUW') tagLine = 'EUW';
-       if (region === 'KR') tagLine = 'KR1';
-       if (region === 'EUNE') tagLine = 'EUNE';
+       // Fallback logic for regions
+       if (region === 'na1') tagLine = 'NA1';
+       if (region === 'euw1') tagLine = 'EUW';
+       if (region === 'kr') tagLine = 'KR1';
+       if (region === 'eun1') tagLine = 'EUNE';
     }
 
     saveRecentSearch(summonerName.trim(), region);
@@ -156,10 +158,10 @@ export default function SearchInput({ variant = 'hero' }: { variant?: 'hero' | '
       gameName = parts[0];
       tagLine = parts[1] || tagLine;
     } else {
-      if (recent.region === 'NA') tagLine = 'NA1';
-      if (recent.region === 'EUW') tagLine = 'EUW';
-      if (recent.region === 'KR') tagLine = 'KR1';
-      if (recent.region === 'EUNE') tagLine = 'EUNE';
+      if (recent.region === 'na1') tagLine = 'NA1';
+      if (recent.region === 'euw1') tagLine = 'EUW';
+      if (recent.region === 'kr') tagLine = 'KR1';
+      if (recent.region === 'eun1') tagLine = 'EUNE';
     }
     
     saveRecentSearch(recent.name, recent.region);
@@ -191,10 +193,9 @@ export default function SearchInput({ variant = 'hero' }: { variant?: 'hero' | '
           onChange={(e) => handleRegionChange(e.target.value)}
           className="bg-transparent text-sm font-bold text-hextech-gold/80 outline-none cursor-pointer hover:text-hextech-gold px-2 py-1 rounded-sm appearance-none flex-shrink-0"
         >
-          <option value="NA" className="bg-hextech-blue">NA</option>
-          <option value="EUW" className="bg-hextech-blue">EUW</option>
-          <option value="KR" className="bg-hextech-blue">KR</option>
-          <option value="EUNE" className="bg-hextech-blue">EUNE</option>
+          {Object.entries(uIRegionToPlatform).map(([ui, platform]) => (
+            <option key={platform} value={platform} className="bg-hextech-blue">{ui}</option>
+          ))}
         </select>
       <div className="w-px h-6 bg-white/10 mx-2" />
       <input
@@ -296,9 +297,24 @@ export default function SearchInput({ variant = 'hero' }: { variant?: 'hero' | '
                     </button>
                   ))
                 ) : (
-                  <div className="px-4 py-8 text-center">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">No Subjects Detected in Local Node</span>
-                    <p className="text-[10px] text-slate-600 mt-1 uppercase font-medium">Try Riot ID (Name#Tag) for direct deep scanning</p>
+                  <div className="px-4 py-8 text-center flex flex-col items-center">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">No Subjects Detected in Local Node</span>
+                    
+                    {summonerName.includes('#') ? (
+                       <Button 
+                        onClick={handleSearch}
+                        variant="primary"
+                        size="sm"
+                        className="bg-hextech-gold/20 border-hextech-gold/40 hover:bg-hextech-gold/30 text-hextech-gold"
+                       >
+                         Initialize Deep Scan for "{summonerName}"
+                       </Button>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-slate-600 uppercase font-medium">Try Riot ID (Name#Tag) for direct deep scanning</p>
+                        <p className="text-[9px] text-slate-700 italic">Example: Hide on bush#KR1</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

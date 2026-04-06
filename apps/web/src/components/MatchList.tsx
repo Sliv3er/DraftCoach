@@ -12,7 +12,6 @@ interface MatchListProps {
   initialMatches: Match[];
   puuid: string;
   region: string;
-  routingRegion: string;
   version: string;
   items: ItemMap;
 }
@@ -21,7 +20,6 @@ export const MatchList: React.FC<MatchListProps> = ({
   initialMatches, 
   puuid, 
   region,
-  routingRegion, 
   version, 
   items 
 }) => {
@@ -36,7 +34,7 @@ export const MatchList: React.FC<MatchListProps> = ({
     if (isLoading || !hasMore) return;
     
     setIsLoading(true);
-    const newMatches = await fetchMoreMatches(puuid, routingRegion, offset, 10);
+    const newMatches = await fetchMoreMatches(puuid, region, offset, 10);
     
     if (newMatches.length === 0) {
       setHasMore(false);
@@ -45,7 +43,7 @@ export const MatchList: React.FC<MatchListProps> = ({
       setOffset(prev => prev + newMatches.length);
     }
     setIsLoading(false);
-  }, [isLoading, hasMore, offset, puuid, routingRegion]);
+  }, [isLoading, hasMore, offset, puuid, region]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

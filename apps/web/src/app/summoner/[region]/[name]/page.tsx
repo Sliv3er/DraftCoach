@@ -63,7 +63,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
             </div>
             <h2 className="text-2xl font-display font-bold uppercase tracking-widest text-white mb-2">Subject Not Found</h2>
             <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-              The archive has no record of {gameName}#{tagLine} in the {region} cluster.
+              No match history found for {gameName}#{tagLine} in the {region} region.
             </p>
             <Link href="/" className="w-full">
                <Button variant="secondary" fullWidth>Initiate Return Trace</Button>
@@ -128,7 +128,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
 
                 <div className="flex-1 text-center lg:text-left">
                   <div className="editorial-header mb-4">
-                     <span>Kinetic Archive Detected // Signal High</span>
+                     <span>Summoner Found</span>
                      <h1 className="text-4xl md:text-7xl leading-none">
                        {gameName}
                        <span className="text-hextech-gold opacity-40 ml-2">#{tagLine}</span>
@@ -148,11 +148,11 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                 {/* Top Level Stats Pane */}
                 <div className="flex gap-16 border-l border-white/5 pl-16 hidden xl:flex h-24 items-end mb-4">
                    <div className="text-right">
-                      <span className="block text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-3">Sync Consistency</span>
+                      <span className="block text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-3">Win Rate</span>
                       <span className="text-5xl font-display text-white font-bold leading-none">{winRate}<span className="text-hextech-gold">%</span></span>
                    </div>
                    <div className="text-right">
-                      <span className="block text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-3">Expended Files</span>
+                      <span className="block text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-3">Matches Played</span>
                       <span className="text-5xl font-display text-white font-bold leading-none">{soloQueue ? soloQueue.wins + soloQueue.losses : 0}</span>
                    </div>
                 </div>
@@ -181,7 +181,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
               {/* Rank Block */}
               <div className="p-10 bg-surface-container relative overflow-hidden group">
                  <div className="absolute top-0 right-0 w-32 h-32 bg-hextech-gold/5 blur-3xl -mr-16 -mt-16" />
-                 <h3 className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/40 mb-10">Archive Ranking</h3>
+                 <h3 className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/40 mb-10">Ranked Stats</h3>
                  
                   <PastRanks rankHistory={player?.rankHistory} />
 
@@ -265,7 +265,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                      <span>Database Feed</span>
                      <h3 className="text-3xl uppercase">Combat Logs</h3>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Archive Depth: 10 Matches</span>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Recent Matches</span>
                </div>
 
                <div className="space-y-4">
@@ -282,7 +282,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                    ) : (
                     <div className="p-20 text-center border-2 border-dashed border-white/5 bg-surface/30">
                        <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/20 block mb-4">Integrity Check Failed // Logs Empty</span>
-                       <p className="text-slate-600 text-sm font-light max-w-xs mx-auto">The kinetic archive returned no active combat records for this subject in the recent cycle.</p>
+                       <p className="text-slate-600 text-sm font-light max-w-xs mx-auto">We couldn't find any recent matches for this player.</p>
                     </div>
                   )}
                </div>

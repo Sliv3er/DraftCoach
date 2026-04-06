@@ -11,7 +11,7 @@
   --color-hextech-accent-success: #35e193; 
   --color-hextech-accent-error: #ffb4ab; 
   
-  /* Archive Specifics */
+  /* DraftCoach Specifics */
   --color-archive-dark: #050a0e;
   --color-silver: #a0a0a8;
   
@@ -69,7 +69,7 @@
     background: linear-gradient(135deg, var(--color-hextech-gold) 0%, var(--color-hextech-gold-dark) 100%);
   }
 
-  /* Glassmorphism - The Kinetic Glass */
+  /* Glassmorphism */
   .hextech-glass {
     @apply bg-hextech-blue-lighter/60 backdrop-blur-xl border border-white/5;
   }
@@ -93,7 +93,7 @@
     @apply border-l-4 border-l-hextech-accent-error;
   }
 
-  /* Kinetic Archive Utilities */
+  /* DraftCoach Utilities */
   .text-outline {
     -webkit-text-stroke: 1px rgba(240, 191, 92, 0.3);
     color: transparent;

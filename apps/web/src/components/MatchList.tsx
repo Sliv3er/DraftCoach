@@ -85,7 +85,7 @@ export const MatchList: React.FC<MatchListProps> = ({
         {isLoading && (
           <>
             <div className="w-12 h-12 border-2 border-hextech-gold/20 border-t-hextech-gold rounded-full animate-spin" />
-            <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/40 animate-pulse">Syncing Archive...</span>
+            <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/40 animate-pulse">Loading Matches...</span>
           </>
         )}
         {!hasMore && matches.length > 0 && (

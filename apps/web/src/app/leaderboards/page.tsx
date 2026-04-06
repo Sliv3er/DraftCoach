@@ -156,7 +156,7 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
               Data synchronized with standard Riot Network protocols.
             </span>
             <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-700 italic">
-              Archive Status: <span className="text-green-500">Node Sync Complete</span>
+              Server Status: <span className="text-green-500">Online</span>
             </span>
           </div>
         </div>

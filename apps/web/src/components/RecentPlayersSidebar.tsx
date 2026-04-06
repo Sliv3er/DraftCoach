@@ -49,15 +49,15 @@ export const RecentPlayersSidebar: React.FC<RecentPlayersSidebarProps> = ({ matc
   if (sortedPlayers.length === 0) {
     return (
        <div className="bg-surface-container/20 border border-white/5 rounded-sm p-4">
-         <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-4">Signal Integrity</span>
-         <span className="text-[11px] text-slate-600 block italic">No persistent signatures detected in recent buffer.</span>
+         <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-4">Player History</span>
+         <span className="text-[11px] text-slate-600 block italic">No recent players found in match history.</span>
        </div>
     );
   }
 
   return (
     <div className="bg-surface-container/20 border border-white/5 rounded-sm p-4">
-      <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-4">Kinetic Affiliates</span>
+      <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-4">Recent Players</span>
       <div className="space-y-3">
         {sortedPlayers.map((p: any) => (
           <div key={p.puuid} className="flex items-center gap-3 group">

@@ -49,7 +49,7 @@ async function NameResolver({ summonerId, region, initialPuuid, initialName }: N
         {fallbackName}
       </span>
       <span className="text-[10px] uppercase font-mono text-slate-500 tracking-widest">
-        Identification Failure // Sync Pending
+        Player Not Found // Try Again Later
       </span>
     </div>
   );

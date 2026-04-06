@@ -120,8 +120,8 @@ export const MatchDetails: React.FC<MatchDetailsProps> = ({
   return (
     <div className="mt-4 pt-6 border-t border-white/5 animate-in fade-in slide-in-from-top-2 duration-300">
       <div className="flex flex-col lg:flex-row gap-8">
-        {renderTeam(team1, "Kinetic Axis", team1[0].win)}
-        {renderTeam(team2, "Opposing Vector", team2[0].win)}
+        {renderTeam(team1, "Blue Team", team1[0].win)}
+        {renderTeam(team2, "Red Team", team2[0].win)}
       </div>
     </div>
   );

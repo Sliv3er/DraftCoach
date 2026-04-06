@@ -77,7 +77,7 @@ export default async function MatchPage({ params }: MatchPageProps) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
         <h2 className="text-2xl text-red-500 mb-4 uppercase tracking-widest font-bold">Data Link Severed</h2>
-        <p className="text-slate-500 max-w-sm font-light">Unable to retrieve combat record from the encrypted archive.</p>
+        <p className="text-slate-500 max-w-sm font-light">Unable to retrieve match details.</p>
         <Link href="/" className="mt-8 text-hextech-gold uppercase text-[10px] font-bold tracking-[0.5em] hover:text-white transition-colors">Return to Surface</Link>
       </div>
     );

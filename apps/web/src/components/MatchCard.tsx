@@ -52,7 +52,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
         {/* Outcome Status Block */}
         <div className="w-20 hidden md:block relative z-10">
           <span className={`block text-[11px] font-bold uppercase tracking-[0.2em] mb-1 ${isWin ? 'text-hextech-accent-success' : 'text-hextech-accent-error'}`}>
-            {isWin ? 'Sync' : 'Drop'}
+            {isWin ? 'Victory' : 'Defeat'}
           </span>
           <span className="text-[10px] text-slate-500 uppercase font-bold tracking-widest opacity-60">
             {durationMin}m

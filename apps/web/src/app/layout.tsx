@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "DraftCoach | The Kinetic Archive",
+  title: "DraftCoach",
   description: "League of Legends Draft & Gameplay Coach. Statistical analysis reinvented.",
 };
 
@@ -31,7 +31,7 @@ export default function RootLayout({
         {/* Global Hextech Navigation */}
         <header className="bg-hextech-blue border-b border-white/5 sticky top-0 z-50 shadow-hextech-ambient">
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            {/* Branding - The "Archive" Logo */}
+            {/* Branding */}
             <Link href="/" className="flex items-center space-x-3 no-underline group">
               <div className="w-9 h-9 bg-hextech-gold rounded-sm flex items-center justify-center font-bold text-hextech-blue transition-transform group-hover:scale-105">
                 <span className="font-display text-lg">D</span>
@@ -40,7 +40,7 @@ export default function RootLayout({
                 <span className="text-lg font-display font-bold text-white tracking-widest uppercase">
                   Draft<span className="text-hextech-gold">Coach</span>
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-hextech-gold/40 font-bold">The Archive</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-hextech-gold/40 font-bold">DraftCoach</span>
               </div>
             </Link>
 

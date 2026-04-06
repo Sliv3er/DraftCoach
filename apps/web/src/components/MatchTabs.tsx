@@ -108,7 +108,7 @@ export const MatchTabs: React.FC<MatchTabsProps> = ({ match, items, version, reg
           <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
              <div className="w-12 h-0.5 bg-hextech-gold/30 mb-6" />
              <h4 className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold mb-2">Metrics Processing</h4>
-             <p className="text-sm font-light max-w-sm">Deeper performance heuristics are currently being synthesized from the archive data.</p>
+             <p className="text-sm font-light max-w-sm">Deeper performance heuristics are currently being analyzed from the match data.</p>
           </div>
         )}
 

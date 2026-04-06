@@ -12,14 +12,14 @@ export default async function Home() {
 
   return (
     <div className="relative w-full">
-      {/* Hero Section - The Archive Entry Point */}
+      {/* Hero Section */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-br from-surface via-surface/80 to-hextech-gold/5 z-10" />
-          <Image 
+          <Image
             src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/RekSai_0.jpg"
-            alt="Kinetic Background" 
-            fill 
+            alt="Background"
+            fill
             sizes="100vw"
             className="object-cover opacity-20 scale-110 blur-sm"
             priority
@@ -29,7 +29,7 @@ export default async function Home() {
         <div className="relative z-20 max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="space-y-4">
             <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-hextech-gold/60 block">
-              Kinetic Archive // System v2.0.4
+              DraftCoach
             </span>
             <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter text-white leading-[0.85]">
               The Ultimate <br />
@@ -61,7 +61,7 @@ export default async function Home() {
       {/* Featured Champions Section */}
       <section className="py-32 border-y border-white/5 bg-hextech-blue-lighter/5 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-full bg-[url('/grid.svg')] bg-repeat opacity-[0.02]" />
-        
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between mb-20 gap-8">
             <div className="space-y-4 text-center md:text-left">
@@ -74,7 +74,7 @@ export default async function Home() {
             </div>
             <Link href="/champions">
               <Button size="lg" className="bg-hextech-gold hover:bg-hextech-gold-bright text-hextech-blue font-bold px-8 shadow-hextech-ambient rounded-none">
-                View All Files
+                View Champions
               </Button>
             </Link>
           </div>
@@ -85,7 +85,7 @@ export default async function Home() {
                 <Card variant="glass" className="group overflow-hidden border-white/5 hover:border-hextech-gold/30 transition-all duration-500">
                   <div className="relative h-48 w-full overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-hextech-blue to-transparent z-10 opacity-60" />
-                    <Image 
+                    <Image
                       src={getDDragonSplash(champion.id)}
                       alt={champion.name}
                       fill

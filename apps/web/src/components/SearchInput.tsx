@@ -307,7 +307,7 @@ export default function SearchInput({ variant = 'hero' }: { variant?: 'hero' | '
                         size="sm"
                         className="bg-hextech-gold/20 border-hextech-gold/40 hover:bg-hextech-gold/30 text-hextech-gold"
                        >
-                         Initialize Deep Scan for "{summonerName}"
+                         Initialize Deep Scan for &quot;{summonerName}&quot;
                        </Button>
                     ) : (
                       <div className="space-y-2">

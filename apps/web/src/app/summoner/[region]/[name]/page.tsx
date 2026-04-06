@@ -5,7 +5,6 @@ import {
   getCDragonChampionIcon,
   getChampionSplash,
   LeagueItem,
-  Match,
   ChampionMastery,
   Champion,
   getItems,
@@ -79,7 +78,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
     // Predetermined favorite champ for background based on top mastery
     const favoriteChampId = topMastery[0]?.championId || 421; 
     const favoriteChamp = Object.values(allChampions).find(c => Number(c.key) === favoriteChampId);
-    const favoriteChampName = (favoriteChamp as any)?.id || "RekSai";
+    const favoriteChampName = (favoriteChamp as Champion)?.id || "RekSai";
 
     return (
       <div className="relative min-h-screen bg-surface">
@@ -87,7 +86,7 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
         <div className="absolute top-0 left-0 right-0 h-[500px] z-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-surface/0 via-surface/80 to-surface z-10" />
           <Image 
-            src={getChampionSplash(favoriteChampId, favoriteChampName)}
+            src={getChampionSplash(favoriteChampId)}
             alt="Favorite Champ Background" 
             fill 
             sizes="100vw"

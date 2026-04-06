@@ -1,46 +1,21 @@
 import { uIRegionToPlatform, LeagueItem, getDDragonSplash } from "@/lib/riot";
-import { getLeaderboard, getAccountByPuuid, getSummonerById } from "@/app/actions";
+import { getLeaderboard } from "@/app/actions";
 import { Card } from "@/components/ui/Card";
+import { SummonerNameCell } from "@/components/SummonerNameCell";
 import Image from "next/image";
-import Link from "next/link";
 
 export default async function LeaderboardsPage(props: { searchParams: Promise<{ region?: string }> }) {
   const searchParams = await props.searchParams;
   const region = searchParams.region || 'NA';
-  const platform = uIRegionToPlatform[region];
+  
   const leagueData = await getLeaderboard(region);
 
-  // Sort by LP and take top 20
+  // Ranking List
   const rawEntries = leagueData?.entries
-    ? leagueData.entries
+    ? (leagueData.entries as LeagueItem[])
       .sort((a: LeagueItem, b: LeagueItem) => b.leaguePoints - a.leaguePoints)
       .slice(0, 20)
     : [];
-
-  // Fetch Riot Account details (gameName#tagLine) for each entry
-  // This is necessary because league-v4 often omits names now.
-  const entries = await Promise.all(
-    rawEntries.map(async (entry) => {
-      try {
-        let puuid = entry.puuid;
-        const sId = entry.summonerId || (entry as any).summonerID;
-
-        // Fallback: If puuid is missing, resolve it via summonerId
-        if (!puuid && sId) {
-          const summoner = await getSummonerById(sId, region);
-          puuid = summoner?.puuid;
-        }
-
-        if (puuid) {
-          const account = await getAccountByPuuid(puuid, region);
-          return { ...entry, account };
-        }
-      } catch (err) {
-        console.error(`Failed to fetch account for ${entry.summonerId}:`, err);
-      }
-      return entry;
-    })
-  );
 
   return (
     <div className="relative min-h-screen pt-12 pb-24 bg-archive-dark overflow-hidden">
@@ -106,14 +81,10 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5 font-display">
-                  {entries.map((entry: any, index: number) => {
-                    console.log(entry)
+                  {rawEntries.map((entry, index: number) => {
                     const winRate = Math.round((entry.wins / (entry.wins + entry.losses)) * 100);
-                    const sId = entry.summonerId || entry.summonerID || "";
-
-                    // Priority: Riot ID (gameName#tagLine) > Summoner Name > Fallback ID
-                    const riotName = entry.account ? `${entry.account.gameName}#${entry.account.tagLine}` : "";
-                    const displayName = riotName || entry.summonerName || (sId ? `Subject // ${sId.slice(0, 12)}...` : 'CLASSIFIED SUBJECT');
+                    const sId = entry.summonerId || "";
+                    const puuid = entry.puuid;
 
                     return (
                       <tr
@@ -127,18 +98,12 @@ export default async function LeaderboardsPage(props: { searchParams: Promise<{ 
                         </td>
                         <td className="px-8 py-8">
                           <div className="flex flex-col gap-1">
-                            {entry.account ? (
-                              <Link
-                                href={`/summoner/${region}/${entry.account.gameName}-${entry.account.tagLine}`}
-                                className="text-lg font-bold text-white group-hover:text-hextech-gold transition-colors tracking-tight hover:underline underline-offset-4 decoration-hextech-gold/30"
-                              >
-                                {displayName}
-                              </Link>
-                            ) : (
-                              <span className="text-lg font-bold text-white transition-colors tracking-tight">
-                                {displayName}
-                              </span>
-                            )}
+                            <SummonerNameCell 
+                              summonerId={sId}
+                              region={region}
+                              initialPuuid={puuid}
+                              initialName={entry.summonerName}
+                            />
                             <div className="flex items-center gap-2">
                               {sId && (
                                 <div className="px-1.5 py-0.5 bg-hextech-gold/10 text-hextech-gold/60 text-[10px] font-bold uppercase rounded border border-hextech-gold/20">

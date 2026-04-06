@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { MatchTabs } from '@/components/MatchTabs';
 
-import { getRoutingRegion, getLatestDDragonVersion, getItems } from '@/lib/riot';
+import { getLatestDDragonVersion, getItems } from '@/lib/riot';
 import { getMatch } from '@/app/actions';
 
 
@@ -14,7 +14,6 @@ interface MatchPageProps {
 
 export default async function MatchPage({ params }: MatchPageProps) {
   const { region, matchId } = await params;
-  const routingRegion = getRoutingRegion(region);
 
   try {
     const match = await getMatch(region, matchId);

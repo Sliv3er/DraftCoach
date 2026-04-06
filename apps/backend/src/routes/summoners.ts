@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import axios from "axios";
-import { getSummoner, getRecentMatchIds, getLeagueEntries, getTopChampionMasteries, uIRegionToPlatform, getAccountByPuuid, getRoutingRegion } from "../services/riot";
+import { getSummoner, getRecentMatchIds, getLeagueEntries, getTopChampionMasteries, uIRegionToPlatform, getAccountByPuuid, getRoutingRegion, getSummonerBySummonerId } from "../services/riot";
 
 const summonerRouter = Router();
 
@@ -89,12 +89,11 @@ summonerRouter.get("/:region/:puuid/mastery", async (req: Request, res: Response
 summonerRouter.get("/by-id/:region/:summonerId", async (req, res) => {
   const { region, summonerId } = req.params;
   try {
-    const url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${summonerId}`;
-    const key = process.env.RIOT_API_KEY;
-    const response = await axios.get(url, { headers: { "X-Riot-Token": key } });
-    res.json(response.data);
-  } catch (err) {
-    console.error("[Backend] Failed to fetch summoner by ID:", err);
+    const platformId = uIRegionToPlatform[region.toUpperCase()] || region;
+    const data = await getSummonerBySummonerId(summonerId, platformId);
+    res.json(data);
+  } catch (err: any) {
+    console.error("[Backend] Failed to fetch summoner by ID:", err.message);
     res.status(500).json({ error: "Failed to fetch summoner by ID" });
   }
 });

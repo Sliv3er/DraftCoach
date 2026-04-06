@@ -193,21 +193,21 @@ export interface ItemMap {
 // --- DATA DRAGON & CDrAGON ASSETS ---
 
 export async function getLatestDDragonVersion() {
-  const res = await fetch('https://ddragon.leagueoflegends.com/api/versions.json', { next: { revalidate: 3600 } } as any);
+  const res = await fetch('https://ddragon.leagueoflegends.com/api/versions.json', { next: { revalidate: 3600 } } as RequestInit & { next: { revalidate: number } });
   if (!res.ok) throw new Error('Failed to fetch DDragon versions');
   const versions = await res.json();
   return versions[0];
 }
 
 export async function getChampions(version: string): Promise<ChampionMap> {
-  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`, { next: { revalidate: 86400 } } as any);
+  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`, { next: { revalidate: 86400 } } as RequestInit & { next: { revalidate: number } });
   if (!res.ok) throw new Error('Failed to fetch champions from DDragon');
   const data = await res.json();
   return data.data;
 }
 
 export async function getItems(version: string): Promise<ItemMap> {
-  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`, { next: { revalidate: 86400 } } as any);
+  const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`, { next: { revalidate: 86400 } } as RequestInit & { next: { revalidate: number } });
   if (!res.ok) throw new Error('Failed to fetch items from DDragon');
   const data = await res.json();
   return data.data;
@@ -222,7 +222,7 @@ export const getCDragonChampionIcon = (championId: number | string) =>
 export const getCDragonItemIcon = (itemId: number | string) => 
   `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/items/${itemId}.png`;
 
-export const getChampionSplash = (championId: number | string, championName: string) => {
+export const getChampionSplash = (championId: number | string) => {
   return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/uncentered/${championId}/${championId}000.png`;
 };
 

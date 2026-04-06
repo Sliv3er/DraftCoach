@@ -35,9 +35,10 @@ export async function searchByRiotId(gameName: string, tagLine: string, region: 
     }
     
     return await res.json();
-  } catch (err: any) {
-    console.error('[Action] searchByRiotId failed:', err.message);
-    throw new Error(err.message);
+  } catch (err) {
+    const error = err as Error;
+    console.error('[Action] searchByRiotId failed:', error.message);
+    throw new Error(error.message);
   }
 }
 
@@ -126,7 +127,7 @@ export async function searchElitePlayers(
     
     const localPlayers = await localRes.json();
     
-    return localPlayers.map((p: any) => ({
+    return localPlayers.map((p: { gameName: string; tagLine: string; region: string; rank: string; lp: number }) => ({
       name: p.gameName,
       tag: p.tagLine,
       region: p.region,

@@ -29,8 +29,13 @@
   
   /* Custom Animations */
   @keyframes scan {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(100%); }
+    0% { transform: translateY(-100%); }
+    50% { transform: translateY(100%); }
+    100% { transform: translateY(-100%); }
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
   @keyframes pulse-slow {
     0%, 100% { opacity: 0.3; }

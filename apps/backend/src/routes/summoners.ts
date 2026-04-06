@@ -26,13 +26,14 @@ summonerRouter.get("/:region/:riotId", async (req: Request, res: Response) => {
     const [gameName, tagLine] = riotId.split("-");
 
     const platformId = uIRegionToPlatform[region.toUpperCase()] || region;
+    const forceRefresh = req.query.forceRefresh === 'true';
 
     if (!gameName || !tagLine) {
       res.status(400).json({ error: "Invalid Riot ID format (must be gameName-tagLine)" });
       return;
     }
 
-    const summoner = await getSummoner(platformId, gameName, tagLine);
+    const summoner = await getSummoner(platformId, gameName, tagLine, forceRefresh);
     if (!summoner) {
       res.status(404).json({ error: "Summoner not found" });
       return;

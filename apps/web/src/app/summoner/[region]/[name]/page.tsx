@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { MatchList } from "@/components/MatchList";
 import { getSummonerFull, getTopMastery, fetchMoreMatches } from "@/app/actions";
+import { ArchiveUpdateButton } from "@/components/ArchiveUpdateButton";
 
 interface SummonerPageProps {
   params: Promise<{ region: string; name: string }>;
@@ -127,7 +128,11 @@ export default async function SummonerProfile({ params }: SummonerPageProps) {
                   </div>
                   
                   <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                     <Button variant="primary" size="sm" className="px-10">Archive Update</Button>
+                     <ArchiveUpdateButton 
+                       region={region} 
+                       gameName={gameName} 
+                       tagLine={tagLine} 
+                     />
                      <Button variant="secondary" size="sm">Signal Trace</Button>
                   </div>
                 </div>

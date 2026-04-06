@@ -69,7 +69,7 @@ async function riotGet(url: string) {
   });
 }
 
-export async function getSummoner(region: string, gameName: string, tagLine: string) {
+export async function getSummoner(region: string, gameName: string, tagLine: string, forceRefresh = false) {
   const routingRegion = getRoutingRegion(region);
 
   // 1. Check Player Cache
@@ -79,21 +79,31 @@ export async function getSummoner(region: string, gameName: string, tagLine: str
     region
   });
 
-  if (cached && (Date.now() - cached.lastUpdated.getTime() < 24 * 60 * 60 * 1000)) {
+  const isStale = cached && (Date.now() - cached.lastUpdated.getTime() > 24 * 60 * 60 * 1000);
+  const isPlaceholder = cached?.gameName === "Mark Evans";
+
+  if (cached && !isStale && !isPlaceholder && !forceRefresh) {
     console.log(`[Player Cache] Hit: ${gameName}#${tagLine}`);
     return cached;
   }
 
   // 2. Fetch from Riot
-  console.log(`[Player Cache] Miss: ${gameName}#${tagLine}`);
+  console.log(`[Player Cache] Miss: ${gameName}#${tagLine}${forceRefresh ? " (Forced)" : ""}`);
   const accountUrl = `https://${routingRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
   const accRes = await riotGet(accountUrl);
   const { puuid } = accRes.data;
 
   const summonerUrl = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
   const sumRes = await riotGet(summonerUrl);
+  
+  // 3. Fetch League Entries (Rank/LP)
+  const leagueEntries = await getLeagueEntries(puuid, region);
+  const soloQueue = leagueEntries.find((l: any) => l.queueType === "RANKED_SOLO_5x5");
+  
+  const rank = soloQueue ? `${soloQueue.tier} ${soloQueue.rank}` : 'Unranked';
+  const lp = soloQueue ? soloQueue.leaguePoints : 0;
 
-  // 3. Update Cache (Player model)
+  // 4. Update Cache (Player model)
   const playerData = {
     puuid,
     summonerId: sumRes.data.id,
@@ -102,6 +112,8 @@ export async function getSummoner(region: string, gameName: string, tagLine: str
     region,
     profileIconId: sumRes.data.profileIconId,
     summonerLevel: sumRes.data.summonerLevel,
+    rank,
+    lp,
     lastUpdated: new Date()
   };
 

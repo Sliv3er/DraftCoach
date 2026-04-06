@@ -46,6 +46,19 @@ export async function getSummonerFull(region: string, gameName: string, tagLine:
     return searchByRiotId(gameName, tagLine, region);
 }
 
+export async function refreshSummonerData(region: string, gameName: string, tagLine: string) {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/summoner/${region}/${gameName}-${tagLine}?forceRefresh=true`, {
+      cache: 'no-store'
+    });
+    if (!res.ok) throw new Error("Failed to refresh archive");
+    return await res.json();
+  } catch (err) {
+    console.error('[Action] refreshSummonerData failed:', err);
+    throw err;
+  }
+}
+
 export async function getMatch(region: string, matchId: string): Promise<Match | null> {
     try {
       const res = await fetch(`${BACKEND_URL}/api/match/${region}/${matchId}`);

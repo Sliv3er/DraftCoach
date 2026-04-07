@@ -1,0 +1,40 @@
+
+D:\Dev\DraftCoach\apps\web\src\app\actions.ts
+   38:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Dev\DraftCoach\apps\web\src\app\layout.tsx
+  21:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+D:\Dev\DraftCoach\apps\web\src\app\leaderboards\[region]\page.tsx
+   1:73  warning  'LeagueItem' is defined but never used              @typescript-eslint/no-unused-vars
+   4:8   warning  'Image' is defined but never used                   @typescript-eslint/no-unused-vars
+  14:9   warning  'routingRegion' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  17:20  warning  'version' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+D:\Dev\DraftCoach\apps\web\src\app\leaderboards\page.tsx
+  10:9   warning  'platform' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  85:43  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+D:\Dev\DraftCoach\apps\web\src\app\match\[region]\[matchId]\page.tsx
+  17:9  warning  'routingRegion' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Dev\DraftCoach\apps\web\src\app\summoner\[region]\[name]\page.tsx
+   8:3   warning  'Match' is defined but never used         @typescript-eslint/no-unused-vars
+  82:49  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Dev\DraftCoach\apps\web\src\components\SearchInput.tsx
+  310:51  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  310:66  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\Dev\DraftCoach\apps\web\src\components\SummonerNameCell.tsx
+  41:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Dev\DraftCoach\apps\web\src\lib\riot.ts
+  196:118  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:141  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  210:137  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  225:64   warning  'championName' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 19 problems (9 errors, 10 warnings)
+

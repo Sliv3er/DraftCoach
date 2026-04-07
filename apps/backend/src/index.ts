@@ -1,11 +1,17 @@
-import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import { buildRouter } from './routes/build';
-import { checkAndSyncRagPipeline, getRagStatus } from './services/rag-updater';
-
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+
+import express from 'express';
+import cors from 'cors';
+import { buildRouter } from './routes/build';
+import summonersRouter from "./routes/summoners";
+import matchesRouter from "./routes/matches";
+import leaderboardRouter from "./routes/leaderboards";
+import playersRouter from "./routes/players";
+import { checkAndSyncRagPipeline, getRagStatus } from './services/rag-updater';
+import { initElasticsearch } from './services/elasticsearch';
+import { initDb } from './services/db';
 
 const app = express();
 const PORT = parseInt(process.env.BACKEND_PORT || '3210', 10);
@@ -13,10 +19,18 @@ const PORT = parseInt(process.env.BACKEND_PORT || '3210', 10);
 app.use(cors());
 app.use(express.json());
 
-// Initialize the local patch architecture — auto-sync on boot
-checkAndSyncRagPipeline().catch(console.error);
+// Initialize DB and Elasticsearch
+initDb().catch(console.error);
+initElasticsearch().catch(console.error);
 
 app.use('/api', buildRouter);
+app.use('/api/players', playersRouter);
+app.use('/api/summoner', summonersRouter);
+app.use('/api/match', matchesRouter);
+app.use('/api/leaderboard', leaderboardRouter);
+
+// Initialize the local patch architecture — auto-sync on boot
+checkAndSyncRagPipeline().catch(console.error);
 
 // ── RAG Status Endpoint — polled by frontend every 3s ──
 app.get('/api/rag/status', (_req, res) => {
@@ -27,7 +41,6 @@ app.get('/api/rag/status', (_req, res) => {
 // ── RAG Force Sync Endpoint — manual override ──
 app.post('/api/rag/sync', async (_req, res) => {
   try {
-    // Don't await — run in background so the response is instant
     checkAndSyncRagPipeline(true).catch(err => {
       console.error('[RAG] Force sync failed:', err);
     });
@@ -41,6 +54,6 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`DraftCoach backend running on http://127.0.0.1:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`DraftCoach backend running on http://localhost:${PORT}`);
 });

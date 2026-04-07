@@ -5,15 +5,20 @@
   "description": "League of Legends champ select assistance app",
   "scripts": {
     "build:engine": "cd shared/engine && npx tsc -p tsconfig.engine.json",
+    "build:backend": "cd apps/backend && npm run build",
     "build:renderer": "cd apps/desktop && npx webpack --mode production",
-    "build:all": "npm run build:engine && npm run build:renderer",
+    "build:web": "cd apps/web && npm run build",
+    "build:all": "npm run build:engine && npm run build:backend && npm run build:renderer && npm run build:web",
     "build:desktop": "npm run build:all && cd apps/desktop && npx electron-builder --win",
+    "dev:backend": "cd apps/backend && npm run dev",
     "dev:desktop": "npm run build:engine && cd apps/desktop && npx concurrently \"npx webpack serve --config webpack.config.js\" \"npx wait-on http://localhost:9000 && npx electron .\"",
-    "dev": "npm run dev:desktop",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:all": "npx concurrently \"npm run dev:backend\" \"npm run dev:web\"",
+    "dev": "npm run dev:all",
     "test": "cd shared && npx jest --config jest.config.js",
     "test:engine": "cd shared && npx jest --config jest.config.js --testPathPattern=engine",
     "validate:kb": "node tools/meta-builder/validate.js shared/kb/data",
-    "postinstall": "cd apps/desktop && npm install"
+    "postinstall": "cd apps/backend && npm install && cd apps/desktop && npm install && cd apps/web && npm install"
   },
   "author": "",
   "license": "MIT",

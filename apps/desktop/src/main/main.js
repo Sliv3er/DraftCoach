@@ -1474,6 +1474,14 @@ COMMON MISTAKES — NEVER DO THESE:
           // Validate & correct
           const corrected = await validateAndCorrectBuild(fullText);
 
+          // Debug: log the raw JUNGLE PATH section before corrections
+          const rawJungleMatch = fullText.match(/JUNGLE PATH\n([\s\S]*?)(?=\n(?:ENEMY|YOUR|WIN|\n\n))/);
+          if (rawJungleMatch) {
+            console.log('[backend] RAW JUNGLE PATH from AI:', JSON.stringify(rawJungleMatch[1].substring(0, 300)));
+          } else {
+            console.log('[backend] NO JUNGLE PATH section found in AI output. First 300 chars:', JSON.stringify(fullText.substring(0, 300)));
+          }
+
           if (corrected.trim() === 'NEED_RETRY') {
             sendSSE({ error: 'NEED_RETRY — build generation failed' });
             return res.end();

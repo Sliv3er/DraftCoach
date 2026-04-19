@@ -271,30 +271,27 @@ function renderRunes(content: string, lookups: IconLookups | null) {
         <TreeHeader label="Secondary" treeName={secondaryTree} />
         {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
       </div>
-      {/* Shards — League-style: 3 tiny icons in a tight row with visible names, no header */}
+      {/* Shards — League client style: tiny circular icons with stat name beside each, tight horizontal row */}
       {shards.length > 0 && (
         <div className="rune-shards-row">
           {shards.map((s, i) => {
             const shardSrc = findIcon(s, lookups?.runes);
             return (
-              <div key={`sh${i}`} className="rune-shard-pill">
-                <div className="rune-shard-icon-wrap">
-                  {shardSrc ? (
-                    <img
-                      src={shardSrc}
-                      alt={s}
-                      className="rune-shard-img"
-                      onError={e => {
-                        const img = e.target as HTMLImageElement;
-                        img.style.display = 'none';
-                        const dot = img.nextElementSibling as HTMLElement;
-                        if (dot && dot.classList.contains('rune-shard-fallback')) dot.style.display = '';
-                      }}
-                    />
-                  ) : null}
-                  <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
-                </div>
-                <span className="rune-shard-label">{s}</span>
+              <div key={`sh${i}`} className="rune-shard-cell">
+                <img
+                  src={shardSrc}
+                  alt={s}
+                  className="rune-shard-icon"
+                  title={s}
+                  onError={e => {
+                    const img = e.target as HTMLImageElement;
+                    img.style.display = 'none';
+                    const dot = img.nextElementSibling as HTMLElement;
+                    if (dot && dot.classList.contains('rune-shard-fallback')) dot.style.display = '';
+                  }}
+                />
+                <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
+                <span className="rune-shard-name">{s}</span>
               </div>
             );
           })}
@@ -561,42 +558,58 @@ function resolveCampLabel(campName: string): string {
 function renderJunglePath(content: string, version: string) {
   console.warn('[BuildOutput] Jungle Path raw content:', JSON.stringify(content));
 
-  // Normalize all possible separators into a single delimiter
-  let normalized = content.trim()
-    .replace(/\*\*/g, '')
-    .replace(/\s*-+>\s*/g, ' ➤ ')
-    .replace(/\s*->+\s*/g, ' ➤ ')
-    .replace(/\s*→\s*/g, ' ➤ ')
-    .replace(/\s*➜\s*/g, ' ➤ ')
-    .replace(/\s*=>\s*/g, ' ➤ ');
+  const raw = content.trim().replace(/\*\*/g, '');
 
-  let camps: string[];
-
-  if (normalized.includes('➤')) {
-    // Arrow-separated: "Red ➤ Krugs ➤ Raptors"
-    camps = normalized.split(/\s*➤\s*/).map(s => s.trim()).filter(Boolean);
-  } else if (normalized.includes('\n')) {
-    // Newline-separated (possibly numbered): "1. Red\n2. Krugs\n3. Raptors"
-    camps = normalized.split('\n')
-      .map(l => l.trim().replace(/^\d+[.)]\s*/, '').replace(/^[-*•]\s*/, '').trim())
-      .filter(Boolean);
-  } else if (normalized.includes(',')) {
-    // Comma-separated: "Red, Krugs, Raptors"
-    camps = normalized.split(',').map(s => s.trim()).filter(Boolean);
-  } else if (normalized.includes('/')) {
-    // Slash-separated compound: "Red/Krugs/Raptors/Wolves/Blue/Gromp/Gank"
-    camps = normalized.split('/').map(s => s.trim()).filter(Boolean);
-  } else {
-    // Single camp or unknown format
-    camps = [normalized].filter(Boolean);
+  // First try: split by arrows (multiple arrow types)
+  const ARROW_RE = /\s*(?:➤|➔|->|→|➜|=>)\s*/;
+  if (ARROW_RE.test(raw)) {
+    const camps = raw.split(ARROW_RE).map(s => s.trim()).filter(Boolean);
+    if (camps.length >= 2) {
+      const cleaned = camps.map(c => c.replace(/^(\d+[.)]\s*)/, '').replace(/\s*—.*$/, '').trim()).filter(Boolean);
+      if (cleaned.length >= 2) {
+        return renderJungleCamps(cleaned, version);
+      }
+    }
   }
 
-  // Clean up each camp name - strip numbered prefixes, markdown
-  camps = camps.map(c => c.replace(/^\d+[.)]\s*/, '').replace(/^[-*•]\s*/, '').trim()).filter(Boolean);
+  // Second try: split by newlines (one camp per line)
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length >= 2) {
+    const cleaned = lines
+      .map(l => l.replace(/^(\d+[.)]\s*)/, '').replace(/^[-*•]\s*/, '').replace(/\s*—.*$/, '').trim())
+      .filter(Boolean);
+    if (cleaned.length >= 2) {
+      return renderJungleCamps(cleaned, version);
+    }
+  }
 
-  // Resolve each camp to its position and clean label
-  const resolved = camps.map((camp, i) => {
-    // For compound names like "Scuttle/Gank", try the first part for position
+  // Third try: comma-separated
+  if (raw.includes(',')) {
+    const cleaned = raw.split(',').map(s => s.trim().replace(/^(\d+[.)]\s*)/, '').replace(/\s*—.*$/, '').trim()).filter(Boolean);
+    if (cleaned.length >= 2) {
+      return renderJungleCamps(cleaned, version);
+    }
+  }
+
+  // Fourth try: slash-separated
+  if (raw.includes('/')) {
+    const cleaned = raw.split('/').map(s => s.trim().replace(/^(\d+[.)]\s*)/, '').replace(/\s*—.*$/, '').trim()).filter(Boolean);
+    if (cleaned.length >= 2) {
+      return renderJungleCamps(cleaned, version);
+    }
+  }
+
+  // Single camp: show what we have (may just be "Red")
+  const single = raw.replace(/^(\d+[.)]\s*)/, '').replace(/\s*—.*$/, '').trim();
+  if (single) {
+    return renderJungleCamps([single], version);
+  }
+
+  return <div className="build-output">{content}</div>;
+}
+
+function renderJungleCamps(campNames: string[], version: string) {
+  const resolved = campNames.map((camp, i) => {
     const primaryName = camp.includes('/') ? camp.split('/')[0].trim() : camp;
     const pos = findCampPosition(primaryName);
     const label = resolveCampLabel(camp);

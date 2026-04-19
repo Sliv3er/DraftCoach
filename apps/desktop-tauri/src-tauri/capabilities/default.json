@@ -1,0 +1,28 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "DraftCoach capabilities for all windows",
+  "windows": ["main", "overlay", "scout", "stats", "scoreboard", "tracker"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:window:allow-create",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-minimize",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-ignore-cursor-events",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-center",
+    "core:webview:default",
+    "opener:default",
+    "shell:default",
+    "shell:allow-spawn",
+    "shell:allow-stdin-write",
+    "shell:allow-kill",
+    "process:default"
+  ]
+}

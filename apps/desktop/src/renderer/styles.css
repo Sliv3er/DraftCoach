@@ -1143,6 +1143,29 @@ body {
   flex-shrink: 0;
 }
 
+.item-card-icon-missing {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px dashed var(--accent-orange);
+  background: rgba(245, 158, 11, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--accent-orange);
+  flex-shrink: 0;
+}
+
+.item-card-removed-tag {
+  font-size: 9px;
+  color: var(--accent-orange);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
 /* Legacy item-row for spell rows */
 .item-row {
   display: flex;

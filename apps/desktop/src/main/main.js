@@ -6,6 +6,8 @@ const http = require('http');
 const { spawn, exec } = require('child_process');
 const { setupCrashHandlers, log } = require('./crash-logger');
 const { loadSettings, getSetting, setSetting, SETTINGS_FILE } = require('./settings');
+// ── Intelligence upgrade: centralised prompt builder ────────────────
+const _prompts = require('./prompt-builder');
 
 // Load .env from multiple possible locations
 const _envSearchPaths = [
@@ -42,6 +44,7 @@ let scoreboardWindow = null;
 let trackerWindow = null;
 let cachedScoutReport = null;  // Cache for scout window
 let overlayData = null;
+let overlayGeneration = 0; // Increments on every overlay update — prevents stale renders
 let ddragonItemCache = null; // { version, items: Map<normalizedName, {id, name, iconUrl, gold}>, byId: Map<id, {name, from, gold, iconUrl}> }
 let ddragonItemCachePromise = null; // Lock to prevent duplicate fetches
 let ddragonRuneCache = null; // { version, trees: [{name, keystones, slots}], shardOptions, reference }
@@ -123,6 +126,115 @@ function getValidBootsReference() {
   }
   if (boots.length === 0) return '';
   return `VALID BOOTS: ${boots.join(', ')}\n`;
+}
+
+// Get full valid item list from DDragon cache, grouped by tag
+function getValidItemsReference() {
+  if (!ddragonItemCache || !ddragonItemCache.byId) return '';
+  const categories = {};
+  for (const [id, item] of ddragonItemCache.byId) {
+    // CRITICAL: Only include items available on Summoner's Rift
+    if (!item.isSR) continue;
+    // Only include truly completed items on Summoner's Rift:
+    // - Must cost >= 2000g (skip cheap components)
+    // - Must have a build path (builds FROM something)
+    // - Must NOT build INTO anything else (it's a final item)
+    // - Exception: boots (which are cheaper but still "completed")
+    const isBoots = item.tags && item.tags.includes('Boots');
+    if (!isBoots && item.gold < 2000) continue;
+    if (!isBoots && (!item.from || item.from.length === 0)) continue;
+    if (item.into && item.into.length > 0) continue; // Skip mid-tier components
+    if (!item.tags || item.tags.length === 0) continue;
+    const primaryTag = item.tags[0];
+    if (!categories[primaryTag]) categories[primaryTag] = [];
+    if (!categories[primaryTag].includes(item.name)) {
+      categories[primaryTag].push(item.name);
+    }
+  }
+  if (Object.keys(categories).length === 0) return '';
+  let ref = 'VALID COMPLETED ITEMS (Season 2026):\n';
+  for (const [tag, items] of Object.entries(categories)) {
+    ref += `${tag}: ${items.join(', ')}\n`;
+  }
+  ref += 'RULE: ONLY suggest items from this list. If an item is not here, it does NOT exist in the game.\n';
+  return ref;
+}
+
+// Get valid summoner spells reference for prompt injection
+async function getSummonerSpellsReference() {
+  try {
+    const sumData = await fetchDdragonSummoners();
+    if (!sumData || !sumData.spellNames || sumData.spellNames.length === 0) return '';
+    return `VALID SUMMONER SPELLS: ${sumData.spellNames.join(', ')}\n`;
+  } catch { return ''; }
+}
+
+// Pre-compute enemy team damage profile from DDragon champion tags
+async function computeEnemyProfile(enemies) {
+  if (!enemies || enemies.length === 0) return '';
+  const champCache = await ensureDdragonChampCache();
+  if (!champCache) return '';
+
+  // Fix #5: Champion-specific counter-item hints for common champions
+  const CHAMPION_COUNTER_HINTS = {
+    'Zed': 'Zed [AD Burst] → Zhonya\'s negates R',
+    'Talon': 'Talon [AD Burst] → Early armor + Sterak\'s/Zhonya\'s',
+    'Fizz': 'Fizz [AP Burst] → Banshee\'s blocks R, MR rush',
+    'Katarina': 'Katarina [AP/AD Hybrid] → CC interrupts R, anti-heal',
+    'Malzahar': 'Malzahar [AP Suppress] → QSS removes R',
+    'Mordekaiser': 'Mordekaiser [AP Bruiser] → QSS cleanses R',
+    'Vayne': 'Vayne [True Dmg] → HP stacking > armor, burst < 3 autos',
+    'Fiora': 'Fiora [True Dmg] → Thornmail + Frozen Heart',
+    'Veigar': 'Veigar [AP Scaling] → Banshee\'s blocks E cage, MR',
+    'Sylas': 'Sylas [AP Bruiser] → Anti-heal CRITICAL, MR',
+    'Vladimir': 'Vladimir [AP Sustain] → Anti-heal MANDATORY',
+    'Aatrox': 'Aatrox [AD Drain] → Anti-heal MANDATORY',
+    'DrMundo': 'Dr. Mundo [HP Tank] → Anti-heal + % HP damage',
+    'Warwick': 'Warwick [Healing Fighter] → Anti-heal, CC interrupts R',
+    'Yasuo': 'Yasuo [AD Crit] → Randuin\'s (anti-crit)',
+    'Yone': 'Yone [AD/AP Hybrid] → Needs armor AND MR, Randuin\'s',
+    'Irelia': 'Irelia [AD Sustained] → Thornmail + Frozen Heart',
+    'Tryndamere': 'Tryndamere [AD Crit] → Randuin\'s, disengage during R',
+    'Kassadin': 'Kassadin [AP Scaling] → Punish early (weak pre-6)',
+    'Nasus': 'Nasus [AD Scaling] → Kite, % armor pen late',
+    'Akali': 'Akali [AP Assassin] → MR + HP, sweeper for shroud',
+    'LeBlanc': 'LeBlanc [AP Burst] → Banshee\'s, MR rush',
+    'Rengar': 'Rengar [AD Burst] → Zhonya\'s/GA, group up',
+    'KhaZix': 'Kha\'Zix [AD Assassin] → Stay grouped (isolation = death)',
+    'Samira': 'Samira [AD Melee ADC] → CC interrupts R',
+    'Kayn': 'Kayn [Shadow/Rhaast] → Red: anti-heal + armor. Blue: MR + burst',
+  };
+
+  let apCount = 0, adCount = 0, tankCount = 0, assassinCount = 0, hasHealing = false;
+  const details = [];
+  const counterHints = [];
+  const healChamps = ['Soraka', 'Yuumi', 'Sona', 'Nami', 'Vladimir', 'Aatrox', 'Warwick', 'DrMundo', 'Swain', 'Fiora', 'Sylas', 'Briar', 'Belveth'];
+
+  for (const enemy of enemies) {
+    const data = champCache.get(enemy);
+    if (!data) { details.push(`${enemy} [Unknown]`); continue; }
+    const tags = data.tags || [];
+    if (tags.includes('Mage')) apCount++;
+    if (tags.includes('Marksman') || tags.includes('Fighter')) adCount++;
+    if (tags.includes('Tank')) tankCount++;
+    if (tags.includes('Assassin')) assassinCount++;
+    if (healChamps.includes(enemy) || healChamps.includes(data.id)) hasHealing = true;
+    details.push(`${enemy} [${tags.join('/')}]`);
+    // Add champion-specific counter hint if available
+    if (CHAMPION_COUNTER_HINTS[enemy]) counterHints.push(CHAMPION_COUNTER_HINTS[enemy]);
+    else if (data.id && CHAMPION_COUNTER_HINTS[data.id]) counterHints.push(CHAMPION_COUNTER_HINTS[data.id]);
+  }
+
+  let analysis = '\nENEMY TEAM PROFILE:\n';
+  analysis += `Champions: ${details.join(', ')}\n`;
+  analysis += `Damage Split: ${apCount} AP / ${adCount} AD / ${tankCount} Tanks / ${assassinCount} Assassins\n`;
+  if (apCount >= 3) analysis += '⚠️ HEAVY AP TEAM — Prioritize MR items (Wit\'s End, Maw of Malmortius, Kaenic Rookern, Spirit Visage, Mercury\'s Treads)\n';
+  if (adCount >= 3) analysis += '⚠️ HEAVY AD TEAM — Prioritize Armor items (Plated Steelcaps, Randuin\'s Omen, Frozen Heart, Dead Man\'s Plate)\n';
+  if (tankCount >= 2) analysis += '⚠️ TANKY TEAM — Prioritize penetration/% HP items (Lord Dominik\'s Regards, Void Staff, Liandry\'s Torment, Black Cleaver)\n';
+  if (assassinCount >= 2) analysis += '⚠️ ASSASSIN-HEAVY — Consider defensive items early (Zhonya\'s Hourglass, Guardian Angel, Sterak\'s Gage)\n';
+  if (hasHealing) analysis += '⚠️ ENEMY HAS HEALING — Consider anti-heal (Mortal Reminder, Morellonomicon, Thornmail)\n';
+  if (counterHints.length > 0) analysis += '\nCHAMPION-SPECIFIC COUNTER TIPS:\n' + counterHints.join('\n') + '\n';
+  return analysis;
 }
 
 // ── DDragon Summoner Spells Cache ──
@@ -378,15 +490,20 @@ async function resolveDdragonItem(itemName) {
           const items = new Map();
           const byId = new Map();
           for (const [id, d] of Object.entries(itemsData.data)) {
-            const norm = d.name.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+            const norm = d.name.toLowerCase().replace(/['\u2019]/g, "'").replace(/\s+/g, ' ').trim();
             const iconUrl = `https://ddragon.leagueoflegends.com/cdn/${ver}/img/item/${id}.png`;
             const isSR = d.maps?.['11'] === true; // Summoner's Rift
-            // Only overwrite if: no existing entry, OR this is the SR version (prefer SR over Arena/ARAM variants)
-            if (!items.has(norm) || isSR) {
-              items.set(norm, { id, name: d.name, iconUrl, gold: d.gold?.total || 0 });
+            // CRITICAL: Only include Summoner's Rift items in the name lookup
+            // This prevents Arena/ARAM-only items (Goredrinker, Stridebreaker, etc.) from being resolved
+            if (isSR) {
+              if (!items.has(norm)) {
+                items.set(norm, { id, name: d.name, iconUrl, gold: d.gold?.total || 0 });
+              }
             }
-            byId.set(id, { name: d.name, from: d.from || [], gold: d.gold?.total || 0, base: d.gold?.base || 0, iconUrl, tags: d.tags || [] });
+            // byId stores ALL items (needed for component resolution) but marks SR availability
+            byId.set(id, { name: d.name, from: d.from || [], into: d.into || [], gold: d.gold?.total || 0, base: d.gold?.base || 0, iconUrl, tags: d.tags || [], isSR });
           }
+          console.log(`[ddragon] Cached ${items.size} SR items out of ${byId.size} total`);
           ddragonItemCache = { version: ver, items, byId };
           ddragonItemCachePromise = null;
         })();
@@ -394,11 +511,20 @@ async function resolveDdragonItem(itemName) {
       await ddragonItemCachePromise;
     }
     const norm = itemName.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
-    // Exact match
+    // Exact match (primary — fastest)
     if (ddragonItemCache.items.has(norm)) return ddragonItemCache.items.get(norm);
-    // Partial match
+    // Strict prefix match only — no loose substring matching
+    // This prevents removed items (e.g. "Divine Sunderer") from matching existing items (e.g. "Sundered Sky")
     for (const [key, val] of ddragonItemCache.items) {
-      if (key.includes(norm) || norm.includes(key)) return val;
+      // Only match if one is a strict prefix of the other WITH a word boundary (space)
+      if ((key.startsWith(norm + ' ') || norm.startsWith(key + ' ')) && Math.abs(key.length - norm.length) <= 15) {
+        return val;
+      }
+    }
+    // Apostrophe-tolerant exact match (e.g. "ludens companion" vs "luden's companion")
+    const normNoApostrophe = norm.replace(/'/g, '');
+    for (const [key, val] of ddragonItemCache.items) {
+      if (key.replace(/'/g, '') === normNoApostrophe) return val;
     }
     return null;
   } catch (e) {
@@ -414,33 +540,7 @@ let liveClientInterval = null;
 let liveAdvisorInterval = null;  // separate from liveClientInterval!
 
 // ── LCU Lockfile Reader ─────────────────────────────────────────
-function getLcuCredentials() {
-  const searchPaths = [
-    'C:\\Riot Games\\League of Legends',
-    'D:\\Riot Games\\League of Legends',
-    'C:\\Program Files\\Riot Games\\League of Legends',
-    'D:\\Program Files\\Riot Games\\League of Legends',
-    'C:\\Games\\Riot Games\\League of Legends',
-    'D:\\Games\\Riot Games\\League of Legends',
-  ];
-  // Also try custom path from settings
-  const customPath = getSetting('lolPath');
-  if (customPath) searchPaths.unshift(customPath);
-
-  for (const base of searchPaths) {
-    const lockfile = path.join(base, 'lockfile');
-    if (fs.existsSync(lockfile)) {
-      try {
-        const content = fs.readFileSync(lockfile, 'utf-8').trim();
-        const parts = content.split(':');
-        if (parts.length >= 5) {
-          return { port: parseInt(parts[2]), password: parts[3] };
-        }
-      } catch (e) { /* ignore */ }
-    }
-  }
-  return null;
-}
+// Duplicate getLcuCredentials declaration removed (already defined at line 3003)
 
 // ── RAG Pipeline ─────────────────────────────────────────────────────
 const RAG_DIR = path.join(app.getPath('userData'), 'rag');
@@ -752,13 +852,24 @@ function startEmbeddedBackend() {
       writeCache(all);
     }
 
-    // Gemini — Dynamic patch injection (NEVER hardcoded)
+    // Gemini — Dynamic patch injection (delegated to prompt-builder.js)
     function buildSystemPrompt(patch) {
-      return `You are a League of Legends Draft & Itemization Engine for Season 2026, Patch ${patch}.
+      return _prompts.buildSystemPrompt(patch);
+    }
+    function _buildSystemPromptLEGACY(patch) {
+      return `You are a Grandmaster League of Legends Draft & Itemization Engine for Season 2026, Patch ${patch}.
 
-You will receive RAG context containing verified patch data. Use it as your PRIMARY knowledge source for champion balance, item stats, and meta shifts. Only use Google Search grounding to supplement if the RAG context is insufficient for a specific matchup detail.
+You will receive RAG context containing verified patch data, a VALID ITEMS list, and an ENEMY TEAM PROFILE with pre-computed damage analysis. Use these as your PRIMARY knowledge sources. Only use Google Search grounding to supplement if the provided context is insufficient for a specific matchup detail.
 
-Return ONLY these sections in this exact format:
+FIRST, output this analysis section to reason about the matchup before building:
+
+ANALYSIS
+Matchup Type: <poke/all-in/sustain/scaling — describe the lane dynamic>
+Enemy Damage Split: <AP-heavy / AD-heavy / mixed — reference the ENEMY TEAM PROFILE provided>
+Key Threats: <1-2 enemy champions that are most dangerous and why>
+Build Priority: <What stats/passives does my champion need MOST vs THIS specific enemy team?>
+
+THEN output these sections in this exact format:
 
 RUNES
 Primary: <TreeName>
@@ -784,8 +895,8 @@ STARTING ITEMS
 (These MUST be true level 1 starting items like Doran's Blade, Hatchling, or Health Potion. Do not list core items here.)
 
 CORE BUILD
-1. <Item1> (<why this item>)
-2. <Item2> (<why this item>)
+1. <Item1> (<why this item: explain adaptation to enemy comp>)
+2. <Item2> (<why this item: explain adaptation to enemy comp>)
 3. <Item3> (<why this item>)
 4. <Item4> (<why this item>)
 5. <Item5> (<why this item>)
@@ -811,26 +922,73 @@ YOUR POWER SPIKES
 1-item spike: <ItemName> — <why this is a power spike and how to play around it>
 2-item spike: <Item1> + <Item2> — <why this combination is strong and what to do>
 
+EXAMPLE (showing the expected reasoning depth — adapt to the actual request):
+ANALYSIS
+Matchup Type: Poke lane — Caitlyn outranges Jinx, expect harass with Q and headshots
+Enemy Damage Split: 3 AP / 1 AD / 1 Tank — heavy magic damage from mid, jungle, and support
+Key Threats: Syndra (burst mage, can one-shot at 6), Amumu (engage tank, R locks entire team)
+Build Priority: Need MR to survive AP threats, but also need core crit scaling for Jinx's identity
+
+RUNES
+Primary: Precision
+Keystone: Lethal Tempo
+Presence of Mind
+Legend: Bloodline
+Cut Down
+Secondary: Inspiration
+Magical Footwear
+Biscuit Delivery
+Shards: Attack Speed, Adaptive Force, Health
+
+CORE BUILD
+1. Berserker's Greaves (Essential AS boots for auto-attack ADC)
+2. Infinity Edge (Core crit multiplier — Jinx rockets scale with AD+crit multiplicatively)
+3. Rapid Firecannon (Extended range helps vs Caitlyn's 650 range — safer kiting in lane)
+4. Runaan's Hurricane (AOE rockets in teamfights — Jinx's identity item for multi-target DPS)
+5. Wit's End (ADAPTED: 3 AP enemies — on-hit MR + damage solves survivability AND DPS simultaneously)
+6. Guardian Angel (Late game insurance vs AP burst flanks from Syndra)
+7. Bloodthirster (Lifesteal sustain for extended teamfights + overheal shield)
+(END OF EXAMPLE — do not copy this example, generate a unique build for the actual request)
+
 Rules:
+- THINK THEN BUILD: Your ANALYSIS section must directly influence your item choices. If you identify "3 AP threats" in the analysis, at least 1-2 items in CORE BUILD must address that.
+- PLAY LIKE A GRANDMASTER: Do not just output standard high-winrate builds. Analyze the lane matchup and the enemy team composition's damage split.
+- ADAPTIVE KEYSTONES: Choose Keystones based on the lane. e.g. Fleet Footwork to survive heavy poke, Conqueror for extended melee trades, Grasp for short trades.
+- ADAPTIVE ITEMS: Build defensive items earlier if the enemy comp dictates it. Reference the ENEMY TEAM PROFILE data provided.
+- RUNE-ITEM COHERENCE: Your Keystone and items must form a coherent identity:
+  Conqueror → sustained trade items (Blade of the Ruined King, Death's Dance, Black Cleaver)
+  Lethal Tempo → attack speed items (Nashor's Tooth, Wit's End, Runaan's Hurricane)
+  Electrocute → burst items (Luden's, Shadowflame, Stormsurge)
+  Fleet Footwork → sustain/kiting items (Bloodthirster, Rapid Firecannon) 
+  Grasp → bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
+  Dark Harvest → snowball items (Mejai's Soulstealer, Shadowflame)
+- ITEMS: Use ONLY items from the VALID COMPLETED ITEMS list provided. NEVER invent item names or use removed items.
+- COUNTER-ITEMS: Use the CHAMPION-SPECIFIC COUNTER TIPS from the ENEMY TEAM PROFILE. If a tip says "Zhonya's negates R," include Zhonya's as a core or situational item.
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).
 - SITUATIONAL ITEMS must ALWAYS have at least 4 items with clear conditions (e.g. "vs heavy AP", "if behind", "vs tanks").
-- BOOTS: ONE pair of upgraded boots MUST be in CORE BUILD for all roles. ALWAYS place the upgraded boots as the FIRST or SECOND item in the CORE BUILD. If you pick the "Magical Footwear" rune, you get free basic boots — still include the UPGRADED boots in CORE BUILD (e.g. Mercury's Treads, Plated Steelcaps) since you'll upgrade them. For Bottom/ADC: they have 6 normal item slots + a 7th quest slot that is specifically for boots. List 7 items total, but you MUST still place the boots as the 1st or 2nd item.
-- RUNES: Use ONLY runes from the VALID RUNES list provided in the user message. NEVER use old/removed rune names. Match the names EXACTLY.
-- SHARDS: Use ONLY shards from the VALID STAT SHARDS list provided. Pick 1 from each row.
-- ITEMS: Use ONLY current Season 2026 item names. Never invent or use removed items.
-- Adapt to enemy comp.
+- BOOTS: ONE pair of upgraded boots MUST be in CORE BUILD for all roles. ALWAYS place the upgraded boots as the FIRST or SECOND item in CORE BUILD. If you pick the "Magical Footwear" rune, include the UPGRADED boots. For Bottom/ADC: list 7 items total, placing boots 1st or 2nd.
+- RUNES: Use ONLY runes from the VALID RUNES list provided in the user message. NEVER use old/removed rune names.
+- SHARDS: Pick 1 from each row. Use ONLY from the VALID STAT SHARDS list.
 - For jungle, include jungle companion start.
-- Keep names exactly as in-game.
 - Do NOT add explanations or extra text outside the sections.
-- If role is Jungle, you MUST include a JUNGLE PATH section with the optimal first clear route.
-- ALWAYS include ENEMY POWER SPIKES with at least one entry per enemy champion provided.
-- ALWAYS include YOUR POWER SPIKES with 1-item and 2-item spikes.
-- ALWAYS include WIN CONDITION with a concise strategy for winning the game with this draft.
-- Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.`;
+- If role is Jungle, include JUNGLE PATH.
+- ALWAYS include ENEMY POWER SPIKES, YOUR POWER SPIKES, and WIN CONDITION.
+- Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.
+
+COMMON MISTAKES — NEVER DO THESE:
+❌ Do NOT put boots as item 5 or 6 — boots MUST be item 1 or 2 in CORE BUILD
+❌ Do NOT suggest the same item twice in CORE BUILD
+❌ Do NOT put starting items (Doran's, potions) in CORE BUILD
+❌ Do NOT pick secondary runes from the SAME tree as primary
+❌ Do NOT suggest 2 pairs of boots
+❌ Do NOT suggest items that only exist in ARAM/Arena
+❌ Do NOT output a generic cookie-cutter build — you MUST adapt to the enemy team profile
+✅ ALWAYS adapt at least 1-2 items specifically to the enemy team composition
+✅ ALWAYS explain HOW an item counters a specific enemy in the reason`;
     }
 
     function buildShortPrompt(patch) {
-      return `You are a League of Legends build advisor for Patch ${patch}. Return ONLY: RUNES, SUMMONERS, SKILL ORDER, STARTING ITEMS, CORE BUILD, SITUATIONAL ITEMS, JUNGLE PATH (if Jungle), ENEMY POWER SPIKES, WIN CONDITION. RUNES: Use ONLY runes from the VALID RUNES list provided. NEVER use old/removed rune names. SHARDS: Use ONLY from the VALID STAT SHARDS list. Keep names exactly as in-game. Adapt to enemy comp. STARTING ITEMS must be level 1 items. CORE BUILD: 6 items for most roles. For ADC/Bot: 7 items total. ALWAYS place boots as the FIRST or SECOND item in the CORE BUILD. With Magical Footwear rune, still include upgraded boots. SITUATIONAL ITEMS must have at least 4 items with conditions. JUNGLE PATH only if role is Jungle. ENEMY POWER SPIKES must have at least one entry per enemy. WIN CONDITION must be a concise 1-2 sentence strategy. Only output NEED_RETRY if champion name or role is invalid.`;
+      return _prompts.buildShortPrompt(patch);
     }
 
     const VALID_MODELS = [
@@ -1013,6 +1171,58 @@ Rules:
         }
       }
 
+      // ── Fix #7: Duplicate item dedup in CORE BUILD ──
+      const coreDedupMatch = corrected.match(/CORE BUILD\n([\s\S]*?)(?=\n(?:SITUATIONAL|JUNGLE PATH|ENEMY POWER|WIN CONDITION|YOUR POWER|\n\n))/);
+      if (coreDedupMatch) {
+        const coreBlock = coreDedupMatch[1];
+        const coreItemLines = coreBlock.split('\n');
+        const seenItems = new Set();
+        const dedupedLines = [];
+        let renumber = 1;
+        for (const line of coreItemLines) {
+          const itemMatch = line.match(/^\d+[\.\\)]\s*(.+?)(?:\s*\(.*\))?$/);
+          if (itemMatch) {
+            const itemKey = itemMatch[1].trim().toLowerCase();
+            if (seenItems.has(itemKey)) {
+              corrections.push(`Removed duplicate item: "${itemMatch[1].trim()}"`);
+              continue; // Skip duplicate
+            }
+            seenItems.add(itemKey);
+            // Re-number
+            dedupedLines.push(line.replace(/^\d+/, String(renumber)));
+            renumber++;
+          } else {
+            dedupedLines.push(line);
+          }
+        }
+        if (dedupedLines.length < coreItemLines.length) {
+          corrected = corrected.replace(coreBlock, dedupedLines.join('\n'));
+        }
+      }
+
+      // ── Fix #8: Secondary tree must differ from primary tree ──
+      const primaryTreeMatch = corrected.match(/Primary:\s*(\w+)/);
+      const secondaryTreeMatch = corrected.match(/Secondary:\s*(\w+)/);
+      if (primaryTreeMatch && secondaryTreeMatch) {
+        const primaryTree = primaryTreeMatch[1].trim().toLowerCase();
+        const secondaryTree = secondaryTreeMatch[1].trim().toLowerCase();
+        if (primaryTree === secondaryTree && primaryTree !== '') {
+          // Pick a different valid tree
+          const allTrees = ['Precision', 'Domination', 'Sorcery', 'Resolve', 'Inspiration'];
+          const alternatives = allTrees.filter(t => t.toLowerCase() !== primaryTree);
+          if (alternatives.length > 0) {
+            // Pick the most commonly paired secondary tree based on primary
+            const pairings = {
+              'precision': 'Domination', 'domination': 'Precision', 'sorcery': 'Inspiration',
+              'resolve': 'Precision', 'inspiration': 'Sorcery',
+            };
+            const replacement = pairings[primaryTree] || alternatives[0];
+            corrections.push(`Secondary tree "${secondaryTreeMatch[1]}" same as primary "${primaryTreeMatch[1]}" → changed to "${replacement}"`);
+            corrected = corrected.replace(/Secondary:\s*\w+/, `Secondary: ${replacement}`);
+          }
+        }
+      }
+
       if (corrections.length > 0) {
         console.log(`[validation] Corrected ${corrections.length} names in build output:`);
         corrections.forEach(c => console.log(`  ${c}`));
@@ -1046,7 +1256,13 @@ Rules:
       const model = genAI.getGenerativeModel({
         model: modelName,
         systemInstruction: systemPrompt,
-        tools: [{ googleSearch: {} }],
+        generationConfig: {
+          // Flash needs lower temp for deterministic output; 1500 tokens covers full build + CONSTRAINTS + ANALYSIS
+          temperature: modelName.includes('flash') ? 0.2 : 0.3,
+          topP: 0.85,
+          topK: 40,
+          maxOutputTokens: 4096,
+        },
       });
 
       // Inject RAG context into the user message
@@ -1059,6 +1275,9 @@ Rules:
         if (runeData) runesRef = runeData.reference;
       } catch (e) { console.warn('[build] Could not fetch DDragon runes:', e.message); }
       const bootsRef = getValidBootsReference();
+      const itemsRef = getValidItemsReference();
+      const sumSpellsRef = await getSummonerSpellsReference();
+      const enemyProfile = await computeEnemyProfile(body.enemies);
 
       const isBot = /^(bottom|adc|bot)$/i.test(body.role);
       const itemSlots = isBot ? 7 : 6;
@@ -1068,7 +1287,11 @@ Rules:
         ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
         : '';
 
-      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Generate optimized build. Output only the sections.`;
+      // ── Ability mechanics context (dynamically fetched from DDragon) ──
+      const allChamps = [body.myChampion, ...(body.enemies || [])];
+      const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
+      const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
+      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
 
       const result = await model.generateContent(userMessage);
       const response = result.response;
@@ -1198,7 +1421,12 @@ Rules:
         const model = genAI.getGenerativeModel({
           model: modelName,
           systemInstruction: systemPrompt,
-          tools: [{ googleSearch: {} }],
+          generationConfig: {
+            temperature: modelName.includes('flash') ? 0.2 : 0.3,
+            topP: 0.85,
+            topK: 40,
+            maxOutputTokens: 4096,
+          },
         });
 
         const ragContext = getLocalRagContext(body.myChampion, body.role, body.enemies);
@@ -1208,6 +1436,9 @@ Rules:
           if (runeData) runesRef = runeData.reference;
         } catch (e) { /* ignore */ }
         const bootsRef = getValidBootsReference();
+        const itemsRef = getValidItemsReference();
+        const sumSpellsRef = await getSummonerSpellsReference();
+        const enemyProfile = await computeEnemyProfile(body.enemies);
 
         const isBot = /^(bottom|adc|bot)$/i.test(body.role);
         const itemSlots = isBot ? 7 : 6;
@@ -1217,7 +1448,11 @@ Rules:
           ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
           : '';
 
-        const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Generate optimized build. Output only the sections.`;
+        // ── Ability mechanics context (dynamically fetched from DDragon) ──
+        const allChamps2 = [body.myChampion, ...(body.enemies || [])];
+        const mechMap2 = await _prompts.fetchMultipleChampionMechanics(allChamps2);
+        const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap2);
+        const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
 
         sendSSE({ patchUsed: patchDisplay });
 
@@ -1295,7 +1530,7 @@ Rules:
         const cached = getCache(cacheKey);
 
         if (cached && Date.now() - cached.timestamp < 24 * 60 * 60 * 1000) {
-          sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'cache', patchUsed: cached.patchDetected });
+          sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'cache', patchUsed: cached.patchDetected, model: 'cache' });
           return res.end();
         }
 
@@ -1310,59 +1545,92 @@ Rules:
         let runesRef = '';
         try { const rd = await fetchDdragonRunes(); if (rd) runesRef = rd.reference; } catch {}
         const bootsRef = getValidBootsReference();
+        const itemsRef = getValidItemsReference();
+        const sumSpellsRef = await getSummonerSpellsReference();
+        const enemyProfile = await computeEnemyProfile(body.enemies);
         const isBot = /^(bottom|adc|bot)$/i.test(body.role);
         const itemSlots = isBot ? 7 : 6;
         const matchupLine = body.enemies && body.enemies.length > 0
           ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
           : '';
 
-        const fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Generate optimized build. Output only the sections.`;
+        // ── Ability mechanics context (dynamically fetched from DDragon) ──
+        const allChamps3 = [body.myChampion, ...(body.enemies || [])];
+        const mechMap3 = await _prompts.fetchMultipleChampionMechanics(allChamps3);
+        const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
+        const fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
 
-        sendSSE({ patchUsed: patchDisplay, dualMode: true });
-        log('INFO', `[dual] Starting parallel generation: Flash (runes) + Pro (full) for ${body.myChampion} ${body.role}`);
+        const generationMode = body.generationMode || getSetting('generationMode') || 'hybrid';
+        const fullPhaseModelName = generationMode === 'flash' 
+          ? 'gemini-3-flash-preview' 
+          : (body.model || 'gemini-3.1-pro-preview');
 
-        // ── Phase 1: Flash for fast runes ──
-        const flashPromise = (async () => {
-          try {
-            const flashModel = genAI.getGenerativeModel({
-              model: 'gemini-3-flash-preview',
-              systemInstruction: `You are a League of Legends rune advisor for Patch ${patchDisplay}. Return ONLY the RUNES and SUMMONERS sections. Be extremely fast and precise.\n\nRUNES\nPrimary: <TreeName>\nKeystone: <RuneName>\n<Rune1>\n<Rune2>\n<Rune3>\nSecondary: <TreeName>\n<Rune1>\n<Rune2>\nShards: <Shard1>, <Shard2>, <Shard3>\n\nSUMMONERS\n<Spell1>\n<Spell2>\n\nSKILL ORDER\n<Key> > <Key> > <Key> > <Key>\n\nRules:\n- Use ONLY runes from the VALID RUNES list provided.\n- SHARDS: Use ONLY from the VALID STAT SHARDS list.\n- Adapt to enemy comp.`,
-            });
+        sendSSE({ patchUsed: patchDisplay, dualMode: generationMode !== 'flash' });
+        log('INFO', `[dual] Starting generation: mode=${generationMode}, model=${fullPhaseModelName} for ${body.myChampion} ${body.role}`);
 
-            const runeMessage = `${runesRef}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay}. Generate runes, summoners, and skill order ONLY.`;
-            const flashStream = await flashModel.generateContentStream(runeMessage);
-            let flashText = '';
+        // ── Phase 1: Flash for fast runes (SKIP in flash-only mode to avoid duplicate runes) ──
+        let flashPromise;
+        if (generationMode === 'flash') {
+          // In flash-only mode, skip the separate runes phase entirely.
+          // The full build call below will include runes in its output.
+          flashPromise = Promise.resolve(null);
+        } else {
+          flashPromise = (async () => {
+            try {
+              const flashModel = genAI.getGenerativeModel({
+                model: 'gemini-3-flash-preview',
+                // ── Upgraded: full rune decision tree from prompt-builder ──
+                systemInstruction: _prompts.buildFlashRuneSystemPrompt(patchDisplay),
+                generationConfig: {
+                  temperature: 0.2,
+                  topP: 0.85,
+                  topK: 40,
+                },
+              });
 
-            for await (const chunk of flashStream.stream) {
-              const t = chunk.text();
-              if (t) {
-                flashText += t;
-                sendSSE({ phase: 'runes', chunk: t });
+              // Inject mechanics context — reuse mechMap3 already fetched above
+              const runeMechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
+              const runeMessage = `${runesRef}${sumSpellsRef}${enemyProfile}\n${runeMechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay}. Generate runes, summoners, and skill order ONLY. Apply the KEYSTONE SELECTION RULES above.`;
+              const flashStream = await flashModel.generateContentStream(runeMessage);
+              let flashText = '';
+
+              for await (const chunk of flashStream.stream) {
+                const t = chunk.text();
+                if (t) {
+                  flashText += t;
+                  sendSSE({ phase: 'runes', chunk: t });
+                }
               }
-            }
 
-            // Validate runes from Flash
-            const validated = await validateAndCorrectBuild(flashText);
-            if (validated !== flashText) {
-              sendSSE({ phase: 'runes', corrected: validated });
+              // Validate runes from Flash
+              const validated = await validateAndCorrectBuild(flashText);
+              if (validated !== flashText) {
+                sendSSE({ phase: 'runes', corrected: validated });
+              }
+              sendSSE({ phase: 'runes', done: true, fullText: validated, model: 'gemini-3-flash-preview' });
+              log('INFO', `[dual] Flash runes complete (${flashText.length} chars)`);
+              return validated;
+            } catch (err) {
+              log('ERROR', `[dual] Flash runes failed: ${err.message}`);
+              sendSSE({ phase: 'runes', error: err.message });
+              return null;
             }
-            sendSSE({ phase: 'runes', done: true, fullText: validated });
-            log('INFO', `[dual] Flash runes complete (${flashText.length} chars)`);
-            return validated;
-          } catch (err) {
-            log('ERROR', `[dual] Flash runes failed: ${err.message}`);
-            sendSSE({ phase: 'runes', error: err.message });
-            return null;
-          }
-        })();
+          })();
+        }
 
-        // ── Phase 2: Pro for full build (runs in parallel) ──
+        // ── Phase 2: Full build (runs in parallel, model depends on setting) ──
         const proPromise = (async () => {
           try {
             const proModel = genAI.getGenerativeModel({
-              model: 'gemini-3.1-pro-preview',
+              model: fullPhaseModelName,
               systemInstruction: buildSystemPrompt(patchDisplay),
-              tools: [{ googleSearch: {} }],
+              generationConfig: {
+                // Flash-only mode uses lower temp for determinism; 1500 tokens for full build
+                temperature: fullPhaseModelName.includes('flash') ? 0.2 : 0.3,
+                topP: 0.85,
+                topK: 40,
+                maxOutputTokens: 4096,
+              },
             });
 
             const proStream = await proModel.generateContentStream(fullUserMessage);
@@ -1382,22 +1650,54 @@ Rules:
               sendSSE({ phase: 'full', corrected: validated });
             }
             setCache(cacheKey, validated, patchDisplay);
-            sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated });
+            sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: fullPhaseModelName });
             log('INFO', `[dual] Pro full build complete (${proText.length} chars)`);
             return validated;
           } catch (err) {
             log('ERROR', `[dual] Pro full build failed: ${err.message}`);
             sendSSE({ phase: 'full', error: err.message });
-            // Fallback to stale cache
-            if (cached) {
-              sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected });
-            }
             return null;
           }
         })();
 
         // Wait for both to finish
-        await Promise.all([flashPromise, proPromise]);
+        const [flashResult, proResult] = await Promise.all([flashPromise, proPromise]);
+
+        // ── Fallback: if Pro failed or missing CORE BUILD, retry with Flash ──
+        let finalText = proResult;
+        if (!proResult || !proResult.includes('CORE BUILD')) {
+          log('WARN', `[dual] Pro result missing CORE BUILD — falling back to Flash for full build`);
+          try {
+            const fallbackModel = genAI.getGenerativeModel({
+              model: 'gemini-3-flash-preview',
+              systemInstruction: buildSystemPrompt(patchDisplay),
+            });
+            const fallbackStream = await fallbackModel.generateContentStream(fullUserMessage);
+            let fallbackText = '';
+            for await (const chunk of fallbackStream.stream) {
+              const t = chunk.text();
+              if (t) {
+                fallbackText += t;
+                sendSSE({ phase: 'full', chunk: t });
+              }
+            }
+            const validated = await validateAndCorrectBuild(fallbackText);
+            if (validated !== fallbackText) {
+              sendSSE({ phase: 'full', corrected: validated });
+            }
+            setCache(cacheKey, validated, patchDisplay);
+            sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'gemini-3-flash-preview' });
+            log('INFO', `[dual] Flash fallback full build complete (${fallbackText.length} chars)`);
+            finalText = validated;
+          } catch (fbErr) {
+            log('ERROR', `[dual] Flash fallback also failed: ${fbErr.message}`);
+            // Last resort: stale cache
+            if (cached) {
+              sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
+            }
+          }
+        }
+
         sendSSE({ allDone: true });
         res.end();
       } catch (err) {
@@ -2177,15 +2477,25 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
           const purchasedItemIds = me.items.map((item) => String(item.itemID));
           const purchasedItemNames = me.items.map((item) => (item.displayName || '').toLowerCase().trim()).filter(Boolean);
 
-          // ── Boots detection (handles ADC quest slot) ──
-          // Check if player owns ANY upgraded boots by DDragon 'Boots' tag
-          // This catches boots in regular slots AND the ADC quest slot
+          // ── Boots detection (handles quest slots + renamed boot variants) ──
+          // Check if player owns ANY upgraded boots by DDragon 'Boots' tag OR name pattern
+          const BOOT_NAME_PATTERNS = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots'];
           const isBootsId = (id) => {
             if (!ddragonItemCache || !ddragonItemCache.byId) return false;
             const d = ddragonItemCache.byId.get(String(id));
-            return d && d.tags && d.tags.includes('Boots') && d.gold > 300;
+            if (!d) return false;
+            // Check DDragon 'Boots' tag (standard boots)
+            if (d.tags && d.tags.includes('Boots') && d.gold > 300) return true;
+            // Check name patterns (catches quest boots, renamed variants)
+            const nameLower = (d.name || '').toLowerCase();
+            return BOOT_NAME_PATTERNS.some(p => nameLower.includes(p));
           };
-          const playerHasBoots = purchasedItemIds.some(id => isBootsId(id));
+          // Also check by purchased item NAMES for boots not in DDragon
+          const isBootName = (name) => {
+            const lower = (name || '').toLowerCase();
+            return BOOT_NAME_PATTERNS.some(p => lower.includes(p));
+          };
+          const playerHasBoots = purchasedItemIds.some(id => isBootsId(id)) || purchasedItemNames.some(n => isBootName(n));
           // Collect boot IDs from the build queue
           const buildBootIds = new Set();
           if (overlayData && overlayData.buildItems) {
@@ -2334,6 +2644,7 @@ function checkGameState() {
         liveAdvisorState.originalBuildText = '';
         // Reset all game-specific data so next game starts fresh
         overlayData = null;
+        overlayGeneration = 0;
         cachedScoutReport = null;
         scoutingState.hasRun = false;
         scoutingState.gameId = null;
@@ -2640,6 +2951,8 @@ function parseLolConfig() {
 // Overlay data from renderer → forward to overlay window
 ipcMain.on('overlay-data', (_event, data) => {
   log('INFO', '[main] Received overlay data from renderer');
+  overlayGeneration++;
+  data._generation = overlayGeneration;
   overlayData = data;
   if (overlayWindow && !overlayWindow.isDestroyed()) {
     overlayWindow.webContents.send('overlay-data-update', data);
@@ -2649,11 +2962,13 @@ ipcMain.on('overlay-data', (_event, data) => {
 // Partial item update — merges new items into existing overlay data
 ipcMain.on('update-overlay-items', (_event, newItems) => {
   log('INFO', `[main] Overlay items updated: ${newItems.length} items`);
+  overlayGeneration++;
   if (overlayData) {
     overlayData.buildItems = newItems;
+    overlayData._generation = overlayGeneration;
   }
   if (overlayWindow && !overlayWindow.isDestroyed()) {
-    overlayWindow.webContents.send('overlay-items-update', newItems);
+    overlayWindow.webContents.send('overlay-items-update', newItems, overlayGeneration);
   }
 });
 
@@ -2742,6 +3057,64 @@ ipcMain.handle('lcu-champ-select', async () => {
   const session = await lcuCall('GET', '/lol-champ-select/v1/session');
   if (!session || session.__lcuError || session.__lcuOk) return { ok: false, error: 'No active session or client not connected' };
   return { ok: true, session };
+});
+
+// In-game detection fallback via Live Client API (port 2999)
+ipcMain.handle('lcu-live-game', async () => {
+  const nodeFetch = require('node-fetch');
+  try {
+    const res = await nodeFetch('https://127.0.0.1:2999/liveclientdata/allgamedata', {
+      agent: new (require('https').Agent)({ rejectUnauthorized: false }),
+      timeout: 3000,
+    });
+    if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+    const data = await res.json();
+    if (!data.allPlayers || data.allPlayers.length === 0) return { ok: false, error: 'No players' };
+
+    // Find local player
+    const activePlayer = data.activePlayer;
+    const localName = activePlayer?.riotIdGameName || activePlayer?.summonerName || '';
+    const localPlayer = data.allPlayers.find(p =>
+      (p.riotIdGameName || p.summonerName || '') === localName
+    );
+    if (!localPlayer) return { ok: false, error: 'Cannot identify local player' };
+
+    const myTeam = localPlayer.team; // "ORDER" or "CHAOS"
+
+    // Map position strings from Live Client API to our role format
+    const posMap = {
+      'TOP': 'top', 'JUNGLE': 'jungle', 'MIDDLE': 'mid', 'BOTTOM': 'bottom', 'UTILITY': 'support',
+      'top': 'top', 'jungle': 'jungle', 'middle': 'mid', 'bottom': 'bottom', 'utility': 'support',
+    };
+
+    const myChampion = localPlayer.championName || '';
+    const myPosition = posMap[(localPlayer.position || '').toUpperCase()] || '';
+    const allies = [];
+    const enemies = [];
+
+    for (const p of data.allPlayers) {
+      if (p === localPlayer) continue;
+      const champName = p.championName || '';
+      if (!champName) continue;
+      if (p.team === myTeam) {
+        allies.push(champName);
+      } else {
+        enemies.push(champName);
+      }
+    }
+
+    return {
+      ok: true,
+      source: 'live-game',
+      myChampion,
+      myPosition,
+      allies,
+      enemies,
+      gameTime: data.gameData?.gameTime || 0,
+    };
+  } catch {
+    return { ok: false, error: 'Game not running' };
+  }
 });
 
 // ── Live Game AI Advisor ─────────────────────────────────────────────
@@ -3152,44 +3525,22 @@ async function pollLiveClient() {
     }
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    const selectedModel = 'gemini-3.1-pro-preview'; // Live advisor always uses Pro for deeper analysis
-    sendAdvisorDebug(`[ai] Using model: ${selectedModel} (forced Pro for advisor)`);
+    const selectedModel = 'gemini-3-flash-preview'; // Flash for speed — pre-computed context makes it smart enough
+    sendAdvisorDebug(`[ai] Using model: ${selectedModel} (Flash + pre-computed context)`);
 
-    let threatAnalysis = '';
-    // Reuse cached threat analysis if less than 60s old
-    if (liveAdvisorState._threatCache && (Date.now() - liveAdvisorState._threatCache.time < 60000)) {
-      threatAnalysis = liveAdvisorState._threatCache.text;
-      sendAdvisorDebug(`[ai] Reusing cached threat analysis (${Math.round((Date.now() - liveAdvisorState._threatCache.time) / 1000)}s old)`);
-    } else {
-      const analysisPrompt = `GAME TIME: ${gameMinutes}:${gameSecs.toString().padStart(2, '0')} — PHASE: ${gamePhase}
+    // Fix #6: Eliminate Step 1 AI call — use pre-computed threat analysis instead
+    // The damage profile (damageSection) + enemy item breakdown is already computed above.
+    // No need to waste an AI call asking "what are the threats?" when we've already calculated it.
+    const threatAnalysis = `${damageSection}\nKey threat: ${(() => {
+      const fedEnemy = enemies.find(e => (e.scores?.kills || 0) >= 5 || ((e.scores?.kills || 0) - (e.scores?.deaths || 0)) >= 4);
+      if (fedEnemy) return `${fedEnemy.championName} is FED (${fedEnemy.scores?.kills}/${fedEnemy.scores?.deaths}/${fedEnemy.scores?.assists}) — prioritize countering their damage type`;
+      const strongestEnemy = enemies.reduce((a, b) => ((b.scores?.kills || 0) - (b.scores?.deaths || 0)) > ((a.scores?.kills || 0) - (a.scores?.deaths || 0)) ? b : a, enemies[0]);
+      return strongestEnemy ? `${strongestEnemy.championName} is the primary threat (${strongestEnemy.scores?.kills || 0}/${strongestEnemy.scores?.deaths || 0}/${strongestEnemy.scores?.assists || 0})` : 'No clear primary threat';
+    })()}`;
+    sendAdvisorDebug(`[ai] Pre-computed threat: ${threatAnalysis.substring(0, 100)}...`);
 
-MY CHAMPION: ${myPlayer?.championName || '?'} (Lv${myPlayer?.level || '?'}, ${myPlayer?.scores?.kills || 0}/${myPlayer?.scores?.deaths || 0}/${myPlayer?.scores?.assists || 0})
-MY GOLD: ${activePlayer.currentGold || 0}
-MY ITEMS: [${myItems.join(', ') || 'None'}]
-HAS BOOTS: ${hasBoots ? 'Yes' : 'No'}
-
-ENEMY BUILDS:
-${enemyItemBreakdown}
-
-In 2-3 sentences: What are the key threats from the enemy builds? What type of damage should the player prioritize defending against (AD/AP/mixed)? Are any enemies snowballing?`;
-
-      const analysisModel = genAI.getGenerativeModel({
-        model: selectedModel,
-        systemInstruction: 'You are a League of Legends game analyst. Analyze the enemy team composition and itemization. Be extremely concise — 2-3 sentences max. Focus on actionable counter-building intel.',
-      });
-      
-      try {
-        const analysisResult = await analysisModel.generateContent(analysisPrompt);
-        threatAnalysis = analysisResult.response.text().trim();
-        liveAdvisorState._threatCache = { text: threatAnalysis, time: Date.now() };
-        sendAdvisorDebug(`[ai] Threat analysis: ${threatAnalysis.substring(0, 100)}...`);
-      } catch (err) {
-        sendAdvisorDebug(`[ai] Threat analysis failed: ${err.message} — proceeding with direct advice`);
-      }
-    }
-
-    // Step 2: Build recommendations using the analysis
-    sendAdvisorDebug('[ai] Step 2: Build recommendations...');
+    // Build recommendations using pre-computed analysis
+    sendAdvisorDebug('[ai] Generating build recommendations...');
 
     // ── #6: Advisor Memory — inject previous advice to prevent flip-flopping ──
     const prevAdviceSection = liveAdvisorState.previousAdvice
@@ -3204,7 +3555,12 @@ In 2-3 sentences: What are the key threats from the enemy builds? What type of d
       const validItems = [];
       const alwaysIncludeTags = ['Health', 'Armor', 'SpellBlock']; // defensive items for everyone
       for (const [id, d] of ddragonItemCache.byId) {
+        // CRITICAL: Only include Summoner's Rift items
+        if (!d.isSR) continue;
         if (d.gold < 2000 || !d.from || d.from.length === 0) continue;
+        // Exclude mid-tier components that build INTO other items (e.g., Kindlegem → Spirit Visage)
+        // Same logic as getValidItemsReference() for consistency
+        if (d.into && d.into.length > 0) continue;
         // Check if item is relevant to champion class
         const itemTags = d.tags || [];
         let relevant = false;
@@ -3265,12 +3621,33 @@ Analyze the current game state and provide live build advice.`;
     const model = genAI.getGenerativeModel({
       model: selectedModel,
       systemInstruction: `You are a League of Legends Live Game Advisor.
-You receive the current game state, ENEMY BUILDS, threat analysis, and the player's REMAINING BUILD QUEUE.
+You receive the current game state, ENEMY BUILDS, pre-computed threat analysis, and the player's REMAINING BUILD QUEUE.
 
-Your job:
-1. React to enemy builds — if enemies are stacking armor, suggest magic/true damage items; if AP-heavy, suggest MR
-2. Check if the build queue order is still optimal
-3. Tell the player their next 2 purchases
+Use this decision framework to determine build adjustments:
+
+1. THREAT CHECK:
+   - If ENEMY DAMAGE PROFILE shows a primary threat with 5+ kills → counter their damage type FIRST
+   - If they are AP → prioritize MR (Wit's End, Maw, Kaenic Rookern, Mercury's Treads)
+   - If they are AD → prioritize Armor (Plated Steelcaps, Randuin's, Frozen Heart)
+
+2. DAMAGE SPLIT CHECK:
+   - If ENEMY DAMAGE PROFILE shows 3+ AP → your team needs MR items
+   - If ENEMY DAMAGE PROFILE shows 3+ AD → your team needs Armor items
+   - If damage is balanced → stick with the original build path
+
+3. GOLD EFFICIENCY:
+   - Check GOLD CONTEXT — NEVER suggest a 3400g item if player has 1200g
+   - If gold < 1000g → suggest components only
+   - If gold > 2500g → suggest completed items
+   - If player has components for an item (CURRENTLY BUILDING) → FINISH IT, don't pivot
+
+4. ANTI-HEAL CHECK:
+   - If any enemy has healing items (Bloodthirster, BotRK) or healing champions AND player has no Grievous Wounds → suggest anti-heal
+   - If player already has anti-heal → skip
+
+5. BOOT CHECK:
+   - If player has no boots at 10+ minutes → one of NEXT ITEMS must be boots
+   - If boots type doesn't match enemy damage profile → suggest swap (e.g., Berserker's → Merc Treads vs 3 AP)
 
 Return ONLY this format:
 
@@ -3295,21 +3672,25 @@ THREAT
 
 Rules:
 - ONLY suggest items from the VALID ITEMS list provided. NEVER invent item names or use old/removed items.
-- USE THE ENEMY DAMAGE PROFILE: It tells you exactly how much AD vs AP the enemy team has. Build defensive items accordingly (armor vs MR).
-- REACT TO ENEMY BUILDS: If enemies have armor → suggest armor penetration. If enemies have MR → suggest magic pen. If enemies are full AD → suggest armor. If enemies are full AP → suggest MR.
-- GOLD CONTEXT: Check the player's current gold. Do NOT recommend a 3400g item if they only have 1200g — suggest affordable components or cheaper items instead.
-- OBJECTIVES: If dragon/baron info is provided, factor it into your recommendations (e.g., team with infernal soul → more aggressive builds).
-- BOOTS: If the player has no upgraded boots past 10 minutes, one of NEXT ITEMS should be upgraded boots. For ADCs, upgraded boots go in the quest boot slot but still need to be bought/upgraded.
-- NEXT ITEMS lists the player's next 2 purchases in order. Item 1 = the item they should be building RIGHT NOW (usually the first item in the remaining queue). Item 2 = what to buy after that.
-- If the player is currently building an item (has components), Item 1 MUST be that same item (finish it). Do NOT suggest a different Item 1 — they already invested gold.
-- CHANGES is for swapping items later in the queue (positions 3+). Never swap Item 1 if the player has components for it.
-- SELL SECTION: Only used when the build is 100% complete. Suggest selling an existing item and replacing it ONLY if the replacement is genuinely impactful for the current game state. Do NOT suggest replacements just because you can — the player's current build might be optimal. Max 1 replacement.
-  - For ADC/Marksman champions: Quest boots CANNOT be sold — they can only be swapped for another boots item. NEVER suggest replacing boots with a non-boots item on ADCs. If boots need changing, suggest a boots→boots swap.
-  - For non-ADC champions: Boots can only be sold in ultra-late game (30+ min) when all 6 item slots are occupied.
-- CONSISTENCY: If you gave previous advice, do NOT contradict yourself unless the game state has meaningfully changed. Avoid flip-flopping between items.
-- Use EXACT in-game item names from the VALID ITEMS list. Spelling must match exactly.
+- USE THE ENEMY DAMAGE PROFILE: Build defensive items accordingly (armor vs MR).
+- REACT TO ENEMY BUILDS: If enemies have armor → suggest armor penetration. If enemies have MR → suggest magic pen.
+- GOLD CONTEXT: Do NOT recommend items the player can't afford.
+- BOOTS: If no upgraded boots past 10 minutes, one of NEXT ITEMS should be boots.
+- NEXT ITEMS: Item 1 = building RIGHT NOW. Item 2 = buy after that.
+- If CURRENTLY BUILDING an item (has components), Item 1 MUST be that same item. Do NOT suggest pivoting.
+- CHANGES is for swapping items later in the queue (positions 3+). Never swap Item 1 if player has components.
+- SELL SECTION: Only when build is 100% complete. Max 1 replacement.
+  - ADC quest boots CANNOT be sold — only boots→boots swap.
+  - Non-ADC boots only sold in ultra-late (30+ min) with all slots full.
+- CONSISTENCY: Do NOT flip-flop. Only change if game state significantly shifted.
+- Use EXACT item names from the VALID ITEMS list.
 - Be concise. Max 2-3 changes.
 - GAME PHASE MATTERS: ${phaseGuidance}`,
+      generationConfig: {
+        temperature: 0.3,
+        topP: 0.85,
+        topK: 40,
+      },
     });
 
     const result = await model.generateContent(userMessage);
@@ -3611,10 +3992,17 @@ Rules:
             seenIds.add(updatedItems[i].id);
           }
         }
+        overlayGeneration++;
         overlayData.buildItems = updatedItems;
+        overlayData._generation = overlayGeneration;
         if (overlayWindow && !overlayWindow.isDestroyed()) {
-          overlayWindow.webContents.send('overlay-items-update', updatedItems);
-          sendAdvisorDebug(`[overlay] Pushed ${updatedItems.length} items to overlay (dedup applied)`);
+          overlayWindow.webContents.send('overlay-items-update', updatedItems, overlayGeneration);
+          sendAdvisorDebug(`[overlay] Pushed ${updatedItems.length} items to overlay (gen=${overlayGeneration}, dedup applied)`);
+        }
+        // CRITICAL: Also push updated items to App UI so CORE BUILD section stays in sync
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('build-items-updated', updatedItems);
+          sendAdvisorDebug(`[app-ui] Pushed ${updatedItems.length} updated items to App UI (gen=${overlayGeneration})`);
         }
       }
     }

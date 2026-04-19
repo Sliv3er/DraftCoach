@@ -147,9 +147,9 @@ export interface IconLookups {
 // ── Section keys for parsing AI output ──────────────────────────────
 
 const SECTION_KEYS = [
-  'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
+  'ANALYSIS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
   'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
-  'ENEMY POWER SPIKES', 'WIN CONDITION',
+  'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES',
 ];
 
 function parseSectionsFromText(text: string): { title: string; content: string }[] {
@@ -189,9 +189,9 @@ function resolveComponentPath(
   // Find the item ID
   let itemId = iconLookups.itemIds.get(normName);
   if (!itemId) {
-    // Try partial match
+    // Strict prefix match only
     for (const [key, id] of iconLookups.itemIds.entries()) {
-      if (key.includes(normName) || normName.includes(key)) {
+      if (key === normName || key.startsWith(normName + ' ') || normName.startsWith(key + ' ')) {
         itemId = id;
         break;
       }
@@ -277,7 +277,7 @@ function extractOverlayData(
   const CONSUMABLES_TO_IGNORE = new Set([
     'health potion', 'refillable potion', 'corrupting potion',
     'biscuit of total restoration', 'total biscuit of rejuvenation',
-    'scorched claw', 'gustwalker hatchling', 'mosstomper seedling',
+    // Jungle companions intentionally NOT excluded — they are real starting items
     'stealth ward', 'oracle lens', 'farsight alteration', 'control ward',
     'wardstone', 'vigilant wardstone', 'watchful wardstone',
   ]);
@@ -303,11 +303,22 @@ function extractOverlayData(
         .replace(/\s*\([^)]*\)\s*$/, '')
         .trim();
       if (!itemName || isConsumable(itemName)) continue;
-      const normName = itemName.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+      // Resolve aliases (e.g. "Hatchling" → "Gustwalker Hatchling")
+      const OVERLAY_ALIASES: Record<string, string> = {
+        'hatchling': 'gustwalker hatchling', 'seedling': 'mosstomper seedling',
+        'scorchclaw': 'scorchclaw pup', 'scorched claw': 'scorchclaw pup',
+        'gustwalker': 'gustwalker hatchling', 'mosstomper': 'mosstomper seedling',
+      };
+      const rawNorm = itemName.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+      const normName = OVERLAY_ALIASES[rawNorm] || rawNorm;
       let itemId: string | undefined = iconLookups.itemIds.get(normName);
       if (!itemId) {
+        // Strict prefix matching only — don't match "luden's companion" to random "luden" items
         for (const [key, id] of iconLookups.itemIds.entries()) {
-          if (key.includes(normName) || normName.includes(key)) { itemId = id; break; }
+          if (key === normName || key.startsWith(normName + ' ') || normName.startsWith(key + ' ')) {
+            itemId = id;
+            break;
+          }
         }
       }
       if (itemId) {
@@ -371,17 +382,22 @@ export function App() {
   const autoDetectRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const champKeyMapRef = useRef<Map<string, { id: string; name: string }>>(new Map());
   const autoGenKeyRef = useRef<string>(''); // track last auto-generated combo to avoid repeated calls
+  const buildGeneratedRef = useRef<boolean>(false); // once a build is generated, lock champion detection
+  const lastSessionIdRef = useRef<string>(''); // track champ select session to avoid resetting lock every poll tick
 
   // ── New UI state: RAG, overlay, settings ───────────────────────
   const [ragStatus, setRagStatus] = useState<RagStatus>({ isUpdating: false, patch: null, updatedAt: null });
   const [overlayHasData, setOverlayHasData] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<Record<string, any>>({});
+  const [runesModel, setRunesModel] = useState('');
+  const [buildModel, setBuildModel] = useState('');
 
   // ── Live Advisor state ─────────────────────────────────────────
   const [liveAdvice, setLiveAdvice] = useState<any>(null);
   const [liveAdvisorActive, setLiveAdvisorActive] = useState(false);
   const [advisorDebugLog, setAdvisorDebugLog] = useState<string[]>([]);
+  const [liveUpdatedItems, setLiveUpdatedItems] = useState<any[] | null>(null);  // Items updated by live advisor
 
   // ── Scouting Report state ──────────────────────────────────────
   const [scoutReport, setScoutReport] = useState<any>(null);
@@ -413,6 +429,12 @@ export function App() {
     ipcRenderer.on('live-advisor-stopped', stoppedHandler);
     const startedHandler = () => { setLiveAdvisorActive(true); };
     ipcRenderer.on('live-advisor-started', startedHandler);
+    // Live advisor pushed updated items — sync to App UI CORE BUILD
+    const buildItemsHandler = (_event: any, items: any[]) => {
+      console.log('[App] Received build-items-updated from live advisor:', items.length, 'items');
+      setLiveUpdatedItems(items);
+    };
+    ipcRenderer.on('build-items-updated', buildItemsHandler);
     // When game ends, clear all game-specific UI
     const gameEndedHandler = () => {
       setBuildResult(null);
@@ -429,6 +451,9 @@ export function App() {
       setStatus('idle');
       // Clear the auto-generate key so the next draft triggers a fresh build
       autoGenKeyRef.current = '';
+      lastSessionIdRef.current = '';
+      // Clear live-updated items so next game starts fresh
+      setLiveUpdatedItems(null);
     };
     ipcRenderer.on('game-ended', gameEndedHandler);
     return () => {
@@ -442,6 +467,7 @@ export function App() {
       ipcRenderer.removeListener('live-advisor-stopped', stoppedHandler);
       ipcRenderer.removeListener('live-advisor-started', startedHandler);
       ipcRenderer.removeListener('game-ended', gameEndedHandler);
+      ipcRenderer.removeListener('build-items-updated', buildItemsHandler);
     };
   }, []);
 
@@ -574,6 +600,9 @@ export function App() {
     if (!myChampion) return;
     setStatus('fetching');
     setBuildResult(null);
+    setRunesModel('');
+    setBuildModel('');
+    // Don't reset buildGeneratedRef here — auto-detect will unlock on new champ select session
 
     try {
       const response = await fetch(`${API_BASE}/api/build-dual`, {
@@ -633,6 +662,7 @@ export function App() {
               if (payload.corrected) runesFinalText = payload.corrected;
               if (payload.done) {
                 runesFinalText = payload.fullText || runesFinalText || runesStreamedText;
+                if (payload.model) setRunesModel(payload.model);
                 console.log('[App] ⚡ Flash runes ready — auto-importing...');
 
                 // Auto-import runes IMMEDIATELY from Flash
@@ -660,6 +690,11 @@ export function App() {
 
             // ── Pro: Full build phase ──
             if (payload.phase === 'full') {
+              if (payload.error) {
+                // Pro model failed — backend will retry with Flash. Reset streamed text.
+                console.warn('[App] Pro full build error (retrying with Flash):', payload.error);
+                fullStreamedText = '';
+              }
               if (payload.chunk) {
                 fullStreamedText += payload.chunk;
                 // Only start showing Pro's text once it has enough content (RUNES section at minimum)
@@ -672,6 +707,7 @@ export function App() {
                 fullPhaseDone = true;
                 fullFinalText = payload.fullText || fullFinalText || fullStreamedText;
                 source = payload.source || source;
+                if (payload.model) setBuildModel(payload.model);
                 // Immediately show the final Pro build
                 setBuildResult({ ok: true, source: source as any, patchDetected: patchUsed, text: fullFinalText } as BuildResponse);
               }
@@ -704,6 +740,7 @@ export function App() {
 
       if (data.ok) {
         setStatus(data.source === 'grounded' ? 'grounded' : data.source === 'cache' ? 'cache' : 'stale-cache');
+        buildGeneratedRef.current = true; // Lock champion detection — no more Viego re-gen
 
         // Only send overlay/advisor/item-export when Pro's FULL build is available
         if (data.text && proComplete) {
@@ -753,15 +790,16 @@ export function App() {
   // ── Auto-generate when all 10 champions are locked in ──
   useEffect(() => {
     if (!autoDetect) return;
+    if (status === 'fetching') return; // Already generating — don't stack duplicate calls
     // Need: 1 myChampion + 4 allies + 5 enemies = 10
     if (!myChampion || allies.length < 4 || enemies.length < 5) return;
     // Build a key so we don't re-trigger for the same exact draft
-    const comboKey = `${myChampion}|${role}|${allies.sort().join(',')}|${enemies.sort().join(',')}`;
+    const comboKey = `${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}`;
     if (autoGenKeyRef.current === comboKey) return;
     autoGenKeyRef.current = comboKey;
     console.log('[App] All 10 champions detected — auto-generating build');
     handleGenerate();
-  }, [autoDetect, myChampion, role, allies, enemies, handleGenerate]);
+  }, [autoDetect, myChampion, role, allies, enemies, status, handleGenerate]);
 
   // Listen for force-regenerate from main process (CTRL+SHIFT+G)
   useEffect(() => {
@@ -783,49 +821,140 @@ export function App() {
     setStatus('idle');
   }, []);
 
-  // Auto-detect: poll LCU for champ select session
+  // Auto-detect: poll LCU for champ select session, with in-game fallback
   const pollLCU = useCallback(async () => {
     try {
+      // ── Attempt 1: Champ Select (LCU API) ──
       const result = await ipcRenderer.invoke('lcu-champ-select');
-      if (!result || !result.ok) {
-        setAutoDetectStatus('searching');
+      if (result?.ok) {
+        setAutoDetectStatus('connected');
+        // Only reset lock when a genuinely NEW champ select session starts
+        // (not on every 2s poll tick — that was causing 3-4x duplicate builds)
+        const session = result.session;
+        const sessionId = `${session.localPlayerCellId}-${session.gameId || session.counter || 'x'}`;
+        if (lastSessionIdRef.current !== sessionId) {
+          lastSessionIdRef.current = sessionId;
+          buildGeneratedRef.current = false;
+          autoGenKeyRef.current = '';
+          console.log('[App] New champ select session detected — unlocking auto-generate');
+        }
+        const localCellId = session.localPlayerCellId;
+        const keyMap = champKeyMapRef.current;
+
+        const myPick = session.myTeam?.find((p: any) => p.cellId === localCellId);
+        if (myPick && myPick.championId && myPick.championId !== 0) {
+          const champ = keyMap.get(String(myPick.championId));
+          if (champ) setMyChampion(champ.id);
+        }
+
+        if (myPick?.assignedPosition) {
+          const mappedRole = LCU_POSITION_MAP[myPick.assignedPosition.toLowerCase()];
+          if (mappedRole) setRole(mappedRole);
+        }
+
+        const allyIds: string[] = [];
+        for (const p of session.myTeam || []) {
+          if (p.cellId === localCellId) continue;
+          if (p.championId && p.championId !== 0) {
+            const champ = keyMap.get(String(p.championId));
+            if (champ) allyIds.push(champ.id);
+          }
+        }
+        // Only update if we have at least as many picks as before
+        if (allyIds.length > 0) {
+          setAllies(prev => allyIds.length >= prev.length ? allyIds : prev);
+        }
+
+        const enemyIds: string[] = [];
+        for (const p of session.theirTeam || []) {
+          if (p.championId && p.championId !== 0) {
+            const champ = keyMap.get(String(p.championId));
+            if (champ) enemyIds.push(champ.id);
+          }
+        }
+        if (enemyIds.length > 0) {
+          setEnemies(prev => enemyIds.length >= prev.length ? enemyIds : prev);
+        }
+        return; // champ select worked, no fallback needed
+      }
+
+      // ── Attempt 2: Live Game (port 2999 API) ──
+      // IMPORTANT: Once a build is generated, do NOT update champions from live game.
+      // Viego's passive changes his championName mid-game, which would trigger re-generation.
+      if (buildGeneratedRef.current) {
+        // Build already generated — just maintain connection status, don't update champs
+        try {
+          const liveResult = await ipcRenderer.invoke('lcu-live-game');
+          if (liveResult?.ok) setAutoDetectStatus('connected');
+        } catch {}
         return;
       }
 
-      setAutoDetectStatus('connected');
-      const session = result.session;
-      const localCellId = session.localPlayerCellId;
-      const keyMap = champKeyMapRef.current;
+      const liveResult = await ipcRenderer.invoke('lcu-live-game');
+      if (liveResult?.ok) {
+        setAutoDetectStatus('connected');
+        const keyMap = champKeyMapRef.current;
 
-      const myPick = session.myTeam?.find((p: any) => p.cellId === localCellId);
-      if (myPick && myPick.championId && myPick.championId !== 0) {
-        const champ = keyMap.get(String(myPick.championId));
-        if (champ) setMyChampion(champ.id);
-      }
-
-      if (myPick?.assignedPosition) {
-        const mappedRole = LCU_POSITION_MAP[myPick.assignedPosition.toLowerCase()];
-        if (mappedRole) setRole(mappedRole);
-      }
-
-      const allyIds: string[] = [];
-      for (const p of session.myTeam || []) {
-        if (p.cellId === localCellId) continue;
-        if (p.championId && p.championId !== 0) {
-          const champ = keyMap.get(String(p.championId));
-          if (champ) allyIds.push(champ.id);
+        // Resolve champion name → DDragon ID (keyMap is keyed by champion key,
+        // so we need a reverse name lookup)
+        const nameToId = new Map<string, string>();
+        for (const [, val] of keyMap) {
+          nameToId.set(val.name.toLowerCase(), val.id);
         }
-      }
-      if (allyIds.length > 0) setAllies(allyIds);
-
-      const enemyIds: string[] = [];
-      for (const p of session.theirTeam || []) {
-        if (p.championId && p.championId !== 0) {
-          const champ = keyMap.get(String(p.championId));
-          if (champ) enemyIds.push(champ.id);
+        // Also add exact IDs (e.g. "Aatrox" → "Aatrox")
+        for (const [, val] of keyMap) {
+          nameToId.set(val.id.toLowerCase(), val.id);
         }
+
+        const resolveChamp = (name: string): string | null => {
+          const lower = name.toLowerCase();
+          // Try exact name match
+          if (nameToId.has(lower)) return nameToId.get(lower)!;
+          // Try without spaces/special chars
+          const stripped = lower.replace(/['\s]/g, '');
+          for (const [key, id] of nameToId) {
+            if (key.replace(/['\s]/g, '') === stripped) return id;
+          }
+          return null;
+        };
+
+        // Set my champion
+        const myChampId = resolveChamp(liveResult.myChampion);
+        if (myChampId) setMyChampion(myChampId);
+
+        // Set role — map 'bottom' → 'adc' for frontend consistency
+        if (liveResult.myPosition) {
+          const LIVE_ROLE_MAP: Record<string, Role> = {
+            top: 'top', jungle: 'jungle', mid: 'mid', bottom: 'adc', support: 'support',
+          };
+          const mappedRole = LIVE_ROLE_MAP[liveResult.myPosition];
+          if (mappedRole) setRole(mappedRole);
+        }
+
+        // Set allies
+        const liveAllies: string[] = [];
+        for (const name of liveResult.allies || []) {
+          const id = resolveChamp(name);
+          if (id) liveAllies.push(id);
+        }
+        if (liveAllies.length > 0) {
+          setAllies(prev => liveAllies.length >= prev.length ? liveAllies : prev);
+        }
+
+        // Set enemies
+        const liveEnemies: string[] = [];
+        for (const name of liveResult.enemies || []) {
+          const id = resolveChamp(name);
+          if (id) liveEnemies.push(id);
+        }
+        if (liveEnemies.length > 0) {
+          setEnemies(prev => liveEnemies.length >= prev.length ? liveEnemies : prev);
+        }
+        return;
       }
-      if (enemyIds.length > 0) setEnemies(enemyIds);
+
+      // Neither champ select nor live game available
+      setAutoDetectStatus('searching');
     } catch {
       setAutoDetectStatus('searching');
     }
@@ -1010,9 +1139,15 @@ export function App() {
               {status === 'stale-cache' && '⚠ Stale cache (AI unavailable)'}
               {status === 'error' && '✗ Error'}
             </span>
+            {(runesModel || buildModel) && (status === 'grounded' || status === 'cache' || status === 'stale-cache') && (
+              <span style={{ marginLeft: 10, fontSize: '10px', color: 'var(--text-secondary)', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                {runesModel && <span style={{ background: 'rgba(200, 170, 110, 0.12)', border: '1px solid rgba(200, 170, 110, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#c8aa6e' }}>⚡ {runesModel.replace('gemini-', '').replace('-preview', '')}</span>}
+                {buildModel && <span style={{ background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#6ba3f7' }}>🧠 {buildModel.replace('gemini-', '').replace('-preview', '')}</span>}
+              </span>
+            )}
           </div>
 
-          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} />
+          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} liveUpdatedItems={liveUpdatedItems} />
 
           {/* ── Live Advisor Panel ── */}
           <div className="live-advisor-section">
@@ -1064,7 +1199,7 @@ export function App() {
                         let url = iconLookups.items.get(norm);
                         if (!url) {
                           for (const [key, val] of iconLookups.items.entries()) {
-                            if (key.includes(norm) || norm.includes(key)) { url = val; break; }
+                            if (key === norm || key.startsWith(norm + ' ') || norm.startsWith(key + ' ')) { url = val; break; }
                           }
                         }
                         return url || '';
@@ -1102,7 +1237,7 @@ export function App() {
                     let url = iconLookups.items.get(norm);
                     if (!url) {
                       for (const [key, val] of iconLookups.items.entries()) {
-                        if (key.includes(norm) || norm.includes(key)) { url = val; break; }
+                        if (key === norm || key.startsWith(norm + ' ') || norm.startsWith(key + ' ')) { url = val; break; }
                       }
                     }
                     return url || '';
@@ -1185,6 +1320,25 @@ export function App() {
           <div className="settings-header">
             <h2>⚙️ Settings</h2>
             <button className="settings-close" onClick={() => setSettingsOpen(false)}>✕</button>
+          </div>
+
+          <div className="settings-group">
+            <div className="settings-group-title">AI & Generation</div>
+            <label className="settings-toggle-row">
+              <span>Generation Mode</span>
+              <select
+                className="game-mode-select"
+                style={{ width: '150px' }}
+                value={settings.generationMode || 'hybrid'}
+                onChange={e => handleSettingChange('generationMode', e.target.value)}
+              >
+                <option value="hybrid">Hybrid (Flash & Pro)</option>
+                <option value="flash">Speed (Flash Only)</option>
+              </select>
+            </label>
+            <div className="settings-desc">
+              Hybrid uses Pro for deeper analysis (~22s). Speed uses Flash for instant results (~7s).
+            </div>
           </div>
 
           <div className="settings-group">

@@ -2,12 +2,21 @@ import React from 'react';
 import { BuildResponse } from '../../types';
 import { IconLookups } from '../App';
 
+interface LiveUpdatedItem {
+  name: string;
+  iconUrl: string;
+  gold: number;
+  id: string;
+  reason?: string;
+}
+
 interface Props {
   result: BuildResponse | null;
   iconLookups: IconLookups | null;
   loading?: boolean;
   championId?: string;
   role?: string;
+  liveUpdatedItems?: LiveUpdatedItem[] | null;  // Items updated by live advisor
 }
 
 import { ipcRenderer } from 'electron';
@@ -15,9 +24,9 @@ import { ipcRenderer } from 'electron';
 // Item name resolution and extraction now handled in main process
 
 const SECTION_KEYS = [
-  'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
+  'ANALYSIS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
   'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
-  'ENEMY POWER SPIKES', 'WIN CONDITION',
+  'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES',
 ];
 
 function parseSections(text: string): { title: string; content: string }[] {
@@ -53,35 +62,71 @@ function IconImg({ src, alt, className }: { src?: string; alt: string; className
   return <img src={src} alt={alt} className={className} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />;
 }
 
+// Known bad icon URLs that show as "recall" or placeholder — never return these
+const BAD_ICON_PATTERNS = ['/item/0.png', '/item/7050.png', '/item/2010.png'];
+
+function isValidIconUrl(url: string): boolean {
+  if (!url) return false;
+  for (const bad of BAD_ICON_PATTERNS) {
+    if (url.includes(bad)) return false;
+  }
+  return true;
+}
+
+// Aliases for items the AI commonly abbreviates (jungle companions, Doran's, etc.)
+const ITEM_ALIASES: Record<string, string> = {
+  'hatchling': 'gustwalker hatchling',
+  'seedling': 'mosstomper seedling',
+  'scorchclaw': 'scorchclaw pup',
+  'scorched claw': 'scorchclaw pup',
+  'gustwalker': 'gustwalker hatchling',
+  'mosstomper': 'mosstomper seedling',
+  'jungle companion': 'gustwalker hatchling',
+};
+
 function findIcon(name: string, map?: Map<string, string>): string | undefined {
   if (!map || !name) return undefined;
-  const n = name.toLowerCase().trim()
+  let n = name.toLowerCase().trim()
     .replace(/['']/g, "'")  // normalize quotes
     .replace(/\s+/g, ' ');  // normalize spaces
 
-  // Exact match
-  if (map.has(n)) return map.get(n);
+  // Check alias table first (e.g. "Hatchling" → "gustwalker hatchling")
+  if (ITEM_ALIASES[n]) n = ITEM_ALIASES[n];
+
+  // Exact match (highest confidence)
+  if (map.has(n)) {
+    const url = map.get(n)!;
+    return isValidIconUrl(url) ? url : undefined;
+  }
 
   // Try without leading markers like "Legend: "
   const colonIdx = n.indexOf(':');
   if (colonIdx > 0 && colonIdx < 15) {
     const afterColon = n.slice(colonIdx + 1).trim();
-    if (map.has(afterColon)) return map.get(afterColon);
-    // Also try full "legend: tenacity" form
-    const fullForm = n;
-    if (map.has(fullForm)) return map.get(fullForm);
+    if (map.has(afterColon)) {
+      const url = map.get(afterColon)!;
+      return isValidIconUrl(url) ? url : undefined;
+    }
   }
 
-  // Try partial/substring match (find the first key that contains or is contained by the search)
+  // For items: only do strict prefix matching, NOT loose substring matching.
+  // The old `key.includes(n) || n.includes(key)` was too aggressive and would
+  // match "Luden's Companion" to random items containing "luden".
+  // Only match if the DDragon key STARTS WITH our search name or vice versa.
   for (const [key, val] of map.entries()) {
-    if (key.includes(n) || n.includes(key)) return val;
+    if (key === n || key.startsWith(n + ' ') || n.startsWith(key + ' ')) {
+      return isValidIconUrl(val) ? val : undefined;
+    }
   }
 
-  // Try matching just the first word (e.g., "Gustwalker" matches "Gustwalker Hatchling")
-  const firstWord = n.split(' ')[0];
-  if (firstWord.length >= 4) {
+  // Try matching just the first significant word (at least 5 chars to avoid false matches)
+  const words = n.split(' ');
+  const firstWord = words[0];
+  if (firstWord.length >= 5 && words.length <= 3) {
     for (const [key, val] of map.entries()) {
-      if (key.startsWith(firstWord)) return val;
+      if (key.startsWith(firstWord) && key.split(' ').length <= 4) {
+        return isValidIconUrl(val) ? val : undefined;
+      }
     }
   }
 
@@ -254,19 +299,57 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
         if (reasonMatch) { text = reasonMatch[1].trim(); reason = reasonMatch[2].trim(); }
 
         const itemName = text.trim();
+        const iconSrc = findIcon(itemName, lookups?.items);
         return (
           <div key={i} className="item-card">
             {numbered && num && <span className="item-number">{num}.</span>}
             <div className="item-card-icon-wrap">
-              <IconImg src={findIcon(itemName, lookups?.items)} alt={itemName} className="item-card-icon" />
+              {iconSrc ? (
+                <IconImg src={iconSrc} alt={itemName} className="item-card-icon" />
+              ) : (
+                <div className="item-card-icon-missing" title="Item not found in DDragon — may be removed">⚠</div>
+              )}
             </div>
             <div className="item-card-info">
               <span className="item-card-name">{itemName}</span>
+              {!iconSrc && <span className="item-card-removed-tag">Not found</span>}
               {reason && <span className="item-card-reason">{reason}</span>}
             </div>
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Render live-updated items from the advisor (replaces stale CORE BUILD text)
+function renderLiveUpdatedItems(items: LiveUpdatedItem[]) {
+  return (
+    <div className="items-list">
+      {items.map((item, i) => {
+        const iconSrc = item.iconUrl && item.iconUrl.length > 0 ? item.iconUrl : undefined;
+        return (
+          <div key={`live-${i}-${item.id || item.name}`} className="item-card">
+            <span className="item-number">{i + 1}.</span>
+            <div className="item-card-icon-wrap">
+              {iconSrc ? (
+                <IconImg src={iconSrc} alt={item.name} className="item-card-icon" />
+              ) : (
+                <div className="item-card-icon-missing" title="Item not found in DDragon — may be removed">⚠</div>
+              )}
+            </div>
+            <div className="item-card-info">
+              <span className="item-card-name">{item.name}</span>
+              {!iconSrc && <span className="item-card-removed-tag">Not found</span>}
+              {item.reason && <span className="item-card-reason">{item.reason}</span>}
+              {item.gold > 0 && <span className="item-card-reason">{item.gold}g</span>}
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
+        🔴 Updated by Live Advisor
+      </div>
     </div>
   );
 }
@@ -373,8 +456,40 @@ function renderWinCondition(content: string) {
   );
 }
 
+function renderAnalysis(content: string) {
+  const lines = content.split('\n').filter(l => l.trim());
+  return (
+    <div style={{
+      padding: '10px 14px',
+      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(168, 85, 247, 0.03) 100%)',
+      border: '1px solid rgba(168, 85, 247, 0.2)',
+      borderRadius: '8px',
+      fontSize: '12px',
+      lineHeight: '1.7',
+      color: 'var(--text-secondary)',
+    }}>
+      {lines.map((line, i) => {
+        const cleaned = line.trim().replace(/\*\*/g, '');
+        const colonIdx = cleaned.indexOf(':');
+        if (colonIdx > 0 && colonIdx < 25) {
+          const label = cleaned.slice(0, colonIdx).trim();
+          const value = cleaned.slice(colonIdx + 1).trim();
+          return (
+            <div key={i} style={{ marginBottom: '3px' }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '12px' }}>{label}: </span>
+              <span>{value}</span>
+            </div>
+          );
+        }
+        return <div key={i}>{cleaned}</div>;
+      })}
+    </div>
+  );
+}
+
 function renderSection(title: string, content: string, lookups: IconLookups | null) {
   switch (title) {
+    case 'ANALYSIS': return renderAnalysis(content);
     case 'RUNES': return renderRunes(content, lookups);
     case 'SUMMONERS': return renderSummoners(content, lookups);
     case 'SKILL ORDER': return renderSkillOrder(content);
@@ -383,12 +498,13 @@ function renderSection(title: string, content: string, lookups: IconLookups | nu
     case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
     case 'JUNGLE PATH': return renderJunglePath(content);
     case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
+    case 'YOUR POWER SPIKES': return renderPowerSpikes(content);
     case 'WIN CONDITION': return renderWinCondition(content);
     default: return <div className="build-output" style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
   }
 }
 
-export function BuildOutput({ result, iconLookups, loading, championId, role }: Props) {
+export function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems }: Props) {
   const [exportStatus, setExportStatus] = React.useState<string | null>(null);
 
   const handleExport = React.useCallback(async () => {
@@ -482,7 +598,11 @@ export function BuildOutput({ result, iconLookups, loading, championId, role }: 
                 Copy
               </button>
             </div>
-            {renderSection(s.title, s.content, iconLookups)}
+            {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
+            {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
+              ? renderLiveUpdatedItems(liveUpdatedItems)
+              : renderSection(s.title, s.content, iconLookups)
+            }
           </div>
         ))
       ) : (

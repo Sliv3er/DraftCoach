@@ -5,6 +5,8 @@ node_modules/
 dist/
 dist-electron/
 apps/desktop/dist/
+apps/desktop-tauri/dist/
+apps/desktop-tauri/src-tauri/target/
 apps/backend/dist/
 shared/engine/dist/
 release/
@@ -35,6 +37,9 @@ tps_content.txt
 
 # Python scripts (non-project)
 convert_*.py
+
+# OpenCode AI config (contains API keys)
+opencode.json
 
 # Package lock at root (monorepo — each app has its own)
 package-lock.json

@@ -101,68 +101,39 @@ Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini A
 ```
 DraftCoach/
 ├── apps/
-│   ├── desktop/                  # Electron + React frontend
-│   │   ├── src/
-│   │   │   ├── main/
-│   │   │   │   ├── main.js       # Electron main process (embedded Express + LCU + overlay)
-│   │   │   │   ├── engine-js.js  # Local decision engine bridge
-│   │   │   │   ├── settings.js   # User settings persistence
-│   │   │   │   ├── crash-logger.js
-│   │   │   │   └── cooldowns/    # Cooldown timer manager
-│   │   │   └── renderer/
-│   │   │       ├── App.tsx           # Main React app (build UI, champion picker)
-│   │   │       ├── Overlay.tsx       # In-game transparent HUD overlay
-│   │   │       ├── ScoreboardWindow.tsx  # Live scoreboard with cooldown tracking
-│   │   │       ├── ScoutWindow.tsx   # Pre-game scouting report
-│   │   │       ├── StatsWindow.tsx   # Performance analytics dashboard
-│   │   │       ├── TrackerPanel.tsx   # Compact cooldown tracker
-│   │   │       ├── components/
-│   │   │       │   └── BuildOutput.tsx  # Build display with runes, items, spells
-│   │   │       ├── validateBuild.ts  # Build validation logic
-│   │   │       └── styles.css        # All UI styles (dark theme)
-│   │   └── dist/                 # Webpack production bundle
-│   └── backend/                  # Express backend (embedded in production)
-│       └── src/
-│           ├── routes/
-│           │   └── build.ts      # /api/build, /api/version, /api/stats
-│           └── services/
-│               ├── gemini.ts     # Gemini AI integration
-│               ├── live-advisor.ts   # Real-time build advisor (Gemini Flash)
-│               ├── rag-updater.ts    # RAG context updater
-│               ├── stats.ts      # Player stats service
-│               ├── ddragon.ts    # DDragon version fetcher
-│               └── cache.ts      # File-based response cache
+│   ├── desktop-tauri/            # Tauri + React frontend
+│   │   ├── src-tauri/            # Rust backend (Window management & Sidecar lifecycle)
+│   │   │   ├── src/lib.rs        # Main Tauri setup and Rust commands
+│   │   │   └── tauri.conf.json   # Tauri configuration and bundle settings
+│   │   ├── sidecar/              # Node.js Sidecar (Original backend runner)
+│   │   │   └── backend.js        # Shim layer (fakes Electron APIs, pipes IPC to HTTP/SSE)
+│   │   ├── src/                  # React Frontend
+│   │   │   ├── App.tsx           # Main React app (build UI, champion picker)
+│   │   │   ├── Overlay.tsx       # In-game transparent HUD overlay (click-through)
+│   │   │   ├── ScoreboardWindow.tsx  # Live scoreboard with cooldown tracking
+│   │   │   ├── ScoutWindow.tsx   # Pre-game scouting report
+│   │   │   ├── StatsWindow.tsx   # Performance analytics dashboard
+│   │   │   ├── TrackerPanel.tsx   # Compact cooldown tracker
+│   │   │   ├── bridge.ts         # Dual-mode bridge (routes calls to Tauri or IPC Proxy)
+│   │   │   └── styles.css        # All UI styles (dark theme)
+│   │   └── dist/                 # Vite production bundle
+│   └── desktop/                  # Legacy backend source files & knowledge base
+│       └── src/main/
+│           ├── main.js           # Monolithic backend (Express + LCU + game logic)
+│           ├── engine-js.js      # Local decision engine bridge
+│           └── settings.js       # User settings persistence
 ├── shared/                       # Shared TypeScript modules
 │   ├── engine/                   # Local decision engine (<30ms builds)
-│   │   ├── engine.ts             # Main orchestrator
-│   │   ├── scoring.ts            # Multi-factor item/rune scoring
-│   │   ├── resolver.ts           # Item/rune resolver from KB
-│   │   ├── rule-engine.ts        # Triggered rules system
-│   │   ├── rules.ts              # Rule definitions
-│   │   ├── comp-profiler.ts      # Team composition profiler
-│   │   └── explainer.ts          # Human-readable explanation generator
 │   ├── kb/                       # Knowledge Base system
-│   │   ├── kb-loader.ts          # KB data loader
-│   │   ├── kb-manager.ts         # Lifecycle manager (hot-reload, rollback)
-│   │   ├── kb-validator.ts       # Validation pipeline
-│   │   └── data/                 # Champion, item, matchup JSON files
-│   ├── lcu/
-│   │   └── lcu-adapter.ts        # League Client WebSocket adapter
-│   ├── export/
-│   │   └── rune-export.ts        # Rune page LCU export
-│   ├── cooldowns/
-│   │   └── cooldown-data.js      # Summoner spell & ult cooldown database
-│   ├── types.ts                  # Shared type definitions
-│   └── engine-types.ts           # Engine-specific types
+│   ├── lcu/                      # League Client WebSocket adapter
+│   └── export/                   # Rune page LCU export
 └── tools/
-    ├── generate-champions.js     # DDragon champion data scraper
-    ├── generate-items.js         # DDragon item data scraper
-    └── meta-builder/             # KB builder CLI (generate, validate, deep-gen)
+    ├── meta-builder/             # KB builder CLI (generate, validate, deep-gen)
 ```
 
-**Production:** The Electron main process embeds a full Express server — no separate backend process needed. The renderer communicates with `http://127.0.0.1:3210`.
+**Production:** The Tauri Rust backend automatically launches the Node.js sidecar on startup. The sidecar intercepts Electron API calls from the legacy `main.js` backend and runs the Express server on `http://127.0.0.1:3210` and an IPC proxy on `http://127.0.0.1:3211`.
 
-**Development:** Backend runs standalone, desktop connects to it via the same port.
+**Development:** Run `npm run tauri dev` from the `apps/desktop-tauri` directory. The Vite dev server proxies API calls to the sidecar.
 
 ---
 
@@ -206,20 +177,19 @@ cp .env.example .env
 ### Development
 
 ```bash
-# Start desktop app (webpack dev server + Electron)
-npm run dev
-
-# Or run backend standalone
-cd apps/backend && npm run dev
+# Start desktop app (Vite dev server + Tauri)
+cd apps/desktop-tauri
+npm run tauri dev
 ```
 
 ### Production Build
 
 ```bash
-# Build everything + package Electron app
-npm run build:desktop
+# Build Vite frontend + Tauri Rust app + NSIS Installer
+cd apps/desktop-tauri
+npm run tauri build
 
-# Output: apps/desktop/dist-electron/win-unpacked/DraftCoach.exe
+# Output: apps/desktop-tauri/src-tauri/target/release/bundle/nsis/DraftCoach_<version>_x64-setup.exe
 ```
 
 ### Running Tests
@@ -251,13 +221,13 @@ In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next t
 
 | Layer | Technology |
 |-------|-----------|
-| Desktop | Electron 28 |
-| Frontend | React 18 + TypeScript |
-| Backend | Express (embedded in main process) |
+| Desktop | Tauri v2 (Rust) |
+| Frontend | React 18 + TypeScript + Vite |
+| Backend | Node.js Sidecar running Express Proxy |
 | AI (Builds) | Google Gemini 3.1 Pro with Search Grounding |
 | AI (Live) | Google Gemini 3 Flash (real-time advisor) |
 | Local Engine | Custom rules-based scoring engine (<30ms) |
-| Build | Webpack 5 + electron-builder |
+| Build | Tauri CLI (NSIS Installer) |
 | Data | Riot DDragon CDN + CommunityDragon |
 | Client API | League Client Update (LCU) WebSocket |
 | Game API | Riot Live Client Data API |
@@ -267,19 +237,20 @@ In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next t
 
 ## Roadmap
 
-- [x] ~~Auto-detect champ select via League Client API (LCU)~~ ✅
-- [x] ~~Rune page auto-import~~ ✅
-- [x] ~~In-game overlay~~ ✅
-- [x] ~~Live cooldown tracking~~ ✅
-- [x] ~~Player scouting~~ ✅
-- [x] ~~Performance stats dashboard~~ ✅
-- [x] ~~Local decision engine~~ ✅
-- [x] ~~Live build advisor~~ ✅
-- [x] ~~App icon and installer~~ ✅
+- [x] Auto-detect champ select via League Client API (LCU)
+- [x] Rune page auto-import
+- [x] In-game overlay
+- [x] Live cooldown tracking
+- [x] Player scouting
+- [x] Performance stats dashboard
+- [x] Local decision engine
+- [x] Live build advisor
+- [x] App icon and installer
+- [x] **Migrated from Electron to Tauri v2 (97% smaller installer, 74MB -> 2MB)**
 - [ ] Match history analysis with AI coaching
 - [ ] Multi-language support
 - [ ] macOS / Linux builds
-- [ ] Auto-updater
+- [ ] Tauri Auto-updater setup
 
 ---
 

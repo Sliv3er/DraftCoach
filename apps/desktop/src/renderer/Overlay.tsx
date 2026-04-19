@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ipcRenderer } from 'electron';
 
 // ── Types ──
@@ -83,6 +83,7 @@ export function Overlay() {
     const [enemies, setEnemies] = useState<any[]>([]);
     const [trackerOpen, setTrackerOpen] = useState(true);
     const [sbGameTime, setSbGameTime] = useState(0);
+    const generationRef = useRef(0); // Track overlay data generation to reject stale updates
 
     // Fetch auto-detected HUD periodically if enabled
     useEffect(() => {
@@ -109,6 +110,8 @@ export function Overlay() {
     useEffect(() => {
         const handler = (_event: any, payload: any) => {
             console.log('[Overlay] Received data:', payload);
+            const gen = payload._generation || 0;
+            generationRef.current = gen;
             setData(payload);
             setCurrentItemIndex(0);
         };
@@ -118,9 +121,15 @@ export function Overlay() {
         };
         ipcRenderer.on('overlay-data-update', handler);
         ipcRenderer.on('settings-update', settingsHandler);
-        // Partial item update — merges into existing data
-        const itemHandler = (_event: any, newItems: BuildItem[]) => {
-            console.log('[Overlay] Items updated:', newItems.length);
+        // Partial item update — merges into existing data, with generation check
+        const itemHandler = (_event: any, newItems: BuildItem[], incomingGen?: number) => {
+            // Reject stale updates from earlier generations
+            if (incomingGen !== undefined && incomingGen < generationRef.current) {
+                console.log(`[Overlay] Rejected stale items update (gen ${incomingGen} < current ${generationRef.current})`);
+                return;
+            }
+            if (incomingGen !== undefined) generationRef.current = incomingGen;
+            console.log('[Overlay] Items updated:', newItems.length, 'gen:', incomingGen || 'none');
             setData(prev => prev ? { ...prev, buildItems: newItems } : { buildItems: newItems, junglePath: [], championName: '' });
             // Don't reset currentItemIndex — preserve purchase progress
             // The item-purchase-update handler will recalculate the correct index
@@ -178,8 +187,17 @@ export function Overlay() {
             const hasBoots = !!(payload as any).playerHasBoots;
             const bootIds: string[] = (payload as any).bootItemIds || [];
 
+            // Boot name patterns for matching quest/variant boots
+            const BOOT_PATTERNS = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots'];
+            const isBootItem = (name: string) => {
+                const lower = name.toLowerCase().trim();
+                return BOOT_PATTERNS.some(p => lower.includes(p));
+            };
+
             // Check each item — match by ID, name, or boots-in-quest-slot
-            // Use a non-breaking scan: skip purchased/boots items to find the true next item
+            // IMPORTANT: Don't break on unmatched items. Boots in position 1-2 might
+            // not match by ID/name if the player has quest boots, but we should still
+            // continue scanning past them.
             let nextIdx = 0;
             for (let i = 0; i < data.buildItems.length; i++) {
                 const bi = data.buildItems[i];
@@ -189,9 +207,11 @@ export function Overlay() {
                     n.includes(bi.name.toLowerCase().trim()) ||
                     bi.name.toLowerCase().trim().includes(n)
                 );
-                // Boots in quest slot: if player has boots and this build item IS boots, skip it
-                const matchByBoots = hasBoots && bi.id && bootIds.includes(bi.id);
-                if (matchById || matchByName || matchByBoots) {
+                // Boots in quest slot: if player has boots and this build item is ANY kind of boots, mark it bought
+                const matchByBoots = hasBoots && bi.name && isBootItem(bi.name);
+                // Also match by boot IDs from the build queue
+                const matchByBootId = hasBoots && bi.id && bootIds.includes(bi.id);
+                if (matchById || matchByName || matchByBoots || matchByBootId) {
                     nextIdx = i + 1;
                 } else {
                     break;

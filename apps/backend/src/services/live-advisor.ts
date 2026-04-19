@@ -39,15 +39,38 @@ export interface LiveAdvice {
 function buildLiveAdvisorPrompt(patch: string): string {
     return `You are a League of Legends Live Game Advisor for Patch ${patch}.
 
-You are given a real-time snapshot of an active game: all 10 players' champions, items, levels, KDA, gold, and the current game time. You also receive the ORIGINAL pre-game recommended build that was generated before the game started.
+You are given a real-time snapshot of an active game: all 10 players' champions, items, levels, KDA, gold, and the current game time. You also receive the ORIGINAL pre-game recommended build. A PRE-COMPUTED GAME STATE SUMMARY is also provided with threat analysis already calculated for you.
 
-Your job is to analyze the current game state and determine if the player should modify their build. Consider:
-- Enemy damage types: Are enemies building AP when expected AD, or vice versa? Should we adjust resistances?
-- Fed enemies: Any enemy with 5+ kills or a KDA advantage of 4+ should be specifically countered
-- My current items vs the recommended build: Am I on track or have I deviated?
-- Component items: The player may be in the middle of building an item (has components but not the full item)
-- Game phase: Early (0-15 min), mid (15-25 min), late (25+ min) — build priorities shift
-- Team composition needs: Does the team need more tank/damage/utility based on how the game is going?
+Use this decision framework to determine build adjustments:
+
+1. THREAT CHECK:
+   - If the PRE-COMPUTED PRIMARY THREAT has 5+ kills → build to counter their damage type FIRST
+   - If they are AP → prioritize MR (Wit's End, Maw, Kaenic Rookern, Mercury's Treads)
+   - If they are AD → prioritize Armor (Plated Steelcaps, Randuin's, Frozen Heart)
+
+2. DAMAGE SPLIT CHECK:
+   - If ENEMY DAMAGE SPLIT shows 3+ AP → your team needs MR items
+   - If ENEMY DAMAGE SPLIT shows 3+ AD → your team needs Armor items
+   - If only 1 enemy is fed → don't over-invest in resistances, focus on core build
+
+3. GOLD EFFICIENCY:
+   - NEVER suggest selling an item worth 2500g+ unless the replacement DIRECTLY counters the PRIMARY THREAT
+   - If player gold < 1000g → suggest only component items they can buy NOW
+   - If player gold > 2500g → suggest completed items
+   - If player has components for a specific item → recommend finishing it, DON'T pivot
+
+4. ANTI-HEAL CHECK:
+   - If any enemy has strong healing (check items: Bloodthirster, Blade of the Ruined King, or healing-heavy champions) AND player has no Grievous Wounds item → suggest anti-heal
+   - If player already has anti-heal → skip
+
+5. BOOT CHECK:
+   - If player has no boots at 10+ minutes → recommend boots
+   - If player has Boots of Speed but not upgraded at 15+ minutes → recommend upgrade
+
+6. ON-TRACK CHECK:
+   - Compare player's current items to the ORIGINAL RECOMMENDED BUILD
+   - If player is following the build and winning → say "on track" with no changes
+   - If player deviated but the deviation makes sense for the game state → acknowledge it
 
 Return ONLY this format:
 
@@ -55,11 +78,11 @@ ASSESSMENT
 <One sentence: Is the current build on track or does it need changes?>
 
 CHANGES
-<ItemToReplace> → <NewItem>: <reason>
+<ItemToReplace> → <NewItem>: <reason referencing a specific enemy or game state>
 <ItemToReplace> → <NewItem>: <reason>
 
 NEXT ITEM
-<ItemName>: <why this should be your next purchase given the current game state>
+<ItemName>: <why this should be your next purchase — reference current gold and game phase>
 
 THREAT
 <EnemyChampion> (<KDA>): <what makes them dangerous right now and how to counter>
@@ -68,7 +91,7 @@ Rules:
 - If no changes are needed, still provide ASSESSMENT and NEXT ITEM sections, but write "None needed" under CHANGES.
 - Keep item names exactly as in-game.
 - Be concise — this is real-time advice, not an essay.
-- Maximum 2-3 item changes. Don't suggest replacing items the player already completed unless critical.
+- Maximum 2-3 item changes. Don't suggest replacing completed items unless critical.
 - Consider gold efficiency: don't suggest selling a 3000g item for a 3000g item unless the switch is critical.
 - If the player has component items (e.g., Pickaxe, Long Sword), recognize they may be building toward a specific item.`;
 }
@@ -89,6 +112,11 @@ export async function generateLiveAdvice(snapshot: GameSnapshot): Promise<LiveAd
     const model = genAI.getGenerativeModel({
         model: 'gemini-3-flash-preview',  // Use flash for speed — this is real-time
         systemInstruction: buildLiveAdvisorPrompt(patchDisplay),
+        generationConfig: {
+            temperature: 0.3,
+            topP: 0.85,
+            topK: 40,
+        },
     });
 
     // Build the game state description
@@ -99,12 +127,32 @@ export async function generateLiveAdvice(snapshot: GameSnapshot): Promise<LiveAd
     const allies = snapshot.players.filter(p => p.team === snapshot.myTeam);
     const enemies = snapshot.players.filter(p => p.team !== snapshot.myTeam);
 
+    // Pre-compute game state analysis so Flash doesn't have to
+    const gamePhase = gameMinutes < 15 ? 'EARLY GAME' : gameMinutes < 25 ? 'MID GAME' : 'LATE GAME';
+    const fedEnemies = enemies.filter(e => e.kills >= 5 || (e.kills - e.deaths >= 4));
+    const primaryThreat = enemies.reduce((a, b) =>
+        (b.kills - b.deaths) > (a.kills - a.deaths) ? b : a, enemies[0]
+    );
+
+    // Estimate enemy damage types from champion names (rough heuristic based on common classes)
+    const myItemCount = myPlayer?.items.filter(i => i.displayName).length || 0;
+
+    const precomputed = `
+PRE-COMPUTED GAME STATE SUMMARY:
+Phase: ${gamePhase} (${gameMinutes}:${gameSeconds.toString().padStart(2, '0')})
+Primary Threat: ${primaryThreat?.championName || 'Unknown'} (${primaryThreat?.kills || 0}/${primaryThreat?.deaths || 0}/${primaryThreat?.assists || 0})
+Fed Enemies: ${fedEnemies.length > 0 ? fedEnemies.map(e => `${e.championName} ${e.kills}/${e.deaths}`).join(', ') : 'None'}
+My Completed Items: ${myItemCount}
+My Available Gold: ${snapshot.activePlayerGold}g
+Can Afford: ${snapshot.activePlayerGold >= 3000 ? 'Full completed items' : snapshot.activePlayerGold >= 1500 ? 'Mid-tier items or large components' : snapshot.activePlayerGold >= 800 ? 'Components only' : 'Small components or consumables only'}`;
+
     const formatPlayer = (p: PlayerSnapshot) => {
         const items = p.items.map(i => i.displayName).filter(Boolean).join(', ') || 'No items';
         return `  ${p.championName} (Lv${p.level}) — ${p.kills}/${p.deaths}/${p.assists} — Gold: ${p.currentGold} — Items: [${items}]`;
     };
 
     const userMessage = `GAME TIME: ${gameMinutes}:${gameSeconds.toString().padStart(2, '0')}
+${precomputed}
 
 MY CHAMPION: ${snapshot.myChampion}
 MY STATS: Level ${myPlayer?.level ?? '?'}, ${myPlayer?.kills ?? 0}/${myPlayer?.deaths ?? 0}/${myPlayer?.assists ?? 0}, Gold: ${snapshot.activePlayerGold}
@@ -119,7 +167,7 @@ ${enemies.map(formatPlayer).join('\n')}
 ORIGINAL RECOMMENDED BUILD (pre-game):
 ${snapshot.originalBuildText}
 
-Analyze the current game state and provide live build advice.`;
+Analyze the current game state using the decision framework and provide live build advice.`;
 
     const result = await model.generateContent(userMessage);
     const text = result.response.text();

@@ -14,14 +14,15 @@
       {
         "label": "main",
         "title": "DraftCoach",
-        "width": 1200,
-        "height": 800,
+        "width": 1920,
+        "height": 1080,
         "minWidth": 900,
         "minHeight": 600,
         "center": true,
         "visible": false,
         "decorations": false,
-        "transparent": false
+        "transparent": false,
+        "fullscreen": true
       }
     ],
     "security": {

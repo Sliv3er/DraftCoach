@@ -1560,7 +1560,7 @@ COMMON MISTAKES — NEVER DO THESE:
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
         const fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
 
-        const generationMode = body.generationMode || getSetting('generationMode') || 'hybrid';
+        const generationMode = body.generationMode || getSetting('generationMode') || 'flash';
         const fullPhaseModelName = generationMode === 'flash' 
           ? 'gemini-3-flash-preview' 
           : (body.model || 'gemini-3.1-pro-preview');

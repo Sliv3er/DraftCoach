@@ -376,7 +376,7 @@ export function App() {
   const [status, setStatus] = useState<Status>('idle');
   const [buildResult, setBuildResult] = useState<BuildResponse | null>(null);
   const [iconLookups, setIconLookups] = useState<IconLookups | null>(null);
-  const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3.1-pro-preview');
+  const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3-flash-preview');
   const [autoDetect, setAutoDetect] = useState(true);
   const [autoDetectStatus, setAutoDetectStatus] = useState<'off' | 'searching' | 'connected' | 'error'>('off');
   const autoDetectRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -1373,7 +1373,7 @@ export function App() {
               <select
                 className="game-mode-select"
                 style={{ width: '150px' }}
-                value={settings.generationMode || 'hybrid'}
+                value={settings.generationMode || 'flash'}
                 onChange={e => handleSettingChange('generationMode', e.target.value)}
               >
                 <option value="hybrid">Hybrid (Flash & Pro)</option>

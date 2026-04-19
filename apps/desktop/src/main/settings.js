@@ -12,8 +12,8 @@ const DEFAULT_SETTINGS = {
     preferredVariant: 'auto',     // 'auto' | 'DAMAGE' | 'SAFETY' | 'UTILITY'
     lolPath: null,                // custom League of Legends install path
     llmEnhancerEnabled: true,
-    geminiModel: 'gemini-3.1-pro-preview',  // base model setting
-    generationMode: 'hybrid',     // 'hybrid' (Flash+Pro) or 'flash' (Flash only for speed)
+    geminiModel: 'gemini-3-flash-preview',  // base model setting
+    generationMode: 'flash',     // 'hybrid' (Flash+Pro) or 'flash' (Flash only for speed)
     autoExportRunes: false,
     autoExportItemSet: false,
     lcuAutoConnect: true,

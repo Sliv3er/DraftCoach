@@ -948,45 +948,56 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text-secondary);
-  font-size: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #1e2328 0%, #141820 100%);
+  border: 1px solid #463714;
+  border-radius: 4px;
+  color: #A09B8C;
+  font-size: 11px;
   font-family: inherit;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.btn-copy-all:hover,
-.btn-export:hover {
-  background: var(--bg-card);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
+.btn-copy-all:hover {
+  background: linear-gradient(180deg, #2a2f35 0%, #1e2328 100%);
+  border-color: #C8AA6E;
+  color: #F0E6D2;
+}
+
+.btn-copy-all .btn-icon,
+.btn-export .btn-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .btn-export {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  background: linear-gradient(135deg, rgba(200, 170, 110, 0.12) 0%, rgba(200, 170, 110, 0.04) 100%);
-  border: 1px solid var(--gold-dim);
-  border-radius: var(--radius);
-  color: var(--gold);
-  font-size: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #C89B3C 0%, #785A28 100%);
+  border: 1px solid #C8AA6E;
+  border-radius: 4px;
+  color: #F0E6D2;
+  font-size: 11px;
   font-family: inherit;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .btn-export:hover {
-  background: rgba(200, 170, 110, 0.15);
-  border-color: var(--gold);
-  color: var(--gold-bright);
+  filter: brightness(1.15);
+  box-shadow: 0 2px 10px rgba(200, 155, 60, 0.3);
+  border-color: #F0E6D2;
 }
 
 .export-status {
@@ -1208,28 +1219,31 @@ body {
 .rune-shard-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
+  gap: 8px;
+  padding: 6px 12px;
   background: var(--bg-elevated);
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 11px;
-  color: var(--text-secondary);
+  font-weight: 500;
+  color: var(--text-primary);
   border: 1px solid var(--border);
 }
 
 .rune-shard-dot {
-  width: 8px;
-  height: 8px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--accent-blue);
+  background: linear-gradient(135deg, #2a2a3a 0%, #1a1a28 100%);
+  border: 1px solid var(--gold-dim);
   flex-shrink: 0;
 }
 
 .rune-shard-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   flex-shrink: 0;
+  border: 1px solid var(--gold-dim);
 }
 
 /* Item Cards */
@@ -1666,6 +1680,12 @@ body {
   opacity: 0.85;
 }
 
+.jungle-minimap-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .jungle-path-legend {
   flex: 0 0 auto;
   display: flex;
@@ -1783,20 +1803,33 @@ body {
 
 /* â”€â”€ Settings Button in Header â”€â”€ */
 .btn-settings-toggle {
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 14px;
+  background: linear-gradient(180deg, #1e2328 0%, #141820 100%);
+  border: 1px solid #463714;
+  border-radius: 4px;
+  padding: 5px 8px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
   line-height: 1;
   -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-settings-toggle .gear-icon {
+  color: #C8AA6E;
+  stroke: #C8AA6E;
 }
 
 .btn-settings-toggle:hover {
-  border-color: var(--gold-dim);
-  background: rgba(200, 170, 110, 0.06);
+  border-color: #C8AA6E;
+  background: linear-gradient(180deg, #2a2f35 0%, #1e2328 100%);
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.2);
+}
+
+.btn-settings-toggle:hover .gear-icon {
+  color: #F0E6D2;
+  stroke: #F0E6D2;
 }
 
 /* â”€â”€ Settings Drawer â”€â”€ */

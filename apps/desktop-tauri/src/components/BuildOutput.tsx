@@ -461,31 +461,38 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   );
 }
 
-// Standard jungle camp positions on SR minimap as percentages
+// Standard jungle camp positions on SR minimap as percentages (blue-side default)
+// Coordinates: x% from left, y% from top in a standard square minimap
 const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
-  'red': { x: 34, y: 22, label: 'Red' },
-  'red buff': { x: 34, y: 22, label: 'Red' },
-  'red brambleback': { x: 34, y: 22, label: 'Red' },
-  'blue': { x: 66, y: 22, label: 'Blue' },
-  'blue sentinel': { x: 66, y: 22, label: 'Blue' },
-  'blue buff': { x: 66, y: 22, label: 'Blue' },
-  'gromp': { x: 56, y: 28, label: 'Gromp' },
-  'grom': { x: 56, y: 28, label: 'Gromp' },
-  'wolves': { x: 42, y: 28, label: 'Wolves' },
-  'murk wolves': { x: 42, y: 28, label: 'Wolves' },
-  'raptor': { x: 32, y: 38, label: 'Raptors' },
-  'raptors': { x: 32, y: 38, label: 'Raptors' },
-  'krug': { x: 26, y: 30, label: 'Krugs' },
-  'krugs': { x: 26, y: 30, label: 'Krugs' },
-  'dragon': { x: 50, y: 50, label: 'Dragon' },
-  'baron': { x: 50, y: 72, label: 'Baron' },
-  'baron nashor': { x: 50, y: 72, label: 'Baron' },
-  'herald': { x: 32, y: 62, label: 'Herald' },
-  'rift herald': { x: 32, y: 62, label: 'Herald' },
-  'scuttle': { x: 60, y: 44, label: 'Scuttle' },
-  'scuttle crab': { x: 60, y: 44, label: 'Scuttle' },
-  'rift scuttler': { x: 60, y: 44, label: 'Scuttle' },
-  'gank': { x: 75, y: 15, label: 'Gank' },
+  // Blue-side camps (bottom-left quadrant)
+  'red': { x: 36, y: 76, label: 'Red' },
+  'red buff': { x: 36, y: 76, label: 'Red' },
+  'red brambleback': { x: 36, y: 76, label: 'Red' },
+  'blue': { x: 22, y: 68, label: 'Blue' },
+  'blue sentinel': { x: 22, y: 68, label: 'Blue' },
+  'blue buff': { x: 22, y: 68, label: 'Blue' },
+  'gromp': { x: 15, y: 62, label: 'Gromp' },
+  'grom': { x: 15, y: 62, label: 'Gromp' },
+  'wolves': { x: 28, y: 56, label: 'Wolves' },
+  'murk wolves': { x: 28, y: 56, label: 'Wolves' },
+  'raptor': { x: 42, y: 64, label: 'Raptors' },
+  'raptors': { x: 42, y: 64, label: 'Raptors' },
+  'krug': { x: 48, y: 82, label: 'Krugs' },
+  'krugs': { x: 48, y: 82, label: 'Krugs' },
+  // Objectives
+  'dragon': { x: 62, y: 66, label: 'Dragon' },
+  'baron': { x: 38, y: 34, label: 'Baron' },
+  'baron nashor': { x: 38, y: 34, label: 'Baron' },
+  'herald': { x: 38, y: 34, label: 'Herald' },
+  'rift herald': { x: 38, y: 34, label: 'Herald' },
+  'scuttle': { x: 50, y: 52, label: 'Scuttle' },
+  'scuttle crab': { x: 50, y: 52, label: 'Scuttle' },
+  'rift scuttler': { x: 50, y: 52, label: 'Scuttle' },
+  // Gank targets
+  'gank': { x: 50, y: 45, label: 'Gank' },
+  'gank mid': { x: 50, y: 50, label: 'Gank Mid' },
+  'gank top': { x: 18, y: 28, label: 'Gank Top' },
+  'gank bot': { x: 82, y: 72, label: 'Gank Bot' },
 };
 
 function normalizeCampName(name: string): string {
@@ -541,15 +548,37 @@ function renderJunglePath(content: string) {
   return (
     <div className="jungle-path-container">
       <div className="jungle-minimap">
-        <img
-          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-game-data/global/default/data/maps/shipping/map11/2dlevelminimap.png"
-          alt="Summoner's Rift Minimap"
-          className="jungle-minimap-img"
-          onError={e => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-          }}
-        />
+        {/* Inline SVG schematic of Summoner's Rift — no external image dependency */}
+        <svg viewBox="0 0 100 100" className="jungle-minimap-svg" xmlns="http://www.w3.org/2000/svg">
+          {/* Background */}
+          <rect width="100" height="100" fill="#0a1a0a" />
+          {/* Terrain fill */}
+          <polygon points="5,95 5,5 95,5 95,95" fill="#0f1e0f" stroke="#1a3a1a" strokeWidth="0.5" />
+          {/* River */}
+          <path d="M15,45 Q30,48 50,50 Q70,52 85,55" fill="none" stroke="#1a3a5a" strokeWidth="3" opacity="0.6" />
+          <path d="M15,45 Q30,48 50,50 Q70,52 85,55" fill="none" stroke="#2a5a8a" strokeWidth="1.5" opacity="0.4" />
+          {/* Lanes */}
+          <line x1="8" y1="92" x2="8" y2="8" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
+          <line x1="8" y1="8" x2="92" y2="8" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
+          <line x1="8" y1="92" x2="92" y2="92" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
+          <line x1="92" y1="92" x2="92" y2="8" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
+          <line x1="10" y1="90" x2="90" y2="10" stroke="#2a2a1a" strokeWidth="1" opacity="0.35" />
+          {/* Blue base */}
+          <rect x="2" y="88" width="10" height="10" rx="2" fill="#1a2a4a" stroke="#3a5a8a" strokeWidth="0.5" opacity="0.6" />
+          {/* Red base */}
+          <rect x="88" y="2" width="10" height="10" rx="2" fill="#4a1a1a" stroke="#8a3a3a" strokeWidth="0.5" opacity="0.6" />
+          {/* Camp markers (subtle dots) */}
+          <circle cx="22" cy="68" r="2" fill="#3a5a8a" opacity="0.4" />{/* Blue buff */}
+          <circle cx="36" cy="76" r="2" fill="#5a2a2a" opacity="0.4" />{/* Red buff */}
+          <circle cx="15" cy="62" r="2" fill="#2a3a2a" opacity="0.3" />{/* Gromp */}
+          <circle cx="28" cy="56" r="2" fill="#2a3a2a" opacity="0.3" />{/* Wolves */}
+          <circle cx="42" cy="64" r="2" fill="#2a3a2a" opacity="0.3" />{/* Raptors */}
+          <circle cx="48" cy="82" r="2" fill="#2a3a2a" opacity="0.3" />{/* Krugs */}
+          {/* Dragon pit */}
+          <circle cx="62" cy="66" r="3" fill="#4a2a1a" stroke="#6a3a1a" strokeWidth="0.5" opacity="0.5" />
+          {/* Baron pit */}
+          <circle cx="38" cy="34" r="3" fill="#3a1a4a" stroke="#5a2a6a" strokeWidth="0.5" opacity="0.5" />
+        </svg>
         {resolved.map((r, i) => {
           if (!r.pos) return null;
           return (

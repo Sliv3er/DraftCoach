@@ -583,6 +583,8 @@ export function App() {
           'move speed': 'perk-images/StatMods/StatModsMovementSpeedIcon.png',
           'movement speed': 'perk-images/StatMods/StatModsMovementSpeedIcon.png',
           'tenacity': 'perk-images/StatMods/StatModsTenacityIcon.png',
+          'tenacity and slow resist': 'perk-images/StatMods/StatModsTenacityIcon.png',
+          'slow resist': 'perk-images/StatMods/StatModsTenacityIcon.png',
         };
         for (const [name, iconPath] of Object.entries(shardIcons)) {
           const url = `https://ddragon.leagueoflegends.com/cdn/${version}/img/${iconPath}`;

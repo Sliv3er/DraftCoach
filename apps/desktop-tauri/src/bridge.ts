@@ -288,3 +288,8 @@ export async function hideCurrentWindow() {
   const window = getCurrentWebviewWindow();
   await window.hide();
 }
+
+export async function toggleMaximizeCurrentWindow() {
+  const window = getCurrentWebviewWindow();
+  await window.toggleMaximize();
+}

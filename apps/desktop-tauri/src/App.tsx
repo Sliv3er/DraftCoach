@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BuildResponse, Role, GeminiModel } from './types';
 import { ChampionPicker } from './components/ChampionPicker';
 import { BuildOutput } from './components/BuildOutput';
-import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow } from './bridge';
+import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow } from './bridge';
 
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
@@ -1083,7 +1083,7 @@ export function App() {
             <button className="win-ctrl-btn win-minimize" onClick={minimizeCurrentWindow} title="Minimize">
               <svg width="10" height="1" viewBox="0 0 10 1"><rect fill="currentColor" width="10" height="1"/></svg>
             </button>
-            <button className="win-ctrl-btn win-maximize" onClick={hideCurrentWindow} title="Maximize">
+            <button className="win-ctrl-btn win-maximize" onClick={toggleMaximizeCurrentWindow} title="Maximize">
               <svg width="10" height="10" viewBox="0 0 10 10"><rect fill="none" stroke="currentColor" strokeWidth="1" width="8" height="8" x="1" y="1"/></svg>
             </button>
             <button className="win-ctrl-btn win-close" onClick={closeCurrentWindow} title="Close">

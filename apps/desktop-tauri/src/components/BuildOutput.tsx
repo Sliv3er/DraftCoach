@@ -361,7 +361,7 @@ function renderLiveUpdatedItems(items: LiveUpdatedItem[]) {
           </div>
         );
       })}
-      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
+      <div className="live-updated-tag">
         🔴 Updated by Live Advisor
       </div>
     </div>
@@ -481,7 +481,7 @@ function renderSection(title: string, content: string, lookups: IconLookups | nu
     case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
     case 'YOUR POWER SPIKES': return renderPowerSpikes(content);
     case 'WIN CONDITION': return renderWinCondition(content);
-    default: return <div className="build-output" style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
+    default: return <div className="build-output">{content}</div>;
   }
 }
 
@@ -546,12 +546,12 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
 
   if (!result.ok) {
     return (
-      <div className="build-section" style={{ borderColor: 'var(--accent-red)' }}>
+      <div className="build-section build-section-error">
         <div className="build-section-header">
-          <h3 style={{ color: 'var(--accent-red)' }}>Error</h3>
+          <h3 className="error-title">Error</h3>
         </div>
-        <div style={{ fontSize: 13 }}>{result.message}</div>
-        {result.canRetry && <div style={{ marginTop: 8, color: 'var(--text-muted)', fontSize: 12 }}>You can retry the request.</div>}
+        <div className="error-message">{result.message}</div>
+        {result.canRetry && <div className="error-retry-hint">You can retry the request.</div>}
       </div>
     );
   }
@@ -630,7 +630,7 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
         </>
       ) : (
         <div className="build-section">
-          <div className="build-output" style={{ whiteSpace: 'pre-wrap' }}>{result.text}</div>
+          <div className="build-output">{result.text}</div>
         </div>
       )}
     </div>

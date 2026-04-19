@@ -1036,6 +1036,35 @@ body {
   line-height: 1.8;
   font-size: 13px;
   color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+/* Error State */
+.build-section-error {
+  border-color: var(--accent-red);
+}
+
+.error-title {
+  color: var(--accent-red) !important;
+}
+
+.error-message {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.error-retry-hint {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Live Updated Tag */
+.live-updated-tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
 }
 
 /* Rune Grid Layout */

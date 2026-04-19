@@ -906,9 +906,10 @@ body {
 /* 2-Column Build Layout */
 .build-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
   margin-bottom: 12px;
+  align-items: start;
 }
 
 .build-col {
@@ -1426,8 +1427,8 @@ body {
 /* Skill Order - LoL HUD style with champion ability icons */
 .skill-order-lol {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 6px;
+  align-items: flex-start;
   padding: 6px 0;
   flex-wrap: wrap;
 }
@@ -1436,14 +1437,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   position: relative;
 }
 
 .skill-ability-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
   border: 2px solid var(--gold-dim);
   overflow: hidden;
   background: var(--bg-elevated);
@@ -1476,11 +1477,11 @@ body {
 
 .skill-ability-badge {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  background: rgba(10, 10, 15, 0.88);
+  bottom: 1px;
+  right: 1px;
+  background: rgba(10, 10, 15, 0.9);
   border: 1px solid #C8AA6E;
-  border-radius: 3px;
+  border-radius: 2px;
   color: #C8AA6E;
   font-size: 9px;
   font-weight: 800;
@@ -1492,11 +1493,21 @@ body {
   z-index: 2;
 }
 
+.skill-ability-priority {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  text-shadow: 0 0 4px rgba(200, 170, 110, 0.3);
+}
+
 .skill-separator {
-  color: var(--text-muted);
-  font-size: 14px;
-  font-weight: 400;
-  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  padding-top: 8px;
+  color: var(--gold-dim);
 }
 
 /* Situational Items Grid */
@@ -1658,18 +1669,18 @@ body {
 /* Jungle Path Minimap */
 .jungle-path-container {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .jungle-minimap {
   position: relative;
-  flex: 1 1 55%;
-  aspect-ratio: 1;
-  max-height: 180px;
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--gold-dim);
   background: #0a0f0a;
 }
 

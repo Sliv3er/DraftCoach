@@ -587,7 +587,7 @@ export function App() {
           'slow resist': 'perk-images/StatMods/StatModsTenacityIcon.png',
         };
         for (const [name, iconPath] of Object.entries(shardIcons)) {
-          const url = `https://ddragon.leagueoflegends.com/cdn/${version}/img/${iconPath}`;
+          const url = `https://ddragon.leagueoflegends.com/cdn/img/${iconPath}`;
           statShards.set(name, url);
           runes.set(name, url);
         }

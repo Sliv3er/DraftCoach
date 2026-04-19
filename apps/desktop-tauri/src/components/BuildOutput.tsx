@@ -326,6 +326,8 @@ function renderSkillOrder(
   const parts = content.split('>').map(s => s.trim()).filter(Boolean);
   if (parts.length === 0) return <div className="build-output">{content}</div>;
 
+  const PRIORITY_LABELS = ['MAX 1ST', 'MAX 2ND', 'MAX 3RD', 'MAX 4TH'];
+
   return (
     <div className="skill-order-lol">
       {parts.map((p, i) => {
@@ -333,7 +335,9 @@ function renderSkillOrder(
         const spell = championSpells.find(s => s.key === letter);
         return (
           <React.Fragment key={i}>
-            {i > 0 && <span className="skill-separator">›</span>}
+            {i > 0 && <span className="skill-separator">
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#785A28" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </span>}
             <div className="skill-ability" title={spell ? `${spell.name} (${letter})` : letter}>
               <div className="skill-ability-icon-wrap">
                 {spell ? (
@@ -350,6 +354,7 @@ function renderSkillOrder(
                 )}
                 <span className="skill-ability-badge">{letter}</span>
               </div>
+              <span className="skill-ability-priority">{PRIORITY_LABELS[i] || ''}</span>
             </div>
           </React.Fragment>
         );
@@ -371,7 +376,13 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
         if (numMatch) { num = numMatch[1]; text = numMatch[2]; }
 
         const reasonMatch = text.match(/^([^(]+)\((.+)\)\s*$/);
-        if (reasonMatch) { text = reasonMatch[1].trim(); reason = reasonMatch[2].trim(); }
+        if (reasonMatch) {
+          text = reasonMatch[1].trim();
+          reason = reasonMatch[2].trim()
+            .replace(/CONSTRAINT:\s*\w+\s*[—–-]\s*/gi, '')
+            .replace(/CONSTRAINT:\s*\w+/gi, '')
+            .trim();
+        }
 
         const itemName = text.trim();
         const iconSrc = findIcon(itemName, lookups?.items);
@@ -529,7 +540,7 @@ function resolveCampLabel(campName: string): string {
   return pos ? pos.label : campName;
 }
 
-function renderJunglePath(content: string) {
+function renderJunglePath(content: string, version: string) {
   const path = content.trim()
     .replace(/\s*-+>\s*/g, ' \u27a4 ')
     .replace(/\s*->+\s*/g, ' \u27a4 ')
@@ -548,37 +559,12 @@ function renderJunglePath(content: string) {
   return (
     <div className="jungle-path-container">
       <div className="jungle-minimap">
-        {/* Inline SVG schematic of Summoner's Rift — no external image dependency */}
-        <svg viewBox="0 0 100 100" className="jungle-minimap-svg" xmlns="http://www.w3.org/2000/svg">
-          {/* Background */}
-          <rect width="100" height="100" fill="#0a1a0a" />
-          {/* Terrain fill */}
-          <polygon points="5,95 5,5 95,5 95,95" fill="#0f1e0f" stroke="#1a3a1a" strokeWidth="0.5" />
-          {/* River */}
-          <path d="M15,45 Q30,48 50,50 Q70,52 85,55" fill="none" stroke="#1a3a5a" strokeWidth="3" opacity="0.6" />
-          <path d="M15,45 Q30,48 50,50 Q70,52 85,55" fill="none" stroke="#2a5a8a" strokeWidth="1.5" opacity="0.4" />
-          {/* Lanes */}
-          <line x1="8" y1="92" x2="8" y2="8" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
-          <line x1="8" y1="8" x2="92" y2="8" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
-          <line x1="8" y1="92" x2="92" y2="92" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
-          <line x1="92" y1="92" x2="92" y2="8" stroke="#2a2a1a" strokeWidth="1.5" opacity="0.5" />
-          <line x1="10" y1="90" x2="90" y2="10" stroke="#2a2a1a" strokeWidth="1" opacity="0.35" />
-          {/* Blue base */}
-          <rect x="2" y="88" width="10" height="10" rx="2" fill="#1a2a4a" stroke="#3a5a8a" strokeWidth="0.5" opacity="0.6" />
-          {/* Red base */}
-          <rect x="88" y="2" width="10" height="10" rx="2" fill="#4a1a1a" stroke="#8a3a3a" strokeWidth="0.5" opacity="0.6" />
-          {/* Camp markers (subtle dots) */}
-          <circle cx="22" cy="68" r="2" fill="#3a5a8a" opacity="0.4" />{/* Blue buff */}
-          <circle cx="36" cy="76" r="2" fill="#5a2a2a" opacity="0.4" />{/* Red buff */}
-          <circle cx="15" cy="62" r="2" fill="#2a3a2a" opacity="0.3" />{/* Gromp */}
-          <circle cx="28" cy="56" r="2" fill="#2a3a2a" opacity="0.3" />{/* Wolves */}
-          <circle cx="42" cy="64" r="2" fill="#2a3a2a" opacity="0.3" />{/* Raptors */}
-          <circle cx="48" cy="82" r="2" fill="#2a3a2a" opacity="0.3" />{/* Krugs */}
-          {/* Dragon pit */}
-          <circle cx="62" cy="66" r="3" fill="#4a2a1a" stroke="#6a3a1a" strokeWidth="0.5" opacity="0.5" />
-          {/* Baron pit */}
-          <circle cx="38" cy="34" r="3" fill="#3a1a4a" stroke="#5a2a6a" strokeWidth="0.5" opacity="0.5" />
-        </svg>
+        <img
+          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/map/map11.png`}
+          alt="Summoner's Rift"
+          className="jungle-minimap-img"
+          onError={e => { (e.target as HTMLImageElement).style.opacity = '0.15'; }}
+        />
         {resolved.map((r, i) => {
           if (!r.pos) return null;
           return (
@@ -693,7 +679,7 @@ function renderSection(
     case 'STARTING ITEMS': return renderItems(content, lookups, false);
     case 'CORE BUILD': return renderItems(content, lookups, true);
     case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
-    case 'JUNGLE PATH': return renderJunglePath(content);
+    case 'JUNGLE PATH': return renderJunglePath(content, version);
     case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
     case 'YOUR POWER SPIKES': return renderPowerSpikes(content);
     case 'WIN CONDITION': return renderWinCondition(content);

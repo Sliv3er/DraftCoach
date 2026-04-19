@@ -136,6 +136,7 @@ function findIcon(name: string, map?: Map<string, string>): string | undefined {
   if (!map || !name) return undefined;
   let n = name.toLowerCase().trim()
     .replace(/['']/g, "'")  // normalize quotes
+    .replace(/-/g, ' ')      // normalize hyphens (e.g. "Attack-Smite" → "attack smite")
     .replace(/\s+/g, ' ');  // normalize spaces
 
   // Check alias table first (e.g. "Hatchling" → "gustwalker hatchling")
@@ -270,15 +271,15 @@ function renderRunes(content: string, lookups: IconLookups | null) {
         <TreeHeader label="Secondary" treeName={secondaryTree} />
         {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
       </div>
-      {/* Shards — League-style: 3 small circular icons in a tight row */}
+      {/* Shards — League-style: 3 tiny icons in a tight row with visible names, no header */}
       {shards.length > 0 && (
         <div className="rune-shards-row">
           {shards.map((s, i) => {
             const shardSrc = findIcon(s, lookups?.runes);
             return (
-              <div key={`sh${i}`} className="rune-shard-slot" title={s}>
-                <div className="rune-shard-circle">
-                  {shardSrc && (
+              <div key={`sh${i}`} className="rune-shard-pill">
+                <div className="rune-shard-icon-wrap">
+                  {shardSrc ? (
                     <img
                       src={shardSrc}
                       alt={s}
@@ -290,9 +291,10 @@ function renderRunes(content: string, lookups: IconLookups | null) {
                         if (dot && dot.classList.contains('rune-shard-fallback')) dot.style.display = '';
                       }}
                     />
-                  )}
+                  ) : null}
                   <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
                 </div>
+                <span className="rune-shard-label">{s}</span>
               </div>
             );
           })}
@@ -482,37 +484,44 @@ function renderSituational(content: string, lookups: IconLookups | null) {
 }
 
 // Standard jungle camp positions on SR minimap as percentages (blue-side default)
-// Coordinates: x% from left, y% from top in a standard square minimap
+// Real Summoner's Rift minimap camp positions (% from left = x, % from top = y)
+// Reference: League of Legends official SR minimap (512x512 image)
+// Blue base = bottom-left, Red base = top-right of map
 const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
-  // Blue-side camps (bottom-left quadrant)
-  'red': { x: 36, y: 76, label: 'Red' },
-  'red buff': { x: 36, y: 76, label: 'Red' },
-  'red brambleback': { x: 36, y: 76, label: 'Red' },
-  'blue': { x: 22, y: 68, label: 'Blue' },
-  'blue sentinel': { x: 22, y: 68, label: 'Blue' },
-  'blue buff': { x: 22, y: 68, label: 'Blue' },
-  'gromp': { x: 15, y: 62, label: 'Gromp' },
-  'grom': { x: 15, y: 62, label: 'Gromp' },
-  'wolves': { x: 28, y: 56, label: 'Wolves' },
-  'murk wolves': { x: 28, y: 56, label: 'Wolves' },
-  'raptor': { x: 42, y: 64, label: 'Raptors' },
-  'raptors': { x: 42, y: 64, label: 'Raptors' },
-  'krug': { x: 48, y: 82, label: 'Krugs' },
-  'krugs': { x: 48, y: 82, label: 'Krugs' },
+  // Main jungle camps (verified from LoL official minimap)
+  'red': { x: 16, y: 85, label: 'Red' },
+  'red buff': { x: 16, y: 85, label: 'Red' },
+  'red brambleback': { x: 16, y: 85, label: 'Red' },
+  'blue': { x: 16, y: 17, label: 'Blue' },
+  'blue sentinel': { x: 16, y: 17, label: 'Blue' },
+  'blue buff': { x: 16, y: 17, label: 'Blue' },
+  'gromp': { x: 21, y: 74, label: 'Gromp' },
+  'grom': { x: 21, y: 74, label: 'Gromp' },
+  'wolves': { x: 27, y: 83, label: 'Wolves' },
+  'murk wolves': { x: 27, y: 83, label: 'Wolves' },
+  'wolf': { x: 27, y: 83, label: 'Wolves' },
+  'raptor': { x: 38, y: 17, label: 'Raptors' },
+  'raptors': { x: 38, y: 17, label: 'Raptors' },
+  'raps': { x: 38, y: 17, label: 'Raptors' },
+  'krug': { x: 63, y: 52, label: 'Krugs' },
+  'krugs': { x: 63, y: 52, label: 'Krugs' },
+  'krugs red': { x: 63, y: 52, label: 'Krugs' },
   // Objectives
-  'dragon': { x: 62, y: 66, label: 'Dragon' },
-  'baron': { x: 38, y: 34, label: 'Baron' },
-  'baron nashor': { x: 38, y: 34, label: 'Baron' },
-  'herald': { x: 38, y: 34, label: 'Herald' },
-  'rift herald': { x: 38, y: 34, label: 'Herald' },
+  'dragon': { x: 62, y: 74, label: 'Dragon' },
+  'baron': { x: 38, y: 39, label: 'Baron' },
+  'baron nashor': { x: 38, y: 39, label: 'Baron' },
+  'herald': { x: 38, y: 39, label: 'Herald' },
+  'rift herald': { x: 38, y: 39, label: 'Herald' },
   'scuttle': { x: 50, y: 52, label: 'Scuttle' },
   'scuttle crab': { x: 50, y: 52, label: 'Scuttle' },
   'rift scuttler': { x: 50, y: 52, label: 'Scuttle' },
-  // Gank targets
-  'gank': { x: 50, y: 45, label: 'Gank' },
-  'gank mid': { x: 50, y: 50, label: 'Gank Mid' },
-  'gank top': { x: 18, y: 28, label: 'Gank Top' },
-  'gank bot': { x: 82, y: 72, label: 'Gank Bot' },
+  // Gank waypoints
+  'gank': { x: 50, y: 52, label: 'Gank' },
+  'gank mid': { x: 50, y: 52, label: 'Gank Mid' },
+  'gank top': { x: 27, y: 39, label: 'Gank Top' },
+  'gank bot': { x: 62, y: 60, label: 'Gank Bot' },
+  // Exits / paths
+  'exit': { x: 50, y: 52, label: 'Exit' },
 };
 
 function normalizeCampName(name: string): string {

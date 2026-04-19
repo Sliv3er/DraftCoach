@@ -558,7 +558,7 @@ export function App() {
         // Add common AI-generated spell name aliases that don't match DDragon exactly
         const smiteUrl = spells.get('smite');
         if (smiteUrl) {
-          for (const alias of ['attack smite', 'unleashed smite', 'primal smite', 'gustwalker smite', 'mosstomper smite', 'scorchclaw smite', 'challenging smite', 'chilling smite']) {
+          for (const alias of ['attack smite', 'attack-smite', 'unleashed smite', 'primal smite', 'gustwalker smite', 'mosstomper smite', 'scorchclaw smite', 'challenging smite', 'chilling smite', 'smite']) {
             spells.set(alias, smiteUrl);
           }
         }

@@ -259,19 +259,21 @@ function renderRunes(content: string, lookups: IconLookups | null) {
   };
 
   return (
-    <div className="runes-grid">
-      {/* Primary tree */}
-      <div className="rune-tree-column">
-        <TreeHeader label="Primary" treeName={primaryTree} />
-        {keystone && <RuneCell name={keystone} isKeystone />}
-        {primaryRunes.map((r, i) => <RuneCell key={`p${i}`} name={r} />)}
+    <div className="runes-container">
+      <div className="runes-grid">
+        {/* Primary tree */}
+        <div className="rune-tree-column">
+          <TreeHeader label="Primary" treeName={primaryTree} />
+          {keystone && <RuneCell name={keystone} isKeystone />}
+          {primaryRunes.map((r, i) => <RuneCell key={`p${i}`} name={r} />)}
+        </div>
+        {/* Secondary tree */}
+        <div className="rune-tree-column">
+          <TreeHeader label="Secondary" treeName={secondaryTree} />
+          {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
+        </div>
       </div>
-      {/* Secondary tree */}
-      <div className="rune-tree-column">
-        <TreeHeader label="Secondary" treeName={secondaryTree} />
-        {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
-      </div>
-      {/* Shards — League client style: tiny circular icons with stat name beside each, tight horizontal row */}
+      {/* Shards — League client style: tiny circular icons with stat name BELOW, vertical stack, tight row */}
       {shards.length > 0 && (
         <div className="rune-shards-row">
           {shards.map((s, i) => {
@@ -482,41 +484,45 @@ function renderSituational(content: string, lookups: IconLookups | null) {
 
 // Standard jungle camp positions on SR minimap as percentages (blue-side default)
 // Real Summoner's Rift minimap camp positions (% from left = x, % from top = y)
-// Reference: League of Legends official SR minimap (512x512 image)
-// Blue base = bottom-left, Red base = top-right of map
+// Reference: League of Legends official SR minimap (map11.png)
+// Minimap orientation: Blue base = BOTTOM-LEFT, Red base = TOP-RIGHT
+// River runs diagonally from bottom-left to top-right
+// x% = distance from left edge, y% = distance from TOP edge
 const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
-  // Main jungle camps (verified from LoL official minimap)
-  'red': { x: 16, y: 85, label: 'Red' },
-  'red buff': { x: 16, y: 85, label: 'Red' },
-  'red brambleback': { x: 16, y: 85, label: 'Red' },
-  'blue': { x: 16, y: 17, label: 'Blue' },
-  'blue sentinel': { x: 16, y: 17, label: 'Blue' },
-  'blue buff': { x: 16, y: 17, label: 'Blue' },
-  'gromp': { x: 21, y: 74, label: 'Gromp' },
-  'grom': { x: 21, y: 74, label: 'Gromp' },
-  'wolves': { x: 27, y: 83, label: 'Wolves' },
-  'murk wolves': { x: 27, y: 83, label: 'Wolves' },
-  'wolf': { x: 27, y: 83, label: 'Wolves' },
-  'raptor': { x: 38, y: 17, label: 'Raptors' },
-  'raptors': { x: 38, y: 17, label: 'Raptors' },
-  'raps': { x: 38, y: 17, label: 'Raptors' },
-  'krug': { x: 63, y: 52, label: 'Krugs' },
-  'krugs': { x: 63, y: 52, label: 'Krugs' },
-  'krugs red': { x: 63, y: 52, label: 'Krugs' },
-  // Objectives
-  'dragon': { x: 62, y: 74, label: 'Dragon' },
-  'baron': { x: 38, y: 39, label: 'Baron' },
-  'baron nashor': { x: 38, y: 39, label: 'Baron' },
-  'herald': { x: 38, y: 39, label: 'Herald' },
-  'rift herald': { x: 38, y: 39, label: 'Herald' },
+  // Blue side jungle (BOTTOM-LEFT of minimap)
+  'blue': { x: 17, y: 84, label: 'Blue' },
+  'blue sentinel': { x: 17, y: 84, label: 'Blue' },
+  'blue buff': { x: 17, y: 84, label: 'Blue' },
+  'gromp': { x: 22, y: 74, label: 'Gromp' },
+  'grom': { x: 22, y: 74, label: 'Gromp' },
+  'wolves': { x: 28, y: 84, label: 'Wolves' },
+  'murk wolves': { x: 28, y: 84, label: 'Wolves' },
+  'wolf': { x: 28, y: 84, label: 'Wolves' },
+  // Red side jungle (TOP-RIGHT of minimap)
+  'red': { x: 84, y: 17, label: 'Red' },
+  'red buff': { x: 84, y: 17, label: 'Red' },
+  'red brambleback': { x: 84, y: 17, label: 'Red' },
+  'krug': { x: 64, y: 52, label: 'Krugs' },
+  'krugs': { x: 64, y: 52, label: 'Krugs' },
+  'krugs red': { x: 64, y: 52, label: 'Krugs' },
+  // Shared/mid area
+  'raptor': { x: 38, y: 18, label: 'Raptors' },
+  'raptors': { x: 38, y: 18, label: 'Raptors' },
+  'raps': { x: 38, y: 18, label: 'Raptors' },
+  // River objectives
+  'dragon': { x: 63, y: 74, label: 'Dragon' },
+  'baron': { x: 38, y: 40, label: 'Baron' },
+  'baron nashor': { x: 38, y: 40, label: 'Baron' },
+  'herald': { x: 38, y: 40, label: 'Herald' },
+  'rift herald': { x: 38, y: 40, label: 'Herald' },
   'scuttle': { x: 50, y: 52, label: 'Scuttle' },
   'scuttle crab': { x: 50, y: 52, label: 'Scuttle' },
   'rift scuttler': { x: 50, y: 52, label: 'Scuttle' },
   // Gank waypoints
   'gank': { x: 50, y: 52, label: 'Gank' },
   'gank mid': { x: 50, y: 52, label: 'Gank Mid' },
-  'gank top': { x: 27, y: 39, label: 'Gank Top' },
-  'gank bot': { x: 62, y: 60, label: 'Gank Bot' },
+  'gank top': { x: 28, y: 40, label: 'Gank Top' },
+  'gank bot': { x: 63, y: 60, label: 'Gank Bot' },
   // Exits / paths
   'exit': { x: 50, y: 52, label: 'Exit' },
 };

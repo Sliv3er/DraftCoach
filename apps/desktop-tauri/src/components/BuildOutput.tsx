@@ -280,11 +280,21 @@ function renderRunes(content: string, lookups: IconLookups | null) {
             const shardSrc = findIcon(s, lookups?.runes);
             return (
               <div key={`sh${i}`} className="rune-shard-cell">
-                {shardSrc ? (
-                  <img src={shardSrc} alt={s} className="rune-shard-icon" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                ) : (
-                  <span className="rune-shard-dot" />
+                {shardSrc && (
+                  <img
+                    src={shardSrc}
+                    alt={s}
+                    className="rune-shard-icon"
+                    onError={e => {
+                      // Replace broken img with next sibling fallback dot
+                      const img = e.target as HTMLImageElement;
+                      img.style.display = 'none';
+                      const dot = img.nextElementSibling as HTMLElement;
+                      if (dot && dot.classList.contains('rune-shard-dot')) dot.style.display = '';
+                    }}
+                  />
                 )}
+                <span className="rune-shard-dot" style={{ display: shardSrc ? 'none' : '' }} />
                 <span>{s}</span>
               </div>
             );
@@ -375,12 +385,14 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
         const numMatch = text.match(/^(\d+)\.\s*(.+)$/);
         if (numMatch) { num = numMatch[1]; text = numMatch[2]; }
 
-        const reasonMatch = text.match(/^([^(]+)\((.+)\)\s*$/);
+        // Match reason in parentheses - handle trailing punctuation like ).
+        const reasonMatch = text.match(/^([^(]+)\((.+)\)[.),;\s]*$/);
         if (reasonMatch) {
           text = reasonMatch[1].trim();
+          // Strip CONSTRAINT: tags from reason text
           reason = reasonMatch[2].trim()
-            .replace(/CONSTRAINT:\s*\w+\s*[—–-]\s*/gi, '')
-            .replace(/CONSTRAINT:\s*\w+/gi, '')
+            .replace(/CONSTRAINT:\s*[\w_]+\s*[—–-]\s*/gi, '')
+            .replace(/CONSTRAINT:\s*[\w_]+/gi, '')
             .trim();
         }
 
@@ -541,6 +553,8 @@ function resolveCampLabel(campName: string): string {
 }
 
 function renderJunglePath(content: string, version: string) {
+  console.warn('[BuildOutput] Jungle Path raw content:', JSON.stringify(content));
+
   // Normalize all possible separators into a single delimiter
   let normalized = content.trim()
     .replace(/\*\*/g, '')
@@ -563,6 +577,9 @@ function renderJunglePath(content: string, version: string) {
   } else if (normalized.includes(',')) {
     // Comma-separated: "Red, Krugs, Raptors"
     camps = normalized.split(',').map(s => s.trim()).filter(Boolean);
+  } else if (normalized.includes('/')) {
+    // Slash-separated compound: "Red/Krugs/Raptors/Wolves/Blue/Gromp/Gank"
+    camps = normalized.split('/').map(s => s.trim()).filter(Boolean);
   } else {
     // Single camp or unknown format
     camps = [normalized].filter(Boolean);

@@ -666,16 +666,21 @@ function renderPowerSpikes(content: string) {
       {lines.map((line, i) => {
         const cleaned = line.trim().replace(/\*\*/g, '').replace(/^[-*•]\s*/, '');
         const colonIdx = cleaned.indexOf(':');
-        const champName = colonIdx > 0 ? cleaned.slice(0, colonIdx).trim() : '';
-        const spike = colonIdx > 0 ? cleaned.slice(colonIdx + 1).trim() : cleaned;
+        const label = colonIdx > 0 ? cleaned.slice(0, colonIdx).trim() : '';
+        const desc = colonIdx > 0 ? cleaned.slice(colonIdx + 1).trim() : cleaned;
+        // Split description at em-dash for separate detail
+        const dashIdx = desc.indexOf(' — ');
+        const mainDesc = dashIdx > 0 ? desc.slice(0, dashIdx).trim() : desc;
+        const detail = dashIdx > 0 ? desc.slice(dashIdx + 3).trim() : '';
         return (
-          <div key={i} className="power-spike-item">
-            <span className="power-spike-icon">
-              <svg viewBox="0 0 10 10" style={{width:10,height:10,display:'block'}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#c8aa6e" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#c8aa6e" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#c8aa6e"/></svg>
-            </span>
-            <div className="power-spike-text">
-              {champName && <span className="power-spike-name">{champName}: </span>}
-              <span className="power-spike-desc">{spike}</span>
+          <div key={i} className="spike-card">
+            <div className="spike-header">
+              <span className="spike-indicator" />
+              <span className="spike-label">{label || `Spike ${i + 1}`}</span>
+            </div>
+            <div className="spike-body">
+              <span className="spike-main">{mainDesc}</span>
+              {detail && <span className="spike-detail">{detail}</span>}
             </div>
           </div>
         );
@@ -685,11 +690,29 @@ function renderPowerSpikes(content: string) {
 }
 
 function renderWinCondition(content: string) {
+  const text = content.replace(/\*\*/g, '').trim();
   return (
     <div className="win-condition-box">
-      {content.replace(/\*\*/g, '').trim()}
+      <div className="win-condition-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+      </div>
+      <div className="win-condition-text">{text}</div>
     </div>
   );
+}
+
+// Human-readable label mapping for AI-generated analysis keys
+function cleanAnalysisLabel(raw: string): string {
+  return raw
+    .replace(/_/g, ' ')            // ANTI_HEAL_NEEDED → ANTI HEAL NEEDED
+    .replace(/\b(NEEDED|VALUE)\b/gi, '')  // strip noise suffixes
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
 }
 
 function renderAnalysis(content: string) {
@@ -699,35 +722,71 @@ function renderAnalysis(content: string) {
     const t = l.trim();
     if (!t) return false;
     if (PROMPT_NOISE.test(t)) return false;
-    // Also stop if we hit a horizontal rule (--- or ===)
     if (/^[-=]{3,}$/.test(t)) return false;
     return true;
   });
 
-  // Additionally, truncate at the first line that looks like prompt structure
   const truncIdx = lines.findIndex(l => {
     const t = l.trim().replace(/\*\*/g, '');
     return /^STEP\s*\d/i.test(t) || /^THREAT_/i.test(t) || /^CONSTRAINTS?$/i.test(t) || /^BUILD CONSTRAINTS/i.test(t);
   });
   const cleanLines = truncIdx > 0 ? lines.slice(0, truncIdx) : lines;
 
+  // Parse into structured entries
+  type Entry = { label: string; value: string; isHighlight: boolean };
+  const entries: Entry[] = [];
+  for (const line of cleanLines) {
+    const cleaned = line.trim().replace(/\*\*/g, '');
+    const colonIdx = cleaned.indexOf(':');
+    if (colonIdx > 0 && colonIdx < 35) {
+      const rawLabel = cleaned.slice(0, colonIdx).trim();
+      const value = cleaned.slice(colonIdx + 1).trim();
+      if (!value) continue;
+      const label = cleanAnalysisLabel(rawLabel);
+      // Highlight key tactical entries
+      const isHighlight = /threat|zhonya|banshee|boot|spike|anti.heal|qss|suppress/i.test(rawLabel);
+      entries.push({ label, value, isHighlight });
+    } else if (cleaned) {
+      entries.push({ label: '', value: cleaned, isHighlight: false });
+    }
+  }
+
+  // Split: top overview entries vs bottom tactical entries
+  const overviewKeys = /matchup|damage|threat|survivab|item prior/i;
+  const overview = entries.filter(e => overviewKeys.test(e.label));
+  const tactical = entries.filter(e => !overviewKeys.test(e.label) && e.label);
+  const freeText = entries.filter(e => !e.label && e.value);
+
   return (
-    <div className="analysis-box">
-      {cleanLines.map((line, i) => {
-        const cleaned = line.trim().replace(/\*\*/g, '');
-        const colonIdx = cleaned.indexOf(':');
-        if (colonIdx > 0 && colonIdx < 25) {
-          const label = cleaned.slice(0, colonIdx).trim();
-          const value = cleaned.slice(colonIdx + 1).trim();
-          return (
-            <div key={i} className="analysis-line">
-              <span className="analysis-label">{label}: </span>
-              <span>{value}</span>
+    <div className="analysis-container">
+      {/* Overview section */}
+      {overview.length > 0 && (
+        <div className="analysis-overview">
+          {overview.map((e, i) => (
+            <div key={`o${i}`} className="analysis-row">
+              <span className="analysis-label">{e.label}</span>
+              <span className="analysis-value">{e.value}</span>
             </div>
-          );
-        }
-        return <div key={i}>{cleaned}</div>;
-      })}
+          ))}
+        </div>
+      )}
+      {/* Tactical insights as compact cards */}
+      {tactical.length > 0 && (
+        <div className="analysis-tactics">
+          {tactical.map((e, i) => (
+            <div key={`t${i}`} className={`analysis-tag ${e.isHighlight ? 'analysis-tag-highlight' : ''}`}>
+              <span className="analysis-tag-label">{e.label}</span>
+              <span className="analysis-tag-value">{e.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Free text */}
+      {freeText.length > 0 && (
+        <div className="analysis-freetext">
+          {freeText.map((e, i) => <div key={`f${i}`}>{e.value}</div>)}
+        </div>
+      )}
     </div>
   );
 }

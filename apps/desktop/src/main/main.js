@@ -1619,81 +1619,116 @@ COMMON MISTAKES — NEVER DO THESE:
         }
 
         // ── Phase 2: Full build (runs in parallel, model depends on setting) ──
-        const proPromise = (async () => {
-          try {
-            const proModel = genAI.getGenerativeModel({
-              model: fullPhaseModelName,
-              systemInstruction: buildSystemPrompt(patchDisplay),
-              generationConfig: {
-                // Flash-only mode uses lower temp for determinism; 1500 tokens for full build
-                temperature: fullPhaseModelName.includes('flash') ? 0.2 : 0.3,
-                topP: 0.85,
-                topK: 40,
-                maxOutputTokens: 4096,
-              },
-            });
-
-            const proStream = await proModel.generateContentStream(fullUserMessage);
-            let proText = '';
-
-            for await (const chunk of proStream.stream) {
-              const t = chunk.text();
-              if (t) {
-                proText += t;
-                sendSSE({ phase: 'full', chunk: t });
-              }
+        // In flash-only mode, skip Pro entirely and go straight to Flash
+        let finalText;
+        if (generationMode === 'flash') {
+          // Flash-only mode: run Flash directly for full build (skip runes phase + Pro phase)
+          log('INFO', `[dual] Flash-only mode: running Flash for full build`);
+          const flashOnlyModel = genAI.getGenerativeModel({
+            model: 'gemini-3-flash-preview',
+            systemInstruction: buildSystemPrompt(patchDisplay),
+            generationConfig: {
+              temperature: 0.3,
+              topP: 0.9,
+              topK: 64,
+              maxOutputTokens: 8192,
+            },
+          });
+          const flashStream = await flashOnlyModel.generateContentStream(fullUserMessage);
+          let flashText = '';
+          for await (const chunk of flashStream.stream) {
+            const t = chunk.text();
+            if (t) {
+              flashText += t;
+              sendSSE({ phase: 'full', chunk: t });
             }
-
-            // Validate full build from Pro
-            const validated = await validateAndCorrectBuild(proText);
-            if (validated !== proText) {
-              sendSSE({ phase: 'full', corrected: validated });
-            }
-            setCache(cacheKey, validated, patchDisplay);
-            sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: fullPhaseModelName });
-            log('INFO', `[dual] Pro full build complete (${proText.length} chars)`);
-            return validated;
-          } catch (err) {
-            log('ERROR', `[dual] Pro full build failed: ${err.message}`);
-            sendSSE({ phase: 'full', error: err.message });
-            return null;
           }
-        })();
+          log('INFO', `[dual] Flash-only raw output (${flashText.length} chars)`);
+          const validated = await validateAndCorrectBuild(flashText);
+          if (validated !== flashText) {
+            sendSSE({ phase: 'full', corrected: validated });
+          }
+          setCache(cacheKey, validated, patchDisplay);
+          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'gemini-3-flash-preview' });
+          log('INFO', `[dual] Flash-only full build complete (${flashText.length} chars)`);
+          finalText = validated;
+        } else {
+          // Hybrid mode: run Pro and Flash in parallel
+          const proPromise = (async () => {
+            try {
+              const proModel = genAI.getGenerativeModel({
+                model: fullPhaseModelName,
+                systemInstruction: buildSystemPrompt(patchDisplay),
+                generationConfig: {
+                  temperature: fullPhaseModelName.includes('flash') ? 0.2 : 0.3,
+                  topP: 0.85,
+                  topK: 40,
+                  maxOutputTokens: 4096,
+                },
+              });
 
-        // Wait for both to finish
-        const [flashResult, proResult] = await Promise.all([flashPromise, proPromise]);
+              const proStream = await proModel.generateContentStream(fullUserMessage);
+              let proText = '';
 
-        // ── Fallback: if Pro failed or missing CORE BUILD, retry with Flash ──
-        let finalText = proResult;
-        if (!proResult || !proResult.includes('CORE BUILD')) {
-          log('WARN', `[dual] Pro result missing CORE BUILD — falling back to Flash for full build`);
-          try {
-            const fallbackModel = genAI.getGenerativeModel({
-              model: 'gemini-3-flash-preview',
-              systemInstruction: buildSystemPrompt(patchDisplay),
-            });
-            const fallbackStream = await fallbackModel.generateContentStream(fullUserMessage);
-            let fallbackText = '';
-            for await (const chunk of fallbackStream.stream) {
-              const t = chunk.text();
-              if (t) {
-                fallbackText += t;
-                sendSSE({ phase: 'full', chunk: t });
+              for await (const chunk of proStream.stream) {
+                const t = chunk.text();
+                if (t) {
+                  proText += t;
+                  sendSSE({ phase: 'full', chunk: t });
+                }
               }
+
+              // Validate full build from Pro
+              const validated = await validateAndCorrectBuild(proText);
+              if (validated !== proText) {
+                sendSSE({ phase: 'full', corrected: validated });
+              }
+              setCache(cacheKey, validated, patchDisplay);
+              sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: fullPhaseModelName });
+              log('INFO', `[dual] Pro full build complete (${proText.length} chars)`);
+              return validated;
+            } catch (err) {
+              log('ERROR', `[dual] Pro full build failed: ${err.message}`);
+              sendSSE({ phase: 'full', error: err.message });
+              return null;
             }
-            const validated = await validateAndCorrectBuild(fallbackText);
-            if (validated !== fallbackText) {
-              sendSSE({ phase: 'full', corrected: validated });
-            }
-            setCache(cacheKey, validated, patchDisplay);
-            sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'gemini-3-flash-preview' });
-            log('INFO', `[dual] Flash fallback full build complete (${fallbackText.length} chars)`);
-            finalText = validated;
-          } catch (fbErr) {
-            log('ERROR', `[dual] Flash fallback also failed: ${fbErr.message}`);
-            // Last resort: stale cache
-            if (cached) {
-              sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
+          })();
+
+          // Wait for both to finish
+          const [flashResult, proResult] = await Promise.all([flashPromise, proPromise]);
+
+          // ── Fallback: if Pro failed or missing CORE BUILD, retry with Flash ──
+          finalText = proResult;
+          if (!proResult || !proResult.includes('CORE BUILD')) {
+            log('WARN', `[dual] Pro result missing CORE BUILD — falling back to Flash for full build`);
+            try {
+              const fallbackModel = genAI.getGenerativeModel({
+                model: 'gemini-3-flash-preview',
+                systemInstruction: buildSystemPrompt(patchDisplay),
+              });
+              const fallbackStream = await fallbackModel.generateContentStream(fullUserMessage);
+              let fallbackText = '';
+              for await (const chunk of fallbackStream.stream) {
+                const t = chunk.text();
+                if (t) {
+                  fallbackText += t;
+                  sendSSE({ phase: 'full', chunk: t });
+                }
+              }
+              const validated = await validateAndCorrectBuild(fallbackText);
+              if (validated !== fallbackText) {
+                sendSSE({ phase: 'full', corrected: validated });
+              }
+              setCache(cacheKey, validated, patchDisplay);
+              sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'gemini-3-flash-preview' });
+              log('INFO', `[dual] Flash fallback full build complete (${fallbackText.length} chars)`);
+              finalText = validated;
+            } catch (fbErr) {
+              log('ERROR', `[dual] Flash fallback also failed: ${fbErr.message}`);
+              // Last resort: stale cache
+              if (cached) {
+                sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
+              }
             }
           }
         }

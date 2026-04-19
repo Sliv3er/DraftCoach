@@ -130,77 +130,6 @@ body {
   border-radius: 4px;
 }
 
-.window-controls {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 8px;
-  -webkit-app-region: no-drag;
-}
-
-.win-ctrl-btn {
-  width: 28px;
-  height: 24px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s;
-  border-radius: 3px;
-  padding: 0;
-}
-
-.win-ctrl-btn:hover {
-  background: rgba(255,255,255,0.08);
-  color: var(--text-primary);
-}
-
-.win-close:hover {
-  background: #c84020 !important;
-  color: #fff !important;
-}
-
-.window-controls {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 10px;
-  background: transparent;
-}
-
-.win-ctrl-btn {
-  width: 32px;
-  height: 28px;
-  border: none;
-  background: rgba(30, 35, 40, 0.9);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s;
-  border-radius: 0 0 4px 4px;
-  padding: 0;
-}
-
-.win-ctrl-btn:hover {
-  background: rgba(50, 55, 60, 0.95);
-  color: var(--text-primary);
-}
-
-.win-close:hover {
-  background: #c84020 !important;
-  color: #fff !important;
-  border-radius: 0 0 0 4px;
-}
-
 .header-meta {
   display: flex;
   align-items: center;
@@ -253,7 +182,40 @@ body {
   color: var(--text-primary);
 }
 
-/* â”€â”€ RAG Badge (next to Patch badge) â”€â”€ */
+/* ─── Window Controls (custom title bar buttons) ─── */
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  -webkit-app-region: no-drag;
+}
+
+.win-ctrl-btn {
+  width: 28px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  border-radius: 3px;
+  padding: 0;
+}
+
+.win-ctrl-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary);
+}
+
+.win-close:hover {
+  background: #c84020 !important;
+  color: #fff !important;
+}
+
+/* ─── RAG Badge (next to Patch badge) ─── */
 .rag-badge {
   display: flex;
   align-items: center;

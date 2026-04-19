@@ -1014,25 +1014,13 @@ export function App() {
   }, []);
 
   return (
-    <>
-      <div className="window-controls">
-        <button className="win-ctrl-btn win-minimize" onClick={minimizeCurrentWindow} title="Minimize">
-          <svg width="10" height="1" viewBox="0 0 10 1"><rect fill="currentColor" width="10" height="1"/></svg>
-        </button>
-        <button className="win-ctrl-btn win-maximize" onClick={hideCurrentWindow} title="Maximize">
-          <svg width="10" height="10" viewBox="0 0 10 10"><rect fill="none" stroke="currentColor" strokeWidth="1" width="8" height="8" x="1" y="1"/></svg>
-        </button>
-        <button className="win-ctrl-btn win-close" onClick={closeCurrentWindow} title="Close">
-          <svg width="10" height="10" viewBox="0 0 10 10"><path stroke="currentColor" strokeWidth="1.2" fill="none" d="M1,1 L9,9 M9,1 L1,9"/></svg>
-        </button>
-      </div>
-      <div className="app">
-        <header className="header">
-          <div className="header-brand">
-            <img src="http://127.0.0.1:3210/logo" alt="DraftCoach" className="brand-logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-            <h1>DraftCoach</h1>
-          </div>
-          <div className="header-meta">
+    <div className="app">
+      <header className="header">
+        <div className="header-brand">
+          <img src="http://127.0.0.1:3210/logo" alt="DraftCoach" className="brand-logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          <h1>DraftCoach</h1>
+        </div>
+        <div className="header-meta">
           <span className="header-tag">Patch <span className="value"> {patchVersion}</span></span>
           <span className={`rag-badge ${ragStatus.isUpdating ? 'rag-badge-syncing' : ragStatus.patch ? 'rag-badge-ok' : 'rag-badge-idle'}`}>
             <span className="rag-badge-dot" />
@@ -1091,6 +1079,17 @@ export function App() {
           <button className="btn-settings-toggle" onClick={() => setSettingsOpen(v => !v)} title="Settings">
             ⚙️
           </button>
+          <div className="window-controls">
+            <button className="win-ctrl-btn win-minimize" onClick={minimizeCurrentWindow} title="Minimize">
+              <svg width="10" height="1" viewBox="0 0 10 1"><rect fill="currentColor" width="10" height="1"/></svg>
+            </button>
+            <button className="win-ctrl-btn win-maximize" onClick={hideCurrentWindow} title="Maximize">
+              <svg width="10" height="10" viewBox="0 0 10 10"><rect fill="none" stroke="currentColor" strokeWidth="1" width="8" height="8" x="1" y="1"/></svg>
+            </button>
+            <button className="win-ctrl-btn win-close" onClick={closeCurrentWindow} title="Close">
+              <svg width="10" height="10" viewBox="0 0 10 10"><path stroke="currentColor" strokeWidth="1.2" fill="none" d="M1,1 L9,9 M9,1 L1,9"/></svg>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -1660,6 +1659,5 @@ export function App() {
         </div>
       </footer>
     </div>
-    </>
   );
 }

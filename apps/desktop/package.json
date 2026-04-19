@@ -20,12 +20,6 @@
           "arch": [
             "x64"
           ]
-        },
-        {
-          "target": "dir",
-          "arch": [
-            "x64"
-          ]
         }
       ],
       "icon": "../../assets/icon.ico",
@@ -41,9 +35,12 @@
       "allowToChangeInstallationDirectory": false,
       "installerIcon": "../../assets/icon.ico",
       "uninstallerIcon": "../../assets/icon.ico",
+      "installerHeaderIcon": "../../assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "DraftCoach"
+      "shortcutName": "DraftCoach",
+      "runAfterFinish": true,
+      "include": "build/installer.nsh"
     },
     "asar": true,
     "extraResources": [

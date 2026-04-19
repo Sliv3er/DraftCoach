@@ -1375,36 +1375,70 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Skill Order */
-.skill-order {
+/* Skill Order - LoL-native with champion ability icons */
+.skill-order-lol {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
-  font-size: 15px;
-  font-weight: 700;
   padding: 6px 0;
+  flex-wrap: wrap;
 }
 
-.skill-key {
+.skill-ability {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.skill-ability-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  border: 2px solid var(--gold-dim);
+  overflow: hidden;
   background: var(--bg-elevated);
-  border: 2px solid var(--border);
-  padding: 6px 16px;
-  border-radius: 6px;
-  font-size: 16px;
+  box-shadow: 0 0 10px rgba(200, 170, 110, 0.15);
+}
+
+.skill-ability-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.skill-ability-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2a2a3a 0%, #1a1a28 100%);
+}
+
+.skill-ability-key {
+  font-size: 20px;
   font-weight: 700;
   color: var(--gold);
-  transition: all 0.15s;
+  text-shadow: 0 0 6px rgba(200, 170, 110, 0.4);
 }
 
-.skill-key:first-of-type {
-  font-size: 18px;
-  padding: 8px 18px;
+.skill-ability-name {
+  font-size: 9px;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 52px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .skill-separator {
   color: var(--text-muted);
   font-size: 14px;
   font-weight: 400;
+  margin-top: 24px;
 }
 
 /* Situational Items Grid */
@@ -1563,6 +1597,89 @@ body {
   color: var(--accent-green);
 }
 
+/* Jungle Path Minimap */
+.jungle-path-container {
+  position: relative;
+  width: 100%;
+}
+
+.jungle-minimap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 180px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #0a0f0a;
+}
+
+.jungle-minimap-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.jungle-minimap-fallback {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 10, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.jungle-mini-camp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--accent-green);
+}
+
+.jungle-mini-num {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jungle-mini-name {
+  font-weight: 600;
+}
+
+.jungle-path-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(200, 170, 110, 0.6);
+  z-index: 2;
+}
+
+.jungle-marker-num {
+  font-size: 9px;
+  font-weight: 700;
+  color: #000;
+  line-height: 1;
+}
 /* Empty State */
 .empty-state {
   display: flex;

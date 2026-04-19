@@ -138,7 +138,9 @@ export interface IconLookups {
   items: Map<string, string>;    // normalized name -> icon url
   itemIds: Map<string, string>;  // normalized name -> item id
   spells: Map<string, string>;   // normalized name -> icon url
-  runes: Map<string, string>;    // normalized name -> icon url
+  runes: Map<string, string>;    // normalized name -> icon url (rune trees + rune slots)
+  statShards: Map<string, string>; // stat shard name -> icon url
+  abilities: Map<string, string>;  // "${championId}_${Q|W|E|R}" -> ability icon url
   version: string;
   /** Full DDragon item data keyed by item ID — used for component path resolution */
   itemFullData: Map<string, { name: string; from?: string[]; gold: { total: number } }>;
@@ -564,7 +566,8 @@ export function App() {
           }
         }
 
-        // Add stat shard icons
+        // Add stat shard icons (proper DDragon URLs)
+        const statShards = new Map<string, string>();
         const shardIcons: Record<string, string> = {
           'adaptive force': 'perk-images/StatMods/StatModsAdaptiveForceIcon.png',
           'attack speed': 'perk-images/StatMods/StatModsAttackSpeedIcon.png',
@@ -580,10 +583,13 @@ export function App() {
           'tenacity': 'perk-images/StatMods/StatModsTenacityIcon.png',
         };
         for (const [name, iconPath] of Object.entries(shardIcons)) {
-          runes.set(name, `https://ddragon.leagueoflegends.com/cdn/img/${iconPath}`);
+          const url = `https://ddragon.leagueoflegends.com/cdn/${version}/img/${iconPath}`;
+          statShards.set(name, url);
+          runes.set(name, url);
         }
 
-        setIconLookups({ items, itemIds, spells, runes, version, itemFullData });
+        const abilities = new Map<string, string>();
+        setIconLookups({ items, itemIds, spells, runes, statShards, abilities, version, itemFullData });
       } catch (err) {
         console.error('Failed to load DDragon data:', err);
       }

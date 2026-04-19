@@ -1,7 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BuildResponse } from '../types';
 import { IconLookups } from '../App';
 import { ipcInvoke } from '../bridge';
+
+interface ChampionSpell {
+  id: string;
+  name: string;
+  key: string;
+  iconUrl: string;
+}
+
+// Cache champion spell data to avoid re-fetching
+const champSpellCache = new Map<string, ChampionSpell[]>();
+
+async function fetchChampionSpells(championId: string, version: string): Promise<ChampionSpell[]> {
+  const cacheKey = `${championId}_${version}`;
+  if (champSpellCache.has(cacheKey)) return champSpellCache.get(cacheKey)!;
+
+  try {
+    const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${championId}.json`);
+    const data = await res.json();
+    const champData = data.data[championId];
+    if (!champData) return [];
+
+    const spells: ChampionSpell[] = (champData.spells || []).map((s: any) => ({
+      id: s.id,
+      name: s.name,
+      key: s.key,
+      iconUrl: `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${s.id}.png`,
+    }));
+
+    champSpellCache.set(cacheKey, spells);
+    return spells;
+  } catch {
+    return [];
+  }
+}
+
+function getAbilityIcon(championId: string, version: string, abilityKey: string, allSpells: ChampionSpell[]): ChampionSpell | undefined {
+  return allSpells.find(s => s.key === abilityKey);
+}
 
 interface LiveUpdatedItem {
   name: string;
@@ -271,25 +309,39 @@ function renderSummoners(content: string, lookups: IconLookups | null) {
   );
 }
 
-const SKILL_COLORS: Record<string, string> = {
-  'Q': '#3b82f6',
-  'W': '#22c55e',
-  'E': '#eab308',
-  'R': '#ef4444',
-};
-
-function renderSkillOrder(content: string) {
+function renderSkillOrder(
+  content: string,
+  championSpells: ChampionSpell[],
+  version: string,
+) {
   const parts = content.split('>').map(s => s.trim()).filter(Boolean);
   if (parts.length === 0) return <div className="build-output">{content}</div>;
+
   return (
-    <div className="skill-order">
+    <div className="skill-order-lol">
       {parts.map((p, i) => {
         const letter = p.trim().toUpperCase();
-        const color = SKILL_COLORS[letter];
+        const spell = championSpells.find(s => s.key === letter);
         return (
           <React.Fragment key={i}>
             {i > 0 && <span className="skill-separator">›</span>}
-            <span className="skill-key" style={color ? { borderColor: color, color, textShadow: `0 0 8px ${color}40` } : undefined}>{p}</span>
+            <div className="skill-ability">
+              <div className="skill-ability-icon-wrap">
+                {spell ? (
+                  <img
+                    src={spell.iconUrl}
+                    alt={spell.name}
+                    className="skill-ability-icon"
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="skill-ability-placeholder">
+                    <span className="skill-ability-key">{letter}</span>
+                  </div>
+                )}
+              </div>
+              <span className="skill-ability-name">{spell?.name || letter}</span>
+            </div>
           </React.Fragment>
         );
       })}
@@ -396,20 +448,84 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   );
 }
 
+// Standard jungle camp positions on SR minimap (512x512 image) as percentages
+const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
+  'red': { x: 34, y: 22, label: 'Red' },
+  'red buff': { x: 34, y: 22, label: 'Red' },
+  'red brambleback': { x: 34, y: 22, label: 'Red' },
+  'blue': { x: 66, y: 22, label: 'Blue' },
+  'blue sentinel': { x: 66, y: 22, label: 'Blue' },
+  'blue buff': { x: 66, y: 22, label: 'Blue' },
+  'gromp': { x: 56, y: 28, label: 'Gromp' },
+  'wolves': { x: 42, y: 28, label: 'Wolves' },
+  'murk wolves': { x: 42, y: 28, label: 'Wolves' },
+  'raptor': { x: 32, y: 38, label: 'Raptors' },
+  'raptors': { x: 32, y: 38, label: 'Raptors' },
+  'krug': { x: 26, y: 30, label: 'Krugs' },
+  'krugs': { x: 26, y: 30, label: 'Krugs' },
+  'dragon': { x: 50, y: 50, label: 'Dragon' },
+  'baron': { x: 50, y: 72, label: 'Baron' },
+  'baron nashor': { x: 50, y: 72, label: 'Baron' },
+  'herald': { x: 32, y: 62, label: 'Herald' },
+  'rift herald': { x: 32, y: 62, label: 'Herald' },
+};
+
+function normalizeCampName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z]/g, '').trim();
+}
+
+function findCampPosition(campName: string): { x: number; y: number; label: string } | null {
+  const norm = normalizeCampName(campName);
+  for (const [key, pos] of Object.entries(CAMP_POSITIONS)) {
+    if (norm.includes(key.replace(/[^a-z]/g, '')) || key.includes(norm)) {
+      return pos;
+    }
+  }
+  return null;
+}
+
 function renderJunglePath(content: string) {
   const path = content.trim()
     .replace(/\s*-+>\s*/g, ' ➔ ')
     .replace(/\s*->+\s*/g, ' ➔ ')
     .replace(/\s*→\s*/g, ' ➔ ');
-  const camps = path.split(/\s*➔\s*/);
+  const camps = path.split(/\s*➔\s*/).map(s => s.trim()).filter(Boolean);
+
   return (
-    <div className="jungle-path-row">
-      {camps.map((camp, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <span className="jungle-path-arrow">➔</span>}
-          <span className="jungle-path-camp">{camp.trim()}</span>
-        </React.Fragment>
-      ))}
+    <div className="jungle-path-container">
+      <div className="jungle-minimap">
+        <img
+          src="https://static.u.gg/assets/lol/riotLol/maps/11/sr-map-1.2.0.png"
+          alt="Summoner's Rift Minimap"
+          className="jungle-minimap-img"
+          onError={e => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            (target.nextElementSibling as HTMLElement).style.display = 'flex';
+          }}
+        />
+        <div className="jungle-minimap-fallback" style={{ display: 'none' }}>
+          {camps.map((camp, i) => (
+            <div key={i} className="jungle-mini-camp">
+              <span className="jungle-mini-num">{i + 1}</span>
+              <span className="jungle-mini-name">{camp}</span>
+            </div>
+          ))}
+        </div>
+        {camps.map((camp, i) => {
+          const pos = findCampPosition(camp);
+          if (!pos) return null;
+          return (
+            <div
+              key={i}
+              className="jungle-path-marker"
+              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+            >
+              <span className="jungle-marker-num">{i + 1}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -468,12 +584,18 @@ function renderAnalysis(content: string) {
   );
 }
 
-function renderSection(title: string, content: string, lookups: IconLookups | null) {
+function renderSection(
+  title: string,
+  content: string,
+  lookups: IconLookups | null,
+  championSpells: ChampionSpell[],
+  version: string,
+) {
   switch (title) {
     case 'ANALYSIS': return renderAnalysis(content);
     case 'RUNES': return renderRunes(content, lookups);
     case 'SUMMONERS': return renderSummoners(content, lookups);
-    case 'SKILL ORDER': return renderSkillOrder(content);
+    case 'SKILL ORDER': return renderSkillOrder(content, championSpells, version);
     case 'STARTING ITEMS': return renderItems(content, lookups, false);
     case 'CORE BUILD': return renderItems(content, lookups, true);
     case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
@@ -487,6 +609,15 @@ function renderSection(title: string, content: string, lookups: IconLookups | nu
 
 export function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems }: Props) {
   const [exportStatus, setExportStatus] = React.useState<string | null>(null);
+  const [championSpells, setChampionSpells] = useState<ChampionSpell[]>([]);
+
+  useEffect(() => {
+    if (!championId || !iconLookups?.version) return;
+    setChampionSpells([]);
+    fetchChampionSpells(championId, iconLookups.version).then(setChampionSpells);
+  }, [championId, iconLookups?.version]);
+
+  const version = iconLookups?.version || '';
 
   const handleExport = React.useCallback(async () => {
     if (!result?.ok || !result.text || !championId || !iconLookups?.itemIds) return;
@@ -567,24 +698,10 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const rightSections = sections.filter(s => RIGHT_COL_KEYS.includes(s.title));
   const bottomSections = sections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
 
-  const SECTION_ICONS: Record<string, string> = {
-    'ANALYSIS': '📊',
-    'RUNES': '🔮',
-    'SUMMONERS': '⚡',
-    'SKILL ORDER': '🎯',
-    'STARTING ITEMS': '🛒',
-    'CORE BUILD': '⚔️',
-    'SITUATIONAL ITEMS': '🔄',
-    'JUNGLE PATH': '🌿',
-    'ENEMY POWER SPIKES': '⚠️',
-    'YOUR POWER SPIKES': '💪',
-    'WIN CONDITION': '🏆',
-  };
-
   const renderSectionCard = (s: { title: string; content: string }, i: number) => (
     <div key={i} className="build-section">
       <div className="build-section-header">
-        <h3><span className="section-icon">{SECTION_ICONS[s.title] || '📋'}</span>{s.title}</h3>
+        <h3>{s.title}</h3>
         <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
           Copy
         </button>
@@ -592,8 +709,30 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
       {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
       {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
         ? renderLiveUpdatedItems(liveUpdatedItems)
-        : renderSection(s.title, s.content, iconLookups)
+        : renderSection(s.title, s.content, iconLookups, championSpells, version)
       }
+    </div>
+  );
+
+  const content = sections.length > 0 ? (
+    <>
+      <div className="build-columns">
+        <div className="build-col build-col-left">
+          {leftSections.map((s, i) => renderSectionCard(s, i))}
+        </div>
+        <div className="build-col build-col-right">
+          {rightSections.map((s, i) => renderSectionCard(s, i))}
+        </div>
+      </div>
+      {bottomSections.length > 0 && (
+        <div className="build-bottom">
+          {bottomSections.map((s, i) => renderSectionCard(s, i))}
+        </div>
+      )}
+    </>
+  ) : (
+    <div className="build-section">
+      <div className="build-output">{result.text}</div>
     </div>
   );
 
@@ -601,38 +740,14 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
     <div>
       <div className="build-actions">
         <button className="btn-copy-all" onClick={() => copyToClipboard(result.text)}>
-          📋 Copy All
+          Copy All
         </button>
         <button className="btn-export" onClick={handleExport}>
-          🎮 Export to LoL
+          Export to LoL
         </button>
         {exportStatus && <span className="export-status">{exportStatus}</span>}
       </div>
-
-      {sections.length > 0 ? (
-        <>
-          {/* 2-column layout: Runes/Skills left, Items right */}
-          <div className="build-columns">
-            <div className="build-col build-col-left">
-              {leftSections.map((s, i) => renderSectionCard(s, i))}
-            </div>
-            <div className="build-col build-col-right">
-              {rightSections.map((s, i) => renderSectionCard(s, i))}
-            </div>
-          </div>
-
-          {/* Full-width sections below */}
-          {bottomSections.length > 0 && (
-            <div className="build-bottom">
-              {bottomSections.map((s, i) => renderSectionCard(s, i))}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="build-section">
-          <div className="build-output">{result.text}</div>
-        </div>
-      )}
+      {content}
     </div>
   );
 }

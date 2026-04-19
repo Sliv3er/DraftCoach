@@ -482,47 +482,44 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   );
 }
 
-// Standard jungle camp positions on SR minimap as percentages (blue-side default)
-// Real Summoner's Rift minimap camp positions (% from left = x, % from top = y)
-// Reference: League of Legends official SR minimap (map11.png)
-// Minimap orientation: Blue base = BOTTOM-LEFT, Red base = TOP-RIGHT
-// River runs diagonally from bottom-left to top-right
-// x% = distance from left edge, y% = distance from TOP edge
+// Standard jungle camp positions on SR minimap as percentages
+// Converted from actual in-game coordinates (14870x14870 map)
+// x% = game_x / 14870 * 100, y% = (1 - game_y / 14870) * 100
+// Using BLUE SIDE camp positions (standard assumption)
 const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
-  // Blue side jungle (BOTTOM-LEFT of minimap) - adjusted positions
-  'blue': { x: 17, y: 82, label: 'Blue' },
-  'blue sentinel': { x: 17, y: 82, label: 'Blue' },
-  'blue buff': { x: 17, y: 82, label: 'Blue' },
-  'gromp': { x: 24, y: 70, label: 'Gromp' },
-  'grom': { x: 24, y: 70, label: 'Gromp' },
-  'wolves': { x: 32, y: 80, label: 'Wolves' },
-  'murk wolves': { x: 32, y: 80, label: 'Wolves' },
-  'wolf': { x: 32, y: 80, label: 'Wolves' },
-  // Red side jungle (TOP-RIGHT of minimap) - adjusted positions
-  'red': { x: 83, y: 18, label: 'Red' },
-  'red buff': { x: 83, y: 18, label: 'Red' },
-  'red brambleback': { x: 83, y: 18, label: 'Red' },
-  'krug': { x: 70, y: 45, label: 'Krugs' },
-  'krugs': { x: 70, y: 45, label: 'Krugs' },
-  'krugs red': { x: 70, y: 45, label: 'Krugs' },
-  // Raptors are on the red side but closer to mid lane - adjusted from y=18 to y=28
-  'raptor': { x: 48, y: 28, label: 'Raptors' },
-  'raptors': { x: 48, y: 28, label: 'Raptors' },
-  'raps': { x: 48, y: 28, label: 'Raptors' },
-  // River objectives - adjusted positions
-  'dragon': { x: 62, y: 72, label: 'Dragon' },
-  'baron': { x: 38, y: 38, label: 'Baron' },
-  'baron nashor': { x: 38, y: 38, label: 'Baron' },
-  'herald': { x: 38, y: 38, label: 'Herald' },
-  'rift herald': { x: 38, y: 38, label: 'Herald' },
+  // Blue side camps (blue team's blue-buff quadrant — top-left on minimap)
+  'blue': { x: 26, y: 47, label: 'Blue' },
+  'blue sentinel': { x: 26, y: 47, label: 'Blue' },
+  'blue buff': { x: 26, y: 47, label: 'Blue' },
+  'gromp': { x: 15, y: 43, label: 'Gromp' },
+  'grom': { x: 15, y: 43, label: 'Gromp' },
+  'wolves': { x: 25, y: 57, label: 'Wolves' },
+  'murk wolves': { x: 25, y: 57, label: 'Wolves' },
+  'wolf': { x: 25, y: 57, label: 'Wolves' },
+  // Blue side camps (blue team's red-buff quadrant — bottom-right on minimap)
+  'red': { x: 53, y: 73, label: 'Red' },
+  'red buff': { x: 53, y: 73, label: 'Red' },
+  'red brambleback': { x: 53, y: 73, label: 'Red' },
+  'raptor': { x: 47, y: 64, label: 'Raptors' },
+  'raptors': { x: 47, y: 64, label: 'Raptors' },
+  'raps': { x: 47, y: 64, label: 'Raptors' },
+  'krug': { x: 56, y: 82, label: 'Krugs' },
+  'krugs': { x: 56, y: 82, label: 'Krugs' },
+  'krugs red': { x: 56, y: 82, label: 'Krugs' },
+  // River objectives
+  'dragon': { x: 66, y: 70, label: 'Dragon' },
+  'baron': { x: 33, y: 30, label: 'Baron' },
+  'baron nashor': { x: 33, y: 30, label: 'Baron' },
+  'herald': { x: 33, y: 30, label: 'Herald' },
+  'rift herald': { x: 33, y: 30, label: 'Herald' },
   'scuttle': { x: 50, y: 50, label: 'Scuttle' },
   'scuttle crab': { x: 50, y: 50, label: 'Scuttle' },
   'rift scuttler': { x: 50, y: 50, label: 'Scuttle' },
   // Gank waypoints
   'gank': { x: 50, y: 50, label: 'Gank' },
   'gank mid': { x: 50, y: 50, label: 'Gank Mid' },
-  'gank top': { x: 30, y: 38, label: 'Gank Top' },
-  'gank bot': { x: 64, y: 58, label: 'Gank Bot' },
+  'gank top': { x: 20, y: 30, label: 'Gank Top' },
+  'gank bot': { x: 70, y: 75, label: 'Gank Bot' },
   // Exits / paths
   'exit': { x: 50, y: 50, label: 'Exit' },
 };
@@ -564,7 +561,14 @@ function resolveCampLabel(campName: string): string {
 function renderJunglePath(content: string, version: string) {
   console.warn('[BuildOutput] Jungle Path raw content:', JSON.stringify(content));
 
-  const raw = content.trim().replace(/\*\*/g, '');
+  let raw = content.trim().replace(/\*\*/g, '');
+
+  // Handle multi-line "BLUE SIDE: ... \n RED SIDE: ..." format — take only the first route
+  if (/^(BLUE|RED)\s*SIDE\s*:/im.test(raw)) {
+    const routeLines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+    // Take the first route line and strip the "BLUE SIDE:" / "RED SIDE:" prefix
+    raw = routeLines[0].replace(/^(BLUE|RED)\s*SIDE\s*:\s*/i, '').trim();
+  }
 
   // First try: split by arrows (multiple arrow types)
   const ARROW_RE = /\s*(?:➤|➔|->|→|➜|=>)\s*/;
@@ -737,19 +741,24 @@ function renderSection(
   championSpells: ChampionSpell[],
   version: string,
 ) {
-  switch (title) {
-    case 'ANALYSIS': return renderAnalysis(content);
-    case 'RUNES': return renderRunes(content, lookups);
-    case 'SUMMONERS': return renderSummoners(content, lookups);
-    case 'SKILL ORDER': return renderSkillOrder(content, championSpells, version);
-    case 'STARTING ITEMS': return renderItems(content, lookups, false);
-    case 'CORE BUILD': return renderItems(content, lookups, true);
-    case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
-    case 'JUNGLE PATH': return renderJunglePath(content, version);
-    case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
-    case 'YOUR POWER SPIKES': return renderPowerSpikes(content);
-    case 'WIN CONDITION': return renderWinCondition(content);
-    default: return <div className="build-output">{content}</div>;
+  try {
+    switch (title) {
+      case 'ANALYSIS': return renderAnalysis(content);
+      case 'RUNES': return renderRunes(content, lookups);
+      case 'SUMMONERS': return renderSummoners(content, lookups);
+      case 'SKILL ORDER': return renderSkillOrder(content, championSpells, version);
+      case 'STARTING ITEMS': return renderItems(content, lookups, false);
+      case 'CORE BUILD': return renderItems(content, lookups, true);
+      case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
+      case 'JUNGLE PATH': return renderJunglePath(content, version);
+      case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
+      case 'YOUR POWER SPIKES': return renderPowerSpikes(content);
+      case 'WIN CONDITION': return renderWinCondition(content);
+      default: return <div className="build-output">{content}</div>;
+    }
+  } catch (err) {
+    console.error(`[BuildOutput] renderSection crashed for "${title}":`, err);
+    return <div className="build-output">{content}</div>;
   }
 }
 

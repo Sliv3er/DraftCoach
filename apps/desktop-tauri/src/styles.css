@@ -756,6 +756,10 @@ body {
 
 /* ── Generate Button (LoL Gold) ── */
 .btn-generate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   padding: 12px;
   background: linear-gradient(180deg, #C89B3C 0%, #785A28 100%);
@@ -773,6 +777,26 @@ body {
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.btn-generate .btn-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.btn-generate-spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid rgba(240, 230, 210, 0.3);
+  border-top-color: #F0E6D2;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .btn-generate::after {
@@ -1385,10 +1409,10 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Skill Order - LoL-native with champion ability icons */
+/* Skill Order - LoL HUD style with champion ability icons */
 .skill-order-lol {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   padding: 6px 0;
   flex-wrap: wrap;
@@ -1398,23 +1422,26 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  position: relative;
 }
 
 .skill-ability-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
   border: 2px solid var(--gold-dim);
   overflow: hidden;
   background: var(--bg-elevated);
-  box-shadow: 0 0 10px rgba(200, 170, 110, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
 }
 
 .skill-ability-icon {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .skill-ability-placeholder {
@@ -1426,22 +1453,29 @@ body {
   background: linear-gradient(135deg, #2a2a3a 0%, #1a1a28 100%);
 }
 
-.skill-ability-key {
+.skill-ability-placeholder .skill-ability-key {
   font-size: 20px;
   font-weight: 700;
   color: var(--gold);
   text-shadow: 0 0 6px rgba(200, 170, 110, 0.4);
 }
 
-.skill-ability-name {
+.skill-ability-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(10, 10, 15, 0.88);
+  border: 1px solid #C8AA6E;
+  border-radius: 3px;
+  color: #C8AA6E;
   font-size: 9px;
-  color: var(--text-secondary);
-  text-align: center;
-  max-width: 52px;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 800;
+  font-family: 'Beaufort for LOL', 'Cinzel', serif;
+  letter-spacing: 0.02em;
+  padding: 1px 3px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .skill-separator {

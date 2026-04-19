@@ -21,7 +21,10 @@ async function fetchChampionSpells(championId: string, version: string): Promise
     const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${championId}.json`);
     const data = await res.json();
     const champData = data.data[championId];
-    if (!champData) return [];
+    if (!champData) {
+      console.warn(`[BuildOutput] No champion data found for ${championId} (version ${version})`);
+      return [];
+    }
 
     const ABILITY_KEYS = ['Q', 'W', 'E', 'R'];
     const spells: ChampionSpell[] = (champData.spells || []).map((s: any, idx: number) => ({
@@ -31,9 +34,14 @@ async function fetchChampionSpells(championId: string, version: string): Promise
       iconUrl: `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${s.id}.png`,
     }));
 
+    if (spells.length === 0) {
+      console.warn(`[BuildOutput] No spells fetched for ${championId} (version ${version})`);
+    }
+
     champSpellCache.set(cacheKey, spells);
     return spells;
-  } catch {
+  } catch (err) {
+    console.warn(`[BuildOutput] Failed to fetch spells for ${championId}:`, err);
     return [];
   }
 }
@@ -326,7 +334,7 @@ function renderSkillOrder(
         return (
           <React.Fragment key={i}>
             {i > 0 && <span className="skill-separator">›</span>}
-            <div className="skill-ability">
+            <div className="skill-ability" title={spell ? `${spell.name} (${letter})` : letter}>
               <div className="skill-ability-icon-wrap">
                 {spell ? (
                   <img
@@ -340,8 +348,8 @@ function renderSkillOrder(
                     <span className="skill-ability-key">{letter}</span>
                   </div>
                 )}
+                <span className="skill-ability-badge">{letter}</span>
               </div>
-              <span className="skill-ability-name">{spell?.name || letter}</span>
             </div>
           </React.Fragment>
         );
@@ -534,7 +542,7 @@ function renderJunglePath(content: string) {
     <div className="jungle-path-container">
       <div className="jungle-minimap">
         <img
-          src="https://static.u.gg/assets/lol/riotLol/maps/11/sr-map-1.2.0.png"
+          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-game-data/global/default/data/maps/shipping/map11/2dlevelminimap.png"
           alt="Summoner's Rift Minimap"
           className="jungle-minimap-img"
           onError={e => {

@@ -270,15 +270,14 @@ function renderRunes(content: string, lookups: IconLookups | null) {
         <TreeHeader label="Secondary" treeName={secondaryTree} />
         {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
       </div>
-      {/* Shards — full-width row below both trees, League-style */}
+      {/* Shards — League-style: 3 small circular icons in a tight row */}
       {shards.length > 0 && (
         <div className="rune-shards-row">
-          <div className="rune-shards-label">Shards</div>
-          <div className="rune-shards-icons">
-            {shards.map((s, i) => {
-              const shardSrc = findIcon(s, lookups?.runes);
-              return (
-                <div key={`sh${i}`} className="rune-shard-slot" title={s}>
+          {shards.map((s, i) => {
+            const shardSrc = findIcon(s, lookups?.runes);
+            return (
+              <div key={`sh${i}`} className="rune-shard-slot" title={s}>
+                <div className="rune-shard-circle">
                   {shardSrc && (
                     <img
                       src={shardSrc}
@@ -293,11 +292,10 @@ function renderRunes(content: string, lookups: IconLookups | null) {
                     />
                   )}
                   <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
-                  <span className="rune-shard-name">{s}</span>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

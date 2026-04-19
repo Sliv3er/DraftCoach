@@ -909,8 +909,10 @@ SITUATIONAL ITEMS
 <ItemName>: <when to buy and why>
 
 JUNGLE PATH (ONLY include this section if the role is Jungle)
-<Camp1> ➔ <Camp2> ➔ <Camp3> ➔ <Camp4> ➔ <Camp5> ➔ <Camp6> ➔ <Action>
-(MUST list the full first clear: at least 5-6 camps separated by ➔ arrows, ending with Gank/Scuttle. Example: Red ➔ Krugs ➔ Raptors ➔ Wolves ➔ Blue ➔ Gromp ➔ Gank Top)
+Include the full jungle first clear route — list every camp you take in order, from start to first action. Use ➔ between camps. Minimum 6 camps.
+Example (RED SIDE): Red ➔ Krugs ➔ Raptors ➔ Wolves ➔ Blue ➔ Gromp ➔ Scuttle
+Example (BLUE SIDE): Blue ➔ Gromp ➔ Wolves ➔ Raptors ➔ Red ➔ Krugs ➔ Scuttle
+Adapt the route to your selected champion and matchup. Do NOT output only 1 or 2 camps.
 
 ENEMY POWER SPIKES
 <EnemyChampion>: <Level/Item spike — what to watch for>
@@ -972,7 +974,7 @@ Rules:
 - SHARDS: Pick 1 from each row. Use ONLY from the VALID STAT SHARDS list.
 - For jungle, include jungle companion start.
 - Do NOT add explanations or extra text outside the sections.
-- If role is Jungle, include JUNGLE PATH with full first clear route: at least 5-6 camps separated by ➔ arrows, ending with Gank or Scuttle.
+- If role is Jungle, include JUNGLE PATH with a complete first clear: every camp in order, 6+ camps with ➔ arrows.
 - ALWAYS include ENEMY POWER SPIKES, YOUR POWER SPIKES, and WIN CONDITION.
 - Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.
 

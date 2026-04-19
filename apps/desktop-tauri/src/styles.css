@@ -888,8 +888,8 @@ body {
 }
 
 .build-bottom {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
@@ -971,7 +971,7 @@ body {
   background: linear-gradient(135deg, #1E2328 0%, rgba(10, 14, 19, 0.9) 100%);
   border: 1px solid #463714;
   border-radius: 4px;
-  padding: 16px;
+  padding: 12px 14px;
   margin-bottom: 12px;
   transition: all 0.2s ease;
 }
@@ -985,8 +985,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -998,6 +998,14 @@ body {
   letter-spacing: 1.5px;
   font-weight: 400;
   text-shadow: 0 0 8px rgba(200, 170, 110, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-icon {
+  font-size: 14px;
+  filter: saturate(0.8);
 }
 
 .btn-copy {
@@ -1027,18 +1035,23 @@ body {
 /* Rune Grid Layout */
 .runes-grid {
   display: flex;
-  gap: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .rune-tree-column {
   flex: 1;
+  min-width: 120px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .rune-shards-column {
-  flex: 0.7;
+  flex: 0 0 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .rune-tree-header {
@@ -1153,17 +1166,17 @@ body {
 .items-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .item-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 6px 8px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 6px;
   transition: border-color 0.15s;
 }
 
@@ -1176,9 +1189,9 @@ body {
 }
 
 .item-card-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
   border: 1px solid var(--border);
   background: var(--bg-primary);
 }
@@ -1186,41 +1199,47 @@ body {
 .item-card-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .item-card-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .item-card-reason {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.3;
   font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .item-number {
   color: var(--gold-dim);
   font-weight: 700;
-  font-size: 12px;
-  min-width: 18px;
+  font-size: 11px;
+  min-width: 16px;
   flex-shrink: 0;
 }
 
 .item-card-icon-missing {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
   border: 1px dashed var(--accent-orange);
   background: rgba(245, 158, 11, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--accent-orange);
   flex-shrink: 0;
 }

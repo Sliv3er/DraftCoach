@@ -587,10 +587,24 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const rightSections = sections.filter(s => RIGHT_COL_KEYS.includes(s.title));
   const bottomSections = sections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
 
+  const SECTION_ICONS: Record<string, string> = {
+    'ANALYSIS': '📊',
+    'RUNES': '🔮',
+    'SUMMONERS': '⚡',
+    'SKILL ORDER': '🎯',
+    'STARTING ITEMS': '🛒',
+    'CORE BUILD': '⚔️',
+    'SITUATIONAL ITEMS': '🔄',
+    'JUNGLE PATH': '🌿',
+    'ENEMY POWER SPIKES': '⚠️',
+    'YOUR POWER SPIKES': '💪',
+    'WIN CONDITION': '🏆',
+  };
+
   const renderSectionCard = (s: { title: string; content: string }, i: number) => (
     <div key={i} className="build-section">
       <div className="build-section-header">
-        <h3>{s.title}</h3>
+        <h3><span className="section-icon">{SECTION_ICONS[s.title] || '📋'}</span>{s.title}</h3>
         <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
           Copy
         </button>

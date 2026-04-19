@@ -193,7 +193,9 @@ export function ScoreboardWindow() {
           <span className="sb-title">Live Scoreboard</span>
           <div className="sb-bar-controls">
             <button className="sb-bar-btn" onClick={() => ipcRef.current?.send('scoreboard-win-minimize')}>—</button>
-            <button className="sb-bar-btn sb-bar-close" onClick={() => ipcRef.current?.send('scoreboard-win-hide')}>✕</button>
+            <button className="sb-bar-btn sb-bar-close" onClick={() => ipcRef.current?.send('scoreboard-win-hide')}>
+              <svg width="8" height="8" viewBox="0 0 8 8"><path stroke="currentColor" strokeWidth="1.5" fill="none" d="M1,1 L7,7 M7,1 L1,7"/></svg>
+            </button>
           </div>
         </div>
         <div className="sb-loading">
@@ -227,7 +229,9 @@ export function ScoreboardWindow() {
         </div>
         <div className="sb-bar-controls">
           <button className="sb-bar-btn" onClick={() => ipcRef.current?.send('scoreboard-win-minimize')}>—</button>
-          <button className="sb-bar-btn sb-bar-close" onClick={() => ipcRef.current?.send('scoreboard-win-hide')}>✕</button>
+          <button className="sb-bar-btn sb-bar-close" onClick={() => ipcRef.current?.send('scoreboard-win-hide')}>
+              <svg width="8" height="8" viewBox="0 0 8 8"><path stroke="currentColor" strokeWidth="1.5" fill="none" d="M1,1 L7,7 M7,1 L1,7"/></svg>
+          </button>
         </div>
       </div>
 

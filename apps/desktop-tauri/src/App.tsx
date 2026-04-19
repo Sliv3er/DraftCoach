@@ -90,7 +90,9 @@ function HotkeyRecorder({ label, value, onChange }: {
           </button>
         )}
         {value && value !== 'none' && (
-          <button className="hotkey-clear" onClick={() => onChange('none')} title="Clear shortcut">✕</button>
+          <button className="hotkey-clear close-x-btn" onClick={() => onChange('none')} title="Clear shortcut">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path stroke="currentColor" strokeWidth="1.5" fill="none" d="M1,1 L7,7 M7,1 L1,7"/></svg>
+          </button>
         )}
       </div>
     </div>
@@ -694,7 +696,7 @@ export function App() {
               if (payload.done) {
                 runesFinalText = payload.fullText || runesFinalText || runesStreamedText;
                 if (payload.model) setRunesModel(payload.model);
-                console.log('[App] ⚡ Flash runes ready — auto-importing...');
+                console.log('[App] Flash runes ready — auto-importing...');
 
                 // Auto-import runes IMMEDIATELY from Flash
                 if (!runesAutoImported) {
@@ -706,7 +708,7 @@ export function App() {
                       if (currentSettings.autoExportRunes) {
                         const runeResult = await ipcInvoke('export-runes', { championName: myChampion, rawText: runeText });
                         if (runeResult?.ok) {
-                          console.log('[App] ⚡ Flash rune auto-import succeeded!');
+                          console.log('[App] Flash rune auto-import succeeded!');
                         } else {
                           console.warn('[App] Flash rune auto-import failed:', runeResult?.error);
                         }
@@ -1079,11 +1081,17 @@ export function App() {
             </span>
             <span className="ping-unit">ms</span>
             {pingData.packetLoss > 0 && (
-              <span className="ping-loss">⚠ {pingData.packetLoss}%</span>
+              <span className="ping-loss">
+                <svg className="warn-icon" viewBox="0 0 10 10" style={{width:9,height:9,verticalAlign:'middle',marginRight:2}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#E84057" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#E84057" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#E84057"/></svg>
+                {pingData.packetLoss}%
+              </span>
             )}
           </div>
           <button className="btn-settings-toggle" onClick={() => setSettingsOpen(v => !v)} title="Settings">
-            ⚙️
+            <svg className="gear-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <circle cx="8" cy="8" r="2.5"/>
+              <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.4 1.4M11.55 11.55l1.4 1.4M3.05 12.95l1.4-1.4M11.55 4.45l1.4-1.4"/>
+            </svg>
           </button>
           <div className="window-controls">
             <button className="win-ctrl-btn win-minimize" onClick={minimizeCurrentWindow} title="Minimize">
@@ -1109,20 +1117,21 @@ export function App() {
                 onClick={() => setAutoDetect((v) => !v)}
                 title="Auto-detect champions from League client"
               >
-                {autoDetectStatus === 'connected' ? '🟢' : autoDetectStatus === 'searching' ? '🔍' : '📡'}
-                {' '}Auto
+                <span className={`auto-detect-dot auto-detect-dot-${autoDetectStatus}`} />
+                Auto
               </button>
               <button className="btn-clear-all" onClick={handleClearAll} title="Clear all selections">
-                🗑️ Clear
+                <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M3 5h10M6 5V3h4v2M5 5l1 9h4l1-9M7 8v4M9 8v4"/></svg>
+                Clear
               </button>
             </div>
           </div>
 
           {autoDetect && (
             <div className={`auto-detect-bar auto-detect-${autoDetectStatus}`}>
-              {autoDetectStatus === 'searching' && '🔍 Searching for League client...'}
-              {autoDetectStatus === 'connected' && '🟢 Connected — reading champion select'}
-              {autoDetectStatus === 'error' && '❌ Could not connect to League client'}
+              {autoDetectStatus === 'searching' && 'Searching for League client...'}
+              {autoDetectStatus === 'connected' && 'Connected — reading champion select'}
+              {autoDetectStatus === 'error' && 'Could not connect to League client'}
               {autoDetectStatus === 'off' && ''}
             </div>
           )}
@@ -1174,7 +1183,14 @@ export function App() {
           </div>
 
           <button className="btn-generate" onClick={handleGenerate} disabled={!myChampion || status === 'fetching'}>
-            {status === 'fetching' ? '⏳ Generating...' : '⚔️ Generate Build'}
+            {status === 'fetching' ? (
+              <><span className="btn-generate-spinner" />Generating...</>
+            ) : (
+              <>
+                <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 14L12 4M9 2h5v5M6 10l-2 2 2 2"/></svg>
+                Generate Build
+              </>
+            )}
           </button>
         </div>
 
@@ -1184,15 +1200,15 @@ export function App() {
             <span>
               {status === 'idle' && 'Ready — select a champion to begin'}
               {status === 'fetching' && 'Generating build with AI...'}
-              {status === 'grounded' && '✓ Grounded result'}
-              {status === 'cache' && '✓ From cache'}
-              {status === 'stale-cache' && '⚠ Stale cache (AI unavailable)'}
-              {status === 'error' && '✗ Error'}
+              {status === 'grounded' && 'Grounded result'}
+              {status === 'cache' && 'From cache'}
+              {status === 'stale-cache' && 'Stale cache (AI unavailable)'}
+              {status === 'error' && 'Error'}
             </span>
             {(runesModel || buildModel) && (status === 'grounded' || status === 'cache' || status === 'stale-cache') && (
               <span style={{ marginLeft: 10, fontSize: '10px', color: 'var(--text-secondary)', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                {runesModel && <span style={{ background: 'rgba(200, 170, 110, 0.12)', border: '1px solid rgba(200, 170, 110, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#c8aa6e' }}>⚡ {runesModel.replace('gemini-', '').replace('-preview', '')}</span>}
-                {buildModel && <span style={{ background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#6ba3f7' }}>🧠 {buildModel.replace('gemini-', '').replace('-preview', '')}</span>}
+                {runesModel && <span className="model-badge model-badge-flash">{runesModel.replace('gemini-', '').replace('-preview', '')}</span>}
+                {buildModel && <span className="model-badge model-badge-pro">{buildModel.replace('gemini-', '').replace('-preview', '')}</span>}
               </span>
             )}
           </div>
@@ -1204,7 +1220,7 @@ export function App() {
             <div className="live-advisor-header">
               <span className="live-advisor-title">
                 <span className={`live-advisor-dot ${liveAdvisorActive ? 'active' : ''}`} />
-                🔴 Live Advisor
+                Live Advisor
               </span>
               <button
                 className={`live-advisor-toggle ${liveAdvisorActive ? 'active' : ''}`}
@@ -1232,7 +1248,7 @@ export function App() {
             {liveAdvice && (
               <div className="live-advisor-card">
                 <div className="live-advisor-trigger">
-                  ⚡ {liveAdvice.triggerReason}
+                  {liveAdvice.triggerReason}
                   <span className="live-advisor-time">
                     {Math.floor((liveAdvice.gameTime || 0) / 60)}:{String(Math.floor((liveAdvice.gameTime || 0) % 60)).padStart(2, '0')}
                   </span>
@@ -1323,7 +1339,10 @@ export function App() {
                   const threatLine = threatMatch[1].trim();
                   return (
                     <div className="advisor-threat">
-                      <div className="live-advisor-changes-title">⚠ Threat</div>
+                      <div className="live-advisor-changes-title">
+                        <svg className="warn-icon" viewBox="0 0 10 10" style={{width:11,height:11,verticalAlign:'middle',marginRight:3}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#c8aa6e" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#c8aa6e" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#c8aa6e"/></svg>
+                        Threat
+                      </div>
                       <div className="advisor-threat-text">{threatLine}</div>
                     </div>
                   );
@@ -1356,7 +1375,13 @@ export function App() {
       {/* ── Scouting Report Notification ── */}
       {(scoutReport || (scoutStatus && scoutStatus.phase !== 'done')) && (
         <div className="scout-notification" onClick={() => ipcInvoke('open-scout-window')}>
-          <span>🔍 {scoutStatus && scoutStatus.phase !== 'done' ? scoutStatus.message : 'Scouting Report Ready'}</span>
+          <span>
+            <svg className="scout-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <circle cx="6" cy="6" r="4.5"/>
+              <line x1="9.5" y1="9.5" x2="13" y2="13"/>
+            </svg>
+            {scoutStatus && scoutStatus.phase !== 'done' ? scoutStatus.message : 'Scouting Report Ready'}
+          </span>
           <button className="scout-open-btn">Open Scout Window</button>
         </div>
       )}
@@ -1368,8 +1393,16 @@ export function App() {
       {settingsOpen && (
         <div className="settings-drawer">
           <div className="settings-header">
-            <h2>⚙️ Settings</h2>
-            <button className="settings-close" onClick={() => setSettingsOpen(false)}>✕</button>
+            <h2>
+              <svg className="gear-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" style={{width:16,height:16,verticalAlign:'middle',marginRight:6}}>
+                <circle cx="8" cy="8" r="2.5"/>
+                <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.4 1.4M11.55 11.55l1.4 1.4M3.05 12.95l1.4-1.4M11.55 4.45l1.4-1.4"/>
+              </svg>
+              Settings
+            </h2>
+            <button className="settings-close close-x-btn" onClick={() => setSettingsOpen(false)}>
+              <svg width="10" height="10" viewBox="0 0 10 10"><path stroke="currentColor" strokeWidth="1.5" fill="none" d="M1,1 L9,9 M9,1 L1,9"/></svg>
+            </button>
           </div>
 
           <div className="settings-group">
@@ -1444,7 +1477,14 @@ export function App() {
           </div>
 
           <div className="settings-group">
-            <div className="settings-group-title">🌐 Network</div>
+            <div className="settings-group-title">
+              <svg className="section-title-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
+                <circle cx="7" cy="7" r="5.5"/>
+                <ellipse cx="7" cy="7" rx="2.5" ry="5.5"/>
+                <line x1="1.5" y1="7" x2="12.5" y2="7"/>
+              </svg>
+              Network
+            </div>
             <div className="settings-toggle-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
               <span>Server Region</span>
               <select
@@ -1476,7 +1516,12 @@ export function App() {
           </div>
 
           <div className="settings-group">
-            <div className="settings-group-title">🔑 API Keys</div>
+            <div className="settings-group-title">
+              <svg className="section-title-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
+                <path d="M7 1C4.5 1 2.5 3 2.5 5.5C2.5 7 3.2 8.3 4.3 9.1L2 13h3l1-2h3l1 2h3L10.5 9.1C11.6 8.3 12.3 7 12.3 5.5C12.3 3 10.3 1 7 7 7 1Z"/>
+              </svg>
+              API Keys
+            </div>
             <div className="settings-path-row">
               <span className="settings-path-label">
                 Riot API Key
@@ -1535,7 +1580,9 @@ export function App() {
                 >Browse</button>
               </div>
               <span className="settings-path-hint">
-                {settings.lolPath ? `✓ ${settings.lolPath}` : 'Auto-detect or set manually'}
+                {settings.lolPath ? (
+                  <><span className="sync-check" style={{display:'inline-block',width:10,height:10,marginRight:4,verticalAlign:'middle'}}></span>{settings.lolPath}</>
+                ) : 'Auto-detect or set manually'}
               </span>
             </div>
           </div>
@@ -1546,7 +1593,13 @@ export function App() {
               <div className="rag-row">
                 <span className="rag-label">Status</span>
                 <span className={`rag-value ${ragStatus.isUpdating ? 'rag-updating' : ragStatus.patch ? 'rag-synced' : 'rag-idle'}`}>
-                  {ragStatus.isUpdating ? '🔄 Syncing...' : ragStatus.patch ? '✓ Synced' : '○ Not synced'}
+                  {ragStatus.isUpdating ? (
+                    <><span className="sync-spinner"></span>Syncing...</>
+                  ) : ragStatus.patch ? (
+                    <><span className="sync-check"></span>Synced</>
+                  ) : (
+                    <><span className="status-idle-dot"></span>Not synced</>
+                  )}
                 </span>
               </div>
               {ragStatus.patch && (
@@ -1621,7 +1674,11 @@ export function App() {
               <div className="rag-row">
                 <span className="rag-label">Data Status</span>
                 <span className={`rag-value ${overlayHasData ? 'rag-synced' : 'rag-idle'}`}>
-                  {overlayHasData ? '✓ Build data ready' : '○ Generate a build first'}
+                  {overlayHasData ? (
+                    <><span className="sync-check"></span>Build data ready</>
+                  ) : (
+                    <><span className="status-idle-dot"></span>Generate a build first</>
+                  )}
                 </span>
               </div>
               <p className="overlay-info-text">

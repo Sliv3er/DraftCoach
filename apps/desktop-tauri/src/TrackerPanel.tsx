@@ -25,8 +25,8 @@ function spellIcon(name: string, ver: string): string {
     return key ? `${DDRAGON}/${ver}/img/spell/${key}.png` : '';
 }
 
-function fmtCD(s: number): string {
-    if (s <= 0) return '✓';
+function fmtCD(s: number): string | JSX.Element {
+    if (s <= 0) return '\u2713';
     const m = Math.floor(s / 60);
     return m > 0 ? `${m}:${(s % 60).toString().padStart(2, '0')}` : `${Math.ceil(s)}`;
 }
@@ -128,7 +128,7 @@ export function TrackerPanel() {
                         >
                             <span className="tp-r-label">R</span>
                             {tR && tR.remaining > 0 && <span className="tp-cd-text">{fmtCD(tR.remaining)}</span>}
-                            {tR && tR.remaining <= 0 && tR.remaining > -5 && <span className="tp-up-text">✓</span>}
+                            {tR && tR.remaining <= 0 && tR.remaining > -5 && <span className="tp-up-text">{fmtCD(tR.remaining)}</span>}
                         </div>
                     </div>
                 );
@@ -150,7 +150,7 @@ function SpellBtn({ icon, timer, onClick, title }: { icon: string; timer?: Timer
         >
             {icon && <img src={icon} alt="" className="tp-spell-img" style={onCD ? { filter: 'grayscale(1) brightness(0.35)' } : {}} />}
             {onCD && timer && <span className="tp-cd-text">{fmtCD(timer.remaining)}</span>}
-            {justUp && <span className="tp-up-text">✓</span>}
+            {justUp && <span className="tp-up-text">{fmtCD(0)}</span>}
         </div>
     );
 }

@@ -411,7 +411,10 @@ export function Overlay() {
                             fontSize: '11px',
                             fontWeight: 700,
                             color: C.green,
-                        }}>✓ BUILD COMPLETE</span>
+                        }}>
+                            <svg viewBox="0 0 10 10" style={{width:10,height:10,verticalAlign:'middle',marginRight:3}}><circle cx="5" cy="5" r="4.2" fill="none" stroke="#4bb074" strokeWidth="1.2"/><path d="M3 5.2 L4.6 6.8 L7.2 3.8" fill="none" stroke="#4bb074" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            BUILD COMPLETE
+                        </span>
                     </div>
                 )}
 
@@ -480,7 +483,7 @@ export function Overlay() {
                                             justifyContent: 'center',
                                             background: 'rgba(73, 176, 74, 0.4)',
                                         }}>
-                                            <span style={{ fontSize: '10px', color: '#fff', fontWeight: 900 }}>✓</span>
+                                            <svg viewBox="0 0 10 10" style={{width:10,height:10}}><path d="M2 5.2 L4.2 7.5 L8.5 2.8" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                                         </div>
                                     )}
                                 </div>
@@ -642,7 +645,7 @@ function EnemySpellPanel({ enemies, timers, isOpen, onToggle }: EnemySpellPanelP
     };
 
     const formatSec = (s: number) => {
-        if (s <= 0) return '✓';
+        if (s <= 0) return <svg viewBox="0 0 10 10" style={{width:9,height:9}}><path d="M2 5.2 L4.2 7.5 L8.5 2.8" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
         return s > 60 ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : `${s}`;
     };
 
@@ -683,7 +686,7 @@ function EnemySpellPanel({ enemies, timers, isOpen, onToggle }: EnemySpellPanelP
                                 >
                                     {s1Icon && <img src={s1Icon} alt="" className="ov-tracker-spell-img" />}
                                     {t1 && t1.remaining > 0 && <span className="ov-tracker-cd-text">{formatSec(t1.remaining)}</span>}
-                                    {t1 && t1.remaining <= 0 && t1.remaining > -5 && <span className="ov-tracker-up-text">✓</span>}
+                                    {t1 && t1.remaining <= 0 && t1.remaining > -5 && <span className="ov-tracker-up-text">{formatSec(0)}</span>}
                                 </div>
 
                                 {/* Spell 2 */}
@@ -694,7 +697,7 @@ function EnemySpellPanel({ enemies, timers, isOpen, onToggle }: EnemySpellPanelP
                                 >
                                     {s2Icon && <img src={s2Icon} alt="" className="ov-tracker-spell-img" />}
                                     {t2 && t2.remaining > 0 && <span className="ov-tracker-cd-text">{formatSec(t2.remaining)}</span>}
-                                    {t2 && t2.remaining <= 0 && t2.remaining > -5 && <span className="ov-tracker-up-text">✓</span>}
+                                    {t2 && t2.remaining <= 0 && t2.remaining > -5 && <span className="ov-tracker-up-text">{formatSec(0)}</span>}
                                 </div>
 
                                 {/* Ultimate R */}
@@ -705,7 +708,7 @@ function EnemySpellPanel({ enemies, timers, isOpen, onToggle }: EnemySpellPanelP
                                 >
                                     <span className="ov-tracker-r-label">R</span>
                                     {tR && tR.remaining > 0 && <span className="ov-tracker-cd-text">{formatSec(tR.remaining)}</span>}
-                                    {tR && tR.remaining <= 0 && tR.remaining > -5 && <span className="ov-tracker-up-text">✓</span>}
+                                    {tR && tR.remaining <= 0 && tR.remaining > -5 && <span className="ov-tracker-up-text">{formatSec(0)}</span>}
                                 </div>
                             </div>
                         );

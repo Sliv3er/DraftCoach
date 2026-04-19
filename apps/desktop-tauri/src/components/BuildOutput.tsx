@@ -373,7 +373,9 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
               {iconSrc ? (
                 <IconImg src={iconSrc} alt={itemName} className="item-card-icon" />
               ) : (
-                <div className="item-card-icon-missing" title="Item not found in DDragon — may be removed">⚠</div>
+                <div className="item-card-icon-missing" title="Item not found in DDragon — may be removed">
+                  <svg viewBox="0 0 10 10" style={{width:10,height:10}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#E84057" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#E84057" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#E84057"/></svg>
+                </div>
               )}
             </div>
             <div className="item-card-info">
@@ -401,7 +403,9 @@ function renderLiveUpdatedItems(items: LiveUpdatedItem[]) {
               {iconSrc ? (
                 <IconImg src={iconSrc} alt={item.name} className="item-card-icon" />
               ) : (
-                <div className="item-card-icon-missing" title="Item not found in DDragon — may be removed">⚠</div>
+                <div className="item-card-icon-missing" title="Item not found in DDragon — may be removed">
+                  <svg viewBox="0 0 10 10" style={{width:10,height:10}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#E84057" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#E84057" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#E84057"/></svg>
+                </div>
               )}
             </div>
             <div className="item-card-info">
@@ -414,7 +418,7 @@ function renderLiveUpdatedItems(items: LiveUpdatedItem[]) {
         );
       })}
       <div className="live-updated-tag">
-        🔴 Updated by Live Advisor
+        <span className="live-updated-dot" /> Updated by Live Advisor
       </div>
     </div>
   );
@@ -541,7 +545,9 @@ function renderPowerSpikes(content: string) {
         const spike = colonIdx > 0 ? cleaned.slice(colonIdx + 1).trim() : cleaned;
         return (
           <div key={i} className="power-spike-item">
-            <span className="power-spike-icon">⚠</span>
+            <span className="power-spike-icon">
+              <svg viewBox="0 0 10 10" style={{width:10,height:10,display:'block'}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#c8aa6e" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#c8aa6e" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#c8aa6e"/></svg>
+            </span>
             <div className="power-spike-text">
               {champName && <span className="power-spike-name">{champName}: </span>}
               <span className="power-spike-desc">{spike}</span>
@@ -643,13 +649,13 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
       });
 
       if (itemRes.ok && runeRes.ok) {
-        setExportStatus('✓ Items & Runes Exported');
+        setExportStatus('Items & Runes Exported');
       } else if (itemRes.ok) {
-        setExportStatus('✓ Items Exported (Runes failed)');
+        setExportStatus('Items Exported (Runes failed)');
       } else if (runeRes.ok) {
-        setExportStatus('✓ Runes Exported (Items failed)');
+        setExportStatus('Runes Exported (Items failed)');
       } else {
-        setExportStatus('✗ Export failed');
+        setExportStatus('Export failed');
       }
     } catch (err: any) {
       setExportStatus(`Export failed: ${err.message}`);
@@ -668,7 +674,12 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   if (!result) {
     return (
       <div className="empty-state">
-        <div className="empty-icon">⚔️</div>
+        <div className="empty-icon">
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M32 4 L52 14 L52 34 C52 46 42 56 32 60 C22 56 12 46 12 34 L12 14 Z"/>
+            <path d="M32 18 L32 44 M22 28 L42 28" strokeWidth="2"/>
+          </svg>
+        </div>
         <div className="empty-text">Select your champion and generate a build</div>
         <div className="empty-hint">Pick a champion from the left panel to get started</div>
       </div>
@@ -740,9 +751,11 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
     <div>
       <div className="build-actions">
         <button className="btn-copy-all" onClick={() => copyToClipboard(result.text)}>
+          <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="4" y="4" width="9" height="10" rx="1"/><path d="M4 4V3a1 1 0 011-1h7a1 1 0 011 1v8"/></svg>
           Copy All
         </button>
         <button className="btn-export" onClick={handleExport}>
+          <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M8 2v8m0 0l-3-3m3 3l3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
           Export to LoL
         </button>
         {exportStatus && <span className="export-status">{exportStatus}</span>}

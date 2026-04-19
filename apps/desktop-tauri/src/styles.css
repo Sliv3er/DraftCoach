@@ -1114,12 +1114,6 @@ body {
 }
 
 /* Rune Grid Layout */
-.runes-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
 .runes-grid {
   display: flex;
   gap: 12px;
@@ -1134,28 +1128,24 @@ body {
   gap: 4px;
 }
 
-.rune-shards-row {
-  flex: 0 0 100%;
+.rune-shards-section {
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 24px;
-  margin-top: 12px;
-  padding-top: 12px;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
-.rune-shard-cell {
+.rune-shard-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: 40px;
+  gap: 8px;
 }
 
 .rune-shard-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: block;
   flex-shrink: 0;
@@ -1164,8 +1154,8 @@ body {
 }
 
 .rune-shard-fallback {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--bg-elevated);
   border: 1px solid var(--gold-dim);
@@ -1173,14 +1163,11 @@ body {
   display: block;
 }
 
-.rune-shard-name {
-  font-size: 9px;
-  color: var(--gold-dim);
+.rune-shard-text {
+  font-size: 11px;
+  color: var(--text-secondary);
   white-space: nowrap;
-  font-weight: 600;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  font-weight: 500;
   line-height: 1.2;
 }
 

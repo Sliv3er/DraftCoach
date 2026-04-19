@@ -259,46 +259,44 @@ function renderRunes(content: string, lookups: IconLookups | null) {
   };
 
   return (
-    <div className="runes-container">
-      <div className="runes-grid">
-        {/* Primary tree */}
-        <div className="rune-tree-column">
-          <TreeHeader label="Primary" treeName={primaryTree} />
-          {keystone && <RuneCell name={keystone} isKeystone />}
-          {primaryRunes.map((r, i) => <RuneCell key={`p${i}`} name={r} />)}
-        </div>
-        {/* Secondary tree */}
-        <div className="rune-tree-column">
-          <TreeHeader label="Secondary" treeName={secondaryTree} />
-          {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
-        </div>
+    <div className="runes-grid">
+      {/* Primary tree */}
+      <div className="rune-tree-column">
+        <TreeHeader label="Primary" treeName={primaryTree} />
+        {keystone && <RuneCell name={keystone} isKeystone />}
+        {primaryRunes.map((r, i) => <RuneCell key={`p${i}`} name={r} />)}
       </div>
-      {/* Shards — League client style: tiny circular icons with stat name BELOW, vertical stack, tight row */}
-      {shards.length > 0 && (
-        <div className="rune-shards-row">
-          {shards.map((s, i) => {
-            const shardSrc = findIcon(s, lookups?.runes);
-            return (
-              <div key={`sh${i}`} className="rune-shard-cell">
-                <img
-                  src={shardSrc}
-                  alt={s}
-                  className="rune-shard-icon"
-                  title={s}
-                  onError={e => {
-                    const img = e.target as HTMLImageElement;
-                    img.style.display = 'none';
-                    const dot = img.nextElementSibling as HTMLElement;
-                    if (dot && dot.classList.contains('rune-shard-fallback')) dot.style.display = '';
-                  }}
-                />
-                <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
-                <span className="rune-shard-name">{s}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* Secondary tree + Shards underneath (like League client) */}
+      <div className="rune-tree-column">
+        <TreeHeader label="Secondary" treeName={secondaryTree} />
+        {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
+        {/* Stat Shards — icon left, stat text right, stacked vertically */}
+        {shards.length > 0 && (
+          <div className="rune-shards-section">
+            {shards.map((s, i) => {
+              const shardSrc = findIcon(s, lookups?.runes);
+              return (
+                <div key={`sh${i}`} className="rune-shard-row">
+                  <img
+                    src={shardSrc}
+                    alt={s}
+                    className="rune-shard-icon"
+                    title={s}
+                    onError={e => {
+                      const img = e.target as HTMLImageElement;
+                      img.style.display = 'none';
+                      const dot = img.nextElementSibling as HTMLElement;
+                      if (dot && dot.classList.contains('rune-shard-fallback')) dot.style.display = '';
+                    }}
+                  />
+                  <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
+                  <span className="rune-shard-text">{s}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

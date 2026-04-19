@@ -1039,7 +1039,7 @@ export function App() {
     <div className="app">
       <header className="header">
         <div className="header-brand">
-          <img src="http://127.0.0.1:3210/logo" alt="DraftCoach" className="brand-logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          {/* Logo removed — sidecar doesn't serve /logo */}
           <h1>DraftCoach</h1>
         </div>
         <div className="header-meta">

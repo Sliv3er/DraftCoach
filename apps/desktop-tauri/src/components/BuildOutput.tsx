@@ -578,6 +578,31 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
 
   const sections = parseSections(result.text);
 
+  // Split sections into columns for 2-column layout
+  const LEFT_COL_KEYS = ['RUNES', 'SKILL ORDER', 'SUMMONERS'];
+  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS'];
+  // Everything else goes full-width below
+
+  const leftSections = sections.filter(s => LEFT_COL_KEYS.includes(s.title));
+  const rightSections = sections.filter(s => RIGHT_COL_KEYS.includes(s.title));
+  const bottomSections = sections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
+
+  const renderSectionCard = (s: { title: string; content: string }, i: number) => (
+    <div key={i} className="build-section">
+      <div className="build-section-header">
+        <h3>{s.title}</h3>
+        <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
+          Copy
+        </button>
+      </div>
+      {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
+      {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
+        ? renderLiveUpdatedItems(liveUpdatedItems)
+        : renderSection(s.title, s.content, iconLookups)
+      }
+    </div>
+  );
+
   return (
     <div>
       <div className="build-actions">
@@ -591,21 +616,24 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
       </div>
 
       {sections.length > 0 ? (
-        sections.map((s, i) => (
-          <div key={i} className="build-section">
-            <div className="build-section-header">
-              <h3>{s.title}</h3>
-              <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
-                Copy
-              </button>
+        <>
+          {/* 2-column layout: Runes/Skills left, Items right */}
+          <div className="build-columns">
+            <div className="build-col build-col-left">
+              {leftSections.map((s, i) => renderSectionCard(s, i))}
             </div>
-            {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
-            {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
-              ? renderLiveUpdatedItems(liveUpdatedItems)
-              : renderSection(s.title, s.content, iconLookups)
-            }
+            <div className="build-col build-col-right">
+              {rightSections.map((s, i) => renderSectionCard(s, i))}
+            </div>
           </div>
-        ))
+
+          {/* Full-width sections below */}
+          {bottomSections.length > 0 && (
+            <div className="build-bottom">
+              {bottomSections.map((s, i) => renderSectionCard(s, i))}
+            </div>
+          )}
+        </>
       ) : (
         <div className="build-section">
           <div className="build-output" style={{ whiteSpace: 'pre-wrap' }}>{result.text}</div>

@@ -869,6 +869,41 @@ body {
   margin-bottom: 16px;
 }
 
+/* 2-Column Build Layout */
+.build-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.build-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.build-col .build-section {
+  margin-bottom: 0;
+}
+
+.build-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.build-bottom .build-section {
+  margin-bottom: 0;
+}
+
+/* Responsive: stack columns on narrow screens */
+@media (max-width: 900px) {
+  .build-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
 .btn-copy-all {
   display: inline-flex;
   align-items: center;

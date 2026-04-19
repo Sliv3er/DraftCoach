@@ -498,6 +498,16 @@ body {
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: visible;
+}
+
+.btn-clear-all .btn-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 .btn-clear-all:hover {
@@ -1599,13 +1609,14 @@ body {
 
 /* Jungle Path Minimap */
 .jungle-path-container {
-  position: relative;
+  display: flex;
+  gap: 10px;
   width: 100%;
 }
 
 .jungle-minimap {
   position: relative;
-  width: 100%;
+  flex: 1 1 55%;
   aspect-ratio: 1;
   max-height: 180px;
   border-radius: 6px;
@@ -1621,16 +1632,13 @@ body {
   opacity: 0.85;
 }
 
-.jungle-minimap-fallback {
-  position: absolute;
-  inset: 0;
-  background: rgba(10, 15, 10, 0.9);
+.jungle-path-legend {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  align-items: center;
+  gap: 3px;
   justify-content: center;
+  min-width: 90px;
 }
 
 .jungle-mini-camp {

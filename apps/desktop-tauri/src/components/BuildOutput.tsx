@@ -23,10 +23,11 @@ async function fetchChampionSpells(championId: string, version: string): Promise
     const champData = data.data[championId];
     if (!champData) return [];
 
-    const spells: ChampionSpell[] = (champData.spells || []).map((s: any) => ({
+    const ABILITY_KEYS = ['Q', 'W', 'E', 'R'];
+    const spells: ChampionSpell[] = (champData.spells || []).map((s: any, idx: number) => ({
       id: s.id,
       name: s.name,
-      key: s.key,
+      key: ABILITY_KEYS[idx] || s.id,
       iconUrl: `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${s.id}.png`,
     }));
 
@@ -452,7 +453,7 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   );
 }
 
-// Standard jungle camp positions on SR minimap (512x512 image) as percentages
+// Standard jungle camp positions on SR minimap as percentages
 const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
   'red': { x: 34, y: 22, label: 'Red' },
   'red buff': { x: 34, y: 22, label: 'Red' },
@@ -461,6 +462,7 @@ const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = 
   'blue sentinel': { x: 66, y: 22, label: 'Blue' },
   'blue buff': { x: 66, y: 22, label: 'Blue' },
   'gromp': { x: 56, y: 28, label: 'Gromp' },
+  'grom': { x: 56, y: 28, label: 'Gromp' },
   'wolves': { x: 42, y: 28, label: 'Wolves' },
   'murk wolves': { x: 42, y: 28, label: 'Wolves' },
   'raptor': { x: 32, y: 38, label: 'Raptors' },
@@ -472,6 +474,10 @@ const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = 
   'baron nashor': { x: 50, y: 72, label: 'Baron' },
   'herald': { x: 32, y: 62, label: 'Herald' },
   'rift herald': { x: 32, y: 62, label: 'Herald' },
+  'scuttle': { x: 60, y: 44, label: 'Scuttle' },
+  'scuttle crab': { x: 60, y: 44, label: 'Scuttle' },
+  'rift scuttler': { x: 60, y: 44, label: 'Scuttle' },
+  'gank': { x: 75, y: 15, label: 'Gank' },
 };
 
 function normalizeCampName(name: string): string {
@@ -480,20 +486,49 @@ function normalizeCampName(name: string): string {
 
 function findCampPosition(campName: string): { x: number; y: number; label: string } | null {
   const norm = normalizeCampName(campName);
+  // Try exact match first
   for (const [key, pos] of Object.entries(CAMP_POSITIONS)) {
-    if (norm.includes(key.replace(/[^a-z]/g, '')) || key.includes(norm)) {
+    const normKey = key.replace(/[^a-z]/g, '');
+    if (norm === normKey) return pos;
+  }
+  // Then substring match
+  for (const [key, pos] of Object.entries(CAMP_POSITIONS)) {
+    const normKey = key.replace(/[^a-z]/g, '');
+    if (norm.includes(normKey) || normKey.includes(norm)) {
       return pos;
     }
   }
   return null;
 }
 
+// Resolve a camp name to a clean label using CAMP_POSITIONS lookup
+function resolveCampLabel(campName: string): string {
+  // Handle compound names like "Scuttle/Gank"
+  if (campName.includes('/')) {
+    return campName.split('/').map(s => {
+      const pos = findCampPosition(s.trim());
+      return pos ? pos.label : s.trim();
+    }).join('/');
+  }
+  const pos = findCampPosition(campName);
+  return pos ? pos.label : campName;
+}
+
 function renderJunglePath(content: string) {
   const path = content.trim()
-    .replace(/\s*-+>\s*/g, ' ➔ ')
-    .replace(/\s*->+\s*/g, ' ➔ ')
-    .replace(/\s*→\s*/g, ' ➔ ');
-  const camps = path.split(/\s*➔\s*/).map(s => s.trim()).filter(Boolean);
+    .replace(/\s*-+>\s*/g, ' \u27a4 ')
+    .replace(/\s*->+\s*/g, ' \u27a4 ')
+    .replace(/\s*\u2192\s*/g, ' \u27a4 ');
+  const camps = path.split(/\s*\u27a4\s*/).map(s => s.trim()).filter(Boolean);
+
+  // Resolve each camp to its position and clean label
+  const resolved = camps.map((camp, i) => {
+    // For compound names like "Scuttle/Gank", try the first part for position
+    const primaryName = camp.includes('/') ? camp.split('/')[0].trim() : camp;
+    const pos = findCampPosition(primaryName);
+    const label = resolveCampLabel(camp);
+    return { raw: camp, pos, label, num: i + 1 };
+  });
 
   return (
     <div className="jungle-path-container">
@@ -505,30 +540,29 @@ function renderJunglePath(content: string) {
           onError={e => {
             const target = e.target as HTMLImageElement;
             target.style.display = 'none';
-            (target.nextElementSibling as HTMLElement).style.display = 'flex';
           }}
         />
-        <div className="jungle-minimap-fallback" style={{ display: 'none' }}>
-          {camps.map((camp, i) => (
-            <div key={i} className="jungle-mini-camp">
-              <span className="jungle-mini-num">{i + 1}</span>
-              <span className="jungle-mini-name">{camp}</span>
-            </div>
-          ))}
-        </div>
-        {camps.map((camp, i) => {
-          const pos = findCampPosition(camp);
-          if (!pos) return null;
+        {resolved.map((r, i) => {
+          if (!r.pos) return null;
           return (
             <div
               key={i}
               className="jungle-path-marker"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+              style={{ left: `${r.pos.x}%`, top: `${r.pos.y}%` }}
+              title={r.label}
             >
-              <span className="jungle-marker-num">{i + 1}</span>
+              <span className="jungle-marker-num">{r.num}</span>
             </div>
           );
         })}
+      </div>
+      <div className="jungle-path-legend">
+        {resolved.map((r, i) => (
+          <div key={i} className="jungle-mini-camp">
+            <span className="jungle-mini-num">{r.num}</span>
+            <span className="jungle-mini-name">{r.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -568,10 +602,27 @@ function renderWinCondition(content: string) {
 }
 
 function renderAnalysis(content: string) {
-  const lines = content.split('\n').filter(l => l.trim());
+  // Filter out internal prompt scaffolding that leaks through
+  const PROMPT_NOISE = /^(STEP\s*\d|---+|={3,}|CONSTRAINTS?|THREAT_\d|BUILD CONSTRAINTS|OUTPUT FORMAT|INTERNAL|TEMPLATE|INSTRUCTION)/i;
+  const lines = content.split('\n').filter(l => {
+    const t = l.trim();
+    if (!t) return false;
+    if (PROMPT_NOISE.test(t)) return false;
+    // Also stop if we hit a horizontal rule (--- or ===)
+    if (/^[-=]{3,}$/.test(t)) return false;
+    return true;
+  });
+
+  // Additionally, truncate at the first line that looks like prompt structure
+  const truncIdx = lines.findIndex(l => {
+    const t = l.trim().replace(/\*\*/g, '');
+    return /^STEP\s*\d/i.test(t) || /^THREAT_/i.test(t) || /^CONSTRAINTS?$/i.test(t) || /^BUILD CONSTRAINTS/i.test(t);
+  });
+  const cleanLines = truncIdx > 0 ? lines.slice(0, truncIdx) : lines;
+
   return (
     <div className="analysis-box">
-      {lines.map((line, i) => {
+      {cleanLines.map((line, i) => {
         const cleaned = line.trim().replace(/\*\*/g, '');
         const colonIdx = cleaned.indexOf(':');
         if (colonIdx > 0 && colonIdx < 25) {

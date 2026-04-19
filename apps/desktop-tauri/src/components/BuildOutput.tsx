@@ -425,26 +425,18 @@ function renderJunglePath(content: string) {
 function renderPowerSpikes(content: string) {
   const lines = content.split('\n').filter(l => l.trim());
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <div className="power-spikes-list">
       {lines.map((line, i) => {
         const cleaned = line.trim().replace(/\*\*/g, '').replace(/^[-*•]\s*/, '');
         const colonIdx = cleaned.indexOf(':');
         const champName = colonIdx > 0 ? cleaned.slice(0, colonIdx).trim() : '';
         const spike = colonIdx > 0 ? cleaned.slice(colonIdx + 1).trim() : cleaned;
         return (
-          <div key={i} style={{
-            display: 'flex',
-            gap: '8px',
-            alignItems: 'flex-start',
-            padding: '6px 10px',
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
-            borderRadius: '6px',
-          }}>
-            <span style={{ color: '#e74c3c', fontWeight: 700, fontSize: '13px', flexShrink: 0 }}>⚠</span>
-            <div>
-              {champName && <span style={{ fontWeight: 600, color: 'var(--gold)', fontSize: '12px' }}>{champName}: </span>}
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{spike}</span>
+          <div key={i} className="power-spike-item">
+            <span className="power-spike-icon">⚠</span>
+            <div className="power-spike-text">
+              {champName && <span className="power-spike-name">{champName}: </span>}
+              <span className="power-spike-desc">{spike}</span>
             </div>
           </div>
         );
@@ -455,16 +447,7 @@ function renderPowerSpikes(content: string) {
 
 function renderWinCondition(content: string) {
   return (
-    <div style={{
-      padding: '10px 14px',
-      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
-      border: '1px solid rgba(59, 130, 246, 0.2)',
-      borderRadius: '8px',
-      fontSize: '13px',
-      lineHeight: '1.6',
-      color: 'var(--text-primary)',
-      fontWeight: 500,
-    }}>
+    <div className="win-condition-box">
       {content.replace(/\*\*/g, '').trim()}
     </div>
   );
@@ -473,15 +456,7 @@ function renderWinCondition(content: string) {
 function renderAnalysis(content: string) {
   const lines = content.split('\n').filter(l => l.trim());
   return (
-    <div style={{
-      padding: '10px 14px',
-      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(168, 85, 247, 0.03) 100%)',
-      border: '1px solid rgba(168, 85, 247, 0.2)',
-      borderRadius: '8px',
-      fontSize: '12px',
-      lineHeight: '1.7',
-      color: 'var(--text-secondary)',
-    }}>
+    <div className="analysis-box">
       {lines.map((line, i) => {
         const cleaned = line.trim().replace(/\*\*/g, '');
         const colonIdx = cleaned.indexOf(':');
@@ -489,8 +464,8 @@ function renderAnalysis(content: string) {
           const label = cleaned.slice(0, colonIdx).trim();
           const value = cleaned.slice(colonIdx + 1).trim();
           return (
-            <div key={i} style={{ marginBottom: '3px' }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '12px' }}>{label}: </span>
+            <div key={i} className="analysis-line">
+              <span className="analysis-label">{label}: </span>
               <span>{value}</span>
             </div>
           );

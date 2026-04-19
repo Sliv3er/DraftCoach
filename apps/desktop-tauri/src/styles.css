@@ -1431,6 +1431,79 @@ body {
   text-overflow: ellipsis;
 }
 
+/* Analysis Box */
+.analysis-box {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(168, 85, 247, 0.03) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.analysis-line {
+  margin-bottom: 2px;
+}
+
+.analysis-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 11px;
+}
+
+/* Win Condition Box */
+.win-condition-box {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Power Spikes */
+.power-spikes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.power-spike-item {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 5px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.power-spike-icon {
+  color: #e74c3c;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.power-spike-text {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.power-spike-name {
+  font-weight: 600;
+  color: var(--gold);
+  font-size: 11px;
+}
+
+.power-spike-desc {
+  color: var(--text-secondary);
+}
+
 /* Empty State */
 .empty-state {
   display: flex;

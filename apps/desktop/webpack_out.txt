@@ -1,0 +1,17 @@
+﻿asset [1m[32mrenderer.js[39m[22m 331 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: main) 1 related asset
+asset [1m[32mindex.html[39m[22m 250 bytes [1m[33m[compared for emit][39m[22m
+orphan modules 197 KiB [1m[33m[orphan][39m[22m 10 modules
+runtime modules 698 bytes 4 modules
+cacheable modules 228 KiB
+  modules by path [1m./node_modules/style-loader/dist/runtime/*.js[39m[22m 5.84 KiB 6 modules
+  modules by path [1m./node_modules/react/[39m[22m 8 KiB 4 modules
+  modules by path [1m./node_modules/react-dom/[39m[22m 131 KiB 3 modules
+  modules by path [1m./node_modules/css-loader/dist/runtime/*.js[39m[22m 2.31 KiB
+    [1m./node_modules/css-loader/dist/runtime/noSourceMaps.js[39m[22m 64 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./node_modules/css-loader/dist/runtime/api.js[39m[22m 2.25 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  modules by path [1m./node_modules/scheduler/[39m[22m 4.33 KiB
+    [1m./node_modules/scheduler/index.js[39m[22m 198 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./node_modules/scheduler/cjs/scheduler.production.min.js[39m[22m 4.14 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  ./node_modules/css-loader/dist/cjs.js![1m./src/renderer/styles.css[39m[22m 77.1 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1m./src/renderer/index.tsx + 10 modules[39m[22m 198 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.105.2 compiled [1m[32msuccessfully[39m[22m in 13657 ms

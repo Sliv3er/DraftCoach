@@ -489,42 +489,42 @@ function renderSituational(content: string, lookups: IconLookups | null) {
 // River runs diagonally from bottom-left to top-right
 // x% = distance from left edge, y% = distance from TOP edge
 const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = {
-  // Blue side jungle (BOTTOM-LEFT of minimap)
-  'blue': { x: 17, y: 84, label: 'Blue' },
-  'blue sentinel': { x: 17, y: 84, label: 'Blue' },
-  'blue buff': { x: 17, y: 84, label: 'Blue' },
-  'gromp': { x: 22, y: 74, label: 'Gromp' },
-  'grom': { x: 22, y: 74, label: 'Gromp' },
-  'wolves': { x: 28, y: 84, label: 'Wolves' },
-  'murk wolves': { x: 28, y: 84, label: 'Wolves' },
-  'wolf': { x: 28, y: 84, label: 'Wolves' },
-  // Red side jungle (TOP-RIGHT of minimap)
-  'red': { x: 84, y: 17, label: 'Red' },
-  'red buff': { x: 84, y: 17, label: 'Red' },
-  'red brambleback': { x: 84, y: 17, label: 'Red' },
-  'krug': { x: 64, y: 52, label: 'Krugs' },
-  'krugs': { x: 64, y: 52, label: 'Krugs' },
-  'krugs red': { x: 64, y: 52, label: 'Krugs' },
-  // Shared/mid area
-  'raptor': { x: 38, y: 18, label: 'Raptors' },
-  'raptors': { x: 38, y: 18, label: 'Raptors' },
-  'raps': { x: 38, y: 18, label: 'Raptors' },
-  // River objectives
-  'dragon': { x: 63, y: 74, label: 'Dragon' },
-  'baron': { x: 38, y: 40, label: 'Baron' },
-  'baron nashor': { x: 38, y: 40, label: 'Baron' },
-  'herald': { x: 38, y: 40, label: 'Herald' },
-  'rift herald': { x: 38, y: 40, label: 'Herald' },
-  'scuttle': { x: 50, y: 52, label: 'Scuttle' },
-  'scuttle crab': { x: 50, y: 52, label: 'Scuttle' },
-  'rift scuttler': { x: 50, y: 52, label: 'Scuttle' },
+  // Blue side jungle (BOTTOM-LEFT of minimap) - adjusted positions
+  'blue': { x: 17, y: 82, label: 'Blue' },
+  'blue sentinel': { x: 17, y: 82, label: 'Blue' },
+  'blue buff': { x: 17, y: 82, label: 'Blue' },
+  'gromp': { x: 24, y: 70, label: 'Gromp' },
+  'grom': { x: 24, y: 70, label: 'Gromp' },
+  'wolves': { x: 32, y: 80, label: 'Wolves' },
+  'murk wolves': { x: 32, y: 80, label: 'Wolves' },
+  'wolf': { x: 32, y: 80, label: 'Wolves' },
+  // Red side jungle (TOP-RIGHT of minimap) - adjusted positions
+  'red': { x: 83, y: 18, label: 'Red' },
+  'red buff': { x: 83, y: 18, label: 'Red' },
+  'red brambleback': { x: 83, y: 18, label: 'Red' },
+  'krug': { x: 70, y: 45, label: 'Krugs' },
+  'krugs': { x: 70, y: 45, label: 'Krugs' },
+  'krugs red': { x: 70, y: 45, label: 'Krugs' },
+  // Raptors are on the red side but closer to mid lane - adjusted from y=18 to y=28
+  'raptor': { x: 48, y: 28, label: 'Raptors' },
+  'raptors': { x: 48, y: 28, label: 'Raptors' },
+  'raps': { x: 48, y: 28, label: 'Raptors' },
+  // River objectives - adjusted positions
+  'dragon': { x: 62, y: 72, label: 'Dragon' },
+  'baron': { x: 38, y: 38, label: 'Baron' },
+  'baron nashor': { x: 38, y: 38, label: 'Baron' },
+  'herald': { x: 38, y: 38, label: 'Herald' },
+  'rift herald': { x: 38, y: 38, label: 'Herald' },
+  'scuttle': { x: 50, y: 50, label: 'Scuttle' },
+  'scuttle crab': { x: 50, y: 50, label: 'Scuttle' },
+  'rift scuttler': { x: 50, y: 50, label: 'Scuttle' },
   // Gank waypoints
-  'gank': { x: 50, y: 52, label: 'Gank' },
-  'gank mid': { x: 50, y: 52, label: 'Gank Mid' },
-  'gank top': { x: 28, y: 40, label: 'Gank Top' },
-  'gank bot': { x: 63, y: 60, label: 'Gank Bot' },
+  'gank': { x: 50, y: 50, label: 'Gank' },
+  'gank mid': { x: 50, y: 50, label: 'Gank Mid' },
+  'gank top': { x: 30, y: 38, label: 'Gank Top' },
+  'gank bot': { x: 64, y: 58, label: 'Gank Bot' },
   // Exits / paths
-  'exit': { x: 50, y: 52, label: 'Exit' },
+  'exit': { x: 50, y: 50, label: 'Exit' },
 };
 
 function normalizeCampName(name: string): string {

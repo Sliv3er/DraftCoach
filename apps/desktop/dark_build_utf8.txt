@@ -1,0 +1,114 @@
+﻿  ÔÇó electron-builder  version=26.8.1 os=10.0.26100
+  ÔÇó loaded configuration  file=package.json ("build" field)
+  ÔÇó executing @electron/rebuild  electronVersion=28.3.3 arch=x64 buildFromSource=false workspaceRoot=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop projectDir=./ appDir=./
+  ÔÇó installing native dependencies  arch=x64
+  ÔÇó completed installing native dependencies
+  ÔÇó packaging       platform=win32 arch=x64 electron=28.3.3 appOutDir=dist-installer\win-unpacked
+  ÔÇó searching for node modules  pm=npm searchDir=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop
+node.exe : (node:26640) [DEP0190] DeprecationWarning: Passing 
+args to a child process with shell option true can lead to 
+security vulnerabilities, as the arguments are not escaped, 
+only concatenated.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:26640) [D... 
+   y concatenated.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning 
+was created)
+  ÔÇó duplicate dependency references  dependencies=["http-errors@2.0.1","on-finished@2.4.1","qs@6.14.2","http-errors@2.0.1","type-is@1.6.18","on-finished@2.4.1","get-intrinsic@1.3.0","call-bind-apply-helpers@1.0.2","call-bind-apply-helpers@1.0.2","es-object-atoms@1.1.1","call-bound@1.0.4","get-intrinsic@1.3.0","side-channel-map@1.0.1","http-errors@2.0.1","on-finished@2.4.1","send@0.19.2","mime-types@2.1.35"]
+  ÔÇó updating asar integrity executable resource  executablePath=dist-installer\win-unpacked\DraftCoach.exe
+  ÔÇó building        target=nsis file=dist-installer\DraftCoach Setup 1.0.0.exe archs=x64 oneClick=true perMachine=false
+  Ô¿» C:\Users\n3tgg\AppData\Local\electron-builder\Cache\nsis\nsis-3.0.4.1-nsis-3.0.4.1\Bin\makensis.exe process failed ERR_ELECTRON_BUILDER_CANNOT_EXECUTE
+Exit code:
+1
+Output:
+Command line defined: "APP_ID=com.draftcoach.app"
+Command line defined: "APP_GUID=62751ef9-8ea6-5e6d-99ed-880ef127a772"
+Command line defined: "UNINSTALL_APP_KEY=62751ef9-8ea6-5e6d-99ed-880ef127a772"
+Command line defined: "PRODUCT_NAME=DraftCoach"
+Command line defined: "PRODUCT_FILENAME=DraftCoach"
+Command line defined: "APP_FILENAME=draftcoach-desktop"
+Command line defined: "APP_DESCRIPTION=DraftCoach - League of Legends Champ Select Assistant"
+Command line defined: "VERSION=1.0.0"
+Command line defined: "PROJECT_DIR=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop"
+Command line defined: "BUILD_RESOURCES_DIR=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\build"
+Command line defined: "APP_PACKAGE_NAME=draftcoach-desktop"
+Command line defined: "MUI_ICON=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "MUI_UNICON=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "APP_64=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\dist-installer\draftcoach-desktop-1.0.0-x64.nsis.7z"
+Command line defined: "APP_64_NAME=draftcoach-desktop-1.0.0-x64.nsis.7z"
+Command line defined: "APP_64_HASH=207821CE75686CBA190D4FCA4D0DE03E1CA0074F4DE1BA787652A876AFE14BC3989DAF89E7214C2C655546C0D3A5E60D26732F45DC1FDC7BE229CC744B27D800"
+Command line defined: "APP_64_UNPACKED_SIZE=273109"
+Command line defined: "COMPANY_NAME=DraftCoach"
+Command line defined: "APP_PRODUCT_FILENAME=DraftCoach"
+Command line defined: "APP_INSTALLER_STORE_FILE=draftcoach-desktop-updater\installer.exe"
+Command line defined: "COMPRESSION_METHOD=7z"
+Command line defined: "ONE_CLICK"
+Command line defined: "RUN_AFTER_FINISH"
+Command line defined: "SHORTCUT_NAME=DraftCoach"
+Command line defined: "UNINSTALL_DISPLAY_NAME=DraftCoach 1.0.0"
+Command line defined: "UNINSTALLER_ICON=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "HEADER_ICO=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "ESTIMATED_SIZE=273109"
+Command line defined: "COMPRESS=auto"
+Command line defined: "BUILD_UNINSTALLER"
+Command line defined: "UNINSTALLER_OUT_FILE=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\dist-installer\DraftCoach Setup 1.0.0.__uninstaller.exe"
+Processing config: C:\Users\n3tgg\AppData\Local\electron-builder\Cache\nsis\nsis-3.0.4.1-nsis-3.0.4.1\nsisconf.nsh
+Processing script file: "<stdin>" (UTF8)
+
+Error output:
+!define: "MUI_ICON" already defined!
+Error in macro customHeader on macroline 1
+Error in script "<stdin>" on line 124 -- aborting creation process
+  failedTask=build stackTrace=Error: C:\Users\n3tgg\AppData\Local\electron-builder\Cache\nsis\nsis-3.0.4.1-nsis-3.0.4.1\Bin\makensis.exe process failed ERR_ELECTRON_BUILDER_CANNOT_EXECUTE
+Exit code:
+1
+Output:
+Command line defined: "APP_ID=com.draftcoach.app"
+Command line defined: "APP_GUID=62751ef9-8ea6-5e6d-99ed-880ef127a772"
+Command line defined: "UNINSTALL_APP_KEY=62751ef9-8ea6-5e6d-99ed-880ef127a772"
+Command line defined: "PRODUCT_NAME=DraftCoach"
+Command line defined: "PRODUCT_FILENAME=DraftCoach"
+Command line defined: "APP_FILENAME=draftcoach-desktop"
+Command line defined: "APP_DESCRIPTION=DraftCoach - League of Legends Champ Select Assistant"
+Command line defined: "VERSION=1.0.0"
+Command line defined: "PROJECT_DIR=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop"
+Command line defined: "BUILD_RESOURCES_DIR=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\build"
+Command line defined: "APP_PACKAGE_NAME=draftcoach-desktop"
+Command line defined: "MUI_ICON=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "MUI_UNICON=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "APP_64=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\dist-installer\draftcoach-desktop-1.0.0-x64.nsis.7z"
+Command line defined: "APP_64_NAME=draftcoach-desktop-1.0.0-x64.nsis.7z"
+Command line defined: "APP_64_HASH=207821CE75686CBA190D4FCA4D0DE03E1CA0074F4DE1BA787652A876AFE14BC3989DAF89E7214C2C655546C0D3A5E60D26732F45DC1FDC7BE229CC744B27D800"
+Command line defined: "APP_64_UNPACKED_SIZE=273109"
+Command line defined: "COMPANY_NAME=DraftCoach"
+Command line defined: "APP_PRODUCT_FILENAME=DraftCoach"
+Command line defined: "APP_INSTALLER_STORE_FILE=draftcoach-desktop-updater\installer.exe"
+Command line defined: "COMPRESSION_METHOD=7z"
+Command line defined: "ONE_CLICK"
+Command line defined: "RUN_AFTER_FINISH"
+Command line defined: "SHORTCUT_NAME=DraftCoach"
+Command line defined: "UNINSTALL_DISPLAY_NAME=DraftCoach 1.0.0"
+Command line defined: "UNINSTALLER_ICON=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "HEADER_ICO=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\assets\icon.ico"
+Command line defined: "ESTIMATED_SIZE=273109"
+Command line defined: "COMPRESS=auto"
+Command line defined: "BUILD_UNINSTALLER"
+Command line defined: "UNINSTALLER_OUT_FILE=C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\dist-installer\DraftCoach Setup 1.0.0.__uninstaller.exe"
+Processing config: C:\Users\n3tgg\AppData\Local\electron-builder\Cache\nsis\nsis-3.0.4.1-nsis-3.0.4.1\nsisconf.nsh
+Processing script file: "<stdin>" (UTF8)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Error output:
+!define: "MUI_ICON" already defined!
+Error in macro customHeader on macroline 1
+Error in script "<stdin>" on line 124 -- aborting creation process
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   at ChildProcess.<anonymous> (C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\node_modules\builder-util\src\util.ts:272:14)
+    at Object.onceWrapper (node:events:623:26)
+    at ChildProcess.emit (node:events:508:28)
+    at ChildProcess.cp.emit (C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop\node_modules\cross-spawn\lib\enoent.js:34:29)
+    at maybeClose (node:internal/child_process:1101:16)
+    at Process.ChildProcess._handle.onexit (node:internal/child_process:305:5)

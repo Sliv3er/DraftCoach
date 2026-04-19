@@ -541,11 +541,35 @@ function resolveCampLabel(campName: string): string {
 }
 
 function renderJunglePath(content: string, version: string) {
-  const path = content.trim()
-    .replace(/\s*-+>\s*/g, ' \u27a4 ')
-    .replace(/\s*->+\s*/g, ' \u27a4 ')
-    .replace(/\s*\u2192\s*/g, ' \u27a4 ');
-  const camps = path.split(/\s*\u27a4\s*/).map(s => s.trim()).filter(Boolean);
+  // Normalize all possible separators into a single delimiter
+  let normalized = content.trim()
+    .replace(/\*\*/g, '')
+    .replace(/\s*-+>\s*/g, ' ➤ ')
+    .replace(/\s*->+\s*/g, ' ➤ ')
+    .replace(/\s*→\s*/g, ' ➤ ')
+    .replace(/\s*➜\s*/g, ' ➤ ')
+    .replace(/\s*=>\s*/g, ' ➤ ');
+
+  let camps: string[];
+
+  if (normalized.includes('➤')) {
+    // Arrow-separated: "Red ➤ Krugs ➤ Raptors"
+    camps = normalized.split(/\s*➤\s*/).map(s => s.trim()).filter(Boolean);
+  } else if (normalized.includes('\n')) {
+    // Newline-separated (possibly numbered): "1. Red\n2. Krugs\n3. Raptors"
+    camps = normalized.split('\n')
+      .map(l => l.trim().replace(/^\d+[.)]\s*/, '').replace(/^[-*•]\s*/, '').trim())
+      .filter(Boolean);
+  } else if (normalized.includes(',')) {
+    // Comma-separated: "Red, Krugs, Raptors"
+    camps = normalized.split(',').map(s => s.trim()).filter(Boolean);
+  } else {
+    // Single camp or unknown format
+    camps = [normalized].filter(Boolean);
+  }
+
+  // Clean up each camp name - strip numbered prefixes, markdown
+  camps = camps.map(c => c.replace(/^\d+[.)]\s*/, '').replace(/^[-*•]\s*/, '').trim()).filter(Boolean);
 
   // Resolve each camp to its position and clean label
   const resolved = camps.map((camp, i) => {

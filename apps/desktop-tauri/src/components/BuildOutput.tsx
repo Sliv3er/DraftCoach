@@ -251,17 +251,19 @@ function renderRunes(content: string, lookups: IconLookups | null) {
 function renderSummoners(content: string, lookups: IconLookups | null) {
   const lines = content.split('\n').filter(l => l.trim());
   return (
-    <div>
+    <div className="summoners-row">
       {lines.map((line, i) => {
         const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
         const match = cleaned.match(/^([A-Za-z\s]+?)(?:\s*\((.+)\))?\s*$/);
         const name = match ? match[1].trim() : line.trim();
         const reason = match ? match[2] : undefined;
         return (
-          <div key={i} className="spell-row">
-            <IconImg src={findIcon(name, lookups?.spells)} alt={name} className="spell-icon" />
-            <span style={{ fontWeight: 500 }}>{name}</span>
-            {reason && <span className="spell-reason">({reason})</span>}
+          <div key={i} className="summoner-card">
+            <IconImg src={findIcon(name, lookups?.spells)} alt={name} className="summoner-icon" />
+            <div className="summoner-info">
+              <span className="summoner-name">{name}</span>
+              {reason && <span className="summoner-reason">{reason}</span>}
+            </div>
           </div>
         );
       })}
@@ -269,17 +271,28 @@ function renderSummoners(content: string, lookups: IconLookups | null) {
   );
 }
 
+const SKILL_COLORS: Record<string, string> = {
+  'Q': '#3b82f6',
+  'W': '#22c55e',
+  'E': '#eab308',
+  'R': '#ef4444',
+};
+
 function renderSkillOrder(content: string) {
   const parts = content.split('>').map(s => s.trim()).filter(Boolean);
   if (parts.length === 0) return <div className="build-output">{content}</div>;
   return (
     <div className="skill-order">
-      {parts.map((p, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <span className="skill-separator">›</span>}
-          <span className="skill-key">{p}</span>
-        </React.Fragment>
-      ))}
+      {parts.map((p, i) => {
+        const letter = p.trim().toUpperCase();
+        const color = SKILL_COLORS[letter];
+        return (
+          <React.Fragment key={i}>
+            {i > 0 && <span className="skill-separator">›</span>}
+            <span className="skill-key" style={color ? { borderColor: color, color, textShadow: `0 0 8px ${color}40` } : undefined}>{p}</span>
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }

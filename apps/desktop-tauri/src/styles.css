@@ -1262,6 +1262,15 @@ body {
   font-size: 13px;
 }
 
+/* Spell Row (legacy) */
+.spell-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
 .spell-row .spell-icon {
   width: 28px;
   height: 28px;
@@ -1271,51 +1280,102 @@ body {
   background: var(--bg-elevated);
 }
 
-/* Spell Row */
-.spell-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-  font-size: 13px;
-}
-
 .spell-row .spell-reason {
   color: var(--text-muted);
   font-size: 11px;
   font-style: italic;
 }
 
+/* Summoner Spell Cards */
+.summoners-row {
+  display: flex;
+  gap: 8px;
+}
+
+.summoner-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: border-color 0.15s;
+}
+
+.summoner-card:hover {
+  border-color: var(--border-hover);
+}
+
+.summoner-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid var(--gold-dim);
+  flex-shrink: 0;
+  background: var(--bg-primary);
+}
+
+.summoner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.summoner-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summoner-reason {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Skill Order */
 .skill-order {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   font-size: 15px;
   font-weight: 700;
-  padding: 4px 0;
+  padding: 6px 0;
 }
 
 .skill-key {
   background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  padding: 4px 12px;
+  border: 2px solid var(--border);
+  padding: 6px 16px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--gold);
+  transition: all 0.15s;
+}
+
+.skill-key:first-of-type {
+  font-size: 18px;
+  padding: 8px 18px;
 }
 
 .skill-separator {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 /* Situational Items Grid */
 .situational-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1fr;
+  gap: 6px;
 }
 
 .sit-card {

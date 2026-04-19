@@ -902,6 +902,12 @@ body {
   .build-columns {
     grid-template-columns: 1fr;
   }
+  .build-bottom {
+    grid-template-columns: 1fr;
+  }
+  .summoners-row {
+    flex-direction: column;
+  }
 }
 
 .btn-copy-all {

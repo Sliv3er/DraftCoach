@@ -403,19 +403,11 @@ function renderJunglePath(content: string) {
     .replace(/\s*→\s*/g, ' ➔ ');
   const camps = path.split(/\s*➔\s*/);
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', padding: '4px 0' }}>
+    <div className="jungle-path-row">
       {camps.map((camp, i) => (
         <React.Fragment key={i}>
-          {i > 0 && <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>➔</span>}
-          <span style={{
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
-            padding: '5px 10px',
-            borderRadius: '6px',
-            fontSize: '12px',
-            fontWeight: 600,
-            color: 'var(--accent-green)',
-          }}>{camp.trim()}</span>
+          {i > 0 && <span className="jungle-path-arrow">➔</span>}
+          <span className="jungle-path-camp">{camp.trim()}</span>
         </React.Fragment>
       ))}
     </div>

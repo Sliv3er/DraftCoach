@@ -555,6 +555,18 @@ export function App() {
         for (const [, spell] of Object.entries<any>(sData.data)) {
           spells.set(spell.name.toLowerCase(), `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.id}.png`);
         }
+        // Add common AI-generated spell name aliases that don't match DDragon exactly
+        const smiteUrl = spells.get('smite');
+        if (smiteUrl) {
+          for (const alias of ['attack smite', 'unleashed smite', 'primal smite', 'gustwalker smite', 'mosstomper smite', 'scorchclaw smite', 'challenging smite', 'chilling smite']) {
+            spells.set(alias, smiteUrl);
+          }
+        }
+        const teleportUrl = spells.get('teleport');
+        if (teleportUrl) {
+          spells.set('unleashed teleport', teleportUrl);
+          spells.set('tp', teleportUrl);
+        }
 
         // Build rune lookup
         const rData: any[] = await rRes.json();

@@ -270,35 +270,34 @@ function renderRunes(content: string, lookups: IconLookups | null) {
         <TreeHeader label="Secondary" treeName={secondaryTree} />
         {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
       </div>
-      {/* Shards */}
+      {/* Shards — full-width row below both trees, League-style */}
       {shards.length > 0 && (
-        <div className="rune-tree-column rune-shards-column">
-          <div className="rune-tree-header">
-            <div className="rune-tree-label-text">Shards</div>
+        <div className="rune-shards-row">
+          <div className="rune-shards-label">Shards</div>
+          <div className="rune-shards-icons">
+            {shards.map((s, i) => {
+              const shardSrc = findIcon(s, lookups?.runes);
+              return (
+                <div key={`sh${i}`} className="rune-shard-slot" title={s}>
+                  {shardSrc && (
+                    <img
+                      src={shardSrc}
+                      alt={s}
+                      className="rune-shard-img"
+                      onError={e => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                        const dot = img.nextElementSibling as HTMLElement;
+                        if (dot && dot.classList.contains('rune-shard-fallback')) dot.style.display = '';
+                      }}
+                    />
+                  )}
+                  <span className="rune-shard-fallback" style={{ display: shardSrc ? 'none' : '' }} />
+                  <span className="rune-shard-name">{s}</span>
+                </div>
+              );
+            })}
           </div>
-          {shards.map((s, i) => {
-            const shardSrc = findIcon(s, lookups?.runes);
-            return (
-              <div key={`sh${i}`} className="rune-shard-cell">
-                {shardSrc && (
-                  <img
-                    src={shardSrc}
-                    alt={s}
-                    className="rune-shard-icon"
-                    onError={e => {
-                      // Replace broken img with next sibling fallback dot
-                      const img = e.target as HTMLImageElement;
-                      img.style.display = 'none';
-                      const dot = img.nextElementSibling as HTMLElement;
-                      if (dot && dot.classList.contains('rune-shard-dot')) dot.style.display = '';
-                    }}
-                  />
-                )}
-                <span className="rune-shard-dot" style={{ display: shardSrc ? 'none' : '' }} />
-                <span>{s}</span>
-              </div>
-            );
-          })}
         </div>
       )}
     </div>

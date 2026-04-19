@@ -519,7 +519,8 @@ SITUATIONAL ITEMS
 <ItemName>: <buy condition>
 
 JUNGLE PATH (ONLY if Jungle)
-<Camp1> ➔ <Camp2> ➔ <Camp3> ➔ <Camp4> ➔ <Action>
+<Camp1> ➔ <Camp2> ➔ <Camp3> ➔ <Camp4> ➔ <Camp5> ➔ <Camp6> ➔ <Action>
+(MUST list at least 5 camps using ➔ arrows. Example: Red ➔ Krugs ➔ Raptors ➔ Wolves ➔ Blue ➔ Gromp ➔ Gank Top)
 
 ENEMY POWER SPIKES
 <EnemyChampion>: <level/item spike>
@@ -543,7 +544,7 @@ CRITICAL RULES:
 - NEVER suggest the same item twice.
 - NEVER put starting items in CORE BUILD.
 - NEVER use the same tree for Primary and Secondary.
-- If Jungle: include companion in STARTING, add JUNGLE PATH.
+- If Jungle: include companion in STARTING, add JUNGLE PATH with full first clear (5-6 camps ➔ arrows ➔ action).
 - For suppression enemies: ALWAYS include QSS in SITUATIONAL minimum.
 - ANTI-HEAL: If needed, include in CORE items 1-5 or SITUATIONAL.
 - Every CORE BUILD item must reference a CONSTRAINT.`;

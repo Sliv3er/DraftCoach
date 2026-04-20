@@ -134,6 +134,20 @@ const ITEM_ALIASES: Record<string, string> = {
   'jungle companion': 'gustwalker hatchling',
 };
 
+// Resolve abbreviated item name to its full display name
+function resolveItemName(name: string): string {
+  const n = name.toLowerCase().trim()
+    .replace(/['']/g, "'")
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ');
+  const alias = ITEM_ALIASES[n];
+  if (alias) {
+    // Title-case the resolved name
+    return alias.replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return name;
+}
+
 function findIcon(name: string, map?: Map<string, string>): string | undefined {
   if (!map || !name) return undefined;
   let n = name.toLowerCase().trim()
@@ -394,8 +408,9 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
             .trim();
         }
 
-        const itemName = text.trim();
-        const iconSrc = findIcon(itemName, lookups?.items);
+        const rawName = text.trim();
+        const itemName = resolveItemName(rawName);
+        const iconSrc = findIcon(rawName, lookups?.items);
         return (
           <div key={i} className="item-card">
             {numbered && num && <span className="item-number">{num}.</span>}
@@ -661,39 +676,48 @@ function renderJungleCamps(campNames: string[], version: string) {
   );
 }
 
-// Extract item names mentioned in parentheses like "(Bloodthirster or Essence Reaver)" or "Nashor's Tooth completion"
+// Extract item names mentioned in text — parenthesized, "and"/"or" separated, or standalone capitalized names
 function extractItemMentions(text: string, lookups: IconLookups | null): { name: string; icon: string | undefined }[] {
   if (!lookups) return [];
   const items: { name: string; icon: string | undefined }[] = [];
   const seen = new Set<string>();
-  // Match parenthesized items and standalone known item patterns
+
+  function tryAdd(raw: string) {
+    const cleanName = raw.trim()
+      .replace(/\*\*/g, '')
+      .replace(/\s+(completion|spike|powerspike|rush|passive|active)$/i, '')
+      .replace(/[.,;!]+$/, '')
+      .trim();
+    if (cleanName.length < 3 || seen.has(cleanName.toLowerCase())) return;
+    const icon = findIcon(cleanName, lookups!.items);
+    if (icon) {
+      seen.add(cleanName.toLowerCase());
+      items.push({ name: cleanName, icon });
+    }
+  }
+
+  // 1. Match parenthesized items — split by "or", "and", ",", "/"
   const parenMatches = text.match(/\(([^)]+)\)/g) || [];
   for (const m of parenMatches) {
     const inner = m.slice(1, -1);
-    // Split by "or", ",", "/"
-    const parts = inner.split(/\s+or\s+|,\s*|\//).map(p => p.trim().replace(/\*\*/g, ''));
-    for (const part of parts) {
-      if (part.length < 3) continue;
-      // Strip trailing words like "completion", "spike"
-      const cleanName = part.replace(/\s+(completion|spike|powerspike|rush)$/i, '').trim();
-      const icon = findIcon(cleanName, lookups.items);
-      if (icon && !seen.has(cleanName.toLowerCase())) {
-        seen.add(cleanName.toLowerCase());
-        items.push({ name: cleanName, icon });
-      }
-    }
+    const parts = inner.split(/\s+or\s+|\s+and\s+|,\s*|\//).map(p => p.trim());
+    for (const part of parts) tryAdd(part);
   }
-  // Also try standalone item names — look for capitalized multi-word names
-  const standalone = text.replace(/\([^)]*\)/g, '').match(/(?:^|\s)([A-Z][a-z]+(?:'s)?\s[A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/g) || [];
-  for (const m of standalone) {
-    const name = m.trim();
-    if (name.length < 4 || seen.has(name.toLowerCase())) continue;
-    const icon = findIcon(name, lookups.items);
-    if (icon) {
-      seen.add(name.toLowerCase());
-      items.push({ name, icon });
-    }
+
+  // 2. Outside-paren text: split by "and"/"or" and try each segment
+  const outsideParen = text.replace(/\([^)]*\)/g, ' ');
+  // Try "X and Y" patterns
+  const andParts = outsideParen.split(/\s+and\s+|\s+or\s+/i);
+  for (const part of andParts) {
+    // Look for capitalized item-like names (2-4 word names starting with uppercase)
+    const nameMatches = part.match(/[A-Z][a-z]+(?:'s)?\s[A-Z][a-z]+(?:\s[A-Z][a-z]+)?(?:\s[A-Z][a-z]+)?/g) || [];
+    for (const nm of nameMatches) tryAdd(nm);
   }
+
+  // 3. Standalone capitalized multi-word names anywhere
+  const standaloneMatches = text.replace(/\([^)]*\)/g, '').match(/(?:^|\s)([A-Z][a-z]+(?:'s)?\s[A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/g) || [];
+  for (const m of standaloneMatches) tryAdd(m.trim());
+
   return items;
 }
 

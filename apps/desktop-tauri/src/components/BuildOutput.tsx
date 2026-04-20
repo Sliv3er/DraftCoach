@@ -706,23 +706,21 @@ function renderWinCondition(content: string) {
 // Human-readable label mapping for AI-generated analysis keys
 function cleanAnalysisLabel(raw: string): string {
   return raw
-    .replace(/_/g, ' ')            // ANTI_HEAL_NEEDED → ANTI HEAL NEEDED
-    .replace(/\b(NEEDED|VALUE)\b/gi, '')  // strip noise suffixes
+    .replace(/_/g, ' ')
+    .replace(/\b(NEEDED|VALUE)\b/gi, '')
     .replace(/\s+/g, ' ')
-    .trim()
-    .split(' ')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ');
+    .trim();
 }
 
 function renderAnalysis(content: string) {
-  // Filter out internal prompt scaffolding that leaks through
-  const PROMPT_NOISE = /^(STEP\s*\d|---+|={3,}|CONSTRAINTS?|THREAT_\d|BUILD CONSTRAINTS|OUTPUT FORMAT|INTERNAL|TEMPLATE|INSTRUCTION)/i;
+  // Filter out internal prompt scaffolding and separator lines
   const lines = content.split('\n').filter(l => {
     const t = l.trim();
     if (!t) return false;
-    if (PROMPT_NOISE.test(t)) return false;
-    if (/^[-=]{3,}$/.test(t)) return false;
+    if (/^(STEP\s*\d|---+|={3,}|CONSTRAINTS?|THREAT_\d|BUILD CONSTRAINTS|OUTPUT FORMAT|INTERNAL|TEMPLATE|INSTRUCTION)/i.test(t)) return false;
+    if (/^[-=]{2,}$/.test(t)) return false;
+    // Strip lines that are ONLY separator characters (═══, ───, etc.)
+    if (/^[═─━─\-=~_]{2,}$/.test(t)) return false;
     return true;
   });
 
@@ -733,33 +731,45 @@ function renderAnalysis(content: string) {
   const cleanLines = truncIdx > 0 ? lines.slice(0, truncIdx) : lines;
 
   // Parse into structured entries
-  type Entry = { label: string; value: string; isHighlight: boolean };
+  type Entry = { label: string; value: string; isTactical: boolean };
   const entries: Entry[] = [];
   for (const line of cleanLines) {
     const cleaned = line.trim().replace(/\*\*/g, '');
+    // Skip lines that are just separator chars
+    if (/^[═─━\-=~_\s]{2,}$/.test(cleaned)) continue;
     const colonIdx = cleaned.indexOf(':');
     if (colonIdx > 0 && colonIdx < 35) {
       const rawLabel = cleaned.slice(0, colonIdx).trim();
       const value = cleaned.slice(colonIdx + 1).trim();
       if (!value) continue;
       const label = cleanAnalysisLabel(rawLabel);
-      // Highlight key tactical entries
-      const isHighlight = /threat|zhonya|banshee|boot|spike|anti.heal|qss|suppress/i.test(rawLabel);
-      entries.push({ label, value, isHighlight });
-    } else if (cleaned) {
-      entries.push({ label: '', value: cleaned, isHighlight: false });
+      // Tactical entries: Yes/No toggles, boots, etc.
+      const isTactical = /anti.heal|qss|suppress|zhonya|banshee|boot|powerspike|key.power/i.test(rawLabel);
+      entries.push({ label, value, isTactical });
     }
   }
 
-  // Split: top overview entries vs bottom tactical entries
+  // Split: overview (matchup info) vs tactical (yes/no decisions)
   const overviewKeys = /matchup|damage|threat|survivab|item prior/i;
   const overview = entries.filter(e => overviewKeys.test(e.label));
-  const tactical = entries.filter(e => !overviewKeys.test(e.label) && e.label);
-  const freeText = entries.filter(e => !e.label && e.value);
+  const tactical = entries.filter(e => e.isTactical);
+  const other = entries.filter(e => !overviewKeys.test(e.label) && !e.isTactical);
+
+  // Extract Yes/No/High/Low from tactical values for badge coloring
+  function getBadge(val: string): { badge: string; color: 'yes' | 'no' | 'high' | 'neutral' } {
+    const lower = val.toLowerCase();
+    if (/^yes\b/i.test(val)) return { badge: 'YES', color: 'yes' };
+    if (/^no\b/i.test(val)) return { badge: 'NO', color: 'no' };
+    if (/^high\b/i.test(val)) return { badge: 'HIGH', color: 'yes' };
+    if (/^low\b/i.test(val)) return { badge: 'LOW', color: 'no' };
+    if (/^mandatory\b/i.test(val)) return { badge: 'YES', color: 'yes' };
+    if (/^essential\b/i.test(val)) return { badge: 'YES', color: 'yes' };
+    return { badge: '', color: 'neutral' };
+  }
 
   return (
     <div className="analysis-container">
-      {/* Overview section */}
+      {/* Overview rows */}
       {overview.length > 0 && (
         <div className="analysis-overview">
           {overview.map((e, i) => (
@@ -770,21 +780,33 @@ function renderAnalysis(content: string) {
           ))}
         </div>
       )}
-      {/* Tactical insights as compact cards */}
+      {/* Tactical badges — compact inline */}
       {tactical.length > 0 && (
-        <div className="analysis-tactics">
-          {tactical.map((e, i) => (
-            <div key={`t${i}`} className={`analysis-tag ${e.isHighlight ? 'analysis-tag-highlight' : ''}`}>
-              <span className="analysis-tag-label">{e.label}</span>
-              <span className="analysis-tag-value">{e.value}</span>
-            </div>
-          ))}
+        <div className="analysis-badges">
+          {tactical.map((e, i) => {
+            const { badge, color } = getBadge(e.value);
+            // Extract just the reason in parens if present
+            const parenMatch = e.value.match(/\(([^)]+)\)/);
+            const reason = parenMatch ? parenMatch[1] : e.value.replace(/^(Yes|No|High|Low|Mandatory|Essential)\s*/i, '').replace(/^\(|\)$/g, '').trim();
+            return (
+              <div key={`b${i}`} className="analysis-badge-item">
+                <span className="analysis-badge-label">{e.label}</span>
+                {badge && <span className={`analysis-badge analysis-badge-${color}`}>{badge}</span>}
+                {reason && <span className="analysis-badge-reason">{reason}</span>}
+              </div>
+            );
+          })}
         </div>
       )}
-      {/* Free text */}
-      {freeText.length > 0 && (
-        <div className="analysis-freetext">
-          {freeText.map((e, i) => <div key={`f${i}`}>{e.value}</div>)}
+      {/* Other entries */}
+      {other.length > 0 && (
+        <div className="analysis-other">
+          {other.map((e, i) => (
+            <div key={`x${i}`} className="analysis-row">
+              <span className="analysis-label">{e.label}</span>
+              <span className="analysis-value">{e.value}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -907,8 +929,8 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const sections = parseSections(result.text);
 
   // Split sections into columns for 2-column layout
-  const LEFT_COL_KEYS = ['RUNES', 'SKILL ORDER', 'SUMMONERS'];
-  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS'];
+  const LEFT_COL_KEYS = ['RUNES', 'SKILL ORDER', 'SUMMONERS', 'ANALYSIS'];
+  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH'];
   // Everything else goes full-width below
 
   const leftSections = sections.filter(s => LEFT_COL_KEYS.includes(s.title));

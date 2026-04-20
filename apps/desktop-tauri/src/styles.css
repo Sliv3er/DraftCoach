@@ -1578,11 +1578,11 @@ body {
 }
 
 /* Analysis Box */
-/* Analysis Section — structured overview + tactical tags */
+/* Analysis Section — structured overview + tactical badges */
 .analysis-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .analysis-overview {
@@ -1596,10 +1596,10 @@ body {
 
 .analysis-row {
   display: flex;
-  padding: 6px 10px;
+  padding: 5px 8px;
   border-bottom: 1px solid var(--border);
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .analysis-row:last-child {
@@ -1607,13 +1607,13 @@ body {
 }
 
 .analysis-label {
-  flex: 0 0 140px;
-  font-weight: 600;
+  flex: 0 0 110px;
+  font-weight: 700;
   color: var(--gold);
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding-top: 1px;
+  letter-spacing: 0.4px;
+  padding-top: 2px;
 }
 
 .analysis-value {
@@ -1622,49 +1622,74 @@ body {
   font-size: 11px;
 }
 
-.analysis-tactics {
+.analysis-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
-.analysis-tag {
+.analysis-badge-item {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px 10px;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 3px;
   font-size: 10px;
-  flex: 1 1 calc(50% - 3px);
-  min-width: 120px;
 }
 
-.analysis-tag-highlight {
-  border-color: var(--gold-dim);
-  background: rgba(200, 155, 60, 0.06);
-}
-
-.analysis-tag-label {
+.analysis-badge-label {
   font-weight: 600;
-  color: var(--gold);
+  color: var(--text-muted);
   font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.3px;
 }
 
-.analysis-tag-value {
-  color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.4;
+.analysis-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
 }
 
-.analysis-freetext {
-  font-size: 11px;
+.analysis-badge-yes {
+  background: rgba(10, 207, 131, 0.15);
+  color: var(--accent-green);
+}
+
+.analysis-badge-no {
+  background: rgba(91, 90, 86, 0.2);
   color: var(--text-muted);
-  line-height: 1.5;
-  padding: 4px 0;
+}
+
+.analysis-badge-high {
+  background: rgba(200, 155, 60, 0.15);
+  color: var(--gold);
+}
+
+.analysis-badge-neutral {
+  color: var(--text-secondary);
+}
+
+.analysis-badge-reason {
+  color: var(--text-muted);
+  font-size: 10px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analysis-other {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 /* Win Condition Box */

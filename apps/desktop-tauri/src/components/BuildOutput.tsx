@@ -3,6 +3,25 @@ import { BuildResponse } from '../types';
 import { IconLookups } from '../App';
 import { ipcInvoke } from '../bridge';
 
+// ErrorBoundary to prevent a single section crash from killing the entire UI
+class SectionErrorBoundary extends React.Component<
+  { fallback: React.ReactNode; children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: any, info: any) {
+    console.error('[BuildOutput] Section render crashed:', error, info);
+  }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
 interface ChampionSpell {
   id: string;
   name: string;
@@ -825,7 +844,6 @@ function renderAnalysis(content: string) {
     if (!t) return false;
     if (/^(STEP\s*\d|---+|={3,}|CONSTRAINTS?|THREAT_\d|BUILD CONSTRAINTS|OUTPUT FORMAT|INTERNAL|TEMPLATE|INSTRUCTION)/i.test(t)) return false;
     if (/^[-=]{2,}$/.test(t)) return false;
-    // Strip lines that are ONLY separator characters (═══, ───, etc.)
     if (/^[═─━─\-=~_]{2,}$/.test(t)) return false;
     return true;
   });
@@ -841,7 +859,6 @@ function renderAnalysis(content: string) {
   const entries: Entry[] = [];
   for (const line of cleanLines) {
     const cleaned = line.trim().replace(/\*\*/g, '');
-    // Skip lines that are just separator chars
     if (/^[═─━\-=~_\s]{2,}$/.test(cleaned)) continue;
     const colonIdx = cleaned.indexOf(':');
     if (colonIdx > 0 && colonIdx < 35) {
@@ -849,24 +866,21 @@ function renderAnalysis(content: string) {
       const value = cleaned.slice(colonIdx + 1).trim();
       if (!value) continue;
       const label = cleanAnalysisLabel(rawLabel);
-      // Tactical entries: Yes/No toggles, boots, etc.
       const isTactical = /anti.heal|qss|suppress|zhonya|banshee|boot|powerspike|key.power/i.test(rawLabel);
       entries.push({ label, value, isTactical });
     }
   }
 
-  // Split: overview (matchup info) vs tactical (yes/no decisions)
+  // Split: overview vs tactical
   const overviewKeys = /matchup|damage|threat|survivab|item prior/i;
   const overview = entries.filter(e => overviewKeys.test(e.label));
   const tactical = entries.filter(e => e.isTactical);
   const other = entries.filter(e => !overviewKeys.test(e.label) && !e.isTactical);
 
-  // Extract Yes/No/High/Low from tactical values for badge coloring
   function getBadge(val: string): { badge: string; color: 'yes' | 'no' | 'high' | 'neutral' } {
-    const lower = val.toLowerCase();
     if (/^yes\b/i.test(val)) return { badge: 'YES', color: 'yes' };
     if (/^no\b/i.test(val)) return { badge: 'NO', color: 'no' };
-    if (/^high\b/i.test(val)) return { badge: 'HIGH', color: 'yes' };
+    if (/^high\b/i.test(val)) return { badge: 'HIGH', color: 'high' };
     if (/^low\b/i.test(val)) return { badge: 'LOW', color: 'no' };
     if (/^mandatory\b/i.test(val)) return { badge: 'YES', color: 'yes' };
     if (/^essential\b/i.test(val)) return { badge: 'YES', color: 'yes' };
@@ -875,44 +889,45 @@ function renderAnalysis(content: string) {
 
   return (
     <div className="analysis-container">
-      {/* Overview rows */}
+      {/* Overview — clean key-value list */}
       {overview.length > 0 && (
-        <div className="analysis-overview">
+        <div className="analysis-kv-list">
           {overview.map((e, i) => (
-            <div key={`o${i}`} className="analysis-row">
-              <span className="analysis-label">{e.label}</span>
-              <span className="analysis-value">{e.value}</span>
+            <div key={`o${i}`} className="analysis-kv">
+              <span className="analysis-kv-key">{e.label}</span>
+              <span className="analysis-kv-val">{e.value}</span>
             </div>
           ))}
         </div>
       )}
-      {/* Tactical badges — compact inline */}
+      {/* Other non-tactical entries */}
+      {other.length > 0 && (
+        <div className="analysis-kv-list">
+          {other.map((e, i) => (
+            <div key={`x${i}`} className="analysis-kv">
+              <span className="analysis-kv-key">{e.label}</span>
+              <span className="analysis-kv-val">{e.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Tactical badges — 2-column grid */}
       {tactical.length > 0 && (
-        <div className="analysis-badges">
+        <div className="analysis-tactical-grid">
           {tactical.map((e, i) => {
             const { badge, color } = getBadge(e.value);
-            // Extract just the reason in parens if present
             const parenMatch = e.value.match(/\(([^)]+)\)/);
             const reason = parenMatch ? parenMatch[1] : e.value.replace(/^(Yes|No|High|Low|Mandatory|Essential)\s*/i, '').replace(/^\(|\)$/g, '').trim();
             return (
-              <div key={`b${i}`} className="analysis-badge-item">
-                <span className="analysis-badge-label">{e.label}</span>
-                {badge && <span className={`analysis-badge analysis-badge-${color}`}>{badge}</span>}
-                {reason && <span className="analysis-badge-reason">{reason}</span>}
+              <div key={`b${i}`} className={`analysis-tac-card analysis-tac-${color}`}>
+                <div className="analysis-tac-top">
+                  <span className="analysis-tac-label">{e.label}</span>
+                  {badge && <span className={`analysis-tac-badge analysis-tac-badge-${color}`}>{badge}</span>}
+                </div>
+                {reason && <div className="analysis-tac-reason">{reason}</div>}
               </div>
             );
           })}
-        </div>
-      )}
-      {/* Other entries */}
-      {other.length > 0 && (
-        <div className="analysis-other">
-          {other.map((e, i) => (
-            <div key={`x${i}`} className="analysis-row">
-              <span className="analysis-label">{e.label}</span>
-              <span className="analysis-value">{e.value}</span>
-            </div>
-          ))}
         </div>
       )}
     </div>
@@ -1046,19 +1061,26 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const bottomSections = sections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
 
   const renderSectionCard = (s: { title: string; content: string }, i: number) => (
-    <div key={i} className="build-section">
-      <div className="build-section-header">
-        <h3>{s.title}</h3>
-        <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
-          Copy
-        </button>
+    <SectionErrorBoundary key={`eb-${s.title}-${i}`} fallback={
+      <div className="build-section">
+        <div className="build-section-header"><h3>{s.title}</h3></div>
+        <div className="build-output">{s.content}</div>
       </div>
-      {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
-      {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
-        ? renderLiveUpdatedItems(liveUpdatedItems)
-        : renderSection(s.title, s.content, iconLookups, championSpells, version, enemies || [])
-      }
-    </div>
+    }>
+      <div key={i} className="build-section">
+        <div className="build-section-header">
+          <h3>{s.title}</h3>
+          <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
+            Copy
+          </button>
+        </div>
+        {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
+        {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
+          ? renderLiveUpdatedItems(liveUpdatedItems)
+          : renderSection(s.title, s.content, iconLookups, championSpells, version, enemies || [])
+        }
+      </div>
+    </SectionErrorBoundary>
   );
 
   const content = sections.length > 0 ? (

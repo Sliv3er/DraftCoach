@@ -1577,119 +1577,127 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Analysis Box */
-/* Analysis Section — structured overview + tactical badges */
+/* Analysis Section — clean key-value + tactical cards */
 .analysis-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-.analysis-overview {
+/* Key-value list (overview + other entries) */
+.analysis-kv-list {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
 }
 
-.analysis-row {
+.analysis-kv {
   display: flex;
-  padding: 5px 8px;
-  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(70, 55, 20, 0.3);
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-.analysis-row:last-child {
+.analysis-kv:last-child {
   border-bottom: none;
 }
 
-.analysis-label {
-  flex: 0 0 110px;
+.analysis-kv-key {
+  flex: 0 0 auto;
+  min-width: 0;
   font-weight: 700;
   color: var(--gold);
-  font-size: 9px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding-top: 2px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
-.analysis-value {
+.analysis-kv-val {
   flex: 1;
   color: var(--text-secondary);
   font-size: 11px;
+  min-width: 0;
 }
 
-.analysis-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+/* Tactical cards — 2-column grid */
+.analysis-tactical-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
 
-.analysis-badge-item {
+.analysis-tac-card {
+  padding: 6px 8px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  border-left: 3px solid var(--border);
+}
+
+.analysis-tac-yes {
+  border-left-color: var(--accent-green);
+}
+
+.analysis-tac-no {
+  border-left-color: var(--text-muted);
+}
+
+.analysis-tac-high {
+  border-left-color: var(--gold);
+}
+
+.analysis-tac-neutral {
+  border-left-color: var(--border);
+}
+
+.analysis-tac-top {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 6px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  font-size: 10px;
+  gap: 6px;
 }
 
-.analysis-badge-label {
-  font-weight: 600;
-  color: var(--text-muted);
+.analysis-tac-label {
   font-size: 9px;
+  font-weight: 700;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
-.analysis-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 1px 4px;
+.analysis-tac-badge {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
   border-radius: 2px;
   letter-spacing: 0.5px;
 }
 
-.analysis-badge-yes {
+.analysis-tac-badge-yes {
   background: rgba(10, 207, 131, 0.15);
   color: var(--accent-green);
 }
 
-.analysis-badge-no {
+.analysis-tac-badge-no {
   background: rgba(91, 90, 86, 0.2);
   color: var(--text-muted);
 }
 
-.analysis-badge-high {
+.analysis-tac-badge-high {
   background: rgba(200, 155, 60, 0.15);
   color: var(--gold);
 }
 
-.analysis-badge-neutral {
+.analysis-tac-badge-neutral {
   color: var(--text-secondary);
 }
 
-.analysis-badge-reason {
-  color: var(--text-muted);
+.analysis-tac-reason {
   font-size: 10px;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.analysis-other {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.3;
 }
 
 /* Win Condition Banner */

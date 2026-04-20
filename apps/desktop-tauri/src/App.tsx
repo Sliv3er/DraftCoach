@@ -1209,24 +1209,6 @@ export function App() {
         </div>
 
         <div className="right-panel">
-          <div className="status-bar">
-            <span className={`status-dot ${status}`} />
-            <span>
-              {status === 'idle' && 'Ready — select a champion to begin'}
-              {status === 'fetching' && 'Generating build with AI...'}
-              {status === 'grounded' && 'Grounded result'}
-              {status === 'cache' && 'From cache'}
-              {status === 'stale-cache' && 'Stale cache (AI unavailable)'}
-              {status === 'error' && 'Error'}
-            </span>
-            {(runesModel || buildModel) && (status === 'grounded' || status === 'cache' || status === 'stale-cache') && (
-              <span style={{ marginLeft: 10, fontSize: '10px', color: 'var(--text-secondary)', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                {runesModel && <span className="model-badge model-badge-flash">{runesModel.replace('gemini-', '').replace('-preview', '')}</span>}
-                {buildModel && <span className="model-badge model-badge-pro">{buildModel.replace('gemini-', '').replace('-preview', '')}</span>}
-              </span>
-            )}
-          </div>
-
           <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} liveUpdatedItems={liveUpdatedItems} enemies={enemies} />
 
           {/* ── Live Advisor Panel ── */}

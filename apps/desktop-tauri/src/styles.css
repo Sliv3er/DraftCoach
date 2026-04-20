@@ -1435,10 +1435,10 @@ body {
 /* Skill Order - LoL HUD style with champion ability icons */
 .skill-order-lol {
   display: flex;
-  gap: 6px;
+  justify-content: space-evenly;
   align-items: flex-start;
   padding: 6px 0;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
 .skill-ability {

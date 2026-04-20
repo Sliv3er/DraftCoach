@@ -1035,11 +1035,9 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
 
   const sections = parseSections(result.text);
 
-  // Split sections into columns for 2-column layout
-  // LEFT: Runes → Summoners → Skill Order → Analysis → Enemy Power Spikes
+  // LEFT: Runes → Summoners → Skill Order → Analysis → Enemy Power Spikes → Win Condition
   // RIGHT: Starting Items → Core Build → Situational Items → Jungle Path → Your Power Spikes
-  // BOTTOM (full-width): Win Condition
-  const LEFT_COL_KEYS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'ANALYSIS', 'ENEMY POWER SPIKES'];
+  const LEFT_COL_KEYS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'ANALYSIS', 'ENEMY POWER SPIKES', 'WIN CONDITION'];
   const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'YOUR POWER SPIKES'];
   // Everything else goes full-width below
 
@@ -1087,17 +1085,6 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
 
   return (
     <div>
-      <div className="build-actions">
-        <button className="btn-copy-all" onClick={() => copyToClipboard(result.text)}>
-          <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="4" y="4" width="9" height="10" rx="1"/><path d="M4 4V3a1 1 0 011-1h7a1 1 0 011 1v8"/></svg>
-          Copy All
-        </button>
-        <button className="btn-export" onClick={handleExport}>
-          <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M8 2v8m0 0l-3-3m3 3l3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
-          Export to LoL
-        </button>
-        {exportStatus && <span className="export-status">{exportStatus}</span>}
-      </div>
       {content}
     </div>
   );

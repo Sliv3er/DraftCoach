@@ -42,6 +42,7 @@
     "resources": {
       "../sidecar/*": "sidecar/",
       "../../desktop/src/main/*.js": "backend/",
+      "../../desktop/src/main/*.cjs": "backend/",
       "../../../shared/kb/data/*": "kb-data/",
       "../../../assets/icon.png": "icon.png"
     },

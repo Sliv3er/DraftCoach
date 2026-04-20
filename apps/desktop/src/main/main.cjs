@@ -4,10 +4,10 @@ const fs = require('fs');
 const https = require('https');
 const http = require('http');
 const { spawn, exec } = require('child_process');
-const { setupCrashHandlers, log } = require('./crash-logger');
-const { loadSettings, getSetting, setSetting, SETTINGS_FILE } = require('./settings');
+const { setupCrashHandlers, log } = require('./crash-logger.cjs');
+const { loadSettings, getSetting, setSetting, SETTINGS_FILE } = require('./settings.cjs');
 // ── Intelligence upgrade: centralised prompt builder ────────────────
-const _prompts = require('./prompt-builder');
+const _prompts = require('./prompt-builder.cjs');
 
 // Load .env from multiple possible locations
 const _envSearchPaths = [

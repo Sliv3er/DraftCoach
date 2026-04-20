@@ -1036,8 +1036,11 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const sections = parseSections(result.text);
 
   // Split sections into columns for 2-column layout
-  const LEFT_COL_KEYS = ['RUNES', 'SKILL ORDER', 'SUMMONERS'];
-  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH'];
+  // LEFT: Runes → Summoners → Skill Order → Analysis → Enemy Power Spikes
+  // RIGHT: Starting Items → Core Build → Situational Items → Jungle Path → Your Power Spikes
+  // BOTTOM (full-width): Win Condition
+  const LEFT_COL_KEYS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'ANALYSIS', 'ENEMY POWER SPIKES'];
+  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'YOUR POWER SPIKES'];
   // Everything else goes full-width below
 
   const leftSections = sections.filter(s => LEFT_COL_KEYS.includes(s.title));

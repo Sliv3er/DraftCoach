@@ -923,8 +923,8 @@ body {
 }
 
 .build-bottom {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
@@ -1692,28 +1692,65 @@ body {
   overflow: hidden;
 }
 
-/* Win Condition Box */
-.win-condition-box {
+/* Win Condition Banner */
+.win-condition-container {
+  padding: 0;
+}
+
+.win-condition-banner {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  background: linear-gradient(135deg, rgba(200, 155, 60, 0.08) 0%, rgba(200, 155, 60, 0.02) 100%);
+  gap: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(200, 155, 60, 0.12) 0%, rgba(200, 155, 60, 0.03) 60%, rgba(10, 14, 19, 0.95) 100%);
   border: 1px solid var(--gold-dim);
+  border-left: 4px solid var(--gold);
   border-radius: 4px;
+  position: relative;
+  overflow: hidden;
 }
 
-.win-condition-icon {
+.win-condition-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
+}
+
+.win-condition-trophy {
   flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(200, 155, 60, 0.2) 0%, rgba(200, 155, 60, 0.05) 100%);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
   color: var(--gold);
-  padding-top: 1px;
 }
 
-.win-condition-text {
-  font-size: 12px;
-  line-height: 1.6;
+.win-condition-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.win-condition-primary {
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.win-condition-secondary {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
 /* Power Spikes */
@@ -1734,8 +1771,17 @@ body {
 .spike-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 3px;
+}
+
+.spike-champ-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-dim);
+  flex-shrink: 0;
+  object-fit: cover;
 }
 
 .spike-indicator {
@@ -1757,8 +1803,12 @@ body {
 .spike-body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding-left: 12px;
+  gap: 4px;
+  padding-left: 32px;
+}
+
+.spike-card:not(:has(.spike-champ-icon)) .spike-body {
+  padding-left: 14px;
 }
 
 .spike-main {
@@ -1773,6 +1823,37 @@ body {
   color: var(--text-muted);
   line-height: 1.4;
   font-style: italic;
+}
+
+.spike-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.spike-item-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 2px 2px;
+  background: rgba(200, 155, 60, 0.08);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.spike-item-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.spike-item-name {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Jungle Path */

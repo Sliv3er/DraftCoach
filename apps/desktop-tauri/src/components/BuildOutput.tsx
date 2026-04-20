@@ -65,6 +65,7 @@ interface Props {
   championId?: string;
   role?: string;
   liveUpdatedItems?: LiveUpdatedItem[] | null;  // Items updated by live advisor
+  enemies?: string[];
 }
 
 // ipcRenderer replaced by bridge.ts
@@ -127,6 +128,7 @@ const ITEM_ALIASES: Record<string, string> = {
   'seedling': 'mosstomper seedling',
   'scorchclaw': 'scorchclaw pup',
   'scorched claw': 'scorchclaw pup',
+  'pup': 'scorchclaw pup',
   'gustwalker': 'gustwalker hatchling',
   'mosstomper': 'mosstomper seedling',
   'jungle companion': 'gustwalker hatchling',
@@ -659,7 +661,56 @@ function renderJungleCamps(campNames: string[], version: string) {
   );
 }
 
-function renderPowerSpikes(content: string) {
+// Extract item names mentioned in parentheses like "(Bloodthirster or Essence Reaver)" or "Nashor's Tooth completion"
+function extractItemMentions(text: string, lookups: IconLookups | null): { name: string; icon: string | undefined }[] {
+  if (!lookups) return [];
+  const items: { name: string; icon: string | undefined }[] = [];
+  const seen = new Set<string>();
+  // Match parenthesized items and standalone known item patterns
+  const parenMatches = text.match(/\(([^)]+)\)/g) || [];
+  for (const m of parenMatches) {
+    const inner = m.slice(1, -1);
+    // Split by "or", ",", "/"
+    const parts = inner.split(/\s+or\s+|,\s*|\//).map(p => p.trim().replace(/\*\*/g, ''));
+    for (const part of parts) {
+      if (part.length < 3) continue;
+      // Strip trailing words like "completion", "spike"
+      const cleanName = part.replace(/\s+(completion|spike|powerspike|rush)$/i, '').trim();
+      const icon = findIcon(cleanName, lookups.items);
+      if (icon && !seen.has(cleanName.toLowerCase())) {
+        seen.add(cleanName.toLowerCase());
+        items.push({ name: cleanName, icon });
+      }
+    }
+  }
+  // Also try standalone item names — look for capitalized multi-word names
+  const standalone = text.replace(/\([^)]*\)/g, '').match(/(?:^|\s)([A-Z][a-z]+(?:'s)?\s[A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/g) || [];
+  for (const m of standalone) {
+    const name = m.trim();
+    if (name.length < 4 || seen.has(name.toLowerCase())) continue;
+    const icon = findIcon(name, lookups.items);
+    if (icon) {
+      seen.add(name.toLowerCase());
+      items.push({ name, icon });
+    }
+  }
+  return items;
+}
+
+// Try to match a champion name label from the spike text against enemy list
+function findChampionIcon(label: string, enemies: string[], version: string): string | undefined {
+  if (!version || !enemies.length) return undefined;
+  const normLabel = label.toLowerCase().replace(/[^a-z]/g, '');
+  for (const enemy of enemies) {
+    const normEnemy = enemy.toLowerCase().replace(/[^a-z]/g, '');
+    if (normLabel.includes(normEnemy) || normEnemy.includes(normLabel)) {
+      return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${enemy}.png`;
+    }
+  }
+  return undefined;
+}
+
+function renderPowerSpikes(content: string, isEnemy: boolean, enemies: string[], version: string, lookups: IconLookups | null) {
   const lines = content.split('\n').filter(l => l.trim());
   return (
     <div className="power-spikes-list">
@@ -672,15 +723,36 @@ function renderPowerSpikes(content: string) {
         const dashIdx = desc.indexOf(' — ');
         const mainDesc = dashIdx > 0 ? desc.slice(0, dashIdx).trim() : desc;
         const detail = dashIdx > 0 ? desc.slice(dashIdx + 3).trim() : '';
+
+        // For enemy power spikes, try to find the champion icon
+        const champIcon = isEnemy && label ? findChampionIcon(label, enemies, version) : undefined;
+
+        // Extract item icons from the description text
+        const itemMentions = extractItemMentions(desc, lookups);
+
         return (
           <div key={i} className="spike-card">
             <div className="spike-header">
-              <span className="spike-indicator" />
+              {champIcon ? (
+                <img src={champIcon} alt={label} className="spike-champ-icon" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              ) : (
+                <span className="spike-indicator" />
+              )}
               <span className="spike-label">{label || `Spike ${i + 1}`}</span>
             </div>
             <div className="spike-body">
               <span className="spike-main">{mainDesc}</span>
               {detail && <span className="spike-detail">{detail}</span>}
+              {itemMentions.length > 0 && (
+                <div className="spike-items">
+                  {itemMentions.map((item, j) => (
+                    <div key={j} className="spike-item-badge">
+                      <img src={item.icon} alt={item.name} className="spike-item-icon" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      <span className="spike-item-name">{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -691,14 +763,24 @@ function renderPowerSpikes(content: string) {
 
 function renderWinCondition(content: string) {
   const text = content.replace(/\*\*/g, '').trim();
+  // Split into sentences for structured display
+  const sentences = text.split(/(?<=[.!])\s+/).filter(s => s.trim());
+  const primary = sentences[0] || text;
+  const secondary = sentences.slice(1).join(' ');
+
   return (
-    <div className="win-condition-box">
-      <div className="win-condition-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
+    <div className="win-condition-container">
+      <div className="win-condition-banner">
+        <div className="win-condition-trophy">
+          <svg viewBox="0 0 24 24" fill="none" style={{width:28,height:28}}>
+            <path d="M7 4V2h10v2h3a1 1 0 011 1v3c0 2.21-1.79 4-4 4h-.535A5.999 5.999 0 0113 15.93V18h2a1 1 0 011 1v2H8v-2a1 1 0 011-1h2v-2.07A5.999 5.999 0 017.535 12H7c-2.21 0-4-1.79-4-4V5a1 1 0 011-1h3zm-3 1v3c0 1.657 1.343 3 3 3h.363A6.004 6.004 0 017 8.5V5H4zm16 0h-3v3.5c0 .946-.22 1.84-.612 2.636A3.005 3.005 0 0020 8V5z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div className="win-condition-content">
+          <div className="win-condition-primary">{primary}</div>
+          {secondary && <div className="win-condition-secondary">{secondary}</div>}
+        </div>
       </div>
-      <div className="win-condition-text">{text}</div>
     </div>
   );
 }
@@ -819,6 +901,7 @@ function renderSection(
   lookups: IconLookups | null,
   championSpells: ChampionSpell[],
   version: string,
+  enemies: string[],
 ) {
   try {
     switch (title) {
@@ -830,8 +913,8 @@ function renderSection(
       case 'CORE BUILD': return renderItems(content, lookups, true);
       case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
       case 'JUNGLE PATH': return renderJunglePath(content, version);
-      case 'ENEMY POWER SPIKES': return renderPowerSpikes(content);
-      case 'YOUR POWER SPIKES': return renderPowerSpikes(content);
+      case 'ENEMY POWER SPIKES': return renderPowerSpikes(content, true, enemies, version, lookups);
+      case 'YOUR POWER SPIKES': return renderPowerSpikes(content, false, [], version, lookups);
       case 'WIN CONDITION': return renderWinCondition(content);
       default: return <div className="build-output">{content}</div>;
     }
@@ -841,7 +924,7 @@ function renderSection(
   }
 }
 
-export function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems }: Props) {
+export function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems, enemies }: Props) {
   const [exportStatus, setExportStatus] = React.useState<string | null>(null);
   const [championSpells, setChampionSpells] = useState<ChampionSpell[]>([]);
 
@@ -929,7 +1012,7 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const sections = parseSections(result.text);
 
   // Split sections into columns for 2-column layout
-  const LEFT_COL_KEYS = ['RUNES', 'SKILL ORDER', 'SUMMONERS', 'ANALYSIS'];
+  const LEFT_COL_KEYS = ['RUNES', 'SKILL ORDER', 'SUMMONERS'];
   const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH'];
   // Everything else goes full-width below
 
@@ -948,7 +1031,7 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
       {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
       {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
         ? renderLiveUpdatedItems(liveUpdatedItems)
-        : renderSection(s.title, s.content, iconLookups, championSpells, version)
+        : renderSection(s.title, s.content, iconLookups, championSpells, version, enemies || [])
       }
     </div>
   );

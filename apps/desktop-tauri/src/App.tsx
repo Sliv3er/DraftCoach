@@ -1227,7 +1227,7 @@ export function App() {
             )}
           </div>
 
-          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} liveUpdatedItems={liveUpdatedItems} />
+          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} liveUpdatedItems={liveUpdatedItems} enemies={enemies} />
 
           {/* ── Live Advisor Panel ── */}
           <div className="live-advisor-section">

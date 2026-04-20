@@ -178,15 +178,21 @@ for (const envPath of envPaths) {
 // It will register ipcMain handlers and start the Express server on :3210
 
 let mainJsPath = '';
+const devMainPathCjs = path.resolve(__dirname, '..', '..', 'desktop', 'src', 'main', 'main.cjs');
 const devMainPath = path.resolve(__dirname, '..', '..', 'desktop', 'src', 'main', 'main.js');
+const prodMainPathCjs = path.resolve(__dirname, '..', 'backend', 'main.cjs');
 const prodMainPath = path.resolve(__dirname, '..', 'backend', 'main.js');
 
-if (fs.existsSync(devMainPath)) {
+if (fs.existsSync(devMainPathCjs)) {
+  mainJsPath = devMainPathCjs;
+} else if (fs.existsSync(devMainPath)) {
   mainJsPath = devMainPath;
+} else if (fs.existsSync(prodMainPathCjs)) {
+  mainJsPath = prodMainPathCjs;
 } else if (fs.existsSync(prodMainPath)) {
   mainJsPath = prodMainPath;
 } else {
-  console.error('[sidecar] FATAL: Could not find main.js');
+  console.error('[sidecar] FATAL: Could not find main.cjs or main.js');
   process.exit(1);
 }
 

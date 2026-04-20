@@ -267,7 +267,7 @@ async function fetchDdragonSummoners() {
 }
 
 // ── Cooldown Tracker State ──
-const cooldownData = require('./cooldowns/cooldown-data');
+const cooldownData = require('./cooldowns/cooldown-data.cjs');
 let cooldownTimers = []; // Array of { id, championName, ability, totalDuration, endTime, startedAt }
 let cooldownTickInterval = null;
 let scoreboardDataInterval = null;

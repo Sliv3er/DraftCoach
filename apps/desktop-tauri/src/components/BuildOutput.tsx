@@ -1054,11 +1054,14 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   // RIGHT: Starting Items → Core Build → Situational Items → Jungle Path → Your Power Spikes
   const LEFT_COL_KEYS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'ANALYSIS', 'ENEMY POWER SPIKES', 'WIN CONDITION'];
   const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'YOUR POWER SPIKES'];
-  // Everything else goes full-width below
 
-  const leftSections = sections.filter(s => LEFT_COL_KEYS.includes(s.title));
-  const rightSections = sections.filter(s => RIGHT_COL_KEYS.includes(s.title));
-  const bottomSections = sections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
+  // Sort sections by the key array order, not by AI output order
+  const sortByKeyOrder = (a: { title: string }, keyArray: string[]) => keyArray.indexOf(a.title);
+  const sortedSections = [...sections].sort((a, b) => sortByKeyOrder(a, LEFT_COL_KEYS) - sortByKeyOrder(b, LEFT_COL_KEYS));
+
+  const leftSections = sortedSections.filter(s => LEFT_COL_KEYS.includes(s.title));
+  const rightSections = sortedSections.filter(s => RIGHT_COL_KEYS.includes(s.title));
+  const bottomSections = sortedSections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
 
   const renderSectionCard = (s: { title: string; content: string }, i: number) => (
     <SectionErrorBoundary key={`eb-${s.title}-${i}`} fallback={

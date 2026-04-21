@@ -3,7 +3,7 @@
 
 const fetch = require('node-fetch');
 
-const RIOT_API_KEY = 'RGAPI-89879322-9b4a-450d-b600-850a667bd76b';
+const RIOT_API_KEY = process.env.RIOT_API_KEY || '';
 const REGION = 'euw1';
 const REGION_V5 = 'europe';
 const SUMMONER_NAME = 'EL Zeni';

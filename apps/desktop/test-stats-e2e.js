@@ -4,7 +4,7 @@
 const fetch = require('node-fetch');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const RIOT_KEY = 'RGAPI-c57898ca-9e68-4da6-98e3-26bdab7d6c16';
+const RIOT_KEY = process.env.RIOT_API_KEY || '';
 const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
 const REGION = 'euw1';
 const REGION_V5 = 'europe';

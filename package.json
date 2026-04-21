@@ -24,6 +24,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "docx": "^9.6.1",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
     "webpack-cli": "^7.0.2"

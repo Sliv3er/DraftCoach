@@ -43,3 +43,6 @@ opencode.json
 
 # Package lock at root (monorepo — each app has its own)
 package-lock.json
+# Generated Word documents
+*.docx
+~$*.docx

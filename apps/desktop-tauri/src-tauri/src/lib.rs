@@ -145,20 +145,43 @@ async fn start_sidecar(app: AppHandle) -> Result<String, String> {
     }
 
     // Spawn Node.js with the backend script
-    // Pipe stdout/stderr so logs appear in the console
     // Set NODE_PATH so main.cjs (loaded via sidecar) can find modules in sidecar/node_modules
+    // Redirect stdout/stderr to log files in userData so we can debug production issues
     let sidecar_dir = sidecar_script.parent().unwrap();
     let sidecar_node_modules = sidecar_dir.join("node_modules").to_string_lossy().to_string();
     let resource_dir_str = sidecar_dir.parent().unwrap().to_string_lossy().to_string();
 
-    let child = std::process::Command::new("node")
-        .arg(&sidecar_script)
+    // Log file location: %APPDATA%/DraftCoach/sidecar.log
+    let log_dir = app.path().app_data_dir().map_err(|e| format!("{e}"))?;
+    std::fs::create_dir_all(&log_dir).ok();
+    let log_path = log_dir.join("sidecar.log");
+    println!("[tauri] Sidecar log: {}", log_path.display());
+
+    let log_file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(&log_path)
+        .map_err(|e| format!("Failed to create log file: {e}"))?;
+    let log_file_err = log_file.try_clone().map_err(|e| format!("{e}"))?;
+
+    let mut cmd = std::process::Command::new("node");
+    cmd.arg(&sidecar_script)
         .env("DRAFTCOACH_RESOURCE_DIR", &resource_dir_str)
         .env("NODE_PATH", &sidecar_node_modules)
-        .stdout(std::process::Stdio::inherit())
-        .stderr(std::process::Stdio::inherit())
-        .spawn()
-        .map_err(|e| format!("Failed to start sidecar: {e}"))?;
+        .stdout(std::process::Stdio::from(log_file))
+        .stderr(std::process::Stdio::from(log_file_err));
+
+    // Windows: hide the spawned node console window
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+
+    let child = cmd.spawn()
+        .map_err(|e| format!("Failed to start sidecar (is Node.js installed and in PATH?): {e}"))?;
 
     println!("[tauri] Sidecar started (PID: {})", child.id());
     state.process = Some(child);

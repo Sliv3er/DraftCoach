@@ -394,6 +394,8 @@ export function App() {
   const [overlayHasData, setOverlayHasData] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<Record<string, any>>({});
+  const [geminiKeyInput, setGeminiKeyInput] = useState('');
+  const [geminiKeySaveStatus, setGeminiKeySaveStatus] = useState<string>('');
   const [runesModel, setRunesModel] = useState('');
   const [buildModel, setBuildModel] = useState('');
 
@@ -1403,27 +1405,84 @@ export function App() {
 
           <div className="settings-group">
             <div className="settings-group-title">AI & Generation</div>
-            <label className="settings-toggle-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
-              <span>Gemini API Key</span>
-              <input
-                type="password"
-                placeholder="Paste your Gemini API key here"
-                value={settings.geminiApiKey || ''}
-                onChange={e => handleSettingChange('geminiApiKey', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '6px 10px',
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 4,
-                  color: 'var(--text-primary)',
-                  fontSize: 12,
-                  fontFamily: 'monospace',
-                }}
-              />
-            </label>
-            <div className="settings-desc">
-              Get your API key from <span style={{ color: 'var(--gold)' }}>https://aistudio.google.com/apikey</span>. Stored locally in your user data.
+            <div style={{ padding: '10px 0' }}>
+              <div style={{ marginBottom: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
+                Gemini API Key {settings.geminiApiKey && <span style={{ color: 'var(--accent-green)', fontSize: 10, marginLeft: 6 }}>● SAVED</span>}
+              </div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  type="password"
+                  placeholder={settings.geminiApiKey ? '•••••••••••• (saved — paste to replace)' : 'Paste your Gemini API key here'}
+                  value={geminiKeyInput}
+                  onChange={e => setGeminiKeyInput(e.target.value)}
+                  onKeyDown={async e => {
+                    if (e.key === 'Enter' && geminiKeyInput.trim()) {
+                      setGeminiKeySaveStatus('Saving...');
+                      await ipcInvoke('set-setting', 'geminiApiKey', geminiKeyInput.trim());
+                      setSettings(prev => ({ ...prev, geminiApiKey: geminiKeyInput.trim() }));
+                      setGeminiKeyInput('');
+                      setGeminiKeySaveStatus('Saved! Restart the app to apply.');
+                      setTimeout(() => setGeminiKeySaveStatus(''), 5000);
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 10px',
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 4,
+                    color: 'var(--text-primary)',
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                  }}
+                />
+                <button
+                  onClick={async () => {
+                    if (!geminiKeyInput.trim()) {
+                      setGeminiKeySaveStatus('Please enter a key first');
+                      setTimeout(() => setGeminiKeySaveStatus(''), 3000);
+                      return;
+                    }
+                    setGeminiKeySaveStatus('Saving...');
+                    const result = await ipcInvoke('set-setting', 'geminiApiKey', geminiKeyInput.trim());
+                    if (result === null) {
+                      setGeminiKeySaveStatus('Failed — backend not running');
+                      setTimeout(() => setGeminiKeySaveStatus(''), 5000);
+                      return;
+                    }
+                    setSettings(prev => ({ ...prev, geminiApiKey: geminiKeyInput.trim() }));
+                    setGeminiKeyInput('');
+                    setGeminiKeySaveStatus('Saved! Restart app to apply.');
+                    setTimeout(() => setGeminiKeySaveStatus(''), 5000);
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'linear-gradient(180deg, #C8AA6E 0%, #785A28 100%)',
+                    border: '1px solid #C8AA6E',
+                    borderRadius: 4,
+                    color: '#010A13',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Save Key
+                </button>
+              </div>
+              {geminiKeySaveStatus && (
+                <div style={{
+                  marginTop: 8,
+                  fontSize: 11,
+                  color: geminiKeySaveStatus.includes('Saved') ? 'var(--accent-green)' :
+                         geminiKeySaveStatus.includes('Failed') ? '#E84057' : 'var(--text-secondary)',
+                }}>
+                  {geminiKeySaveStatus}
+                </div>
+              )}
+              <div className="settings-desc" style={{ marginTop: 8 }}>
+                Get your API key at <span style={{ color: 'var(--gold)' }}>https://aistudio.google.com/apikey</span>
+              </div>
             </div>
             <label className="settings-toggle-row" style={{ marginTop: 10 }}>
               <span>Generation Mode</span>

@@ -53,4 +53,13 @@ for (const f of backendFiles) {
 // Cooldowns subdir
 cpDir(path.join(BACKEND_SRC, 'cooldowns'), path.join(backendOut, 'cooldowns'));
 
+// Copy .env if it exists (so production can find API keys)
+const envSrc = path.resolve(ROOT, '..', '..', '.env');
+if (fs.existsSync(envSrc)) {
+  cp(envSrc, path.join(OUT, '.env'));
+  console.log('[prep-bundle] Copied .env to bundle');
+} else {
+  console.log('[prep-bundle] No .env found at project root, skipping');
+}
+
 console.log('[prep-bundle] Bundle ready at:', OUT);

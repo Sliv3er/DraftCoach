@@ -35,4 +35,11 @@ copyDir(path.join(BUNDLE, 'sidecar'), path.join(RELEASE, 'sidecar'));
 console.log('[post-build] Copying backend/ to target/release/backend/');
 copyDir(path.join(BUNDLE, 'backend'), path.join(RELEASE, 'backend'));
 
+// Copy .env if present in bundle
+const envSrc = path.join(BUNDLE, '.env');
+if (fs.existsSync(envSrc)) {
+  fs.copyFileSync(envSrc, path.join(RELEASE, '.env'));
+  console.log('[post-build] Copied .env to target/release/');
+}
+
 console.log('[post-build] Done. Backend bundle ready at:', RELEASE);

@@ -15,6 +15,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { emit, listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { open as dialogOpen } from '@tauri-apps/plugin-dialog';
 
 // ── Config ──
 const IPC_PROXY_PORT = 3211;  // IPC proxy server (sidecar)
@@ -133,6 +134,20 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     case 'get-ddragon-version':
       return fetch(`${BACKEND_URL}/api/version`).then(r => r.json()).then(d => d.version);
     
+    // Browse directory — use Tauri native dialog instead of Electron dialog shim
+    case 'browse-directory':
+      try {
+        const selected = await dialogOpen({
+          directory: true,
+          multiple: false,
+          title: 'Select League of Legends Installation Folder',
+        });
+        return selected || null;
+      } catch (e) {
+        console.warn('[bridge] browse-directory dialog failed:', e);
+        return null;
+      }
+
     // Pass-through to sidecar IPC proxy for all backend IPC handlers
     case 'lcu-champ-select':
     case 'lcu-live-game':
@@ -157,7 +172,6 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     case 'get-setting':
     case 'set-setting':
     case 'get-autodetect-hud':
-    case 'browse-directory':
     case 're-register-shortcuts':
     case 'test-shortcut':
     case 'get-rag-status':

@@ -186,9 +186,20 @@ async fn start_sidecar(app: AppHandle) -> Result<String, String> {
         .map_err(|e| format!("Failed to create log file: {e}"))?;
     let log_file_err = log_file.try_clone().map_err(|e| format!("{e}"))?;
 
+    // Determine the install directory (where the .exe lives)
+    // In production this is e.g. C:\Users\<user>\AppData\Local\DraftCoach\
+    let install_dir = if cfg!(debug_assertions) {
+        resource_dir_str.clone()
+    } else {
+        // In production, the exe is at <install_dir>/draftcoach.exe
+        // resource_dir is already the install dir on Windows NSIS
+        resource_dir_str.clone()
+    };
+
     let mut cmd = std::process::Command::new("node");
     cmd.arg(&sidecar_script)
         .env("DRAFTCOACH_RESOURCE_DIR", &resource_dir_str)
+        .env("DRAFTCOACH_INSTALL_DIR", &install_dir)
         .env("NODE_PATH", &sidecar_node_modules)
         .stdout(std::process::Stdio::from(log_file))
         .stderr(std::process::Stdio::from(log_file_err));

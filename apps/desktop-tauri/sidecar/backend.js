@@ -18,9 +18,16 @@ const EventEmitter = require('events');
 
 // ── Config ──
 const RESOURCE_DIR = process.env.DRAFTCOACH_RESOURCE_DIR || path.resolve(__dirname, '..', '..');
+// INSTALL_DIR: where the .exe lives (and sidecar/, backend/, .env sit next to it)
+// In production NSIS install this is e.g. C:\Users\<user>\AppData\Local\DraftCoach\
+const INSTALL_DIR = process.env.DRAFTCOACH_INSTALL_DIR || RESOURCE_DIR;
 const userData = process.env.APPDATA 
   ? path.join(process.env.APPDATA, 'DraftCoach')
   : path.join(require('os').homedir(), '.draftcoach');
+// Tauri uses the bundle identifier for its app data dir
+const tauriAppData = process.env.APPDATA
+  ? path.join(process.env.APPDATA, 'com.draftcoach.app')
+  : userData;
 
 // Ensure userData dir exists
 if (!fs.existsSync(userData)) fs.mkdirSync(userData, { recursive: true });
@@ -94,7 +101,9 @@ const electronShim = {
       switch (name) {
         case 'userData': return userData;
         case 'temp': return require('os').tmpdir();
-        case 'exe': return process.execPath;
+        // In production, 'exe' should point to the install directory (where DraftCoach.exe lives)
+        // NOT Node.js's process.execPath (which is the node binary itself)
+        case 'exe': return path.join(INSTALL_DIR, 'draftcoach.exe');
         case 'home': return require('os').homedir();
         default: return userData;
       }
@@ -119,7 +128,11 @@ const electronShim = {
   },
   Menu: { setApplicationMenu: () => {} },
   globalShortcut: {
-    register: () => true,
+    register: (accelerator, cb) => {
+      // No-op in sidecar — Tauri handles shortcuts natively
+      // Suppress noisy logs by returning true silently
+      return true;
+    },
     unregister: () => {},
     unregisterAll: () => {},
   },
@@ -128,6 +141,12 @@ const electronShim = {
       bounds: { width: 1920, height: 1080 },
       workArea: { width: 1920, height: 1040 },
     }),
+  },
+  dialog: {
+    // browse-directory IPC handler uses dialog.showOpenDialog()
+    // In Tauri, this is handled by the frontend via @tauri-apps/plugin-dialog
+    // Return cancelled result so the backend doesn't crash
+    showOpenDialog: async () => ({ canceled: true, filePaths: [] }),
   },
 };
 
@@ -185,7 +204,9 @@ const envPaths = [
   path.resolve(__dirname, '..', '..', '..', '.env'),       // DraftCoach root (dev)
   path.resolve(__dirname, '..', '..', 'desktop', '.env'),   // desktop app
   path.resolve(__dirname, '..', '.env'),                    // installed app (next to sidecar/)
-  path.join(userData, '.env'),                               // user data
+  path.join(INSTALL_DIR, '.env'),                            // NSIS install dir (next to .exe)
+  path.join(userData, '.env'),                               // %APPDATA%/DraftCoach/.env
+  path.join(tauriAppData, '.env'),                           // %APPDATA%/com.draftcoach.app/.env
 ];
 
 for (const envPath of envPaths) {
@@ -203,6 +224,7 @@ for (const envPath of envPaths) {
     break;
   }
 }
+console.log('[sidecar] .env search paths:', envPaths.filter(p => fs.existsSync(p)).join(', ') || 'NONE FOUND');
 
 // ── Now load the original main.js ──
 // It will register ipcMain handlers and start the Express server on :3210
@@ -263,7 +285,11 @@ electronShim.app.whenReady = () => ({
 });
 
 // Also need process.resourcesPath (used by main.js in production mode)
-process.resourcesPath = path.resolve(__dirname, '..', '..', 'assets');
+// In production, RESOURCE_DIR = the install directory (e.g. %LOCALAPPDATA%/DraftCoach/)
+// which contains backend/, sidecar/, kb-data/, icon.png, etc.
+process.resourcesPath = RESOURCE_DIR;
+console.log('[sidecar] process.resourcesPath:', process.resourcesPath);
+console.log('[sidecar] INSTALL_DIR:', INSTALL_DIR);
 
 // Actually load main.js — this will:
 // 1. Register all ipcMain handlers (30+) at module scope

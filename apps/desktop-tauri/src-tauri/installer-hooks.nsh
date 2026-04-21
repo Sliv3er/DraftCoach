@@ -18,6 +18,10 @@
   SetOutPath "$INSTDIR\backend"
   File /r "..\..\..\..\..\build-bundle\backend\*.*"
 
+  ; Copy .env if it exists (contains API keys)
+  SetOutPath "$INSTDIR"
+  File /nonfatal "..\..\..\..\..\build-bundle\.env"
+
   DetailPrint "DraftCoach backend installed."
 
   ; Restore output path to install dir

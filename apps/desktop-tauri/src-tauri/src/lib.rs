@@ -267,24 +267,46 @@ pub fn run() {
                     Err(e) => eprintln!("[tauri] Sidecar auto-start failed: {e}"),
                 }
 
-                // Wait for backend port to be open (max 15s)
-                let port_ready = tokio::time::timeout(std::time::Duration::from_secs(15), async {
-                    for _ in 0..30 {
-                        if let Ok(mut stream) = tokio::net::TcpStream::connect("127.0.0.1:3210").await {
-                            use tokio::io::AsyncWriteExt;
-                            let _ = stream.shutdown().await;
-                            println!("[tauri] Backend port 3210 is open");
+                // Wait for BOTH backend ports to be open (max 20s)
+                // Port 3210: Express server (build endpoints, DDragon API)
+                // Port 3211: IPC proxy server (ipcMain handlers, SSE events)
+                // The IPC proxy starts AFTER main.cjs loads and whenReady fires,
+                // so 3211 is always ready after 3210. We must wait for both.
+                let ports_ready = tokio::time::timeout(std::time::Duration::from_secs(20), async {
+                    let mut port_3210_ready = false;
+                    let mut port_3211_ready = false;
+                    for i in 0..40 {
+                        if !port_3210_ready {
+                            if let Ok(mut stream) = tokio::net::TcpStream::connect("127.0.0.1:3210").await {
+                                use tokio::io::AsyncWriteExt;
+                                let _ = stream.shutdown().await;
+                                port_3210_ready = true;
+                                println!("[tauri] Backend port 3210 is open (attempt {})", i + 1);
+                            }
+                        }
+                        if !port_3211_ready {
+                            if let Ok(mut stream) = tokio::net::TcpStream::connect("127.0.0.1:3211").await {
+                                use tokio::io::AsyncWriteExt;
+                                let _ = stream.shutdown().await;
+                                port_3211_ready = true;
+                                println!("[tauri] IPC proxy port 3211 is open (attempt {})", i + 1);
+                            }
+                        }
+                        if port_3210_ready && port_3211_ready {
                             return true;
                         }
                         tokio::time::sleep(std::time::Duration::from_millis(500)).await;
                     }
+                    // Log which ports failed
+                    if !port_3210_ready { eprintln!("[tauri] Port 3210 never opened"); }
+                    if !port_3211_ready { eprintln!("[tauri] Port 3211 never opened"); }
                     false
                 }).await;
 
-                if port_ready.unwrap_or(false) {
-                    println!("[tauri] Backend ready, showing window");
+                if ports_ready.unwrap_or(false) {
+                    println!("[tauri] Backend ready (both ports), showing window");
                 } else {
-                    eprintln!("[tauri] Backend not ready after 15s, showing window anyway");
+                    eprintln!("[tauri] Backend not fully ready after 20s, showing window anyway");
                 }
 
                 if let Some(window) = handle.get_webview_window("main") {

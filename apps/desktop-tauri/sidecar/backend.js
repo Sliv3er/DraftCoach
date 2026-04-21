@@ -134,13 +134,42 @@ const electronShim = {
 // ── Module Shim Injection ──
 // Override require() to intercept Electron imports
 const Module = require('module');
+
+// Ensure sidecar's node_modules is in the module resolution path
+// so main.cjs (loaded from a different directory) can find express, cors, etc.
+const sidecarNodeModules = path.join(__dirname, 'node_modules');
+if (fs.existsSync(sidecarNodeModules)) {
+  if (!Module.globalPaths.includes(sidecarNodeModules)) {
+    Module.globalPaths.push(sidecarNodeModules);
+  }
+  // Also set NODE_PATH so child processes inherit
+  process.env.NODE_PATH = process.env.NODE_PATH
+    ? `${process.env.NODE_PATH}${path.delimiter}${sidecarNodeModules}`
+    : sidecarNodeModules;
+  // Re-init Module paths to pick up NODE_PATH changes
+  Module._initPaths();
+}
+
 const originalResolve = Module._resolveFilename;
 Module._resolveFilename = function(request, parent, isMain, options) {
   if (request === 'electron') {
     // Return a fake path that we'll handle
     return '__electron_shim__';
   }
-  return originalResolve.call(this, request, parent, isMain, options);
+  // Try normal resolution first
+  try {
+    return originalResolve.call(this, request, parent, isMain, options);
+  } catch (err) {
+    // If it fails, try resolving from sidecar's node_modules
+    if (fs.existsSync(sidecarNodeModules)) {
+      try {
+        return originalResolve.call(this, request, { paths: [sidecarNodeModules] }, isMain, options);
+      } catch (_) {
+        // Fall through to throw original error
+      }
+    }
+    throw err;
+  }
 };
 
 const originalLoad = Module._load;

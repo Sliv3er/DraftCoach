@@ -146,9 +146,15 @@ async fn start_sidecar(app: AppHandle) -> Result<String, String> {
 
     // Spawn Node.js with the backend script
     // Pipe stdout/stderr so logs appear in the console
+    // Set NODE_PATH so main.cjs (loaded via sidecar) can find modules in sidecar/node_modules
+    let sidecar_dir = sidecar_script.parent().unwrap();
+    let sidecar_node_modules = sidecar_dir.join("node_modules").to_string_lossy().to_string();
+    let resource_dir_str = sidecar_dir.parent().unwrap().to_string_lossy().to_string();
+
     let child = std::process::Command::new("node")
         .arg(&sidecar_script)
-        .env("DRAFTCOACH_RESOURCE_DIR", sidecar_script.parent().unwrap().parent().unwrap().to_string_lossy().to_string())
+        .env("DRAFTCOACH_RESOURCE_DIR", &resource_dir_str)
+        .env("NODE_PATH", &sidecar_node_modules)
         .stdout(std::process::Stdio::inherit())
         .stderr(std::process::Stdio::inherit())
         .spawn()

@@ -1651,8 +1651,19 @@ export function App() {
                 <button
                   className="settings-path-browse"
                   onClick={async () => {
-                    const dir = await (window as any).require('electron').ipcInvoke('browse-directory');
-                    if (dir) handleSettingChange('lolPath', dir);
+                    try {
+                      const { open } = await import('@tauri-apps/plugin-dialog');
+                      const dir = await open({
+                        directory: true,
+                        multiple: false,
+                        title: 'Select League of Legends Installation Folder',
+                      });
+                      if (dir && typeof dir === 'string') {
+                        handleSettingChange('lolPath', dir);
+                      }
+                    } catch (err) {
+                      console.error('[App] Browse failed:', err);
+                    }
                   }}
                 >Browse</button>
               </div>

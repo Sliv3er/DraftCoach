@@ -155,6 +155,13 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     case 'get-settings':
     case 'save-setting':
     case 'get-setting':
+    case 'set-setting':
+    case 'get-autodetect-hud':
+    case 'browse-directory':
+    case 're-register-shortcuts':
+    case 'test-shortcut':
+    case 'get-rag-status':
+    case 'get-icon':
       return fetch(`${IPC_PROXY_URL}/api/ipc/${channel}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

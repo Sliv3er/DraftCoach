@@ -144,6 +144,27 @@ async fn start_sidecar(app: AppHandle) -> Result<String, String> {
         return Err(format!("Sidecar script not found: {}", sidecar_script.display()));
     }
 
+    // Kill any stale sidecar process holding our ports (3210, 3211) from a previous run.
+    // This is the common failure: app was force-closed, node.exe kept running.
+    #[cfg(windows)]
+    {
+        for port in &["3210", "3211"] {
+            let cmd_str = format!(
+                "Get-NetTCPConnection -LocalPort {} -State Listen -ErrorAction SilentlyContinue | \
+                 ForEach-Object {{ Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }}",
+                port
+            );
+            use std::os::windows::process::CommandExt;
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            let _ = std::process::Command::new("powershell")
+                .args(&["-NoProfile", "-Command", &cmd_str])
+                .creation_flags(CREATE_NO_WINDOW)
+                .output();
+        }
+        // Give Windows a moment to free the sockets
+        std::thread::sleep(std::time::Duration::from_millis(300));
+    }
+
     // Spawn Node.js with the backend script
     // Set NODE_PATH so main.cjs (loaded via sidecar) can find modules in sidecar/node_modules
     // Redirect stdout/stderr to log files in userData so we can debug production issues
@@ -211,7 +232,9 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_process::init())
-        .manage(Mutex::new(SidecarState { process: None }))
+        .manage(Mutex::new(SidecarState {
+            process: None,
+        }))
         .invoke_handler(tauri::generate_handler![
             create_window,
             close_window,

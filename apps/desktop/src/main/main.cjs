@@ -637,7 +637,7 @@ async function checkAndSyncRag(livePatch, force = false) {
 
     log('INFO', `[RAG] Patch mismatch. Live: ${livePatch}, Local: ${localMeta?.patch || 'None'}. Updating...`);
     const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
     if (!apiKey) { log('WARN', '[RAG] No API key, skipping'); return; }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -1236,8 +1236,8 @@ COMMON MISTAKES — NEVER DO THESE:
 
     async function generateBuild(body, shortPrompt) {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error('GEMINI_API_KEY not set. Place a .env file with GEMINI_API_KEY=your_key next to the exe or in ' + app.getPath('userData'));
+      const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
+      if (!apiKey) throw new Error('Gemini API key not set. Open Settings and paste your Gemini API key, or place a .env file with GEMINI_API_KEY=your_key in ' + app.getPath('userData'));
 
       // Get live patch from DDragon (never hardcoded)
       let livePatch;
@@ -1408,7 +1408,7 @@ COMMON MISTAKES — NEVER DO THESE:
 
         // Generate with streaming
         const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
         if (!apiKey) {
           sendSSE({ error: 'GEMINI_API_KEY not set' });
           return res.end();
@@ -1546,7 +1546,7 @@ COMMON MISTAKES — NEVER DO THESE:
         }
 
         const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
         if (!apiKey) { sendSSE({ error: 'GEMINI_API_KEY not set' }); return res.end(); }
 
         const genAI = new GoogleGenerativeAI(apiKey);
@@ -3564,7 +3564,7 @@ async function pollLiveClient() {
     // Step 1: Quick threat analysis (cached for 60s to reduce latency)
     sendAdvisorDebug('[ai] Step 1: Threat analysis...');
     const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
     if (!apiKey) {
       sendAdvisorDebug('[error] GEMINI_API_KEY not set in environment');
       return;
@@ -4482,7 +4482,7 @@ IMPORTANT: Output ONLY the JSON object. No text before or after it.`;
   try {
     sendScoutDebug('[ai] Sending to Gemini...');
     const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
     if (!apiKey) {
       sendScoutDebug('[error] GEMINI_API_KEY not set');
       return;

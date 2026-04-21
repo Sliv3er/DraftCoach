@@ -1403,7 +1403,29 @@ export function App() {
 
           <div className="settings-group">
             <div className="settings-group-title">AI & Generation</div>
-            <label className="settings-toggle-row">
+            <label className="settings-toggle-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+              <span>Gemini API Key</span>
+              <input
+                type="password"
+                placeholder="Paste your Gemini API key here"
+                value={settings.geminiApiKey || ''}
+                onChange={e => handleSettingChange('geminiApiKey', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 4,
+                  color: 'var(--text-primary)',
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                }}
+              />
+            </label>
+            <div className="settings-desc">
+              Get your API key from <span style={{ color: 'var(--gold)' }}>https://aistudio.google.com/apikey</span>. Stored locally in your user data.
+            </div>
+            <label className="settings-toggle-row" style={{ marginTop: 10 }}>
               <span>Generation Mode</span>
               <select
                 className="game-mode-select"

@@ -184,6 +184,7 @@ Module._load = function(request, parent, isMain) {
 const envPaths = [
   path.resolve(__dirname, '..', '..', '..', '.env'),       // DraftCoach root (dev)
   path.resolve(__dirname, '..', '..', 'desktop', '.env'),   // desktop app
+  path.resolve(__dirname, '..', '.env'),                    // installed app (next to sidecar/)
   path.join(userData, '.env'),                               // user data
 ];
 

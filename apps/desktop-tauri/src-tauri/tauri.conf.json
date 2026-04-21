@@ -40,11 +40,6 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "../sidecar/backend.js": "sidecar/backend.js",
-      "../sidecar/package.json": "sidecar/package.json",
-      "../sidecar/node_modules/**/*": "sidecar/node_modules/",
-      "../../desktop/src/main/*.cjs": "backend/",
-      "../../desktop/src/main/cooldowns/*.cjs": "backend/cooldowns/",
       "../../../shared/kb/data/*": "kb-data/",
       "../../../assets/icon.png": "icon.png"
     },

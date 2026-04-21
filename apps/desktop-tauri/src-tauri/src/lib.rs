@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Manager, WebviewWindowBuilder, WebviewUrl};
+use tauri::{AppHandle, Emitter, Manager, WebviewWindowBuilder, WebviewUrl};
 use std::sync::Mutex;
 use std::process::Child;
 
@@ -308,6 +308,10 @@ pub fn run() {
                 } else {
                     eprintln!("[tauri] Backend not fully ready after 20s, showing window anyway");
                 }
+
+                // Emit event BEFORE showing window so frontend can start initialization
+                let _ = handle.emit("backend-ready", true);
+                println!("[tauri] Emitted backend-ready event");
 
                 if let Some(window) = handle.get_webview_window("main") {
                     let _ = window.show();

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BuildResponse, Role, GeminiModel } from './types';
 import { ChampionPicker } from './components/ChampionPicker';
 import { BuildOutput } from './components/BuildOutput';
-import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow } from './bridge';
+import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow, backendReady } from './bridge';
 
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
@@ -480,9 +480,13 @@ export function App() {
   useEffect(() => {
     (async () => {
       try {
-        // Wait for backend sidecar to be ready (it starts ~1-3s after app launch)
+        // Wait for Tauri to confirm backend ports are open
+        await backendReady;
+        console.log('[App] Backend ready signal received, initializing...');
+
+        // Fetch DDragon version from our backend
         let version = '';
-        for (let attempt = 0; attempt < 20; attempt++) {
+        for (let attempt = 0; attempt < 10; attempt++) {
           try {
             const vRes = await fetch(`${API_BASE}/api/version`);
             if (vRes.ok) {
@@ -491,9 +495,9 @@ export function App() {
               break;
             }
           } catch {
-            // Backend not ready yet
+            // Backend returned error, retry
           }
-          console.log(`[App] Backend not ready, retrying... (${attempt + 1}/20)`);
+          console.log(`[App] Version fetch retry... (${attempt + 1}/10)`);
           await new Promise(r => setTimeout(r, 500));
         }
         if (!version) {
@@ -616,23 +620,36 @@ export function App() {
 
   // ── Fetch RAG status from backend every 3s ────────────────
   useEffect(() => {
-    const fetchRag = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/rag/status`);
-        const data = await res.json();
-        setRagStatus(data);
-      } catch { /* backend not ready yet */ }
+    let ragPoll: ReturnType<typeof setInterval> | null = null;
+    let cancelled = false;
+
+    (async () => {
+      await backendReady;
+      if (cancelled) return;
+
+      const fetchRag = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/rag/status`);
+          const data = await res.json();
+          setRagStatus(data);
+        } catch { /* backend not ready yet */ }
+      };
+      const fetchSettings = async () => {
+        try {
+          const s = await ipcInvoke('get-settings');
+          setSettings(s);
+        } catch { /* ignore */ }
+      };
+
+      fetchRag();
+      fetchSettings();
+      ragPoll = setInterval(fetchRag, 3000);
+    })();
+
+    return () => {
+      cancelled = true;
+      if (ragPoll) clearInterval(ragPoll);
     };
-    const fetchSettings = async () => {
-      try {
-        const s = await ipcInvoke('get-settings');
-        setSettings(s);
-      } catch { /* ignore */ }
-    };
-    fetchRag();
-    fetchSettings();
-    const ragPoll = setInterval(fetchRag, 3000); // poll every 3s
-    return () => clearInterval(ragPoll);
   }, []);
 
   const handleForceSync = useCallback(async () => {
@@ -1010,18 +1027,23 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (autoDetect) {
-      setAutoDetectStatus('searching');
-      pollLCU();
-      autoDetectRef.current = setInterval(pollLCU, 2000);
-    } else {
-      setAutoDetectStatus('off');
-      if (autoDetectRef.current) {
-        clearInterval(autoDetectRef.current);
-        autoDetectRef.current = null;
+    let cancelled = false;
+
+    (async () => {
+      await backendReady;
+      if (cancelled) return;
+
+      if (autoDetect) {
+        setAutoDetectStatus('searching');
+        pollLCU();
+        autoDetectRef.current = setInterval(pollLCU, 2000);
+      } else {
+        setAutoDetectStatus('off');
       }
-    }
+    })();
+
     return () => {
+      cancelled = true;
       if (autoDetectRef.current) {
         clearInterval(autoDetectRef.current);
         autoDetectRef.current = null;

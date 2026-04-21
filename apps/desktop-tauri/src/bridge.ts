@@ -83,8 +83,28 @@ function connectSSE() {
   }
 }
 
-// Start SSE connection on load
-connectSSE();
+// ── Backend Ready Gate ──
+// The sidecar takes a few seconds to start. Instead of immediately connecting
+// (which spams ERR_CONNECTION_REFUSED), we wait for Tauri to signal readiness.
+let _resolveBackendReady: () => void;
+export const backendReady = new Promise<void>((resolve) => {
+  _resolveBackendReady = resolve;
+});
+
+// Listen for the Rust-side 'backend-ready' event
+if (typeof (window as any).__TAURI_INTERNALS__ !== 'undefined') {
+  listen('backend-ready', () => {
+    console.log('[bridge] Received backend-ready from Tauri');
+    _resolveBackendReady();
+    connectSSE();
+  });
+} else {
+  // Running in plain browser (e.g. localhost:1420 directly) — no Tauri event
+  setTimeout(() => {
+    _resolveBackendReady();
+    connectSSE();
+  }, 1000);
+}
 
 /**
  * Replaces ipcRenderer.invoke(channel, ...args)

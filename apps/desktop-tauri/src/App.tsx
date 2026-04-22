@@ -664,17 +664,25 @@ export function App() {
 
   const handleGenerate = useCallback(async () => {
     if (!myChampion) return;
+    // Don't generate if DDragon hasn't loaded yet
+    if (!patchVersion || patchVersion === '...') {
+      console.warn('[App] handleGenerate called before patchVersion is ready, skipping');
+      return;
+    }
     setStatus('fetching');
     setBuildResult(null);
     setRunesModel('');
     setBuildModel('');
     // Don't reset buildGeneratedRef here — auto-detect will unlock on new champ select session
 
+    const requestBody = { patch: patchVersion, myChampion, role, allies, enemies, model: selectedModel, generationMode: settings.generationMode || 'flash' };
+    console.log('[App] Generate request:', JSON.stringify({ ...requestBody, allies: requestBody.allies?.length, enemies: requestBody.enemies?.length }));
+
     try {
       const response = await fetch(`${API_BASE}/api/build-dual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patch: patchVersion, myChampion, role, allies, enemies, model: selectedModel, generationMode: settings.generationMode || 'flash' }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -851,7 +859,7 @@ export function App() {
       setBuildResult({ ok: false, source: 'error', message: err.message, canRetry: true });
       setStatus('error');
     }
-  }, [myChampion, role, allies, enemies, selectedModel, iconLookups]);
+  }, [myChampion, role, allies, enemies, selectedModel, iconLookups, patchVersion, settings]);
 
   // ── Auto-generate when all 10 champions are locked in ──
   useEffect(() => {
@@ -859,13 +867,15 @@ export function App() {
     if (status === 'fetching') return; // Already generating — don't stack duplicate calls
     // Need: 1 myChampion + 4 allies + 5 enemies = 10
     if (!myChampion || allies.length < 4 || enemies.length < 5) return;
+    // Don't auto-generate until DDragon data is loaded
+    if (!patchVersion || patchVersion === '...') return;
     // Build a key so we don't re-trigger for the same exact draft
     const comboKey = `${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}`;
     if (autoGenKeyRef.current === comboKey) return;
     autoGenKeyRef.current = comboKey;
     console.log('[App] All 10 champions detected — auto-generating build');
     handleGenerate();
-  }, [autoDetect, myChampion, role, allies, enemies, status, handleGenerate]);
+  }, [autoDetect, myChampion, role, allies, enemies, status, handleGenerate, patchVersion]);
 
   // Listen for force-regenerate from main process (CTRL+SHIFT+G)
   useEffect(() => {

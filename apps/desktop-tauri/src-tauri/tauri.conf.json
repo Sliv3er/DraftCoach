@@ -47,7 +47,10 @@
       "nsis": {
         "installerIcon": "icons/icon.ico",
         "displayLanguageSelector": false,
-        "installerHooks": "installer-hooks.nsh"
+        "installerHooks": "installer-hooks.nsh",
+        "headerImage": "../../../nsis/assets/header.bmp",
+        "sidebarImage": "../../../nsis/assets/sidebar.bmp",
+        "template": "../../../nsis/template.nsi"
       }
     },
     "externalBin": []

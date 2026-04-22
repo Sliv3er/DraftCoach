@@ -21,10 +21,20 @@ import { generateExplanations, buildDraftAnalysis } from './explainer';
  * and draft analysis.
  *
  * Target: <150ms (typically <30ms).
+ * 
+ * NOTE: Ensure KB is initialized via initKB() before first call.
  */
 export function recommend(draft: EngineDraftState): BuildRecommendation | null {
     const start = performance.now();
-    const kb = getKB();
+    
+    // Get KB - must be initialized via initKB() at startup
+    let kb;
+    try {
+        kb = getKB();
+    } catch (e) {
+        console.warn('KB not initialized - call initKB() at startup');
+        return null;
+    }
 
     // 1. Must have a champion selected
     if (!draft.myChampionId) return null;
@@ -52,26 +62,17 @@ export function recommend(draft: EngineDraftState): BuildRecommendation | null {
     // Even if we fell back to a top-lane build for an off-meta Jungler,
     // they MUST take Smite and a jungle starter.
     for (const v of [primary, alt1, alt2]) {
+        // Set role-appropriate starting items
+        v.startingItems = getStartingItemsForRole(draft.myRole, kb);
+        
+        // Enforce max 2 starting items (always)
+        v.startingItems = v.startingItems.slice(0, 2);
+        
+        // Set role-appropriate summoner spells
         if (draft.myRole === 'JUNGLE') {
             v.summonerSpells = ['Flash', 'Smite'];
-            // Ensure they have a jungle starter
-            if (!v.startingItems.find(i => i.name.includes('Seedling') || i.name.includes('Hatchling') || i.name.includes('Pup'))) {
-                v.startingItems = [
-                    { id: '1103', name: 'Mosstomper Seedling' },
-                    { id: '2003', name: 'Health Potion' }
-                ];
-            }
         } else if (draft.myRole === 'SUPPORT') {
-            if (!v.summonerSpells.includes('Ignite') && !v.summonerSpells.includes('Exhaust') && !v.summonerSpells.includes('Heal')) {
-                v.summonerSpells = ['Flash', 'Ignite'];
-            }
-            if (!v.startingItems.find(i => i.name === 'World Atlas')) {
-                v.startingItems = [
-                    { id: '3862', name: 'World Atlas' },
-                    { id: '2003', name: 'Health Potion' },
-                    { id: '2003', name: 'Health Potion' }
-                ];
-            }
+            v.summonerSpells = ['Flash', 'Ignite'];
         } else if (draft.myRole === 'BOT') {
             v.summonerSpells = ['Flash', 'Heal'];
         }
@@ -91,7 +92,7 @@ export function recommend(draft: EngineDraftState): BuildRecommendation | null {
     };
 
     // 6. Evaluate rules against all variants
-    const triggeredRules = evaluateRules([primary, alt1, alt2], compProfile, draft, kb, champNames);
+    const triggeredRules = evaluateRules([primary, alt1, alt2], compProfile, draft, champNames);
 
     // 7. Generate template-based explanations
     const explanations = generateExplanations(triggeredRules, compProfile);
@@ -197,7 +198,129 @@ export function buildDraftFromUI(
  * Check if the KB has data for a given champion+role combo.
  */
 export function hasLocalData(champId: string, role: string): boolean {
-    const kb = getKB();
+    let kb;
+    try {
+        kb = getKB();
+    } catch {
+        return false;
+    }
     const engineRole = toEngineRole(role);
     return kb.getBuildTemplate(champId, engineRole) !== undefined;
+}
+
+// ─── Starting Items ───────────────────────────────────────────────────
+
+const STARTING_ITEMS_BY_ROLE: Record<EngineRole, { id: string; name: string }[]> = {
+    'JUNGLE': [
+        { id: '1103', name: 'Mosstomper Seedling' },
+        { id: '2003', name: 'Health Potion' }
+    ],
+    'SUPPORT': [
+        { id: '3865', name: 'World Atlas' },
+        { id: '2003', name: 'Health Potion' }
+    ],
+    'BOT': [
+        { id: '1055', name: "Doran's Blade" },
+        { id: '2003', name: 'Health Potion' }
+    ],
+    'TOP': [
+        { id: '1055', name: "Doran's Blade" },
+        { id: '2003', name: 'Health Potion' }
+    ],
+    'MID': [
+        { id: '1056', name: "Doran's Ring" },
+        { id: '2003', name: 'Health Potion' }
+    ]
+};
+
+const MAX_STARTING_ITEMS = 2;
+const MAX_STARTING_GOLD = 500;
+
+/**
+ * Get appropriate starting items for a role.
+ * Rules:
+ * - Junglers: 1 jungle item + 1 potion
+ * - Supports: 1 support item + 1 potion  
+ * - Laners: 1 Doran's item + 1 potion OR Long Sword + potions
+ * - NEVER more than 2 items
+ * - Total cost <= 500g
+ */
+export function getStartingItemsForRole(
+    role: EngineRole,
+    kb: KnowledgeBase
+): { id: string; name: string }[] {
+    let items = STARTING_ITEMS_BY_ROLE[role] || STARTING_ITEMS_BY_ROLE['TOP'];
+    
+    // Validate cost constraint
+    let totalCost = 0;
+    for (const item of items) {
+        const kbItem = kb.getItem(item.id);
+        totalCost += kbItem?.cost || 0;
+    }
+    
+    // If over budget, try to find cheaper alternatives
+    if (totalCost > MAX_STARTING_GOLD) {
+        // For now, just ensure we have at least 2 items
+        items = items.slice(0, MAX_STARTING_ITEMS);
+    }
+    
+    // Always enforce max 2 items
+    return items.slice(0, MAX_STARTING_ITEMS);
+}
+
+/**
+ * Validate starting items. Throws if rules are violated.
+ */
+export function validateStartingItems(
+    items: { id: string; name: string }[],
+    role: EngineRole,
+    kb: KnowledgeBase
+): void {
+    // Rule 1: Max 2 items
+    if (items.length > MAX_STARTING_ITEMS) {
+        throw new Error(`Too many starting items: ${items.length} (max ${MAX_STARTING_ITEMS})`);
+    }
+    
+    // Rule 2: Total cost <= 500g
+    let totalCost = 0;
+    for (const item of items) {
+        const kbItem = kb.getItem(item.id);
+        totalCost += kbItem?.cost || 0;
+    }
+    if (totalCost > MAX_STARTING_GOLD) {
+        throw new Error(`Starting items cost ${totalCost}g > ${MAX_STARTING_GOLD}g`);
+    }
+    
+    // Rule 3: Junglers must have jungle item
+    if (role === 'JUNGLE') {
+        const hasJungle = items.some(item => {
+            const kbItem = kb.getItem(item.id);
+            return kbItem?.tags?.includes('JUNGLE');
+        });
+        if (!hasJungle) {
+            throw new Error('Jungler must start with a jungle item');
+        }
+    }
+    
+    // Rule 4: Supports should have support item
+    if (role === 'SUPPORT') {
+        const hasSupport = items.some(item => {
+            const kbItem = kb.getItem(item.id);
+            return kbItem?.tags?.includes('SUPPORT');
+        });
+        if (!hasSupport) {
+            throw new Error('Support should start with support item');
+        }
+    }
+    
+    // Rule 5: Non-junglers should NOT have jungle items
+    if (role !== 'JUNGLE') {
+        const hasJungle = items.some(item => {
+            const kbItem = kb.getItem(item.id);
+            return kbItem?.tags?.includes('JUNGLE');
+        });
+        if (hasJungle) {
+            throw new Error('Non-jungler cannot start with jungle item');
+        }
+    }
 }

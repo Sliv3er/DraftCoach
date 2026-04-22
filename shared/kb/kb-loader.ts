@@ -1,21 +1,192 @@
 // Knowledge Base Loader
-// Loads all JSON data files into memory-indexed Maps for O(1) lookup.
+// Uses DDragon as the single source of truth for all data.
+// Maintains backward compatibility with existing engine imports.
 
 import {
     ChampionKBEntry, ItemKBEntry, MatchupKBEntry, BuildTemplate,
     SynergyCounterData, ScoringWeights, KBFile, KBMeta, RuneSet,
-    SynergyEntry, CounterEntry
+    SynergyEntry, CounterEntry, EngineRole
 } from '../engine-types';
+import { getDDragonData, DDragonChampion, DDragonItem, DDragonRune } from './ddragon';
 
-import championsData from './data/champions.json';
-import itemsData from './data/items.json';
-import matchupsData from './data/matchups.json';
-import runeTemplatesData from './data/rune-templates.json';
-import buildTemplatesData from './data/build-templates.json';
-import synergyCountersData from './data/synergy-counters.json';
-import weightsData from './data/weights.json';
+// Types for internal use that map DDragon to engine types
+interface ChampionTagData {
+    engage: number;
+    peel: number;
+    frontline: number;
+    burst: number;
+    sustained: number;
+    poke: number;
+    healShield: number;
+    splitpush: number;
+    ccDensity: number;
+    mobility: number;
+    range: number;
+    damageType: 'AD' | 'AP' | 'MIXED' | 'TRUE';
+    scalingCurve: 'EARLY' | 'MID' | 'LATE';
+}
 
-export class KnowledgeBase {
+// Internal state that gets populated after async init
+let _ddragonData: Awaited<ReturnType<typeof getDDragonData>> | null = null;
+
+function mapDDragonChampionToKBEntry(champ: DDragonChampion): ChampionKBEntry {
+    // Determine champion roles from tags
+    const tags = champ.tags || [];
+    const roles: EngineRole[] = [];
+
+    if (tags.includes('Fighter')) roles.push('TOP', 'JUNGLE');
+    if (tags.includes('Tank')) roles.push('TOP', 'JUNGLE', 'SUPPORT');
+    if (tags.includes('Assassin')) roles.push('MID', 'JUNGLE');
+    if (tags.includes('Mage')) roles.push('MID', 'BOT', 'SUPPORT');
+    if (tags.includes('Marksman')) roles.push('BOT');
+    if (tags.includes('Support')) roles.push('SUPPORT');
+
+    // Default to TOP if no clear role
+    if (roles.length === 0) roles.push('TOP');
+
+    // Infer damage type from partype and stats
+    let damageType: 'AD' | 'AP' | 'MIXED' | 'TRUE' = 'AD';
+    if (champ.partype === 'Mana') {
+        // Most mana champs are AP, but some are AD
+        damageType = 'AP';
+    } else if (champ.partype === 'Energy') {
+        damageType = 'AD';
+    } else if (!champ.partype || champ.partype === 'None') {
+        // Could be mixed or true damage
+        damageType = 'AD'; // Default to AD for manaless
+    }
+
+    // Estimate scaling based on base stats
+    let scalingCurve: 'EARLY' | 'MID' | 'LATE' = 'MID';
+    if (tags.includes('Marksman') || tags.includes('Mage')) {
+        scalingCurve = 'LATE';
+    } else if (tags.includes('Assassin') || tags.includes('Fighter')) {
+        scalingCurve = 'MID';
+    } else if (tags.includes('Tank')) {
+        scalingCurve = 'EARLY';
+    }
+
+    return {
+        id: champ.id,
+        name: champ.name,
+        roles,
+        tags: {
+            engage: 50,
+            peel: tags.includes('Support') || tags.includes('Tank') ? 70 : 30,
+            frontline: tags.includes('Tank') || tags.includes('Fighter') ? 70 : 20,
+            burst: tags.includes('Assassin') || tags.includes('Mage') ? 80 : 40,
+            sustained: tags.includes('Fighter') || tags.includes('Marksman') ? 70 : 40,
+            poke: tags.includes('Mage') || tags.includes('Marksman') ? 70 : 30,
+            healShield: tags.includes('Support') ? 60 : 20,
+            splitpush: tags.includes('Fighter') || tags.includes('Marksman') ? 60 : 30,
+            ccDensity: tags.includes('Tank') || tags.includes('Support') ? 70 : 30,
+            mobility: tags.includes('Assassin') ? 80 : 40,
+            range: tags.includes('Mage') || tags.includes('Marksman') ? 80 : 30,
+            damageType,
+            scalingCurve,
+            threatWindow: { start: 'EARLY', end: 'LATE' }
+        },
+        laneStrengths: {}
+    };
+}
+
+function mapDDragonItemToKBEntry(item: DDragonItem, itemId: string): ItemKBEntry {
+    // Determine spike timing from cost
+    let spikeTiming: 'EARLY' | 'MID' | 'LATE' = 'MID';
+    if (item.gold.total <= 1100) spikeTiming = 'EARLY';
+    else if (item.gold.total >= 3000) spikeTiming = 'LATE';
+
+    // Parse tags
+    let itemTags: string[] = [];
+    if (typeof item.tags === 'string') {
+        itemTags = item.tags ? item.tags.split(' ') : [];
+    } else if (Array.isArray(item.tags)) {
+        itemTags = item.tags;
+    }
+
+    // Build passive keywords from description
+    const passiveKeywords: string[] = [];
+    if (item.description) {
+        // Extract unique passive names
+        const matches = item.description.match(/<li>Unique Passive: ([^<]+)/gi);
+        if (matches) {
+            for (const match of matches) {
+                const name = match.replace(/<li>Unique Passive: /gi, '').replace(/<[^>]+>/g, '').trim();
+                if (name) passiveKeywords.push(name);
+            }
+        }
+        // Add Grievous Wounds keyword if applicable
+        if (item.description.toLowerCase().includes('grievous')) {
+            passiveKeywords.push('GRIEVOUS_WOUNDS');
+        }
+    }
+
+    return {
+        id: itemId,
+        name: item.name,
+        tags: itemTags,
+        cost: item.gold.total,
+        spikeTiming,
+        statProfile: item.stats || {},
+        passiveKeywords
+    };
+}
+
+// Build rune templates from DDragon data
+function buildRuneTemplates(champ: ChampionKBEntry): Map<string, RuneSet> {
+    const templates = new Map<string, RuneSet>();
+
+    // Common rune sets based on champion class
+    const runeSets: Record<string, RuneSet> = {
+        'DAMAGE': {
+            primaryTree: 'Precision',
+            primaryKeystone: 'Press the Attack',
+            primarySlots: ['Overheal', 'Legend: Bloodline', 'Coup de Grace'],
+            secondaryTree: 'Domination',
+            secondarySlots: ['Taste of Blood', 'Treasure Hunter'],
+            statShards: ['Adaptive Force', 'Adaptive Force', 'Health']
+        },
+        'SAFETY': {
+            primaryTree: 'Precision',
+            primaryKeystone: 'Fleet Footwork',
+            primarySlots: ['Overheal', 'Legend: Bloodline', 'Cut Down'],
+            secondaryTree: 'Resolve',
+            secondarySlots: ['Shield Bash', 'Revitalize'],
+            statShards: ['Adaptive Force', 'Adaptive Force', 'Health']
+        },
+        'UTILITY': {
+            primaryTree: 'Sorcery',
+            primaryKeystone: 'Arcane Comet',
+            primarySlots: ['Manaflow Band', 'Transcendence', 'Scorch'],
+            secondaryTree: 'Precision',
+            secondarySlots: ['Presence of Mind', 'Cut Down'],
+            statShards: ['Adaptive Force', 'Adaptive Force', 'Health']
+        }
+    };
+
+    // Apply defaults for this champion
+    for (const [label, runes] of Object.entries(runeSets)) {
+        templates.set(`${champ.id}_${champ.roles[0] || 'TOP'}_${label}`, runes);
+    }
+
+    return templates;
+}
+
+// Default weights for scoring
+const DEFAULT_WEIGHTS: ScoringWeights = {
+    laneMatchup: 0.20,
+    teamNeeds: 0.15,
+    teamDmgBalance: 0.10,
+    enemyThreat: 0.15,
+    synergy: 0.10,
+    scalingMatch: 0.08,
+    ccDensity: 0.07,
+    rangeAdvantage: 0.08,
+    mobilityGap: 0.07,
+};
+
+// Interface for KB - used by engine modules
+export interface KnowledgeBase {
     readonly patch: string;
     readonly champions: Map<string, ChampionKBEntry>;
     readonly items: Map<string, ItemKBEntry>;
@@ -25,58 +196,127 @@ export class KnowledgeBase {
     readonly synergyCounters: Map<string, SynergyCounterData>;
     readonly weights: ScoringWeights;
     readonly meta: KBMeta;
+    getChampion(id: string): ChampionKBEntry | undefined;
+    getItem(id: string): ItemKBEntry | undefined;
+    getMatchup(champId: string, role: string, enemyId: string): MatchupKBEntry | undefined;
+    getRuneTemplate(champId: string, role: string, style: string): RuneSet | undefined;
+    getBuildTemplate(champId: string, role: string): BuildTemplate | undefined;
+    getSynergyCounters(champId: string): SynergyCounterData | undefined;
+    getAllChampions(): ChampionKBEntry[];
+    getAllItems(): ItemKBEntry[];
+}
 
-    constructor() {
-        const cData = championsData as KBFile<Record<string, ChampionKBEntry>>;
-        this.patch = cData.meta.patch;
-        this.meta = cData.meta;
+// Build class that holds the KB data after initialization
+class KBImpl implements KnowledgeBase {
+    readonly patch: string;
+    readonly champions: Map<string, ChampionKBEntry>;
+    readonly items: Map<string, ItemKBEntry>;
+    readonly matchups: Map<string, MatchupKBEntry>;
+    readonly runeTemplates: Map<string, RuneSet>;
+    readonly buildTemplates: Map<string, BuildTemplate>;
+    readonly synergyCounters: Map<string, SynergyCounterData>;
+    readonly weights: ScoringWeights;
+    readonly meta: KBMeta;
+    readonly ddragon: {
+        champions: Map<string, DDragonChampion>;
+        items: Map<string, DDragonItem>;
+        runes: DDragonRune[];
+    };
 
-        // Champions
+    constructor(dd: Awaited<ReturnType<typeof getDDragonData>>) {
+        this.patch = dd.version;
+        this.meta = {
+            patch: dd.version,
+            buildHash: 'ddragon',
+            createdAt: new Date().toISOString(),
+            source: 'ddragon',
+            checksum: '',
+            previousPatch: '',
+            rollbackAvailable: false
+        };
+        this.weights = DEFAULT_WEIGHTS;
+        
+        // Map champions
         this.champions = new Map();
-        for (const [key, val] of Object.entries(cData.data)) {
-            this.champions.set(key, val as ChampionKBEntry);
+        for (const [key, champ] of dd.champions) {
+            this.champions.set(key, mapDDragonChampionToKBEntry(champ));
         }
 
-        // Items
+        // Map items
         this.items = new Map();
-        const iData = itemsData as KBFile<Record<string, ItemKBEntry>>;
-        for (const [key, val] of Object.entries(iData.data)) {
-            this.items.set(key, val as ItemKBEntry);
+        for (const [key, item] of dd.items) {
+            if (item.gold.purchasable && item.inStore !== false) {
+                this.items.set(key, mapDDragonItemToKBEntry(item, key));
+            }
         }
 
-        // Matchups
-        this.matchups = new Map();
-        const mData = matchupsData as KBFile<Record<string, MatchupKBEntry>>;
-        for (const [key, val] of Object.entries(mData.data)) {
-            this.matchups.set(key, val as MatchupKBEntry);
-        }
-
-        // Rune Templates: key = "ChampId_ROLE_STYLE"
+        // Build rune templates from champions
         this.runeTemplates = new Map();
-        const rData = runeTemplatesData as unknown as KBFile<Record<string, { championId: string; role: string; label: string } & RuneSet>>;
-        for (const [key, val] of Object.entries(rData.data)) {
-            this.runeTemplates.set(key, val as unknown as RuneSet);
+        for (const champ of this.champions.values()) {
+            const templates = buildRuneTemplates(champ);
+            for (const [key, runes] of templates) {
+                this.runeTemplates.set(key, runes);
+            }
         }
 
-        // Build Templates: key = "ChampId_ROLE"
+        // Build templates - use champion-based generation
         this.buildTemplates = new Map();
-        const bData = buildTemplatesData as unknown as KBFile<Record<string, BuildTemplate>>;
-        for (const [key, val] of Object.entries(bData.data)) {
-            this.buildTemplates.set(key, val as BuildTemplate);
+        for (const champ of this.champions.values()) {
+            for (const role of champ.roles) {
+                const template: BuildTemplate = {
+                    championId: champ.id,
+                    role,
+                    variants: {
+                        'DAMAGE': {
+                            label: 'DAMAGE',
+                            startingItems: getDefaultStartingItems(role),
+                            coreItems: [],
+                            situationalPool: [],
+                            runes: this.runeTemplates.get(`${champ.id}_${role}_DAMAGE`) || getDefaultRuneSet(),
+                            summonerSpells: getDefaultSummonerSpells(role),
+                            skillOrder: getDefaultSkillOrderTyped(),
+                            bootChoice: getDefaultBoots(role),
+                        },
+                        'SAFETY': {
+                            label: 'SAFETY',
+                            startingItems: getDefaultStartingItems(role),
+                            coreItems: [],
+                            situationalPool: [],
+                            runes: this.runeTemplates.get(`${champ.id}_${role}_SAFETY`) || getDefaultRuneSet(),
+                            summonerSpells: getDefaultSummonerSpells(role),
+                            skillOrder: getDefaultSkillOrderTyped(),
+                            bootChoice: getDefaultBoots(role),
+                        },
+                        'UTILITY': {
+                            label: 'UTILITY',
+                            startingItems: getDefaultStartingItems(role),
+                            coreItems: [],
+                            situationalPool: [],
+                            runes: this.runeTemplates.get(`${champ.id}_${role}_UTILITY`) || getDefaultRuneSet(),
+                            summonerSpells: getDefaultSummonerSpells(role),
+                            skillOrder: getDefaultSkillOrderTyped(),
+                            bootChoice: getDefaultBoots(role),
+                        }
+                    }
+                };
+                this.buildTemplates.set(`${champ.id}_${role}`, template);
+                // Also set champion alone as fallback
+                if (!this.buildTemplates.has(champ.id)) {
+                    this.buildTemplates.set(champ.id, template);
+                }
+            }
         }
 
-        // Synergy & Counters
+        // Empty matchups and synergy (not available from DDragon)
+        this.matchups = new Map();
         this.synergyCounters = new Map();
-        const sData = synergyCountersData as unknown as { meta: KBMeta; synergies: Record<string, SynergyEntry>; counters: Record<string, { championId: string; counters: CounterEntry[] }> };
-        for (const cid of this.champions.keys()) {
-            const synergiesWith = Object.values(sData.synergies).filter(s => s.champions.includes(cid));
-            const counters = sData.counters[cid]?.counters || [];
-            this.synergyCounters.set(cid, { synergiesWith, counters });
-        }
 
-        // Weights
-        const wData = weightsData as KBFile<ScoringWeights>;
-        this.weights = wData.data;
+        // Store DDragon raw data
+        this.ddragon = {
+            champions: dd.champions,
+            items: dd.items,
+            runes: dd.runes
+        };
     }
 
     getChampion(id: string): ChampionKBEntry | undefined {
@@ -88,14 +328,7 @@ export class KnowledgeBase {
     }
 
     getMatchup(champId: string, role: string, enemyId: string): MatchupKBEntry | undefined {
-        const exact = this.matchups.get(`${champId}_vs_${enemyId}_${role}`);
-        if (exact) return exact;
-
-        const champ = this.champions.get(champId);
-        if (champ && champ.roles.length > 0) {
-            return this.matchups.get(`${champId}_vs_${enemyId}_${champ.roles[0]}`);
-        }
-        return undefined;
+        return undefined; // Not available from DDragon
     }
 
     getRuneTemplate(champId: string, role: string, style: string): RuneSet | undefined {
@@ -110,43 +343,131 @@ export class KnowledgeBase {
     }
 
     getBuildTemplate(champId: string, role: string): BuildTemplate | undefined {
-        // Exact match for secondary roles (e.g. "Champ_ROLE")
         const exact = this.buildTemplates.get(`${champId}_${role}`);
         if (exact) return exact;
-
-        // Fallback to base champion data which holds the primary role build
-        const primary = this.buildTemplates.get(champId);
-        if (primary) return primary;
-
-        return undefined;
+        return this.buildTemplates.get(champId);
     }
 
     getSynergyCounters(champId: string): SynergyCounterData | undefined {
-        return this.synergyCounters.get(champId);
+        return undefined;
     }
 
-    /** Returns all champions as an array for iteration */
     getAllChampions(): ChampionKBEntry[] {
         return Array.from(this.champions.values());
     }
 
-    /** Returns all items as an array for tag-based resolution */
     getAllItems(): ItemKBEntry[] {
         return Array.from(this.items.values());
     }
 }
 
-// Singleton instance
-let _instance: KnowledgeBase | null = null;
+function getDefaultStartingItems(role: string): { id: string; name: string }[] {
+    switch (role) {
+        case 'JUNGLE':
+            return [
+                { id: '1103', name: 'Mosstomper Seedling' },
+                { id: '2003', name: 'Health Potion' }
+            ];
+        case 'SUPPORT':
+            return [
+                { id: '3865', name: 'World Atlas' },
+                { id: '2003', name: 'Health Potion' }
+            ];
+        case 'BOT':
+            return [
+                { id: '1055', name: "Doran's Blade" },
+                { id: '2003', name: 'Health Potion' }
+            ];
+        case 'MID':
+            return [
+                { id: '1056', name: "Doran's Ring" },
+                { id: '2003', name: 'Health Potion' }
+            ];
+        default: // TOP
+            return [
+                { id: '1055', name: "Doran's Blade" },
+                { id: '2003', name: 'Health Potion' }
+            ];
+    }
+}
 
-export function getKB(): KnowledgeBase {
+function getDefaultRuneSet(): RuneSet {
+    return {
+        primaryTree: 'Precision',
+        primaryKeystone: 'Press the Attack',
+        primarySlots: ['Overheal', 'Legend: Bloodline', 'Coup de Grace'],
+        secondaryTree: 'Domination',
+        secondarySlots: ['Taste of Blood', 'Treasure Hunter'],
+        statShards: ['Adaptive Force', 'Adaptive Force', 'Health']
+    };
+}
+
+function getDefaultSkillOrder(): { first3: string[]; maxOrder: string[] } {
+    return {
+        first3: ['Q', 'W', 'E'],
+        maxOrder: ['Q', 'W', 'E']
+    };
+}
+
+function getDefaultSkillOrderTyped(): { first3: import('../engine-types').Ability[]; maxOrder: import('../engine-types').Ability[] } {
+    return {
+        first3: ['Q', 'W', 'E'] as import('../engine-types').Ability[],
+        maxOrder: ['Q', 'W', 'E'] as import('../engine-types').Ability[]
+    };
+}
+
+function getDefaultSummonerSpells(role: string): [string, string] {
+    switch (role) {
+        case 'JUNGLE':
+            return ['Smite', 'Flash'];
+        case 'SUPPORT':
+            return ['Exhaust', 'Flash'];
+        default:
+            return ['Flash', 'Exhaust'];
+    }
+}
+
+function getDefaultBoots(role: string): { id: string; name: string } {
+    return { id: '3006', name: 'Berserker\'s Greaves' };
+}
+
+// Singleton instance - initialized synchronously after first async load
+let _instance: KBImpl | null = null;
+let _initPromise: Promise<KBImpl> | null = null;
+let _initialized = false;
+
+/**
+ * Initialize the KnowledgeBase - call this ONCE at app startup.
+ * After calling this, use getKB_Sync() to access the KB.
+ */
+export async function initKB(): Promise<KBImpl> {
+    if (_instance && _initialized) {
+        return _instance;
+    }
+
+    const dd = await getDDragonData();
+    _instance = new KBImpl(dd);
+    _initialized = true;
+    return _instance;
+}
+
+/**
+ * Synchronous access to KB - ONLY use after calling initKB() at startup.
+ * @throws Error if KB not initialized
+ */
+export function getKB(): KBImpl {
     if (!_instance) {
-        _instance = new KnowledgeBase();
+        throw new Error('KB not initialized. Call initKB() at app startup before using the engine.');
     }
     return _instance;
 }
 
-export function reloadKB(): KnowledgeBase {
-    _instance = new KnowledgeBase();
+// Backward compatibility alias
+export const getKB_Sync = getKB;
+
+export async function reloadKB(): Promise<KBImpl> {
+    const dd = await getDDragonData(true);
+    _instance = new KBImpl(dd);
+    _initialized = true;
     return _instance;
 }

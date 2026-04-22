@@ -10,6 +10,7 @@ import {
     EngineDraftState, BuildTemplate, RuneSet, SkillOrder
 } from '../engine-types';
 import { KnowledgeBase } from '../kb/kb-loader';
+import { getRunesForChampion } from './rune-mappings';
 
 /**
  * Build 3 BuildPlan variants from the template and score them.
@@ -26,9 +27,25 @@ export function scoreAndRankVariants(
 
     const plans: BuildPlan[] = labels.map(label => {
         const variant = template.variants[label];
-        const runes = kb.getRuneTemplate(template.championId, template.role, label)
-            || variant.runes
-            || defaultRunes();
+        
+        // Get runes using champion mappings (never null/undefined)
+        const champion = kb.getChampion(template.championId);
+        const championTagKeys: string[] = [];
+        if (champion?.tags) {
+            for (const [key, value] of Object.entries(champion.tags)) {
+                if (typeof value === 'number' && value > 0) {
+                    championTagKeys.push(key);
+                }
+            }
+        }
+        const runes = champion 
+            ? getRunesForChampion(
+                template.championId, 
+                template.role as any, 
+                label, 
+                championTagKeys
+              )
+            : defaultRunes();
 
         const plan: BuildPlan = {
             label,

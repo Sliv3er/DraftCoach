@@ -1,14 +1,20 @@
 // Rule Engine — Evaluates rules and applies effects to build plans.
 // Uses RuleContext/RuleEffect interfaces.
 // Items resolved via SCORED resolver (not cheapest-by-tag).
+// Includes role validation and conflict detection.
 
 import {
     BuildPlan, CompProfile, EngineDraftState,
     TriggeredRule, RuleContext, RuleEffect, ConditionTag
 } from '../engine-types';
-import { KnowledgeBase } from '../kb/kb-loader';
+import { getKB } from '../kb/kb-loader';
 import { RULES } from './rules';
 import { resolveTagFromRuleCtx } from './resolver';
+import { checkItemConflict } from './item-conflicts';
+import { canRoleReceiveItemTag } from './role-validator';
+
+// Maximum situational items allowed in a build
+const MAX_SITUATIONAL_ITEMS = 3;
 
 /**
  * Evaluate all rules against current state.
@@ -19,7 +25,6 @@ export function evaluateRules(
     plans: BuildPlan[],
     cp: CompProfile,
     draft: EngineDraftState,
-    kb: KnowledgeBase,
     champNames: { allies: string[]; enemies: string[] }
 ): TriggeredRule[] {
     const triggered: TriggeredRule[] = [];
@@ -31,7 +36,7 @@ export function evaluateRules(
         for (const rule of RULES) {
             if (rule.condition(ctx)) {
                 const effect = rule.apply(ctx);
-                applyEffect(effect, plan, kb, ctx);
+                applyEffect(effect, plan, ctx);
 
                 if (!seenRuleIds.has(rule.id)) {
                     seenRuleIds.add(rule.id);
@@ -54,15 +59,46 @@ export function evaluateRules(
 /**
  * Apply a RuleEffect to a BuildPlan.
  * Uses scored resolver instead of naive cheapest-by-tag.
+ * Includes role validation and conflict detection.
  */
-function applyEffect(effect: RuleEffect, plan: BuildPlan, kb: KnowledgeBase, ctx: RuleContext): void {
+function applyEffect(effect: RuleEffect, plan: BuildPlan, ctx: RuleContext): void {
+    const kb = getKB();
+    
     // Add situational items (resolved from tags via scored resolver)
     if (effect.situationalItemTags) {
         for (const { tag, reason } of effect.situationalItemTags) {
+            // Skip if already added
             if (plan.situationalItems.some(si => si.triggerTag === tag)) continue;
+
+            // Check role compatibility - skip items not valid for this role
+            if (!canRoleReceiveItemTag(ctx.draft.myRole, tag)) {
+                continue;
+            }
+
+            // Cap situational items
+            if (plan.situationalItems.length >= MAX_SITUATIONAL_ITEMS) {
+                break;
+            }
 
             const item = resolveTagFromRuleCtx(tag, ctx, kb);
             if (item) {
+                // Get item data for conflict checking
+                const itemData = kb.getItem(item.id);
+                if (!itemData) continue;
+
+                // Collect all current items (core + situational) for conflict check
+                const allCurrentItems = [
+                    ...plan.coreItems.map(ci => ({ id: ci.id })),
+                    ...plan.situationalItems.map(si => ({ id: si.itemId }))
+                ];
+
+                // Check for conflicts with existing items
+                const conflict = checkItemConflict(item.id, allCurrentItems);
+                if (!conflict.canAdd) {
+                    // Skip this item - conflict detected
+                    continue;
+                }
+
                 plan.situationalItems.push({
                     itemId: item.id,
                     itemName: item.name,
@@ -78,7 +114,7 @@ function applyEffect(effect: RuleEffect, plan: BuildPlan, kb: KnowledgeBase, ctx
         for (const fork of effect.forks) {
             if (plan.conditionalForks.some(f => f.condition === fork.condition)) continue;
 
-            const swapItem = resolveTagFromRuleCtx(fork.swapTag, ctx, kb);
+            const swapItem = resolveTagFromRuleCtx(fork.swapTag, ctx, getKB());
             if (swapItem) {
                 const lastCore = plan.coreItems[plan.coreItems.length - 1];
                 if (lastCore) {

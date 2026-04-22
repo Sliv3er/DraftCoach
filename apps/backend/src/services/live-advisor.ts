@@ -37,63 +37,54 @@ export interface LiveAdvice {
 }
 
 function buildLiveAdvisorPrompt(patch: string): string {
-    return `You are a League of Legends Live Game Advisor for Patch ${patch}.
+    return `You are a Challenger-tier League of Legends analyst. Your job is to provide optimal itemization advice for an active game.
 
-You are given a real-time snapshot of an active game: all 10 players' champions, items, levels, KDA, gold, and the current game time. You also receive the ORIGINAL pre-game recommended build. A PRE-COMPUTED GAME STATE SUMMARY is also provided with threat analysis already calculated for you.
+CRITICAL MANDATORY RULES - NEVER VIOLATE:
 
-Use this decision framework to determine build adjustments:
+1. NEVER recommend two Grievous Wounds items together
+   - Anti-heal items: Mortal Reminder, Morellonomicon, Thornmail, Chemtech Putrifier, Chempunk Chainsword
+   - If player already has ANY of these, do NOT recommend another one
 
-1. THREAT CHECK:
-   - If the PRE-COMPUTED PRIMARY THREAT has 5+ kills → build to counter their damage type FIRST
-   - If they are AP → prioritize MR (Wit's End, Maw, Kaenic Rookern, Mercury's Treads)
-   - If they are AD → prioritize Armor (Plated Steelcaps, Randuin's, Frozen Heart)
+2. NEVER recommend an item the player cannot afford
+   - If gold < item cost, recommend the component instead
+   - Check player's current gold before recommending anything
 
-2. DAMAGE SPLIT CHECK:
-   - If ENEMY DAMAGE SPLIT shows 3+ AP → your team needs MR items
-   - If ENEMY DAMAGE SPLIT shows 3+ AD → your team needs Armor items
-   - If only 1 enemy is fed → don't over-invest in resistances, focus on core build
+3. NEVER recommend jungle items to non-junglers OR support items to non-supports
+   - Know the player's role and NEVER suggest items invalid for that role
 
-3. GOLD EFFICIENCY:
-   - NEVER suggest selling an item worth 2500g+ unless the replacement DIRECTLY counters the PRIMARY THREAT
-   - If player gold < 1000g → suggest only component items they can buy NOW
-   - If player gold > 2500g → suggest completed items
-   - If player has components for a specific item → recommend finishing it, DON'T pivot
+4. NEVER recommend two Mythic items
+   - If player already has a Mythic, do not suggest another
 
-4. ANTI-HEAL CHECK:
-   - If any enemy has strong healing (check items: Bloodthirster, Blade of the Ruined King, or healing-heavy champions) AND player has no Grievous Wounds item → suggest anti-heal
-   - If player already has anti-heal → skip
+5. Prioritize countering the MOST FED ENEMY (highest KDA), not just damage type
+   - If someone is 8/2, they are the threat - build to counter THEM specifically
 
-5. BOOT CHECK:
-   - If player has no boots at 10+ minutes → recommend boots
-   - If player has Boots of Speed but not upgraded at 15+ minutes → recommend upgrade
+6. If player has < 1000g, only suggest components they can buy now
+   - Don't suggest 3000g items to someone with 800g
 
-6. ON-TRACK CHECK:
-   - Compare player's current items to the ORIGINAL RECOMMENDED BUILD
-   - If player is following the build and winning → say "on track" with no changes
-   - If player deviated but the deviation makes sense for the game state → acknowledge it
+7. If pre-game build item is now suboptimal (e.g., enemy team changed, player is behind), 
+   explicitly say which item to replace and why
 
-Return ONLY this format:
+Output format (STRICT - use exactly this structure):
 
 ASSESSMENT
 <One sentence: Is the current build on track or does it need changes?>
 
 CHANGES
-<ItemToReplace> → <NewItem>: <reason referencing a specific enemy or game state>
 <ItemToReplace> → <NewItem>: <reason>
+(Maximum 2 changes - if no changes, write "None needed")
 
 NEXT ITEM
-<ItemName>: <why this should be your next purchase — reference current gold and game phase>
+<ItemName> (<cost>g): <why this is optimal right now - cite specific threat and gold amount>
 
 THREAT
-<EnemyChampion> (<KDA>): <what makes them dangerous right now and how to counter>
+<EnemyChampion> (<KDA>): <specific counter strategy - which item counters them and why>
 
-Rules:
-- If no changes are needed, still provide ASSESSMENT and NEXT ITEM sections, but write "None needed" under CHANGES.
-- Keep item names exactly as in-game.
-- Be concise — this is real-time advice, not an essay.
-- Maximum 2-3 item changes. Don't suggest replacing completed items unless critical.
-- Consider gold efficiency: don't suggest selling a 3000g item for a 3000g item unless the switch is critical.
-- If the player has component items (e.g., Pickaxe, Long Sword), recognize they may be building toward a specific item.`;
+Remember:
+- Keep item names exactly as they appear in-game
+- Always check if player already owns the recommended item
+- If player already has anti-heal, do NOT recommend more
+- If player has 2+ completed items, do NOT suggest selling unless critical
+- Consider game phase: early game = components, mid = spike items, late = full builds`;
 }
 
 export async function generateLiveAdvice(snapshot: GameSnapshot): Promise<LiveAdvice> {
@@ -202,12 +193,65 @@ Analyze the current game state using the decision framework and provide live bui
         }
     }
 
+    // Post-process: validate and filter recommendations
+    const validatedChanges = validateAndFilterAdvice(
+        changes, 
+        myPlayer?.items || [],
+        snapshot.activePlayerGold
+    );
+
     return {
         triggered: true,
         triggerReason: '',  // filled by caller
         gameTime: snapshot.gameTime,
         summary: summary || 'Build analysis complete.',
-        changes,
+        changes: validatedChanges,
         rawText: text,
     };
+}
+
+// Validate and filter AI recommendations programmatically
+function validateAndFilterAdvice(
+    changes: { currentItem: string; recommendedItem: string; reason: string }[],
+    currentItems: { itemID: number; displayName: string }[],
+    playerGold: number
+): { currentItem: string; recommendedItem: string; reason: string }[] {
+    // Anti-heal item names (used for matching display names from live client)
+    const antiHealNames = [
+        'Mortal Reminder', 'Morellonomicon', 'Thornmail', 
+        'Chemtech Putrifier', 'Chempunk Chainsword', 'Executioner'
+    ];
+    
+    // Get current item names
+    const currentItemNames = currentItems.map(i => i.displayName).filter(Boolean);
+    const currentItemNamesLower = currentItemNames.map(n => n.toLowerCase());
+    
+    // Check if player already has anti-heal
+    const hasAntiHeal = currentItemNames.some(name => 
+        antiHealNames.some(ai => name.toLowerCase().includes(ai.toLowerCase()))
+    );
+    
+    const validated: { currentItem: string; recommendedItem: string; reason: string }[] = [];
+    
+    for (const change of changes) {
+        const recName = change.recommendedItem;
+        
+        // Validation 1: Check if already owned
+        if (currentItemNamesLower.some(name => name.includes(recName.toLowerCase()))) {
+            console.log(`[LiveAdvisor] Dropping recommendation: ${recName} - already owned`);
+            continue;
+        }
+        
+        // Validation 2: Check for Grievous Wounds stacking
+        const isAntiHeal = antiHealNames.some(ai => recName.toLowerCase().includes(ai.toLowerCase()));
+        if (isAntiHeal && hasAntiHeal) {
+            console.log(`[LiveAdvisor] Dropping recommendation: ${recName} - already has anti-heal`);
+            continue;
+        }
+        
+        validated.push(change);
+    }
+    
+    // Cap at 2 changes max
+    return validated.slice(0, 2);
 }

@@ -15,6 +15,7 @@ import {
     RuleContext
 } from '../engine-types';
 import { KnowledgeBase } from '../kb/kb-loader';
+import { isAntiHealItem } from '../kb/ddragon';
 
 export interface ResolverContext {
     tag: string;
@@ -31,12 +32,47 @@ interface ScoredItem {
     reasons: string[];
 }
 
+// Tag-to-passiveKeyword mapping for tags that DDragon doesn't use natively
+const TAG_TO_KEYWORDS: Record<string, string[]> = {
+    'ANTI_HEAL': ['GRIEVOUS_WOUNDS'],
+    'ANTI_DIVE': ['STASIS', 'STOPWATCH'],
+    'ANTI_BURST': ['SPELL_SHIELD', 'SHIELD', 'LIFELINE'],
+    'ANTI_CC': ['CLEANSE', 'TENACITY', 'QUICKSILVER'],
+    'PENETRATION': ['PENETRATION', 'LETHALITY'],
+    'ARMOR': ['ARMOR'],
+};
+
+/**
+ * Check if an item matches a rule tag.
+ * Checks: item.tags, item.passiveKeywords, and DDragon-derived sets (e.g. anti-heal).
+ */
+function matchesTag(item: ItemKBEntry, tag: string): boolean {
+    // Direct tag match (DDragon tags like 'Health', 'Damage', 'Armor', etc.)
+    if (item.tags.includes(tag)) return true;
+
+    // Check passive keywords mapping
+    const keywords = TAG_TO_KEYWORDS[tag];
+    if (keywords && item.passiveKeywords) {
+        if (keywords.some(kw => item.passiveKeywords.includes(kw))) return true;
+    }
+
+    // DDragon-derived checks
+    if (tag === 'ANTI_HEAL' && isAntiHealItem(item.id)) return true;
+
+    // Fallback: check if item description mentions the tag concept
+    if (tag === 'ARMOR' && item.tags.includes('Armor')) return true;
+    if (tag === 'PENETRATION' && (item.tags.includes('ArmorPenetration') || item.tags.includes('MagicPenetration'))) return true;
+    if (tag === 'ANTI_DIVE' && item.tags.includes('Active')) return true;
+
+    return false;
+}
+
 /**
  * Resolve an item tag to the best item for the given context.
  * Returns null if no valid candidate exists.
  */
 export function resolveTagScored(ctx: ResolverContext): { id: string; name: string } | null {
-    const candidates = ctx.kb.getAllItems().filter(item => item.tags.includes(ctx.tag));
+    const candidates = ctx.kb.getAllItems().filter(item => matchesTag(item, ctx.tag));
     if (candidates.length === 0) return null;
 
     // Score each candidate

@@ -17,7 +17,7 @@ export const RULES: RuleDefinition[] = [
         priority: 2,
         category: 'ANTI_HEAL',
         tags: ['ANTI_HEAL', 'SITUATIONAL'],
-        condition: ({ cp }) => cp.enemyHealShieldScore > 40,
+        condition: ({ cp }) => cp.enemyHealShieldScore >= 40,
         apply: ({ cp }) => ({
             situationalItemTags: [{ tag: 'ANTI_HEAL', reason: 'Enemy team has heavy healing/shielding — Grievous Wounds recommended' }],
         }),

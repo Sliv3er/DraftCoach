@@ -80,18 +80,18 @@ export interface MatchupKBEntry {
 export interface RuneSet {
   primaryTree: string;
   primaryKeystone: string;
-  primarySlots: [string, string, string];
+  primarySlots: string[];
   secondaryTree: string;
-  secondarySlots: [string, string];
-  statShards: [string, string, string];
+  secondarySlots: string[];
+  statShards: string[];
 }
 
 // ─── Skill Order ─────────────────────────────────────────────────────
 export type Ability = 'Q' | 'W' | 'E';
 
 export interface SkillOrder {
-  first3: [Ability, Ability, Ability];
-  maxOrder: [Ability, Ability, Ability];
+  first3: Ability[];
+  maxOrder: Ability[];
 }
 
 // ─── Build Plan ──────────────────────────────────────────────────────

@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `http://localhost:${process.env.BACKEND_PORT || 3210}/api/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

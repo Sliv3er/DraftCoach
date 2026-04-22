@@ -9,6 +9,7 @@ import summonersRouter from "./routes/summoners";
 import matchesRouter from "./routes/matches";
 import leaderboardRouter from "./routes/leaderboards";
 import playersRouter from "./routes/players";
+import { championsRouter } from './routes/champions';
 import { checkAndSyncRagPipeline, getRagStatus } from './services/rag-updater';
 import { initElasticsearch } from './services/elasticsearch';
 import { initDb } from './services/db';
@@ -28,6 +29,7 @@ app.use('/api/players', playersRouter);
 app.use('/api/summoner', summonersRouter);
 app.use('/api/match', matchesRouter);
 app.use('/api/leaderboard', leaderboardRouter);
+app.use('/api/champions', championsRouter);
 
 // Initialize the local patch architecture — auto-sync on boot
 checkAndSyncRagPipeline().catch(console.error);

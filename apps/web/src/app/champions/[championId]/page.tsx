@@ -307,7 +307,7 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 -mt-20 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="max-w-7xl mx-auto px-8 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Left Column: Summary & Info */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}

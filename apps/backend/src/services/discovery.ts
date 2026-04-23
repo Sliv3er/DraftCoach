@@ -50,7 +50,17 @@ export async function indexPlayer(playerData: {
 }
 
 export async function searchPlayers(query: string, region?: string) {
-  const must: any[] = [
+  const should: any[] = [
+    // Exact name match (boosted)
+    {
+      term: {
+        'gameName.keyword': {
+          value: query,
+          boost: 5,
+        },
+      },
+    },
+    // Prefix match
     {
       match_phrase_prefix: {
         gameName: {
@@ -61,17 +71,19 @@ export async function searchPlayers(query: string, region?: string) {
     },
   ];
 
+  const filter: any[] = [];
   if (region) {
-    must.push({ term: { region: region.toLowerCase() } });
+    filter.push({ term: { region: region.toLowerCase() } });
   }
 
-  // v8: body is replaced by top-level 'query', 'size', etc.
   try {
     const result = await esClient.search({
       index: 'players',
       query: {
         bool: {
-          must,
+          should,
+          minimum_should_match: 1,
+          filter,
         },
       },
       size: 20,

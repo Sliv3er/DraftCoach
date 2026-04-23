@@ -40,7 +40,7 @@ export const RuneIcon: React.FC<RuneIconProps> = ({
 
   if (showTooltip && runeData) {
     return (
-      <RuneTooltip runeId={runeId} runeData={runeData}>
+      <RuneTooltip runeData={runeData}>
         {content}
       </RuneTooltip>
     );

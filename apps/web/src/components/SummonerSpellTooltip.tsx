@@ -33,7 +33,7 @@ export const SummonerSpellTooltip: React.FC<SummonerSpellTooltipProps> = ({
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 w-64 pointer-events-none transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
           <div className="bg-[#0a0a0c] border border-hextech-gold/30 p-4 rounded-sm shadow-2xl backdrop-blur-md">
             <div className="flex items-center gap-3 mb-3 border-b border-white/10 pb-2">
-              <div className="w-10 h-10 relative flex-shrink-0 border border-hextech-gold/20 rounded-sm overflow-hidden">
+              <div className="w-10 h-10 relative shrink-0 border border-hextech-gold/20 rounded-sm overflow-hidden">
                 <Image 
                   src={getDDragonSpellIcon(version, spellData.image)}
                   alt={spellData.name}

@@ -84,6 +84,28 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
   const [runeNameToId, setRuneNameToId] = useState<Map<string, number>>(new Map());
   const [spellMap, setSpellMap] = useState<Record<string, { id: string; name: string; description: string; image: string }>>({});
 
+  const fetchAnalyticsWithRetry = async (id: string, retries = 2): Promise<ChampionDetails | null> => {
+    let attempt = 0;
+    while (attempt <= retries) {
+      try {
+        const analyticsRes = await fetch(`/api/champions/${id}`, { cache: 'no-store' });
+        if (!analyticsRes.ok) {
+          return null;
+        }
+        const data = await analyticsRes.json();
+        return data.details as ChampionDetails;
+      } catch (err) {
+        if (attempt === retries) {
+          console.error('[ChampionPage] Analytics fetch failed after retries:', err);
+          return null;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+      }
+      attempt += 1;
+    }
+    return null;
+  };
+
   const enrichAnalyticsWithIcons = (
     details: ChampionDetails,
     v: string,
@@ -184,12 +206,9 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
         }
         setChampion(c);
 
-        // Fetch analytics from backend
-        const analyticsRes = await fetch(`/api/champions/${championId}`);
-        if (analyticsRes.ok) {
-          const data = await analyticsRes.json();
-          const details = data.details;
-
+        // Fetch analytics from backend with small retry window for transient proxy/backend restarts
+        const details = await fetchAnalyticsWithRetry(championId);
+        if (details) {
           // Enrich with fallback icons if backend didn't provide them
           enrichAnalyticsWithIcons(details, v, iMap, rMap);
           setAnalytics(details);

@@ -26,14 +26,42 @@ const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 // ── Map of active listeners for cleanup ──
 const listenerMap = new Map<string, UnlistenFn[]>();
 
+// ── Window Identity ──
+// Detect if this is the main window or a sub-window (overlay, scout, etc.)
+// Sub-windows should NOT open their own SSE connections to avoid exhausting
+// the browser's 6-connection-per-domain limit.
+const _hash = window.location.hash.replace('#', '');
+const _pathname = window.location.pathname;
+const _route = _hash || _pathname;
+const IS_MAIN_WINDOW = _route === '/' || _route === '' || _route === '/index.html';
+
 // ── SSE Event Bus ──
-// Connects to the sidecar's SSE endpoint to receive push events
-// (live-advice, scout-report, ping-update, etc.)
+// Only the MAIN window connects to the sidecar's SSE endpoint.
+// It forwards events to sub-windows via Tauri's internal event system.
 const sseListeners = new Map<string, Set<(...args: any[]) => void>>();
 let sseConnected = false;
 let sseRetryTimeout: ReturnType<typeof setTimeout> | null = null;
 
+function dispatchSSEEvent(channel: string, args: any[]) {
+  const handlers = sseListeners.get(channel);
+  if (handlers) {
+    for (const handler of handlers) {
+      handler({}, ...(args || []));
+    }
+  }
+}
+
 function connectSSE() {
+  if (!IS_MAIN_WINDOW) {
+    // Sub-windows receive events via Tauri's inter-window event system
+    console.log(`[bridge] Sub-window (${_route}) — listening for Tauri forwarded events`);
+    listen('sse-forward', (event: any) => {
+      const { channel, args } = event.payload as { channel: string; args: any[] };
+      dispatchSSEEvent(channel, args);
+    });
+    return;
+  }
+
   if (sseConnected) return;
   
   try {
@@ -41,7 +69,7 @@ function connectSSE() {
     
     evtSource.onopen = () => {
       sseConnected = true;
-      console.log('[bridge] SSE connected to sidecar');
+      console.log('[bridge] SSE connected to sidecar (main window only)');
     };
     
     evtSource.onmessage = (event) => {
@@ -49,13 +77,12 @@ function connectSSE() {
         const data = JSON.parse(event.data);
         const { channel, args } = data;
         
-        // Dispatch to registered SSE listeners
-        const handlers = sseListeners.get(channel);
-        if (handlers) {
-          for (const handler of handlers) {
-            handler({}, ...(args || []));
-          }
-        }
+        // Dispatch locally in this window
+        dispatchSSEEvent(channel, args);
+        
+        // Forward to ALL other Tauri windows via internal event system
+        // This does NOT use HTTP — it goes through Tauri's IPC bridge
+        emit('sse-forward', { channel, args }).catch(() => {});
       } catch (e) {
         // Ignore parse errors
       }
@@ -84,26 +111,57 @@ function connectSSE() {
 }
 
 // ── Backend Ready Gate ──
-// The sidecar takes a few seconds to start. Instead of immediately connecting
-// (which spams ERR_CONNECTION_REFUSED), we wait for Tauri to signal readiness.
+// The sidecar takes a few seconds to start. We use MULTIPLE strategies to
+// detect readiness, because the Tauri 'backend-ready' event often fires
+// BEFORE the webview JS loads (race condition).
 let _resolveBackendReady: () => void;
+let _backendResolved = false;
 export const backendReady = new Promise<void>((resolve) => {
-  _resolveBackendReady = resolve;
+  _resolveBackendReady = () => {
+    if (_backendResolved) return; // prevent double-resolve
+    _backendResolved = true;
+    resolve();
+  };
 });
 
-// Listen for the Rust-side 'backend-ready' event
+// Strategy 1: Listen for the Rust-side 'backend-ready' event
 if (typeof (window as any).__TAURI_INTERNALS__ !== 'undefined') {
   listen('backend-ready', () => {
-    console.log('[bridge] Received backend-ready from Tauri');
+    console.log('[bridge] Received backend-ready from Tauri event');
     _resolveBackendReady();
     connectSSE();
   });
+}
+
+// Strategy 2: Poll the sidecar health endpoint — ONLY in main window
+// Sub-windows receive backend-ready via Tauri event (no HTTP needed)
+if (IS_MAIN_WINDOW) {
+  (function pollForBackend() {
+    if (_backendResolved) return;
+    fetch(`${IPC_PROXY_URL}/api/health`, { signal: AbortSignal.timeout(2000) })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.ok) {
+          console.log('[bridge] Backend ready detected via health poll');
+          _resolveBackendReady();
+          connectSSE();
+        } else {
+          setTimeout(pollForBackend, 500);
+        }
+      })
+      .catch(() => {
+        setTimeout(pollForBackend, 500);
+      });
+  })();
 } else {
-  // Running in plain browser (e.g. localhost:1420 directly) — no Tauri event
+  // Sub-windows: resolve backendReady after a reasonable delay if event hasn't fired
   setTimeout(() => {
-    _resolveBackendReady();
-    connectSSE();
-  }, 1000);
+    if (!_backendResolved) {
+      console.log('[bridge] Sub-window backendReady timeout — resolving');
+      _resolveBackendReady();
+      connectSSE();
+    }
+  }, 5000);
 }
 
 /**
@@ -150,6 +208,14 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     case 'overlay-set-ignore-mouse':
       return invoke('set_ignore_mouse', { label: 'overlay', ignore: args[0] });
 
+    // Overlay window management — create/show/hide the Tauri overlay webview
+    case 'overlay-ensure':
+      return invoke('create_overlay_window').catch(() => {/* already exists */});
+    case 'overlay-show':
+      return invoke('show_window', { label: 'overlay' }).catch(() => {});
+    case 'overlay-hide':
+      return invoke('hide_window', { label: 'overlay' }).catch(() => {});
+
     // Backend API calls (direct Express endpoints)
     case 'get-ddragon-version':
       return fetch(`${BACKEND_URL}/api/version`).then(r => r.json()).then(d => d.version);
@@ -168,7 +234,8 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
         return null;
       }
 
-    // Pass-through to sidecar IPC proxy for all backend IPC handlers
+    // Pass-through to sidecar IPC proxy via Tauri's native invoke
+    // (bypasses browser's 6-connection-per-domain HTTP limit)
     case 'lcu-champ-select':
     case 'lcu-live-game':
     case 'live-advisor-start':
@@ -196,12 +263,8 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     case 'test-shortcut':
     case 'get-rag-status':
     case 'get-icon':
-      return fetch(`${IPC_PROXY_URL}/api/ipc/${channel}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ args }),
-      }).then(r => r.json()).catch(e => {
-        console.warn(`[bridge] IPC call ${channel} failed:`, e);
+      return invoke('ipc_proxy', { channel, args }).catch((e: any) => {
+        console.warn(`[bridge] IPC call ${channel} failed:`, e?.message || e);
         return null;
       });
 
@@ -216,19 +279,15 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
  * One-way message (fire-and-forget)
  */
 export function ipcSend(channel: string, ...args: any[]): void {
-  // For one-way messages, use HTTP to sidecar IPC proxy
+  // For one-way messages, use Tauri invoke to bypass browser connection limits
   switch (channel) {
     case 'overlay-data':
     case 'update-overlay-items':
     case 'store-original-build':
     case 'set-ping-region':
     case 'overlay-set-ignore-mouse':
-      // Send to sidecar via IPC proxy
-      fetch(`${IPC_PROXY_URL}/api/ipc/${channel}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ args }),
-      }).catch(() => {});
+      // Send to sidecar via Rust IPC proxy (bypasses browser connection limit)
+      invoke('ipc_send', { channel, args }).catch(() => {});
       break;
     default:
       // Use Tauri events for window-to-window communication
@@ -251,6 +310,11 @@ const PUSH_CHANNELS = new Set([
   'ping-update',
   'game-ended',
   'overlay-data-update',
+  'overlay-items-update',
+  'overlay-visibility',
+  'item-purchase-update',
+  'settings-update',
+  'force-regenerate',
   'cooldown-tick',
   'scoreboard-data',
   'champ-select-update',

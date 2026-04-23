@@ -50,7 +50,8 @@
         "installerHooks": "installer-hooks.nsh",
         "headerImage": "../../../nsis/assets/header.bmp",
         "sidebarImage": "../../../nsis/assets/sidebar.bmp",
-        "template": "../../../nsis/template.nsi"
+        "template": "../../../nsis/template.nsi",
+        "installMode": "currentUser"
       }
     },
     "externalBin": []

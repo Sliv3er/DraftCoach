@@ -259,48 +259,14 @@ class KBImpl implements KnowledgeBase {
             }
         }
 
-        // Build templates - use champion-based generation
+        // Build templates - generate dynamically from DDragon items based on champion tags
         this.buildTemplates = new Map();
+        const allItemsList = Array.from(this.items.values());
         for (const champ of this.champions.values()) {
+            const champTags = champ.tags ? Object.keys(champ.tags).filter(k => typeof champ.tags[k as keyof typeof champ.tags] === 'number') : [];
             for (const role of champ.roles) {
-                const template: BuildTemplate = {
-                    championId: champ.id,
-                    role,
-                    variants: {
-                        'DAMAGE': {
-                            label: 'DAMAGE',
-                            startingItems: getDefaultStartingItems(role),
-                            coreItems: [],
-                            situationalPool: [],
-                            runes: this.runeTemplates.get(`${champ.id}_${role}_DAMAGE`) || getDefaultRuneSet(),
-                            summonerSpells: getDefaultSummonerSpells(role),
-                            skillOrder: getDefaultSkillOrderTyped(),
-                            bootChoice: getDefaultBoots(role),
-                        },
-                        'SAFETY': {
-                            label: 'SAFETY',
-                            startingItems: getDefaultStartingItems(role),
-                            coreItems: [],
-                            situationalPool: [],
-                            runes: this.runeTemplates.get(`${champ.id}_${role}_SAFETY`) || getDefaultRuneSet(),
-                            summonerSpells: getDefaultSummonerSpells(role),
-                            skillOrder: getDefaultSkillOrderTyped(),
-                            bootChoice: getDefaultBoots(role),
-                        },
-                        'UTILITY': {
-                            label: 'UTILITY',
-                            startingItems: getDefaultStartingItems(role),
-                            coreItems: [],
-                            situationalPool: [],
-                            runes: this.runeTemplates.get(`${champ.id}_${role}_UTILITY`) || getDefaultRuneSet(),
-                            summonerSpells: getDefaultSummonerSpells(role),
-                            skillOrder: getDefaultSkillOrderTyped(),
-                            bootChoice: getDefaultBoots(role),
-                        }
-                    }
-                };
+                const template = generateBuildTemplate(champ, role, champTags, this.runeTemplates, allItemsList);
                 this.buildTemplates.set(`${champ.id}_${role}`, template);
-                // Also set champion alone as fallback
                 if (!this.buildTemplates.has(champ.id)) {
                     this.buildTemplates.set(champ.id, template);
                 }
@@ -429,6 +395,83 @@ function getDefaultSummonerSpells(role: string): [string, string] {
 
 function getDefaultBoots(role: string): { id: string; name: string } {
     return { id: '3006', name: 'Berserker\'s Greaves' };
+}
+
+function generateBuildTemplate(
+    champ: ChampionKBEntry,
+    role: string,
+    champTags: string[],
+    runeTemplates: Map<string, RuneSet>,
+    allItems: ItemKBEntry[]
+): BuildTemplate {
+    const coreItems: { id: string; name: string; reason: string }[] = [];
+    const situationalPool: { id: string; name: string; triggerTag: string }[] = [];
+
+    const hasTag = (search: string) => champTags.some(t => t.toLowerCase().includes(search.toLowerCase()));
+    const byTag = (tag: string) => allItems.filter(i => i.tags.includes(tag));
+
+    if (hasTag('Tank') || (hasTag('Fighter') && role !== 'MID' && role !== 'BOT')) {
+        coreItems.push(...byTag('Health').slice(0, 3).map(i => ({ id: i.id, name: i.name, reason: 'Core tank item' })));
+        coreItems.push(...byTag('Armor').filter(i => i.cost > 1000 && i.cost < 3000).slice(0, 2).map(i => ({ id: i.id, name: i.name, reason: 'Armor for tankiness' })));
+    } else if (hasTag('Assassin')) {
+        coreItems.push(...byTag('CriticalStrike').slice(0, 2).map(i => ({ id: i.id, name: i.name, reason: 'Critical strike for burst' })));
+        coreItems.push(...byTag('LifeSteal').slice(0, 1).map(i => ({ id: i.id, name: i.name, reason: 'Lifesteal for sustain' })));
+    } else if (hasTag('Mage') || hasTag('APC')) {
+        coreItems.push(...byTag('SpellDamage').filter(i => i.cost > 2500).slice(0, 2).map(i => ({ id: i.id, name: i.name, reason: 'AP damage core' })));
+        coreItems.push(...byTag('Mana').filter(i => i.cost > 1000).slice(0, 1).map(i => ({ id: i.id, name: i.name, reason: 'Mana sustain' })));
+    } else if (role === 'BOT' || hasTag('Marksman')) {
+        coreItems.push(...byTag('CriticalStrike').slice(0, 2).map(i => ({ id: i.id, name: i.name, reason: 'ADC core crit' })));
+        coreItems.push(...byTag('AttackSpeed').slice(0, 2).map(i => ({ id: i.id, name: i.name, reason: 'Attack speed for DPS' })));
+    } else if (role === 'SUPPORT') {
+        coreItems.push(...byTag('Health').slice(0, 2).map(i => ({ id: i.id, name: i.name, reason: 'Support health' })));
+        coreItems.push(...byTag('ManaRegen').slice(0, 1).map(i => ({ id: i.id, name: i.name, reason: 'Mana regen for support' })));
+    } else {
+        coreItems.push(...byTag('Damage').filter(i => i.cost > 1000).slice(0, 3).map(i => ({ id: i.id, name: i.name, reason: 'AD core item' })));
+    }
+
+    for (const tag of ['Health', 'Armor', 'MagicResist', 'LifeSteal', 'SpellVamp', 'CriticalStrike', 'AttackSpeed']) {
+        const items = byTag(tag).filter(i => !coreItems.find(c => c.id === i.id)).slice(0, 3);
+        for (const item of items) {
+            situationalPool.push({ id: item.id, name: item.name, triggerTag: tag });
+        }
+    }
+
+    return {
+        championId: champ.id,
+        role: role as EngineRole,
+        variants: {
+            'DAMAGE': {
+                label: 'DAMAGE',
+                startingItems: getDefaultStartingItems(role),
+                coreItems: coreItems.slice(0, 4),
+                situationalPool,
+                runes: runeTemplates.get(`${champ.id}_${role}_DAMAGE`) || getDefaultRuneSet(),
+                summonerSpells: getDefaultSummonerSpells(role),
+                skillOrder: getDefaultSkillOrderTyped(),
+                bootChoice: getDefaultBoots(role),
+            },
+            'SAFETY': {
+                label: 'SAFETY',
+                startingItems: getDefaultStartingItems(role),
+                coreItems: coreItems.slice(0, 4),
+                situationalPool,
+                runes: runeTemplates.get(`${champ.id}_${role}_SAFETY`) || getDefaultRuneSet(),
+                summonerSpells: getDefaultSummonerSpells(role),
+                skillOrder: getDefaultSkillOrderTyped(),
+                bootChoice: getDefaultBoots(role),
+            },
+            'UTILITY': {
+                label: 'UTILITY',
+                startingItems: getDefaultStartingItems(role),
+                coreItems: coreItems.slice(0, 4),
+                situationalPool,
+                runes: runeTemplates.get(`${champ.id}_${role}_UTILITY`) || getDefaultRuneSet(),
+                summonerSpells: getDefaultSummonerSpells(role),
+                skillOrder: getDefaultSkillOrderTyped(),
+                bootChoice: getDefaultBoots(role),
+            }
+        }
+    };
 }
 
 // Singleton instance - initialized synchronously after first async load

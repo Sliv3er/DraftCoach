@@ -46,6 +46,7 @@ const ipcListeners = {};  // channel → function (for ipcMain.on)
 
 // Fake BrowserWindow that captures webContents.send() calls
 function createFakeWindow(label) {
+  let _visible = false;
   const webContents = {
     send: (channel, ...args) => {
       // Broadcast to SSE clients
@@ -60,12 +61,28 @@ function createFakeWindow(label) {
     _destroyed: false,
     webContents,
     isDestroyed: () => false,
-    isVisible: () => true,
+    isVisible: () => _visible,
     isFocused: () => false,
     isMinimized: () => false,
-    show: () => {},
-    showInactive: () => {},
-    hide: () => {},
+    show: () => {
+      _visible = true;
+      // Emit SSE event so Tauri frontend can show the real window
+      if (label === 'overlay') {
+        eventBus.emit('ipc-event', { channel: 'overlay-visibility', args: [{ visible: true }], target: 'main' });
+      }
+    },
+    showInactive: () => {
+      _visible = true;
+      if (label === 'overlay') {
+        eventBus.emit('ipc-event', { channel: 'overlay-visibility', args: [{ visible: true }], target: 'main' });
+      }
+    },
+    hide: () => {
+      _visible = false;
+      if (label === 'overlay') {
+        eventBus.emit('ipc-event', { channel: 'overlay-visibility', args: [{ visible: false }], target: 'main' });
+      }
+    },
     focus: () => {},
     minimize: () => {},
     maximize: () => {},
@@ -385,10 +402,18 @@ const startProxy = () => {
       // Try handle first (request-response)
       if (ipcHandlers[channel]) {
         try {
+          // Log LCU and settings calls for debugging
+          if (channel.startsWith('lcu-') || channel === 'get-settings' || channel === 'set-setting') {
+            console.log(`[ipc-proxy] → ${channel}(${args.length} args)`);
+          }
           const result = await ipcHandlers[channel]({}, ...args);
+          if (channel.startsWith('lcu-') || channel === 'set-setting') {
+            console.log(`[ipc-proxy] ← ${channel}: ${JSON.stringify(result)?.substring(0, 200)}`);
+          }
           res.writeHead(200, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify(result !== undefined ? result : { ok: true }));
         } catch (err) {
+          console.error(`[ipc-proxy] ✗ ${channel} error:`, err.message);
           res.writeHead(500, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ error: err.message }));
         }

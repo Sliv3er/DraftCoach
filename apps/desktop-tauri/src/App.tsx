@@ -388,6 +388,8 @@ export function App() {
   const autoGenKeyRef = useRef<string>(''); // track last auto-generated combo to avoid repeated calls
   const buildGeneratedRef = useRef<boolean>(false); // once a build is generated, lock champion detection
   const lastSessionIdRef = useRef<string>(''); // track champ select session to avoid resetting lock every poll tick
+  const overlayShownRef = useRef<boolean>(false); // track if overlay is currently shown by polling
+  const overlayHasDataRef = useRef<boolean>(false); // ref mirror for use in pollLCU callback
 
   // ── New UI state: RAG, overlay, settings ───────────────────────
   const [ragStatus, setRagStatus] = useState<RagStatus>({ isUpdating: false, patch: null, updatedAt: null });
@@ -441,6 +443,27 @@ export function App() {
       setLiveUpdatedItems(items);
     };
     ipcOn('build-items-updated', buildItemsHandler);
+
+    // ── Overlay visibility — sidecar's game detection tells us when to show/hide ──
+    const overlayVisibilityHandler = (_event: any, payload: any) => {
+      if (payload?.visible) {
+        console.log('[App] Overlay show requested by sidecar');
+        ipcInvoke('overlay-ensure').then(() => ipcInvoke('overlay-show'));
+      } else {
+        console.log('[App] Overlay hide requested by sidecar');
+        ipcInvoke('overlay-hide');
+      }
+    };
+    ipcOn('overlay-visibility', overlayVisibilityHandler);
+
+    // ── Settings updates pushed from backend ──
+    const settingsUpdateHandler = (_event: any, newSettings: any) => {
+      if (newSettings && typeof newSettings === 'object') {
+        setSettings(newSettings);
+      }
+    };
+    ipcOn('settings-update', settingsUpdateHandler);
+
     // When game ends, clear all game-specific UI
     const gameEndedHandler = () => {
       setBuildResult(null);
@@ -460,6 +483,10 @@ export function App() {
       lastSessionIdRef.current = '';
       // Clear live-updated items so next game starts fresh
       setLiveUpdatedItems(null);
+      // Reset overlay tracking
+      overlayShownRef.current = false;
+      overlayHasDataRef.current = false;
+      setOverlayHasData(false);
     };
     ipcOn('game-ended', gameEndedHandler);
     return () => {
@@ -474,6 +501,8 @@ export function App() {
       ipcRemoveListener('live-advisor-started', startedHandler);
       ipcRemoveListener('game-ended', gameEndedHandler);
       ipcRemoveListener('build-items-updated', buildItemsHandler);
+      ipcRemoveListener('overlay-visibility', overlayVisibilityHandler);
+      ipcRemoveListener('settings-update', settingsUpdateHandler);
     };
   }, []);
 
@@ -819,8 +848,12 @@ export function App() {
         // Only send overlay/advisor/item-export when Pro's FULL build is available
         if (data.text && proComplete) {
           const overlayPayload = extractOverlayData(data.text, role, iconLookups, ddragonVersion, myChampion);
-          ipcSend('overlay-data', overlayPayload);
+          // Ensure overlay window exists before sending data
+          ipcInvoke('overlay-ensure').then(() => {
+            ipcSend('overlay-data', overlayPayload);
+          });
           setOverlayHasData(true);
+          overlayHasDataRef.current = true;
           console.log('[App] 🧠 Pro full build sent to overlay');
 
           // Store build text for live advisor (Pro) and auto-start it
@@ -899,9 +932,11 @@ export function App() {
 
   // Auto-detect: poll LCU for champ select session, with in-game fallback
   const pollLCU = useCallback(async () => {
+    console.log('[Auto-detect] pollLCU tick');
     try {
       // ── Attempt 1: Champ Select (LCU API) ──
       const result = await ipcInvoke('lcu-champ-select');
+      console.log('[Auto-detect] lcu-champ-select result:', JSON.stringify(result)?.substring(0, 300));
       if (result?.ok) {
         setAutoDetectStatus('connected');
         // Only reset lock when a genuinely NEW champ select session starts
@@ -961,12 +996,21 @@ export function App() {
         // Build already generated — just maintain connection status, don't update champs
         try {
           const liveResult = await ipcInvoke('lcu-live-game');
-          if (liveResult?.ok) setAutoDetectStatus('connected');
+          if (liveResult?.ok) {
+            setAutoDetectStatus('connected');
+            // Show overlay when in-game (reliable fallback for SSE)
+            if (!overlayShownRef.current && overlayHasDataRef.current) {
+              overlayShownRef.current = true;
+              console.log('[App] Showing overlay (live game detected by poll)');
+              ipcInvoke('overlay-ensure').then(() => ipcInvoke('overlay-show'));
+            }
+          }
         } catch {}
         return;
       }
 
       const liveResult = await ipcInvoke('lcu-live-game');
+      console.log('[Auto-detect] lcu-live-game result:', liveResult?.ok ? 'connected' : 'not in game');
       if (liveResult?.ok) {
         setAutoDetectStatus('connected');
         const keyMap = champKeyMapRef.current;
@@ -1026,12 +1070,26 @@ export function App() {
         if (liveEnemies.length > 0) {
           setEnemies(prev => liveEnemies.length >= prev.length ? liveEnemies : prev);
         }
+
+        // Show overlay when in-game (reliable fallback for SSE)
+        if (!overlayShownRef.current && overlayHasDataRef.current) {
+          overlayShownRef.current = true;
+          console.log('[App] Showing overlay (live game first detection)');
+          ipcInvoke('overlay-ensure').then(() => ipcInvoke('overlay-show'));
+        }
         return;
       }
 
       // Neither champ select nor live game available
+      // If overlay was shown, hide it (game ended)
+      if (overlayShownRef.current) {
+        overlayShownRef.current = false;
+        console.log('[App] Hiding overlay (no game detected)');
+        ipcInvoke('overlay-hide');
+      }
       setAutoDetectStatus('searching');
-    } catch {
+    } catch (err: any) {
+      console.warn('[Auto-detect] Poll error:', err?.message || err);
       setAutoDetectStatus('searching');
     }
   }, []);
@@ -1039,26 +1097,34 @@ export function App() {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
-      await backendReady;
-      if (cancelled) return;
-
-      if (autoDetect) {
-        setAutoDetectStatus('searching');
+    if (autoDetect) {
+      setAutoDetectStatus('searching');
+      console.log('[App] Auto-detect ON — starting LCU polling');
+      // Small initial delay to let bridge initialize, then poll every 2s
+      const initialTimer = setTimeout(() => {
+        if (cancelled) return;
         pollLCU();
         autoDetectRef.current = setInterval(pollLCU, 2000);
-      } else {
-        setAutoDetectStatus('off');
-      }
-    })();
+      }, 1500);
 
-    return () => {
-      cancelled = true;
-      if (autoDetectRef.current) {
-        clearInterval(autoDetectRef.current);
-        autoDetectRef.current = null;
-      }
-    };
+      return () => {
+        cancelled = true;
+        clearTimeout(initialTimer);
+        if (autoDetectRef.current) {
+          clearInterval(autoDetectRef.current);
+          autoDetectRef.current = null;
+        }
+      };
+    } else {
+      setAutoDetectStatus('off');
+      return () => {
+        cancelled = true;
+        if (autoDetectRef.current) {
+          clearInterval(autoDetectRef.current);
+          autoDetectRef.current = null;
+        }
+      };
+    }
   }, [autoDetect, pollLCU]);
 
   const getChampIconUrl = (champId: string) =>
@@ -1627,7 +1693,7 @@ export function App() {
           <div className="settings-group">
             <div className="settings-group-title">
               <svg className="section-title-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <path d="M7 1C4.5 1 2.5 3 2.5 5.5C2.5 7 3.2 8.3 4.3 9.1L2 13h3l1-2h3l1 2h3L10.5 9.1C11.6 8.3 12.3 7 12.3 5.5C12.3 3 10.3 1 7 7 7 1Z"/>
+                <path d="M7 1C4.5 1 2.5 3 2.5 5.5C2.5 7 3.2 8.3 4.3 9.1L2 13h3l1-2h3l1 2h3L10.5 9.1C11.6 8.3 12.3 7 12.3 5.5C12.3 3 10.3 1 7.8 1Z"/>
               </svg>
               API Keys
             </div>
@@ -1833,11 +1899,11 @@ export function App() {
         </div>
         <div className="footer-divider" />
         <div className="footer-section footer-hotkeys">
-          <kbd>{displayAccelerator(settings.hotkeyToggleOverlay || 'CommandOrControl+Alt+O')}</kbd>
+          <kbd>{displayAccelerator(settings?.hotkeyToggleOverlay || 'CommandOrControl+Alt+O')}</kbd>
           <span className="footer-text">Overlay</span>
-          <kbd>{displayAccelerator(settings.hotkeyRegenerate || 'CommandOrControl+Alt+G')}</kbd>
+          <kbd>{displayAccelerator(settings?.hotkeyRegenerate || 'CommandOrControl+Alt+G')}</kbd>
           <span className="footer-text">Regen</span>
-          <kbd>{displayAccelerator(settings.hotkeyFocusMain || 'CommandOrControl+Alt+B')}</kbd>
+          <kbd>{displayAccelerator(settings?.hotkeyFocusMain || 'CommandOrControl+Alt+B')}</kbd>
           <span className="footer-text">Focus</span>
         </div>
       </footer>

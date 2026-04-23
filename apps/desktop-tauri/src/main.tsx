@@ -2,8 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./styles.css";
 
-// Dynamic routing based on URL hash — same approach as the Electron version
+// Dynamic routing based on URL — supports both hash (Electron) and pathname (Tauri)
 const hash = window.location.hash.replace('#', '');
+const pathname = window.location.pathname;
+// Check hash first (Electron-style: /#/overlay), then pathname (Tauri-style: /overlay)
+const route = hash || pathname;
 
 // Lazy load windows based on route (named exports → wrap in default)
 const AppLazy = React.lazy(() => import("./App").then(m => ({ default: m.App })));
@@ -14,7 +17,7 @@ const ScoreboardWindowLazy = React.lazy(() => import("./ScoreboardWindow").then(
 const TrackerPanelLazy = React.lazy(() => import("./TrackerPanel").then(m => ({ default: m.TrackerPanel })));
 
 function Router() {
-  switch (hash) {
+  switch (route) {
     case '/overlay':
       return <React.Suspense fallback={null}><OverlayLazy /></React.Suspense>;
     case '/scout':

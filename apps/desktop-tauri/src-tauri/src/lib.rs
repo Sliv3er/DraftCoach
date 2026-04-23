@@ -108,6 +108,40 @@ async fn set_ignore_mouse(app: AppHandle, label: String, ignore: bool) -> Result
     Ok(())
 }
 
+/// Create the in-game overlay window — fullscreen, transparent, always-on-top,
+/// click-through, using hash routing to load the Overlay component.
+#[tauri::command]
+async fn create_overlay_window(app: AppHandle) -> Result<(), String> {
+    // If overlay already exists, just return OK
+    if app.get_webview_window("overlay").is_some() {
+        return Ok(());
+    }
+
+    // Use pathname-based URL so main.tsx Router renders the Overlay component
+    let url = WebviewUrl::App("/overlay".into());
+
+    let window = WebviewWindowBuilder::new(&app, "overlay", url)
+        .title("DraftCoach Overlay")
+        .inner_size(1920.0, 1080.0)
+        .position(0.0, 0.0)
+        .transparent(true)
+        .always_on_top(true)
+        .decorations(false)
+        .skip_taskbar(true)
+        .focused(false)
+        .visible(false)
+        .build()
+        .map_err(|e| format!("Failed to create overlay window: {e}"))?;
+
+    // Click-through: mouse events pass to the game underneath
+    let _ = window.set_ignore_cursor_events(true);
+    // Highest always-on-top level
+    let _ = window.set_always_on_top(true);
+
+    println!("[tauri] Overlay window created (hidden)");
+    Ok(())
+}
+
 // ── Sidecar Management ─────────────────────────────────────────────
 
 #[tauri::command]
@@ -221,6 +255,50 @@ async fn start_sidecar(app: AppHandle) -> Result<String, String> {
     Ok("started".to_string())
 }
 
+/// Proxy IPC calls through Rust's HTTP client, bypassing browser connection limits.
+/// The browser's 6-connection-per-domain limit blocks fetch() POST requests when
+/// SSE EventSource connections occupy all slots. This command lets the frontend
+/// call invoke('ipc_proxy', {channel, args}) instead of fetch().
+#[tauri::command]
+async fn ipc_proxy(channel: String, args: Vec<serde_json::Value>) -> Result<serde_json::Value, String> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("HTTP client error: {e}"))?;
+
+    let url = format!("http://127.0.0.1:3211/api/ipc/{}", channel);
+    let body = serde_json::json!({ "args": args });
+
+    let res = client
+        .post(&url)
+        .json(&body)
+        .send()
+        .await
+        .map_err(|e| format!("IPC proxy request failed: {e}"))?;
+
+    let json: serde_json::Value = res
+        .json()
+        .await
+        .map_err(|e| format!("IPC proxy parse failed: {e}"))?;
+
+    Ok(json)
+}
+
+/// Fire-and-forget IPC send (for listeners like overlay-data, set-ping-region)
+#[tauri::command]
+async fn ipc_send(channel: String, args: Vec<serde_json::Value>) -> Result<(), String> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5))
+        .build()
+        .map_err(|e| format!("HTTP client error: {e}"))?;
+
+    let url = format!("http://127.0.0.1:3211/api/ipc/{}", channel);
+    let body = serde_json::json!({ "args": args });
+
+    let _ = client.post(&url).json(&body).send().await;
+    Ok(())
+}
+
 #[tauri::command]
 async fn stop_sidecar(app: AppHandle) -> Result<(), String> {
     let state = app.state::<Mutex<SidecarState>>();
@@ -254,6 +332,9 @@ pub fn run() {
             hide_window,
             show_window,
             set_ignore_mouse,
+            create_overlay_window,
+            ipc_proxy,
+            ipc_send,
             start_sidecar,
             stop_sidecar,
         ])
@@ -319,6 +400,12 @@ pub fn run() {
                     println!("[tauri] Main window shown");
                 } else {
                     eprintln!("[tauri] Failed to get main window handle");
+                }
+
+                // Create the overlay window (hidden) so it's ready when a build is generated
+                match create_overlay_window(handle.clone()).await {
+                    Ok(()) => println!("[tauri] Overlay window auto-created"),
+                    Err(e) => eprintln!("[tauri] Overlay window creation failed: {e}"),
                 }
             });
 

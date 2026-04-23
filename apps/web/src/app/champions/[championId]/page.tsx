@@ -16,6 +16,7 @@ import { SummonerSpellTooltip } from "@/components/SummonerSpellTooltip";
 
 interface RoleData {
   winRate: string;
+  pickRate: string;
   runes: {
     primary: string;
     primaryIcon?: string;
@@ -36,6 +37,18 @@ interface RoleData {
     situational: string[];
     situationalIcons?: (string | null)[];
   };
+  bestMatchups?: {
+    enemy: string;
+    score: number;
+    tip: string;
+    earlyGame: string;
+  }[];
+  worstMatchups?: {
+    enemy: string;
+    score: number;
+    tip: string;
+    earlyGame: string;
+  }[];
 }
 
 interface ChampionDetails {
@@ -60,6 +73,11 @@ interface Champion {
   };
 }
 
+const formatRoleLabel = (role: string): string => {
+  const normalized = role.toLowerCase();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
+
 const getRecommendedSpells = (role: string): string[] => {
   switch (role.toLowerCase()) {
     case 'jungle': return ['Flash', 'Smite'];
@@ -83,6 +101,7 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
   const [runeDataById, setRuneDataById] = useState<Record<number, RuneData>>({});
   const [runeNameToId, setRuneNameToId] = useState<Map<string, number>>(new Map());
   const [spellMap, setSpellMap] = useState<Record<string, { id: string; name: string; description: string; image: string }>>({});
+  const [activeRole, setActiveRole] = useState<string | null>(null);
 
   const fetchAnalyticsWithRetry = async (id: string, retries = 2): Promise<ChampionDetails | null> => {
     let attempt = 0;
@@ -212,6 +231,7 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
           // Enrich with fallback icons if backend didn't provide them
           enrichAnalyticsWithIcons(details, v, iMap, rMap);
           setAnalytics(details);
+          setActiveRole(Object.keys(details.roles)[0] || null);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -221,6 +241,10 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
     }
     fetchData();
   }, [championId]);
+
+  const roleEntries = analytics ? Object.entries(analytics.roles) : [];
+  const selectedRoleKey = activeRole && analytics?.roles[activeRole] ? activeRole : roleEntries[0]?.[0] || null;
+  const selectedRoleData = selectedRoleKey ? analytics?.roles[selectedRoleKey] : null;
 
   if (loading) {
     return (
@@ -256,13 +280,13 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
         <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/40 to-transparent" />
         <div className="absolute inset-0 bg-linear-to-r from-slate-950/80 via-transparent to-transparent" />
 
-        <div className="absolute top-8 left-8 z-50">
+        <div className="absolute top-0 left-8 z-50">
           <Link
             href="/champions"
             className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group"
           >
             <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-xs font-bold uppercase tracking-widest">Database</span>
+            <span className="text-xs font-bold uppercase tracking-widest">Champions</span>
           </Link>
         </div>
 
@@ -352,193 +376,276 @@ export default function ChampionPage({ params }: { params: Promise<{ championId:
         </motion.div>
 
         {/* Right Column: Roles & Builds */}
-        <div className="lg:col-span-2 space-y-16">
+        <div className="lg:col-span-2 space-y-10">
           {analytics ? (
-            Object.entries(analytics.roles).map(([role, data], idx) => (
-              <motion.section
-                key={role}
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="relative"
-              >
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-4xl font-black uppercase tracking-tighter flex items-center gap-4">
-                    <span className="text-hextech-gold/30 font-display">0{idx + 1}</span> {role} Meta
-                    <span className="text-[10px] bg-hextech-gold/10 text-hextech-gold border border-hextech-gold/20 px-3 py-1 rounded-full font-black uppercase tracking-widest">
-                      {data.winRate} WR
-                    </span>
-                  </h2>
-                </div>
+            <>
+              <div className="flex flex-wrap items-center gap-3">
+                {roleEntries.map(([role]) => {
+                  const isActive = role === selectedRoleKey;
+                  return (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => setActiveRole(role)}
+                      className={`px-4 py-2 rounded-full border text-xs font-black uppercase tracking-widest transition-all ${isActive ? 'bg-hextech-gold text-slate-950 border-hextech-gold shadow-[0_0_20px_rgba(196,151,87,0.25)]' : 'bg-white/5 text-slate-400 border-white/10 hover:border-white/20 hover:text-white'}`}
+                    >
+                      {formatRoleLabel(role)}
+                    </button>
+                  );
+                })}
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Runes */}
-                  <Card noOverflow variant="accent" className="p-8 backdrop-blur-xl border-white/5 hover:border-hextech-gold/20 transition-colors group">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-hextech-gold mb-8 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-hextech-gold animate-pulse" /> Rune Configuration
-                    </h3>
-                    <div className="space-y-8">
-                      <div className="flex items-center gap-6">
-                        <RuneTooltip
-                          runeData={runeDataById[runeNameToId.get(data.runes.keystone.toLowerCase()) || 0] || null}
-                        >
-                          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-slate-800 to-slate-900 border border-white/5 flex items-center justify-center overflow-hidden hover:scale-110 transition-transform shadow-[0_0_20px_rgba(196,151,87,0.2)]">
-                            {data.runes.keystoneIcon ? (
-                              <Image src={data.runes.keystoneIcon} alt={data.runes.keystone} width={64} height={64} className="w-full h-full object-contain p-2" />
-                            ) : (
-                              <span className="text-3xl font-black text-hextech-gold">{data.runes.keystone[0]}</span>
-                            )}
-                          </div>
-                        </RuneTooltip>
-                        <div>
-                          <p className="text-xl font-black text-white uppercase tracking-tight">{data.runes.keystone}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            {data.runes.primaryIcon && <Image src={data.runes.primaryIcon} alt={data.runes.primary} width={16} height={16} className="w-4 h-4 opacity-60" />}
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{data.runes.primary} Tree</p>
-                          </div>
-                        </div>
-                      </div>
+              {selectedRoleData && selectedRoleKey ? (
+                <motion.section
+                  key={selectedRoleKey}
+                  initial={{ y: 50, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  className="relative"
+                >
+                  <div className="flex items-end justify-between gap-4 mb-8">
+                    <div>
+                      <h2 className="text-4xl font-black uppercase tracking-tighter flex items-center gap-4">
+                        <span className="text-hextech-gold/30 font-display">{selectedRoleKey}</span> Meta
+                      </h2>
+                      <p className="text-xs text-slate-500 uppercase tracking-[0.3em] mt-3">
+                        Overall {analytics.winRate} WR • {analytics.pickRate} PR
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <span className="text-[10px] bg-hextech-gold/10 text-hextech-gold border border-hextech-gold/20 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+                        {selectedRoleData.winRate} WR
+                      </span>
+                      <span className="text-[10px] bg-blue-500/10 text-blue-300 border border-blue-500/20 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+                        {selectedRoleData.pickRate} PR
+                      </span>
+                    </div>
+                  </div>
 
-                      <div className="grid grid-cols-1 gap-3">
-                        {data.runes.runes.map((rune, i) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Runes */}
+                    <Card noOverflow variant="accent" className="p-8 backdrop-blur-xl border-white/5 hover:border-hextech-gold/20 transition-colors group">
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-hextech-gold mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-hextech-gold animate-pulse" /> Rune Configuration
+                      </h3>
+                      <div className="space-y-8">
+                        <div className="flex items-center gap-6">
                           <RuneTooltip
-                            key={rune}
-                            runeData={runeDataById[runeNameToId.get(rune.toLowerCase()) || 0] || null}
+                            runeData={runeDataById[runeNameToId.get(selectedRoleData.runes.keystone.toLowerCase()) || 0] || null}
                           >
-                            <div className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-slate-300 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                              {data.runes.runeIcons?.[i] ? (
-                                <Image src={data.runes.runeIcons[i]!} alt={rune} width={24} height={24} className="w-6 h-6" />
+                            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-slate-800 to-slate-900 border border-white/5 flex items-center justify-center overflow-hidden hover:scale-110 transition-transform shadow-[0_0_20px_rgba(196,151,87,0.2)]">
+                              {selectedRoleData.runes.keystoneIcon ? (
+                                <Image src={selectedRoleData.runes.keystoneIcon} alt={selectedRoleData.runes.keystone} width={64} height={64} className="w-full h-full object-contain p-2" />
                               ) : (
-                                <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                                <span className="text-3xl font-black text-hextech-gold">{selectedRoleData.runes.keystone[0]}</span>
                               )}
-                              {rune}
                             </div>
                           </RuneTooltip>
-                        ))}
-                      </div>
-
-                      <div className="pt-8 border-t border-white/5">
-                        <div className="flex items-center gap-2 mb-4">
-                          {data.runes.secondaryIcon && <Image src={data.runes.secondaryIcon} alt={data.runes.secondary} width={14} height={14} className="w-3.5 h-3.5 opacity-50" />}
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Secondary: {data.runes.secondary}</p>
+                          <div>
+                            <p className="text-xl font-black text-white uppercase tracking-tight">{selectedRoleData.runes.keystone}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              {selectedRoleData.runes.primaryIcon && <Image src={selectedRoleData.runes.primaryIcon} alt={selectedRoleData.runes.primary} width={16} height={16} className="w-4 h-4 opacity-60" />}
+                              <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{selectedRoleData.runes.primary} Tree</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-3">
-                          {data.runes.secondaryRunes.map((rune, i) => (
+
+                        <div className="grid grid-cols-1 gap-3">
+                          {selectedRoleData.runes.runes.map((rune, i) => (
                             <RuneTooltip
                               key={rune}
                               runeData={runeDataById[runeNameToId.get(rune.toLowerCase()) || 0] || null}
                             >
-                              <div className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:border-white/20 transition-all">
-                                {data.runes.secondaryRuneIcons?.[i] && (
-                                  <Image src={data.runes.secondaryRuneIcons[i]!} alt={rune} width={16} height={16} className="w-4 h-4" />
+                              <div className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-slate-300 flex items-center gap-3 hover:bg-white/10 transition-colors">
+                                {selectedRoleData.runes.runeIcons?.[i] ? (
+                                  <Image src={selectedRoleData.runes.runeIcons[i]!} alt={rune} width={24} height={24} className="w-6 h-6" />
+                                ) : (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
                                 )}
                                 {rune}
                               </div>
                             </RuneTooltip>
                           ))}
                         </div>
-                      </div>
 
-                      <div className="pt-8 border-t border-white/5">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Summoner Spells</p>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                          {getRecommendedSpells(role).map((spellName) => {
-                            const spellData = Object.values(spellMap).find((spell) => spell.name === spellName) || null;
-                            if (!spellData || !version) return null;
-
-                            return (
-                              <SummonerSpellTooltip
-                                key={spellData.id}
-                                spellId={Number(spellData.id)}
-                                spellData={spellData}
-                                version={version}
+                        <div className="pt-8 border-t border-white/5">
+                          <div className="flex items-center gap-2 mb-4">
+                            {selectedRoleData.runes.secondaryIcon && <Image src={selectedRoleData.runes.secondaryIcon} alt={selectedRoleData.runes.secondary} width={14} height={14} className="w-3.5 h-3.5 opacity-50" />}
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Secondary: {selectedRoleData.runes.secondary}</p>
+                          </div>
+                          <div className="flex flex-wrap gap-3">
+                            {selectedRoleData.runes.secondaryRunes.map((rune, i) => (
+                              <RuneTooltip
+                                key={rune}
+                                runeData={runeDataById[runeNameToId.get(rune.toLowerCase()) || 0] || null}
                               >
-                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/5 bg-white/5 hover:border-blue-400/30 transition-colors">
-                                  <Image
-                                    src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spellData.image}`}
-                                    alt={spellData.name}
-                                    width={40}
-                                    height={40}
-                                    className="w-full h-full object-cover"
-                                  />
+                                <div className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:border-white/20 transition-all">
+                                  {selectedRoleData.runes.secondaryRuneIcons?.[i] && (
+                                    <Image src={selectedRoleData.runes.secondaryRuneIcons[i]!} alt={rune} width={16} height={16} className="w-4 h-4" />
+                                  )}
+                                  {rune}
                                 </div>
-                              </SummonerSpellTooltip>
-                            );
-                          })}
+                              </RuneTooltip>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-8 border-t border-white/5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Summoner Spells</p>
+                          </div>
+                          <div className="flex flex-wrap gap-3">
+                            {getRecommendedSpells(selectedRoleKey).map((spellName) => {
+                              const spellData = Object.values(spellMap).find((spell) => spell.name === spellName) || null;
+                              if (!spellData || !version) return null;
+
+                              return (
+                                <SummonerSpellTooltip
+                                  key={spellData.id}
+                                  spellId={Number(spellData.id)}
+                                  spellData={spellData}
+                                  version={version}
+                                >
+                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/5 bg-white/5 hover:border-blue-400/30 transition-colors">
+                                    <Image
+                                      src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spellData.image}`}
+                                      alt={spellData.name}
+                                      width={40}
+                                      height={40}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                </SummonerSpellTooltip>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
+                    </Card>
 
-
-                  {/* Build */}
-                  <Card noOverflow variant="accent" className="p-8 backdrop-blur-xl border-white/5 hover:border-blue-500/20 transition-colors group">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400 mb-8 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" /> Equipment Loadout
-                    </h3>
-                    <div className="space-y-10">
-                      <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Starter Strategy</p>
-                        <div className="flex flex-wrap gap-4">
-                          {data.items.starting.map((item) => (
-                            <div key={item} className="flex flex-col items-center gap-2">
-                              <ItemTooltip
-                                itemId={Number(itemMap.get(item.toLowerCase()) || 0)}
-                                item={itemMap.get(item.toLowerCase()) ? itemsById[itemMap.get(item.toLowerCase()) || ''] || null : null}
-                                version={version || ''}
-                                className="w-12 h-12"
-                              />
-                              <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter text-center max-w-15 truncate">{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Core Item Path</p>
-
-                        <div className="grid grid-cols-1 gap-3">
-                          {data.items.core.map((item, i) => (
-                            <div key={item} className="flex items-center gap-4">
-                              <span className="text-[10px] font-black text-blue-500/40 w-4">{i + 1}</span>
-                              <div className="flex-1 flex items-center gap-4 px-4 py-3 bg-blue-500/5 border border-blue-500/10 rounded-xl hover:translate-x-2 transition-transform">
+                    {/* Build */}
+                    <Card noOverflow variant="accent" className="p-8 backdrop-blur-xl border-white/5 hover:border-blue-500/20 transition-colors group">
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400 mb-8 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" /> Equipment Loadout
+                      </h3>
+                      <div className="space-y-10">
+                        <div>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Starter Strategy</p>
+                          <div className="flex flex-wrap gap-4">
+                            {selectedRoleData.items.starting.map((item) => (
+                              <div key={item} className="flex flex-col items-center gap-2">
                                 <ItemTooltip
                                   itemId={Number(itemMap.get(item.toLowerCase()) || 0)}
                                   item={itemMap.get(item.toLowerCase()) ? itemsById[itemMap.get(item.toLowerCase()) || ''] || null : null}
                                   version={version || ''}
-                                  className="w-8 h-8"
+                                  className="w-12 h-12"
                                 />
-                                <span className="text-sm font-black text-blue-300 uppercase tracking-tight">{item}</span>
+                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter text-center max-w-15 truncate">{item}</span>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Core Item Path</p>
+
+                          <div className="grid grid-cols-1 gap-3">
+                            {selectedRoleData.items.core.map((item, i) => (
+                              <div key={item} className="flex items-center gap-4">
+                                <span className="text-[10px] font-black text-blue-500/40 w-4">{i + 1}</span>
+                                <div className="flex-1 flex items-center gap-4 px-4 py-3 bg-blue-500/5 border border-blue-500/10 rounded-xl hover:translate-x-2 transition-transform">
+                                  <ItemTooltip
+                                    itemId={Number(itemMap.get(item.toLowerCase()) || 0)}
+                                    item={itemMap.get(item.toLowerCase()) ? itemsById[itemMap.get(item.toLowerCase()) || ''] || null : null}
+                                    version={version || ''}
+                                    className="w-8 h-8"
+                                  />
+                                  <span className="text-sm font-black text-blue-300 uppercase tracking-tight">{item}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Tactical Adaptations</p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedRoleData.items.situational.map((item) => (
+                              <div key={item} className="px-3 py-2 bg-slate-800/50 border border-white/5 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-colors">
+                                <ItemTooltip
+                                  itemId={Number(itemMap.get(item.toLowerCase()) || 0)}
+                                  item={itemMap.get(item.toLowerCase()) ? itemsById[itemMap.get(item.toLowerCase()) || ''] || null : null}
+                                  version={version || ''}
+                                  className="w-5 h-5"
+                                />
+                                {item}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Tactical Adaptations</p>
-                        <div className="flex flex-wrap gap-2">
-                          {data.items.situational.map((item) => (
-                            <div key={item} className="px-3 py-2 bg-slate-800/50 border border-white/5 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-colors">
-                              <ItemTooltip
-                                itemId={Number(itemMap.get(item.toLowerCase()) || 0)}
-                                item={itemMap.get(item.toLowerCase()) ? itemsById[itemMap.get(item.toLowerCase()) || ''] || null : null}
-                                version={version || ''}
-                                className="w-5 h-5"
-                              />
-                              {item}
-                            </div>
-                          ))}
-                        </div>
+                    </Card>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <Card variant="accent" className="p-6 border-white/5 bg-emerald-950/20">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-300">Best Matchups</h3>
+                        <span className="text-[10px] font-black text-emerald-300/70 uppercase tracking-widest">Top lane edges</span>
                       </div>
+                      <div className="space-y-3">
+                        {(selectedRoleData.bestMatchups || []).map((matchup) => (
+                          <div key={`${selectedRoleKey}-best-${matchup.enemy}`} className="rounded-xl border border-emerald-500/10 bg-white/5 p-4">
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-black text-white uppercase tracking-tight">{matchup.enemy}</p>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1">{matchup.earlyGame}</p>
+                              </div>
+                              <span className="text-[10px] font-black text-emerald-300 uppercase tracking-widest">{matchup.score}</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-3 leading-relaxed">{matchup.tip}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+
+                    <Card variant="accent" className="p-6 border-white/5 bg-rose-950/20">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-300">Worst Matchups</h3>
+                        <span className="text-[10px] font-black text-rose-300/70 uppercase tracking-widest">Play safe here</span>
+                      </div>
+                      <div className="space-y-3">
+                        {(selectedRoleData.worstMatchups || []).map((matchup) => (
+                          <div key={`${selectedRoleKey}-worst-${matchup.enemy}`} className="rounded-xl border border-rose-500/10 bg-white/5 p-4">
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-black text-white uppercase tracking-tight">{matchup.enemy}</p>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1">{matchup.earlyGame}</p>
+                              </div>
+                              <span className="text-[10px] font-black text-rose-300 uppercase tracking-widest">{matchup.score}</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-3 leading-relaxed">{matchup.tip}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  </div>
+                </motion.section>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-40 text-slate-500 space-y-8 border-2 border-dashed border-white/5 rounded-[3rem] bg-slate-900/20 backdrop-blur-sm">
+                  <div className="relative">
+                    <div className="w-20 h-20 border-4 border-hextech-gold/20 border-t-hextech-gold rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-10 h-10 bg-hextech-gold/20 rounded-full animate-ping" />
                     </div>
-                  </Card>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xl font-black text-white uppercase tracking-tighter mb-2">Synthesizing Combat Intel</p>
+                    <p className="text-sm font-medium text-slate-500">Querying global performance benchmarks...</p>
+                  </div>
                 </div>
-              </motion.section>
-            ))
+              )}
+            </>
           ) : (
 
             <div className="flex flex-col items-center justify-center py-40 text-slate-500 space-y-8 border-2 border-dashed border-white/5 rounded-[3rem] bg-slate-900/20 backdrop-blur-sm">

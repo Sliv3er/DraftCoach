@@ -3,6 +3,7 @@ import { fetchDDragonVersion, fetchDDragonData, getItemIconUrl, getRuneIconUrl }
 import ChampionDetail from '../models/ChampionDetail';
 import championsKb from '../../../../shared/kb/data/champions.json';
 import buildTemplatesKb from '../../../../shared/kb/data/build-templates.json';
+import matchupsKb from '../../../../shared/kb/data/matchups.json';
 
 type KbRole = 'TOP' | 'JUNGLE' | 'MID' | 'BOT' | 'SUPPORT';
 
@@ -49,13 +50,31 @@ interface KbBuildTemplate {
   variants: Partial<Record<'DAMAGE' | 'SAFETY' | 'UTILITY', KbBuildVariant>>;
 }
 
+interface KbMatchupEntry {
+  champion: string;
+  enemy: string;
+  role: KbRole | string;
+  score: number;
+  tip: string;
+  earlyGame: string;
+}
+
+interface MatchupSummary {
+  enemy: string;
+  score: number;
+  tip: string;
+  earlyGame: string;
+}
+
 interface ChampionDetails {
+  schemaVersion: number;
   championId: string;
   winRate: string;
   tier: string;
   pickRate: string;
   roles: Record<string, {
     winRate: string;
+    pickRate: string;
     runes: {
       primary: string;
       primaryIcon?: string;
@@ -76,12 +95,16 @@ interface ChampionDetails {
       situational: string[];
       situationalIcons?: (string | null)[];
     };
+    bestMatchups?: MatchupSummary[];
+    worstMatchups?: MatchupSummary[];
   }>;
   summary: string;
 }
 
 const championsData = (championsKb as any).data as Record<string, KbChampionEntry>;
 const buildTemplatesData = (buildTemplatesKb as any).data as Record<string, KbBuildTemplate>;
+const matchupsData = (matchupsKb as any).data as Record<string, KbMatchupEntry>;
+const CHAMPION_DETAILS_SCHEMA_VERSION = 2;
 
 function fmtPct(value: number): string {
   return `${value.toFixed(1)}%`;
@@ -120,6 +143,30 @@ function resolveBuildTemplate(championId: string, role: KbRole): KbBuildTemplate
     (entry) => entry.championId.toLowerCase() === championId.toLowerCase() && entry.role === role
   );
   return found || null;
+}
+
+function getMatchupSummaries(championId: string, role: KbRole): { bestMatchups: MatchupSummary[]; worstMatchups: MatchupSummary[] } {
+  const matchups = Object.values(matchupsData).filter(
+    (entry) => entry.champion.toLowerCase() === championId.toLowerCase() && entry.role.toUpperCase() === role
+  );
+
+  const sortedBest = [...matchups].sort((a, b) => b.score - a.score).slice(0, 3);
+  const sortedWorst = [...matchups].sort((a, b) => a.score - b.score).slice(0, 3);
+
+  return {
+    bestMatchups: sortedBest.map((entry) => ({
+      enemy: entry.enemy,
+      score: entry.score,
+      tip: entry.tip,
+      earlyGame: entry.earlyGame,
+    })),
+    worstMatchups: sortedWorst.map((entry) => ({
+      enemy: entry.enemy,
+      score: entry.score,
+      tip: entry.tip,
+      earlyGame: entry.earlyGame,
+    })),
+  };
 }
 
 function buildRolePayload(championId: string, role: KbRole, damageType: KbChampionEntry['tags']['damageType']) {
@@ -180,6 +227,7 @@ function buildChampionDetailsFromKB(championId: string): ChampionDetails {
 
   const rolesPayload: ChampionDetails['roles'] = {};
   const roleWinRates: number[] = [];
+  const roleWeights: Array<{ role: KbRole; weight: number }> = [];
 
   for (const role of championEntry.roles) {
     const lane = championEntry.laneStrengths[role] || { poke: 35, allIn: 50, sustain: 30 };
@@ -195,12 +243,28 @@ function buildChampionDetailsFromKB(championId: string): ChampionDetails {
       lane.allIn * 0.18 +
       lane.sustain * 0.12;
 
+    const roleWeight = clamp(
+      lane.allIn * 0.35 +
+      lane.poke * 0.2 +
+      lane.sustain * 0.2 +
+      tags.mobility * 0.1 +
+      tags.ccDensity * 6 +
+      tags.range * 0.05,
+      25,
+      180
+    );
+    roleWeights.push({ role, weight: roleWeight });
+
     const roleWinRate = clamp(46 + roleScore / 22, 47.2, 54.6);
     roleWinRates.push(roleWinRate);
 
+    const matchupSummaries = getMatchupSummaries(championEntry.id, role);
+
     rolesPayload[role] = {
       winRate: fmtPct(roleWinRate),
+      pickRate: '0.0%',
       ...buildRolePayload(championEntry.id, role, championEntry.tags.damageType),
+      ...matchupSummaries,
     };
   }
 
@@ -209,8 +273,17 @@ function buildChampionDetailsFromKB(championId: string): ChampionDetails {
     : 49.5;
   const tier = getTierFromWinRate(avgWinRate);
   const pickRate = clamp(2.8 + championEntry.roles.length * 1.4 + championEntry.tags.mobility * 0.03, 3.1, 12.8);
+  const totalWeight = roleWeights.reduce((sum, entry) => sum + entry.weight, 0) || 1;
+
+  for (const entry of roleWeights) {
+    const rolePickRate = pickRate * (entry.weight / totalWeight);
+    if (rolesPayload[entry.role]) {
+      rolesPayload[entry.role].pickRate = fmtPct(rolePickRate);
+    }
+  }
 
   return {
+    schemaVersion: CHAMPION_DETAILS_SCHEMA_VERSION,
     championId: championEntry.id,
     winRate: fmtPct(avgWinRate),
     tier,
@@ -233,9 +306,16 @@ export async function getChampionDetails(championId: string) {
     
     if (cached) {
       console.log(`[ChampionAdvisor] Cache hit for ${championId} on patch ${patchDisplay}`);
-      // Even if cached, we might want to ensure icons are there if we just updated the logic
-      // But for now, we'll just return it.
-      return cached;
+      const firstRole = Object.values(cached.roles || {})[0] as { bestMatchups?: unknown; worstMatchups?: unknown; pickRate?: string } | undefined;
+      const isCurrentSchema = (cached as { schemaVersion?: number }).schemaVersion === CHAMPION_DETAILS_SCHEMA_VERSION;
+      const hasMatchupData = Array.isArray(firstRole?.bestMatchups) && firstRole.bestMatchups.length > 0 && Array.isArray(firstRole?.worstMatchups) && firstRole.worstMatchups.length > 0;
+      const hasRolePickRate = typeof firstRole?.pickRate === 'string' && firstRole.pickRate.includes('%');
+
+      if (isCurrentSchema && hasMatchupData && hasRolePickRate) {
+        return cached;
+      }
+
+      console.log(`[ChampionAdvisor] Cache entry for ${championId} is missing matchup data. Rebuilding from KB...`);
     }
   } catch (err) {
     console.error('[ChampionAdvisor] Cache lookup failed:', err);
@@ -303,7 +383,7 @@ export async function getChampionDetails(championId: string) {
     await ChampionDetail.findOneAndUpdate(
       { championId: data.championId, patch: patchDisplay },
       { ...data, patch: patchDisplay, lastUpdated: new Date() },
-      { upsert: true, new: true }
+      { upsert: true, new: true, returnDocument: 'after' }
     );
     console.log(`[ChampionAdvisor] Cached fresh intel for ${championId}`);
   } catch (err) {

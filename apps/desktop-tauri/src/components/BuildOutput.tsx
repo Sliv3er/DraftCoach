@@ -475,8 +475,8 @@ function renderLiveUpdatedItems(items: LiveUpdatedItem[]) {
             <div className="item-card-info">
               <span className="item-card-name">{item.name}</span>
               {!iconSrc && <span className="item-card-removed-tag">Not found</span>}
-              {item.reason && <span className="item-card-reason">{item.reason}</span>}
-              {item.gold > 0 && <span className="item-card-reason">{item.gold}g</span>}
+              {item.reason && <span className="item-card-reason" style={{ color: '#c8aa6e', fontStyle: 'italic' }}>⚡ {item.reason}</span>}
+              {item.gold > 0 && <span className="item-card-reason" style={{ color: '#888', fontSize: '10px' }}>{item.gold}g</span>}
             </div>
           </div>
         );

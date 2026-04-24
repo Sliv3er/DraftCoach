@@ -939,53 +939,73 @@ export function App() {
       console.log('[Auto-detect] lcu-champ-select result:', JSON.stringify(result)?.substring(0, 300));
       if (result?.ok) {
         setAutoDetectStatus('connected');
-        // Only reset lock when a genuinely NEW champ select session starts
-        // (not on every 2s poll tick — that was causing 3-4x duplicate builds)
         const session = result.session;
         const sessionId = `${session.localPlayerCellId}-${session.gameId || session.counter || 'x'}`;
         if (lastSessionIdRef.current !== sessionId) {
           lastSessionIdRef.current = sessionId;
           buildGeneratedRef.current = false;
           autoGenKeyRef.current = '';
+          // Clear stale data from previous session
+          setMyChampion('');
+          setAllies([]);
+          setEnemies([]);
           console.log('[App] New champ select session detected — unlocking auto-generate');
         }
         const localCellId = session.localPlayerCellId;
         const keyMap = champKeyMapRef.current;
 
-        const myPick = session.myTeam?.find((p: any) => p.cellId === localCellId);
-        if (myPick && myPick.championId && myPick.championId !== 0) {
-          const champ = keyMap.get(String(myPick.championId));
+        // ── Build a map of cellId → confirmed pick championId using the actions array ──
+        // The actions array contains phases like [[ban1, ban2,...],[pick1, pick2,...],...]
+        // Each action has: type ("ban"|"pick"|"phase_transition"), championId, actorCellId,
+        //   completed (bool), isInProgress (bool), isAllyAction (bool)
+        // We ONLY want picks (not bans), and only completed or in-progress ones.
+        const pickedChampByCellId = new Map<number, number>();
+        for (const phase of session.actions || []) {
+          for (const action of phase) {
+            if (action.type === 'pick' && action.championId && action.championId !== 0) {
+              if (action.completed || action.isInProgress) {
+                pickedChampByCellId.set(action.actorCellId, action.championId);
+              }
+            }
+          }
+        }
+
+        // My champion — from confirmed pick action
+        const myPickedChampId = pickedChampByCellId.get(localCellId);
+        if (myPickedChampId) {
+          const champ = keyMap.get(String(myPickedChampId));
           if (champ) setMyChampion(champ.id);
         }
 
-        if (myPick?.assignedPosition) {
-          const mappedRole = LCU_POSITION_MAP[myPick.assignedPosition.toLowerCase()];
+        // Role from assigned position
+        const myTeamEntry = session.myTeam?.find((p: any) => p.cellId === localCellId);
+        if (myTeamEntry?.assignedPosition) {
+          const mappedRole = LCU_POSITION_MAP[myTeamEntry.assignedPosition.toLowerCase()];
           if (mappedRole) setRole(mappedRole);
         }
 
+        // Allies — only confirmed picks from my team
         const allyIds: string[] = [];
         for (const p of session.myTeam || []) {
           if (p.cellId === localCellId) continue;
-          if (p.championId && p.championId !== 0) {
-            const champ = keyMap.get(String(p.championId));
+          const pickedId = pickedChampByCellId.get(p.cellId);
+          if (pickedId) {
+            const champ = keyMap.get(String(pickedId));
             if (champ) allyIds.push(champ.id);
           }
         }
-        // Only update if we have at least as many picks as before
-        if (allyIds.length > 0) {
-          setAllies(prev => allyIds.length >= prev.length ? allyIds : prev);
-        }
+        setAllies(allyIds);
 
+        // Enemies — only confirmed picks from their team
         const enemyIds: string[] = [];
         for (const p of session.theirTeam || []) {
-          if (p.championId && p.championId !== 0) {
-            const champ = keyMap.get(String(p.championId));
+          const pickedId = pickedChampByCellId.get(p.cellId);
+          if (pickedId) {
+            const champ = keyMap.get(String(pickedId));
             if (champ) enemyIds.push(champ.id);
           }
         }
-        if (enemyIds.length > 0) {
-          setEnemies(prev => enemyIds.length >= prev.length ? enemyIds : prev);
-        }
+        setEnemies(enemyIds);
         return; // champ select worked, no fallback needed
       }
 
@@ -1004,6 +1024,11 @@ export function App() {
               console.log('[App] Showing overlay (live game detected by poll)');
               ipcInvoke('overlay-ensure').then(() => ipcInvoke('overlay-show'));
             }
+          } else if (overlayShownRef.current) {
+            // Game ended — hide overlay
+            overlayShownRef.current = false;
+            console.log('[App] Hiding overlay (game ended, build-locked path)');
+            ipcInvoke('overlay-hide');
           }
         } catch {}
         return;
@@ -1139,7 +1164,7 @@ export function App() {
     <div className="app">
       <header className="header">
         <div className="header-brand">
-          {/* Logo removed — sidecar doesn't serve /logo */}
+          <img src="/logo.png" alt="DraftCoach" className="header-logo" />
           <h1>DraftCoach</h1>
         </div>
         <div className="header-meta">

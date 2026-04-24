@@ -186,12 +186,69 @@ export async function generateBuild(
 
 Champion: ${req.myChampion}, Role: ${req.role}, Allies: ${req.allies.join(', ') || 'none'}, Enemies: ${req.enemies.join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Make sure to place upgraded boots as the 1st or 2nd item in the CORE BUILD. Generate optimized build. Output the ANALYSIS section first, then all other sections.`;
 
-  const result = await model.generateContent(userMessage);
-  const response = result.response;
-  const text = response.text();
+  const startTime = Date.now();
+  const modelUsed = getModel(req.model);
 
-  return {
-    text,
-    patchUsed: patchDisplay,
-  };
+  try {
+    const result = await model.generateContent(userMessage);
+    const response = result.response;
+    const text = response.text();
+
+    // Track usage - usageMetadata is inside result.response
+    const usageMetadata = (result as any).response?.usageMetadata || {};
+    const tokensIn = usageMetadata.promptTokenCount || 0;
+    const tokensOut = usageMetadata.candidatesTokenCount || 0;
+    console.log('[Usage] Tracked:', modelUsed, '|', tokensIn, 'in /', tokensOut, 'out');
+
+    // Fire-and-forget tracking (don't block the response)
+    trackGeminiUsage({
+      userId: req.userId || 'anonymous',
+      model: modelUsed,
+      tokensIn,
+      tokensOut,
+      latencyMs: Date.now() - startTime,
+      success: true,
+    }).catch(err => console.warn('[Usage] Tracking failed:', err));
+
+    return {
+      text,
+      patchUsed: patchDisplay,
+    };
+  } catch (error: any) {
+    // Track failed call
+    trackGeminiUsage({
+      userId: req.userId || 'anonymous',
+      model: modelUsed,
+      tokensIn: 0,
+      tokensOut: 0,
+      latencyMs: Date.now() - startTime,
+      success: false,
+      error: error.message,
+    }).catch(err => console.warn('[Usage] Tracking failed:', err));
+
+    throw error;
+  }
+}
+
+// ── Track Gemini usage (fire-and-forget) ──
+async function trackGeminiUsage(call: {
+  userId: string;
+  model: string;
+  tokensIn: number;
+  tokensOut: number;
+  latencyMs: number;
+  success: boolean;
+  error?: string;
+}) {
+  try {
+    const billingPort = process.env.BILLING_PORT || '3211';
+    await fetch(`http://localhost:${billingPort}/api/billing/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(call),
+    });
+  } catch (e) {
+    // Silently fail - don't影响主流程
+    console.warn('[Usage] Could not reach billing service');
+  }
 }

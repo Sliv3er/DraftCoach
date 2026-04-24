@@ -7,6 +7,7 @@ import { fetchDDragonVersion } from '../services/ddragon';
 
 export const buildRouter = Router();
 
+// All routes in this router are under /api/build/*
 buildRouter.get('/version', async (_req: Request, res: Response) => {
   try {
     const version = await fetchDDragonVersion();
@@ -16,7 +17,7 @@ buildRouter.get('/version', async (_req: Request, res: Response) => {
   }
 });
 
-buildRouter.post('/build', async (req: Request, res: Response) => {
+buildRouter.post('/', async (req: Request, res: Response) => {
   try {
     const body = req.body as BuildRequest;
     if (!body.myChampion || !body.role) {
@@ -113,8 +114,67 @@ buildRouter.post('/build', async (req: Request, res: Response) => {
   }
 });
 
+// ── Build Dual (streaming) ─────────────────────────────────────────
+buildRouter.post('/build-dual', async (req: Request, res: Response) => {
+  try {
+    const body = req.body as BuildRequest;
+    if (!body.myChampion || !body.role) {
+      res.status(400).json({ ok: false, source: 'error', message: 'Missing required fields', canRetry: false } as BuildResponse);
+      return;
+    }
+
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    // Get live patch
+    let livePatch: string;
+    try {
+      livePatch = await fetchDDragonVersion();
+    } catch {
+      livePatch = body.patch || 'unknown';
+    }
+    const patchKey = livePatch.split('.').slice(0, 2).join('.');
+
+    // Try Pro model first (gemini-3.1-pro-preview)
+    const proModel = 'gemini-3.1-pro-preview';
+    try {
+      const proResult = await generateBuild({ ...body, model: proModel }, false);
+      
+      // Stream the Pro result
+      res.write(`data: ${JSON.stringify({ phase: 'full', chunk: proResult.text, patchUsed: proResult.patchUsed, source: 'grounded', model: proModel })}\n\n`);
+      res.write(`data: ${JSON.stringify({ phase: 'full', done: true, fullText: proResult.text, source: 'grounded', model: proModel })}\n\n`);
+    } catch (proErr: any) {
+      console.error('[build-dual] Pro model failed:', proErr.message);
+      res.write(`data: ${JSON.stringify({ phase: 'full', error: proErr.message })}\n\n`);
+      
+      // Fall back to Flash model
+      const flashModel = 'gemini-3-flash-preview-0514';
+      try {
+        const flashResult = await generateBuild({ ...body, model: flashModel }, true);
+        
+        // Stream the Flash result
+        res.write(`data: ${JSON.stringify({ phase: 'full', chunk: flashResult.text, patchUsed: flashResult.patchUsed, source: 'grounded', model: flashModel })}\n\n`);
+        res.write(`data: ${JSON.stringify({ phase: 'full', done: true, fullText: flashResult.text, source: 'grounded', model: flashModel })}\n\n`);
+      } catch (flashErr: any) {
+        console.error('[build-dual] Flash model also failed:', flashErr.message);
+        res.write(`data: ${JSON.stringify({ phase: 'full', error: flashErr.message, done: true })}\n\n`);
+      }
+    }
+
+    res.end();
+  } catch (err: any) {
+    console.error('[build-dual] Error:', err.message);
+    res.write(`data: ${JSON.stringify({ phase: 'full', error: err.message, done: true })}\n\n`);
+    res.end();
+  }
+});
+
 // ── Live Game Advisor ──────────────────────────────────────────────
 buildRouter.post('/live-advice', async (req: Request, res: Response) => {
+  const startTime = Date.now();
   try {
     const snapshot = req.body as GameSnapshot;
     if (!snapshot.myChampion || !snapshot.players || snapshot.players.length === 0) {
@@ -123,8 +183,40 @@ buildRouter.post('/live-advice', async (req: Request, res: Response) => {
     }
 
     const advice = await generateLiveAdvice(snapshot);
+    
+    // Track usage (fire-and-forget)
+    const userId = req.body.userId || 'anonymous';
+    fetch(`http://localhost:3211/api/billing/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        model: 'gemini-3-flash-preview', // Live advice uses Flash for speed
+        tokensIn: 800, // Estimated for live advice
+        tokensOut: 400,
+        latencyMs: Date.now() - startTime,
+        success: true,
+      }),
+    }).catch(() => {});
+
     res.json({ ok: true, advice });
   } catch (err: any) {
+    // Track failed call
+    const userId = req.body.userId || 'anonymous';
+    fetch(`http://localhost:3211/api/billing/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        model: 'gemini-3-flash-preview', // Live advice uses Flash for speed
+        tokensIn: 0,
+        tokensOut: 0,
+        latencyMs: Date.now() - startTime,
+        success: false,
+        error: err.message,
+      }),
+    }).catch(() => {});
+
     console.error('[live-advice] Error:', err.message);
     res.status(500).json({ ok: false, error: err.message });
   }

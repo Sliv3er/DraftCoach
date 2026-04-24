@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DraftCoach Setup</title>
+<style>STYLES_PLACEHOLDER</style>
+</head>
+<body>
+  <!-- Drag region -->
+  <div class="titlebar">
+    <div class="window-controls">
+      <button class="win-btn minimize" id="btn-min">&#x2014;</button>
+      <button class="win-btn close" id="btn-close">&#x2715;</button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-glow"></div>
+      <img src="ICON_DATA_URI" alt="" class="logo">
+      <h2 class="brand-name">DraftCoach</h2>
+      <span class="brand-version">v1.1.0</span>
+    </div>
+    <nav class="steps">
+      <div class="step active" data-step="0"><span class="step-num">1</span><span class="step-label">Welcome</span></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="1"><span class="step-num">2</span><span class="step-label">Location</span></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2"><span class="step-num">3</span><span class="step-label">Install</span></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3"><span class="step-num">4</span><span class="step-label">Finish</span></div>
+    </nav>
+    <div class="sidebar-footer">&copy; 2025 DraftCoach</div>
+  </aside>
+
+  <main class="content">
+    <!-- Page 0: Welcome -->
+    <section class="page active" id="page-welcome">
+      <div class="page-inner">
+        <span class="page-eyebrow">Welcome to</span>
+        <h1 class="page-title">Draft<span class="gold">Coach</span></h1>
+        <p class="page-subtitle">AI-Powered League of Legends Build Coach</p>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">&diams;</div>
+            <div class="feature-text"><strong>Smart Builds</strong><span>Real-time item recommendations</span></div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#9733;</div>
+            <div class="feature-text"><strong>Rune Advisor</strong><span>AI-powered rune page generation</span></div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#9878;</div>
+            <div class="feature-text"><strong>Live Scouting</strong><span>Enemy team analysis in draft</span></div>
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="btn-install-now">
+            Install Now <span class="arrow">&rarr;</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 1: Directory -->
+    <section class="page" id="page-directory">
+      <div class="page-inner">
+        <span class="page-eyebrow">Step 2 of 4</span>
+        <h1 class="page-title">Choose Location</h1>
+        <p class="page-subtitle">Select where DraftCoach will be installed.</p>
+        <div class="dir-picker">
+          <label class="dir-label">Installation Folder</label>
+          <div class="dir-input-row">
+            <input type="text" id="dir-input" class="dir-input" value="" readonly>
+            <button class="btn btn-secondary btn-browse" id="btn-browse">Browse</button>
+          </div>
+          <div class="dir-info">Approximately 200 MB required</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-ghost" id="btn-back-dir"><span class="arrow flip">&rarr;</span> Back</button>
+          <button class="btn btn-primary" id="btn-start-install">Install <span class="arrow">&rarr;</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 2: Installing -->
+    <section class="page" id="page-installing">
+      <div class="page-inner center-content">
+        <div class="install-anim"><div class="ring"></div><div class="ring-icon">&#9881;</div></div>
+        <h1 class="page-title">Installing...</h1>
+        <p class="page-subtitle" id="install-status">Preparing installation...</p>
+        <div class="progress-wrap">
+          <div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div>
+          <div class="progress-pct" id="progress-pct">0%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 3: Finish -->
+    <section class="page" id="page-finish">
+      <div class="page-inner center-content">
+        <div class="check-anim">
+          <svg viewBox="0 0 52 52" width="80" height="80">
+            <circle class="chk-circle" cx="26" cy="26" r="24" fill="none" stroke="#C89B3C" stroke-width="2"/>
+            <path class="chk-mark" d="M14 27l7 7 16-16" fill="none" stroke="#C89B3C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1 class="page-title">All Set!</h1>
+        <p class="page-subtitle">DraftCoach is ready. Time to dominate the Rift.</p>
+        <div class="page-actions center">
+          <button class="btn btn-primary btn-lg" id="btn-launch">Launch DraftCoach <span class="arrow">&rarr;</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Exit confirmation modal -->
+  <div class="modal-overlay" id="exit-modal">
+    <div class="modal-card">
+      <div class="modal-icon">&#9888;</div>
+      <h3 class="modal-title">Cancel Installation?</h3>
+      <p class="modal-text">Are you sure you want to cancel the DraftCoach installation?</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="btn-exit-no">Continue Setup</button>
+        <button class="btn btn-danger" id="btn-exit-yes">Yes, Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="particles" class="particles"></canvas>
+
+<script>
+SCRIPT_PLACEHOLDER
+</script>
+</body>
+</html>

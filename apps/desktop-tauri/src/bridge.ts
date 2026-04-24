@@ -41,6 +41,16 @@ const IS_MAIN_WINDOW = _route === '/' || _route === '' || _route === '/index.htm
 const sseListeners = new Map<string, Set<(...args: any[]) => void>>();
 let sseConnected = false;
 let sseRetryTimeout: ReturnType<typeof setTimeout> | null = null;
+let sseRetryCount = 0;
+const SSE_MAX_RETRY_DELAY = 30000; // 30 seconds max
+const SSE_INITIAL_RETRY_DELAY = 1000; // 1 second initial
+
+function getSseRetryDelay(): number {
+  // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (capped)
+  const delay = Math.min(SSE_INITIAL_RETRY_DELAY * Math.pow(2, sseRetryCount), SSE_MAX_RETRY_DELAY);
+  sseRetryCount++;
+  return delay;
+}
 
 function dispatchSSEEvent(channel: string, args: any[]) {
   const handlers = sseListeners.get(channel);
@@ -91,21 +101,27 @@ function connectSSE() {
     evtSource.onerror = () => {
       sseConnected = false;
       evtSource.close();
-      // Retry after 3 seconds
+      // Use exponential backoff with max delay of 30s
+      const delay = getSseRetryDelay();
+      // Only log errors for first 3 retries to avoid console spam
+      if (sseRetryCount <= 3) {
+        console.log(`[bridge] SSE connection error, retrying in ${delay}ms (attempt ${sseRetryCount})`);
+      }
       if (!sseRetryTimeout) {
         sseRetryTimeout = setTimeout(() => {
           sseRetryTimeout = null;
           connectSSE();
-        }, 3000);
+        }, delay);
       }
     };
   } catch (e) {
-    // SSE not available yet, retry later
+    // SSE not available yet, retry later with backoff
+    const delay = getSseRetryDelay();
     if (!sseRetryTimeout) {
       sseRetryTimeout = setTimeout(() => {
         sseRetryTimeout = null;
         connectSSE();
-      }, 3000);
+      }, delay);
     }
   }
 }
@@ -281,11 +297,15 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
 export function ipcSend(channel: string, ...args: any[]): void {
   // For one-way messages, use Tauri invoke to bypass browser connection limits
   switch (channel) {
+    // Overlay mouse interaction — must go directly to Tauri (not sidecar)
+    case 'overlay-set-ignore-mouse':
+      invoke('set_ignore_mouse', { label: 'overlay', ignore: args[0] }).catch(() => {});
+      break;
+    // Sidecar listeners (fire-and-forget)
     case 'overlay-data':
     case 'update-overlay-items':
     case 'store-original-build':
     case 'set-ping-region':
-    case 'overlay-set-ignore-mouse':
       // Send to sidecar via Rust IPC proxy (bypasses browser connection limit)
       invoke('ipc_send', { channel, args }).catch(() => {});
       break;

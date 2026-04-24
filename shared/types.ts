@@ -14,6 +14,7 @@ export interface BuildRequest {
   allies: string[];
   enemies: string[];
   model?: string;
+  userId?: string;  // For usage tracking
 }
 
 export interface BuildSuccessResponse {

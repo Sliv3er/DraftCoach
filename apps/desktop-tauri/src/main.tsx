@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./styles.css";
+import { SplashScreen } from "./SplashScreen";
 
 // Dynamic routing based on URL — supports both hash (Electron) and pathname (Tauri)
 const hash = window.location.hash.replace('#', '');
@@ -16,7 +17,12 @@ const StatsWindowLazy = React.lazy(() => import("./StatsWindow").then(m => ({ de
 const ScoreboardWindowLazy = React.lazy(() => import("./ScoreboardWindow").then(m => ({ default: m.ScoreboardWindow })));
 const TrackerPanelLazy = React.lazy(() => import("./TrackerPanel").then(m => ({ default: m.TrackerPanel })));
 
-function Router() {
+function Router({ showSplash, setShowSplash }: { showSplash: boolean; setShowSplash: (v: boolean) => void }) {
+  // Show splash screen for main window while backend initializes
+  if (showSplash && route === '') {
+    return <SplashScreen onReady={() => setShowSplash(false)} />;
+  }
+  
   switch (route) {
     case '/overlay':
       return <React.Suspense fallback={null}><OverlayLazy /></React.Suspense>;
@@ -33,8 +39,14 @@ function Router() {
   }
 }
 
+function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  return <Router showSplash={showSplash} setShowSplash={setShowSplash} />;
+}
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <Router />
+    <App />
   </React.StrictMode>,
 );

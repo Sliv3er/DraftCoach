@@ -13,6 +13,7 @@ import { championsRouter } from './routes/champions';
 import { checkAndSyncRagPipeline, getRagStatus } from './services/rag-updater';
 import { initElasticsearch } from './services/elasticsearch';
 import { initDb } from './services/db';
+import billingRouter from './routes/billing';
 
 const app = express();
 const PORT = parseInt(process.env.BACKEND_PORT || '3210', 10);
@@ -24,12 +25,16 @@ app.use(express.json());
 initDb().catch(console.error);
 initElasticsearch().catch(console.error);
 
+// Mount build router at both /api/build and /api (for backward compatibility)
+app.use('/api/build', buildRouter);
 app.use('/api', buildRouter);
+
 app.use('/api/players', playersRouter);
 app.use('/api/summoner', summonersRouter);
 app.use('/api/match', matchesRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/champions', championsRouter);
+app.use('/api/billing', billingRouter);
 
 // Initialize the local patch architecture — auto-sync on boot
 checkAndSyncRagPipeline().catch(console.error);

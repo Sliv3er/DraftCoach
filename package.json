@@ -11,14 +11,16 @@
     "build:all": "npm run build:engine && npm run build:backend && npm run build:renderer && npm run build:web",
     "build:desktop": "npm run build:all && cd apps/desktop && npx electron-builder --win",
     "dev:backend": "cd apps/backend && npm run dev",
+    "dev:billing": "cd apps/billing && npm run dev",
     "dev:desktop": "npm run build:engine && cd apps/desktop && npx concurrently \"npx webpack serve --config webpack.config.js\" \"npx wait-on http://localhost:9000 && npx electron .\"",
     "dev:web": "cd apps/web && npm run dev",
-    "dev:all": "npx concurrently \"npm run dev:backend\" \"npm run dev:web\"",
+    "dev:all": "npx concurrently \"npm run dev:backend\" \"npm run dev:billing\" \"npm run dev:web\"",
     "dev": "npm run dev:all",
+    "start:all": "node start-all.js",
     "test": "cd shared && npx jest --config jest.config.js",
     "test:engine": "cd shared && npx jest --config jest.config.js --testPathPattern=engine",
     "validate:kb": "node tools/meta-builder/validate.js shared/kb/data",
-    "postinstall": "cd apps/backend && npm install && cd apps/desktop && npm install && cd apps/web && npm install"
+    "postinstall": "cd apps/backend && npm install && cd apps/desktop && npm install && cd apps/web && npm install && cd apps/billing && npm install"
   },
   "author": "",
   "license": "MIT",

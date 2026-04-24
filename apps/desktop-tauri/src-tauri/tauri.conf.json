@@ -26,12 +26,14 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://ddragon.leagueoflegends.com https://raw.githubusercontent.com; connect-src 'self' http://localhost:* https://ddragon.leagueoflegends.com https://generativelanguage.googleapis.com; font-src 'self' data:; frame-src 'none'; object-src 'none'"
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": [
+      "nsis"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -41,7 +43,8 @@
     ],
     "resources": {
       "../../../shared/kb/data/*": "kb-data/",
-      "../../../assets/icon.png": "icon.png"
+      "../../../assets/icon.png": "icon.png",
+      "../../../apps/desktop-tauri/src/assets/logo.png": "logo.png"
     },
     "windows": {
       "nsis": {

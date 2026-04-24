@@ -108,9 +108,25 @@ Rules:
             console.log(`[RAG] Making Gemini Search request for Patch ${livePatchMajorMinor} notes...`);
 
             let newDataset: RagDataset;
+            const startTime = Date.now();
             try {
                 const result = await model.generateContent(prompt);
                 const textResponse = result.response.text().trim();
+
+                // Track RAG/patch notes usage (fire-and-forget)
+                const usageMetadata = (result as any).response?.usageMetadata || {};
+                fetch(`http://localhost:3211/api/billing/track`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: 'system-rag', // System-level usage
+                        model: 'gemini-3.1-pro-preview',
+                        tokensIn: usageMetadata.promptTokenCount || 1500,
+                        tokensOut: usageMetadata.candidatesTokenCount || 500,
+                        latencyMs: Date.now() - startTime,
+                        success: true,
+                    }),
+                }).catch(() => {});
 
                 const cleanJson = textResponse
                     .replace(/^```(json)?[\s\n]*/i, '')
@@ -132,6 +148,22 @@ Rules:
                 }
             } catch (apiError) {
                 console.error('[RAG] Gemini Grounding request failed:', apiError);
+                
+                // Track failed RAG request
+                fetch(`http://localhost:3211/api/billing/track`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: 'system-rag',
+                        model: 'gemini-3.1-pro-preview',
+                        tokensIn: 0,
+                        tokensOut: 0,
+                        latencyMs: Date.now() - startTime,
+                        success: false,
+                        error: String(apiError),
+                    }),
+                }).catch(() => {});
+
                 const oldDatasetExists = fs.existsSync(DATASET_FILE);
                 if (oldDatasetExists && !force) {
                     console.log('[RAG] Keeping previous dataset as rollback.');

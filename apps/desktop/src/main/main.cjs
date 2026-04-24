@@ -2473,6 +2473,11 @@ function startLiveClientPolling() {
   if (liveClientInterval) return;
   console.log('[main] Starting Live Client Data polling for item purchases');
 
+  // ADC quest slot fix: Once boots are detected, NEVER revert.
+  // When the ADC quest completes, boots move from inventory to a hidden quest
+  // slot and disappear from the Live Client API items[] — this flag persists.
+  global.__bootsEverDetected = false;
+
   // Pre-warm DDragon cache so component data is available immediately
   resolveDdragonItem('_warmup').catch(() => {});
 
@@ -2541,7 +2546,13 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
             const lower = (name || '').toLowerCase();
             return BOOT_NAME_PATTERNS.some(p => lower.includes(p));
           };
-          const playerHasBoots = purchasedItemIds.some(id => isBootsId(id)) || purchasedItemNames.some(n => isBootName(n));
+          const playerHasBootsFromInventory = purchasedItemIds.some(id => isBootsId(id)) || purchasedItemNames.some(n => isBootName(n));
+          // ADC quest slot fix: sticky flag — once boots are seen, they stay "seen"
+          // (quest slot boots disappear from items[] but player still has them)
+          if (playerHasBootsFromInventory) {
+            global.__bootsEverDetected = true;
+          }
+          const playerHasBoots = global.__bootsEverDetected || playerHasBootsFromInventory;
           // Collect boot IDs from the build queue
           const buildBootIds = new Set();
           if (overlayData && overlayData.buildItems) {
@@ -2658,6 +2669,8 @@ function stopLiveClientPolling() {
   if (liveClientInterval) {
     clearInterval(liveClientInterval);
     liveClientInterval = null;
+    // Reset sticky boots flag for next game
+    global.__bootsEverDetected = false;
     console.log('[main] Stopped Live Client Data polling');
   }
 }
@@ -3381,7 +3394,16 @@ async function pollLiveClient() {
       return d && d.tags && d.tags.includes('Boots') && d.gold > 300;
     };
     const myItemIds = (myPlayer?.items || []).map(i => String(i.itemID));
-    const advisorHasBoots = myItemIds.some(id => advisorIsBootsId(id));
+    const advisorHasBootsFromInventory = myItemIds.some(id => advisorIsBootsId(id));
+    // Also check names for quest boots that might not have standard IDs
+    const myItemNames = (myPlayer?.items || []).map(i => (i.displayName || '').toLowerCase().trim()).filter(Boolean);
+    const BOOT_PATTERNS_ADV = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots'];
+    const advisorHasBootsFromNames = myItemNames.some(n => BOOT_PATTERNS_ADV.some(p => n.includes(p)));
+    // Use sticky flag: once boots are detected, never revert (ADC quest slot fix)
+    if (advisorHasBootsFromInventory || advisorHasBootsFromNames) {
+      global.__bootsEverDetected = true;
+    }
+    const advisorHasBoots = global.__bootsEverDetected || advisorHasBootsFromInventory || advisorHasBootsFromNames;
 
     // Detect which item the player is currently building toward (next unbought in build order)
     let currentlyBuilding = '';
@@ -3442,16 +3464,24 @@ async function pollLiveClient() {
       return d && d.gold && (d.gold > 1000 || (d.tags && d.tags.includes('Boots') && d.gold > 300));
     });
     const myItemCount = myCompletedItems.length;
+    // ADC quest slot: if boots moved to quest slot, they're not in items[] anymore
+    // but the player still has them — count them toward completed items
+    const hasBootsInInventory = myCompletedItems.some(i => {
+      const d = ddragonItemCache?.byId?.get(String(i.itemID));
+      return d && d.tags && d.tags.includes('Boots');
+    });
+    const questBootsMissing = isADC && global.__bootsEverDetected && !hasBootsInInventory;
+    const effectiveItemCount = questBootsMissing ? myItemCount + 1 : myItemCount;
     const myNonBootsCount = myCompletedItems.filter(i => {
       const d = ddragonItemCache?.byId?.get(String(i.itemID));
       return !(d && d.tags && d.tags.includes('Boots'));
     }).length;
 
     const buildItemsTotal = overlayData?.buildItems?.length || 6;
-    const isBuildComplete = !remainingBuildQueue && !currentlyBuilding && myItemCount >= Math.min(buildItemsTotal, isADC ? 7 : 6);
+    const isBuildComplete = !remainingBuildQueue && !currentlyBuilding && effectiveItemCount >= Math.min(buildItemsTotal, isADC ? 7 : 6);
     // For ADCs: full build = 6 non-boots slots filled (quest boots is separate)
     // For non-ADCs: full build = 6 total slots filled
-    const isFullBuild = isADC ? myNonBootsCount >= 6 : myItemCount >= 6;
+    const isFullBuild = isADC ? myNonBootsCount >= 6 : effectiveItemCount >= 6;
     const isUltraLateGame = gameTime >= 1800; // 30+ min
 
     let buildCompleteContext = '';
@@ -4015,6 +4045,7 @@ Rules:
                 iconUrl: resolved.iconUrl || '',
                 gold: resolved.gold || 0,
                 id: resolved.id || '',
+                reason: sell.reason || '',
               };
               modified = true;
               replaced = true;

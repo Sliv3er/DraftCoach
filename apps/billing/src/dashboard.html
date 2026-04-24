@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DraftCoach Admin - API Usage & Billing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: #111827; }
+    .card { background: #1f2937; border: 1px solid #374151; }
+  </style>
+</head>
+<body class="min-h-screen text-white p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold">🔒 Admin Dashboard</h1>
+        <p class="text-gray-400 mt-1">API Usage & Cost Tracking</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <label class="text-gray-400">Period:</label>
+        <select id="days" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+        <button onclick="fetchData()" class="bg-yellow-600 hover:bg-yellow-500 px-4 py-2 rounded font-bold">
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Current Model -->
+    <div id="model-info" class="card rounded-lg p-4 mb-6">
+      <span class="text-gray-400">Loading model info...</span>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+      <div class="card rounded-lg p-6">
+        <div class="text-gray-400 text-sm mb-1">Total API Calls</div>
+        <div id="total-calls" class="text-3xl font-bold">-</div>
+      </div>
+      <div class="card rounded-lg p-6">
+        <div class="text-gray-400 text-sm mb-1">Input Tokens</div>
+        <div id="total-in" class="text-3xl font-bold text-green-400">-</div>
+      </div>
+      <div class="card rounded-lg p-6">
+        <div class="text-gray-400 text-sm mb-1">Output Tokens</div>
+        <div id="total-out" class="text-3xl font-bold text-red-400">-</div>
+      </div>
+      <div class="card rounded-lg p-6">
+        <div class="text-gray-400 text-sm mb-1">Unique Users</div>
+        <div id="total-users" class="text-3xl font-bold text-blue-400">-</div>
+      </div>
+      <div class="card rounded-lg p-6 border-yellow-700">
+        <div class="text-gray-400 text-sm mb-1">Estimated Cost</div>
+        <div id="total-cost" class="text-3xl font-bold text-yellow-400">-</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Daily Usage Chart -->
+      <div class="card rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Daily Cost</h2>
+        <canvas id="daily-chart" height="200"></canvas>
+      </div>
+
+      <!-- Model Distribution -->
+      <div class="card rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Usage by Model</h2>
+        <canvas id="model-chart" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- All Users Table -->
+    <div class="card rounded-lg p-6 mb-8">
+      <h2 class="text-xl font-bold mb-4">All Users</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="text-left text-gray-400 border-b border-gray-700">
+              <th class="pb-3">User ID</th>
+              <th class="pb-3">Calls</th>
+              <th class="pb-3">Input Tokens</th>
+              <th class="pb-3">Output Tokens</th>
+              <th class="pb-3">Cost</th>
+              <th class="pb-3">Last Active</th>
+            </tr>
+          </thead>
+          <tbody id="users-table">
+            <tr><td colspan="6" class="py-4 text-gray-500">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pricing Reference -->
+    <div class="card rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Model Pricing Reference</h2>
+      <div id="pricing-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3211/api/billing';
+    let dailyChart, modelChart;
+
+    function formatNumber(num) {
+      if (num >= 1_000_000) return (num / 1_000_000).toFixed(2) + 'M';
+      if (num >= 1_000) return (num / 1_000).toFixed(2) + 'K';
+      return num.toString();
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    }
+
+    async function fetchData() {
+      const days = document.getElementById('days').value;
+
+      try {
+        // Fetch all data in parallel
+        const [pricingRes, usageRes, allUsersRes] = await Promise.all([
+          fetch(`${API_BASE}/pricing`),
+          fetch(`${API_BASE}/me?days=${days}`),
+          fetch(`${API_BASE}/admin/all?days=${days}`),
+        ]);
+
+        const pricing = await pricingRes.json();
+        const usage = await usageRes.json();
+        const allUsers = await allUsersRes.json();
+
+        // Update model info
+        const currentModel = pricing.models?.find(m => m.model === pricing.currentModel);
+        document.getElementById('model-info').innerHTML = `
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-gray-400">Current Model:</span>
+            <span class="font-mono text-yellow-400">${pricing.currentModel}</span>
+            <span class="text-gray-600">|</span>
+            <span class="text-gray-400">Input:</span>
+            <span class="text-green-400">$${currentModel?.inputTokens || '?'}/M</span>
+            <span class="text-gray-400">Output:</span>
+            <span class="text-red-400">$${currentModel?.outputTokens || '?'}/M</span>
+          </div>
+        `;
+
+        // Update summary cards
+        const totalCost = allUsers.reduce((sum, u) => sum + (u.totalCost || 0), 0);
+        const totalCalls = allUsers.reduce((sum, u) => sum + (u.totalCalls || 0), 0);
+        const totalIn = allUsers.reduce((sum, u) => sum + (u.totalTokensIn || 0), 0);
+        const totalOut = allUsers.reduce((sum, u) => sum + (u.totalTokensOut || 0), 0);
+
+        document.getElementById('total-calls').textContent = totalCalls;
+        document.getElementById('total-in').textContent = formatNumber(totalIn);
+        document.getElementById('total-out').textContent = formatNumber(totalOut);
+        document.getElementById('total-users').textContent = allUsers.length;
+        document.getElementById('total-cost').textContent = formatCurrency(totalCost);
+
+        // Update users table
+        const tbody = document.getElementById('users-table');
+        if (allUsers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="py-4 text-gray-500 text-center">No usage data yet</td></tr>';
+        } else {
+          tbody.innerHTML = allUsers.map(u => `
+            <tr class="border-b border-gray-700/50">
+              <td class="py-3 font-mono text-sm">${u.userId}</td>
+              <td class="py-3">${u.totalCalls}</td>
+              <td class="py-3 text-green-400">${formatNumber(u.totalTokensIn)}</td>
+              <td class="py-3 text-red-400">${formatNumber(u.totalTokensOut)}</td>
+              <td class="py-3 text-yellow-400">${formatCurrency(u.totalCost)}</td>
+              <td class="py-3 text-gray-400">${new Date(u.lastCall).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+        }
+
+        // Update pricing cards
+        document.getElementById('pricing-cards').innerHTML = pricing.models?.map(m => `
+          <div class="p-4 rounded-lg border ${m.model === pricing.currentModel ? 'border-yellow-500 bg-yellow-500/10' : 'border-gray-700'}">
+            <div class="font-mono text-sm mb-2">${m.model}</div>
+            <div class="text-xs text-gray-400 mb-2">${m.displayName}</div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Input:</span>
+              <span class="text-green-400">$${m.inputTokens}/M</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Output:</span>
+              <span class="text-red-400">$${m.outputTokens}/M</span>
+            </div>
+          </div>
+        `).join('') || '<div class="text-gray-500">No pricing data</div>';
+
+        // Update daily chart
+        updateDailyChart(usage.daily || []);
+
+        // Update model chart
+        updateModelChart(usage.byModel || {});
+
+      } catch (e) {
+        console.error('Failed to fetch data:', e);
+        document.getElementById('model-info').innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+      }
+    }
+
+    function updateDailyChart(daily) {
+      const ctx = document.getElementById('daily-chart').getContext('2d');
+      
+      if (dailyChart) dailyChart.destroy();
+      
+      dailyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: daily.map(d => d.date.slice(5)),
+          datasets: [{
+            label: 'Cost ($)',
+            data: daily.map(d => d.cost),
+            backgroundColor: 'rgba(234, 179, 8, 0.6)',
+            borderColor: 'rgba(234, 179, 8, 1)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#374151' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function updateModelChart(byModel) {
+      const ctx = document.getElementById('model-chart').getContext('2d');
+      
+      if (modelChart) modelChart.destroy();
+      
+      const labels = Object.keys(byModel);
+      const data = Object.values(byModel).map(m => m.cost);
+      
+      modelChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length ? labels : ['No data'],
+          datasets: [{
+            data: data.length ? data : [1],
+            backgroundColor: [
+              'rgba(234, 179, 8, 0.8)',
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(16, 185, 129, 0.8)',
+            ],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#9ca3af' } }
+          }
+        }
+      });
+    }
+
+    // Initial load
+    fetchData();
+
+    // Auto-refresh every 30 seconds
+    setInterval(fetchData, 30000);
+  </script>
+</body>
+</html>

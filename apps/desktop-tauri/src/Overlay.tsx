@@ -288,6 +288,7 @@ export function Overlay() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                pointerEvents: 'auto',
             }}>
                 {/* Current item to buy — large */}
                 {nextItem && (

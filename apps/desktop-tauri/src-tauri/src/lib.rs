@@ -1,11 +1,95 @@
 use tauri::{AppHandle, Emitter, Manager, WebviewWindowBuilder, WebviewUrl};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{TrayIcon, TrayIconBuilder, MouseButton, MouseButtonState, TrayIconEvent};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::process::Child;
 
 // Sidecar state — holds the Node.js backend process
 struct SidecarState {
     process: Option<Child>,
 }
+
+// Global flag to track if app should minimize to tray instead of closing
+static MINIMIZE_TO_TRAY: AtomicBool = AtomicBool::new(false);
+
+// ── System Tray Setup ─────────────────────────────────────────────────
+
+fn setup_system_tray(app: &AppHandle) -> Result<TrayIcon, Box<dyn std::error::Error>> {
+    let show_item = MenuItem::with_id(app, "show", "Show DraftCoach", true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    
+    let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
+    
+    let tray = TrayIconBuilder::new()
+        .menu(&menu)
+        .tooltip("DraftCoach - AI Companion")
+        .on_menu_event(|app, event| {
+            match event.id.as_ref() {
+                "show" => {
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
+                "quit" => {
+                    MINIMIZE_TO_TRAY.store(false, Ordering::SeqCst);
+                    app.exit(0);
+                }
+                _ => {}
+            }
+        })
+        .on_tray_icon_event(|tray, event| {
+            if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = event {
+                let app = tray.app_handle();
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+        })
+        .build(app)?;
+    
+    Ok(tray)
+}
+
+// ── Sidecar Watchdog ─────────────────────────────────────────────────
+
+async fn start_sidecar_watchdog(app: AppHandle) {
+    loop {
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+        
+        let state = match app.try_state::<Mutex<SidecarState>>() {
+            Some(s) => s,
+            None => continue,
+        };
+        
+        let is_alive = {
+            let mut state = match state.lock() {
+                Ok(s) => s,
+                Err(_) => continue,
+            };
+            if let Some(ref mut child) = state.process {
+                child.try_wait().map(|exit| exit.is_none()).unwrap_or(false)
+            } else {
+                false
+            }
+        };
+        
+        if !is_alive {
+            eprintln!("[tauri] Sidecar process died, restarting...");
+            
+            // Try to restart the sidecar
+            match start_sidecar(app.clone()).await {
+                Ok(status) => println!("[tauri] Sidecar restarted: {status}"),
+                Err(e) => eprintln!("[tauri] Sidecar restart failed: {e}"),
+            }
+        }
+    }
+}
+
+// Global flag to stop the overlay cursor watch loop
+static OVERLAY_CURSOR_WATCH_ACTIVE: AtomicBool = AtomicBool::new(false);
 
 // ── Window Management Commands ──────────────────────────────────────
 
@@ -133,13 +217,126 @@ async fn create_overlay_window(app: AppHandle) -> Result<(), String> {
         .build()
         .map_err(|e| format!("Failed to create overlay window: {e}"))?;
 
-    // Click-through: mouse events pass to the game underneath
+    // Start as click-through — the cursor watch will toggle this dynamically
     let _ = window.set_ignore_cursor_events(true);
-    // Highest always-on-top level
     let _ = window.set_always_on_top(true);
 
-    println!("[tauri] Overlay window created (hidden)");
+    // Auto-start cursor watch for this overlay
+    let handle = app.clone();
+    tauri::async_runtime::spawn(async move {
+        start_overlay_cursor_watch_inner(handle).await;
+    });
+
+    println!("[tauri] Overlay window created (hidden, cursor watch started)");
     Ok(())
+}
+
+// ── Overlay Cursor Watch ───────────────────────────────────────────
+// Polls cursor position and toggles click-through based on whether
+// the cursor is in an interactive zone of the overlay.
+
+/// Get cursor position using Windows API
+#[cfg(target_os = "windows")]
+fn get_cursor_pos() -> Option<(i32, i32)> {
+    use std::mem::MaybeUninit;
+    #[repr(C)]
+    struct POINT { x: i32, y: i32 }
+    extern "system" { fn GetCursorPos(lp: *mut POINT) -> i32; }
+    unsafe {
+        let mut pt = MaybeUninit::<POINT>::uninit();
+        if GetCursorPos(pt.as_mut_ptr()) != 0 {
+            let pt = pt.assume_init();
+            Some((pt.x, pt.y))
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn get_cursor_pos() -> Option<(i32, i32)> {
+    None
+}
+
+/// Check if cursor is in an interactive overlay zone (percentage-based for DPI awareness)
+fn is_in_interactive_zone(x: i32, y: i32, screen_w: i32, screen_h: i32) -> bool {
+    // Convert to percentages for DPI-aware zones
+    let x_pct = (x as f64 / screen_w as f64) * 100.0;
+    let y_pct = (y as f64 / screen_h as f64) * 100.0;
+    
+    // Zone 1: Top-left item tracker (~18% width, ~46% height)
+    if x_pct < 18.0 && y_pct < 46.0 {
+        return true;
+    }
+    // Zone 2: Right edge — enemy spell tracker panel (~13% width, centered vertically, ~19% height)
+    if x_pct > 87.0 && y_pct > 40.0 && y_pct < 60.0 {
+        return true;
+    }
+    // Zone 3: Top-right cooldown timer strip (~16% width, ~11% height)
+    if y_pct < 11.0 && x_pct > 84.0 {
+        return true;
+    }
+    false
+}
+
+async fn start_overlay_cursor_watch_inner(app: AppHandle) {
+    OVERLAY_CURSOR_WATCH_ACTIVE.store(true, Ordering::SeqCst);
+    let mut was_interactive = false;
+
+    // Get screen dimensions from the overlay window
+    let (screen_w, screen_h) = if let Some(win) = app.get_webview_window("overlay") {
+        if let Ok(monitor) = win.current_monitor() {
+            if let Some(m) = monitor {
+                let size = m.size();
+                (size.width as i32, size.height as i32)
+            } else {
+                (1920, 1080)
+            }
+        } else {
+            (1920, 1080)
+        }
+    } else {
+        (1920, 1080)
+    };
+
+    while OVERLAY_CURSOR_WATCH_ACTIVE.load(Ordering::SeqCst) {
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+
+        let overlay = match app.get_webview_window("overlay") {
+            Some(w) => w,
+            None => continue,
+        };
+
+        // Only check when overlay is visible
+        if !overlay.is_visible().unwrap_or(false) {
+            if was_interactive {
+                let _ = overlay.set_ignore_cursor_events(true);
+                was_interactive = false;
+            }
+            continue;
+        }
+
+        if let Some((cx, cy)) = get_cursor_pos() {
+            let in_zone = is_in_interactive_zone(cx, cy, screen_w, screen_h);
+            if in_zone && !was_interactive {
+                let _ = overlay.set_ignore_cursor_events(false);
+                was_interactive = true;
+            } else if !in_zone && was_interactive {
+                let _ = overlay.set_ignore_cursor_events(true);
+                was_interactive = false;
+            }
+        }
+    }
+
+    // Cleanup: ensure click-through is restored
+    if let Some(overlay) = app.get_webview_window("overlay") {
+        let _ = overlay.set_ignore_cursor_events(true);
+    }
+}
+
+#[tauri::command]
+async fn stop_overlay_cursor_watch() {
+    OVERLAY_CURSOR_WATCH_ACTIVE.store(false, Ordering::SeqCst);
 }
 
 // ── Sidecar Management ─────────────────────────────────────────────
@@ -313,6 +510,11 @@ async fn stop_sidecar(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn set_minimize_to_tray(enabled: bool) {
+    MINIMIZE_TO_TRAY.store(enabled, Ordering::SeqCst);
+}
+
 // ── App Entry Point ─────────────────────────────────────────────────
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -322,6 +524,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .manage(Mutex::new(SidecarState {
             process: None,
         }))
@@ -333,12 +536,22 @@ pub fn run() {
             show_window,
             set_ignore_mouse,
             create_overlay_window,
+            stop_overlay_cursor_watch,
             ipc_proxy,
             ipc_send,
             start_sidecar,
             stop_sidecar,
+            set_minimize_to_tray,
         ])
         .setup(|app| {
+            // Enable minimize to tray
+            MINIMIZE_TO_TRAY.store(true, Ordering::SeqCst);
+            
+            // Setup system tray
+            if let Err(e) = setup_system_tray(app.handle()) {
+                eprintln!("[tauri] Failed to setup system tray: {e}");
+            }
+            
             let handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 tokio::time::sleep(std::time::Duration::from_millis(500)).await;
@@ -407,11 +620,26 @@ pub fn run() {
                     Ok(()) => println!("[tauri] Overlay window auto-created"),
                     Err(e) => eprintln!("[tauri] Overlay window creation failed: {e}"),
                 }
+
+                // Start sidecar health check watchdog
+                let watchdog_handle = handle.clone();
+                tauri::async_runtime::spawn(async move {
+                    start_sidecar_watchdog(watchdog_handle).await;
+                });
             });
 
             Ok(())
         })
         .on_window_event(|window, event| {
+            // Handle minimize to tray instead of closing
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main" && MINIMIZE_TO_TRAY.load(Ordering::SeqCst) {
+                    api.prevent_close();
+                    let _ = window.hide();
+                    return;
+                }
+            }
+            
             // Kill sidecar when main window is destroyed
             if let tauri::WindowEvent::Destroyed = event {
                 if window.label() == "main" {

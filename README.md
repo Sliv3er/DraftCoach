@@ -60,7 +60,7 @@ Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini A
 - Click enemy summoner spells to start cooldown timers
 - **Kill score** and game timer displayed in the title bar
 
-### 📈 Performance Stats
+### 📈 Performance Stats (Web Dashboard)
 - **Personal stats dashboard** powered by Riot API — rank, LP, win rate, champion pool
 - **LP progress chart** — interactive graph tracking Solo/Duo and Flex LP over 7d/30d
 - **Match history** with expandable scoreboards, per-game DPM bars, and KP stats
@@ -69,6 +69,17 @@ Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini A
 - **Mode filtering** — filter by Ranked, Flex, ARAM, Draft, or Normal
 - **Player profile lookup** — click any player name in match history to view their stats
 - **LP prediction** — estimated games to promotion based on current win rate
+
+### 🌐 Web Portal
+- **Champion encyclopedia** — browse all champions with DDragon data, runes, items, and spells
+- **Champion-specific pages** — detailed stats, recommended builds, and matchup information
+- **Match details** — detailed breakdown of any match via match ID
+- **Leaderboards** — regional rankings by rank, LP, and win rate
+
+### 💰 Billing System
+- **Usage tracking** — track API calls, AI generations, and feature usage
+- **Usage dashboard** — visualize usage patterns over time
+- **Pricing tiers** — manage different pricing plans and limits
 
 ### 🔄 Live Advisor (Mid-Game)
 - **Real-time build adaptation** during the game via Gemini Flash
@@ -101,39 +112,90 @@ Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini A
 ```
 DraftCoach/
 ├── apps/
-│   ├── desktop-tauri/            # Tauri + React frontend
-│   │   ├── src-tauri/            # Rust backend (Window management & Sidecar lifecycle)
-│   │   │   ├── src/lib.rs        # Main Tauri setup and Rust commands
-│   │   │   └── tauri.conf.json   # Tauri configuration and bundle settings
-│   │   ├── sidecar/              # Node.js Sidecar (Original backend runner)
-│   │   │   └── backend.js        # Shim layer (fakes Electron APIs, pipes IPC to HTTP/SSE)
-│   │   ├── src/                  # React Frontend
-│   │   │   ├── App.tsx           # Main React app (build UI, champion picker)
-│   │   │   ├── Overlay.tsx       # In-game transparent HUD overlay (click-through)
-│   │   │   ├── ScoreboardWindow.tsx  # Live scoreboard with cooldown tracking
-│   │   │   ├── ScoutWindow.tsx   # Pre-game scouting report
-│   │   │   ├── StatsWindow.tsx   # Performance analytics dashboard
-│   │   │   ├── TrackerPanel.tsx   # Compact cooldown tracker
-│   │   │   ├── bridge.ts         # Dual-mode bridge (routes calls to Tauri or IPC Proxy)
-│   │   │   └── styles.css        # All UI styles (dark theme)
-│   │   └── dist/                 # Vite production bundle
-│   └── desktop/                  # Legacy backend source files & knowledge base
-│       └── src/main/
-│           ├── main.js           # Monolithic backend (Express + LCU + game logic)
-│           ├── engine-js.js      # Local decision engine bridge
-│           └── settings.js       # User settings persistence
-├── shared/                       # Shared TypeScript modules
-│   ├── engine/                   # Local decision engine (<30ms builds)
-│   ├── kb/                       # Knowledge Base system
-│   ├── lcu/                      # League Client WebSocket adapter
-│   └── export/                   # Rune page LCU export
-└── tools/
-    ├── meta-builder/             # KB builder CLI (generate, validate, deep-gen)
+│   ├── backend/                   # Express API server
+│   │   └── src/
+│   │       ├── index.ts           # Main server entry
+│   │       ├── routes/            # API endpoints
+│   │       │   ├── build.ts       # Build generation
+│   │       │   ├── billing.ts     # Usage tracking
+│   │       │   └── ...
+│   │       ├── services/          # Business logic
+│   │       │   ├── gemini.ts      # AI integration
+│   │       │   └── rag-updater.ts # Knowledge base updates
+│   │       └── models/            # Data models
+│   │
+│   ├── web/                       # Next.js web portal
+│   │   └── src/app/
+│   │       ├── page.tsx           # Home / search
+│   │       ├── summoner/[region]/[name]/  # Player stats
+│   │       ├── champions/[championId]/     # Champion pages
+│   │       ├── match/[region]/[matchId]/  # Match details
+│   │       └── leaderboards/      # Regional leaderboards
+│   │
+│   ├── billing/                   # Usage tracking dashboard
+│   │   └── src/
+│   │       ├── index.ts           # Billing API
+│   │       ├── dashboard.html     # Usage visualization
+│   │       ├── routes/usage.ts    # Usage endpoints
+│   │       └── services/
+│   │           ├── pricing.ts    # Pricing logic
+│   │           └── tracker.ts     # Usage tracking
+│   │
+│   ├── desktop-tauri/             # Tauri v2 Desktop App
+│   │   ├── src-tauri/             # Rust backend
+│   │   │   ├── src/lib.rs         # Main Tauri setup
+│   │   │   ├── tauri.conf.json    # Tauri config
+│   │   │   └── target/            # Build output
+│   │   └── src/                   # React frontend
+│   │       ├── App.tsx            # Main app
+│   │       ├── Overlay.tsx        # In-game overlay
+│   │       ├── SplashScreen.tsx   # Startup splash
+│   │       ├── ScoreboardWindow.tsx
+│   │       ├── ScoutWindow.tsx
+│   │       ├── StatsWindow.tsx
+│   │       ├── TrackerPanel.tsx
+│   │       ├── hooks/             # React hooks
+│   │       │   ├── useBuildHistory.ts
+│   │       │   ├── useLCUPolling.ts
+│   │       │   ├── useLiveAdvisor.ts
+│   │       │   └── useSettings.ts
+│   │       └── bridge.ts          # Tauri IPC bridge
+│   │
+│   ├── installer/                 # Custom Rust installer
+│   │   ├── src/main.rs            # Installer logic
+│   │   └── ui/                    # Installer UI
+│   │
+│   └── desktop/                   # Legacy Electron (deprecated)
+│
+├── shared/                        # Shared TypeScript modules
+│   ├── engine/                    # Local decision engine (<30ms)
+│   ├── kb/                        # Knowledge Base system
+│   ├── lcu/                       # League Client WebSocket adapter
+│   ├── export/                    # Rune page LCU export
+│   └── types.ts                   # Shared types
+│
+├── tools/
+│   └── meta-builder/              # KB builder CLI
+│
+└── nsis/                         # NSIS installer scripts
 ```
 
-**Production:** The Tauri Rust backend automatically launches the Node.js sidecar on startup. The sidecar intercepts Electron API calls from the legacy `main.js` backend and runs the Express server on `http://127.0.0.1:3210` and an IPC proxy on `http://127.0.0.1:3211`.
+**Production:** The Tauri Rust backend automatically launches the Node.js backend on startup. The backend runs an Express server on `http://127.0.0.1:3210`.
 
-**Development:** Run `npm run tauri dev` from the `apps/desktop-tauri` directory. The Vite dev server proxies API calls to the sidecar.
+**Development:**
+```bash
+# Start all services
+npm run dev:all
+
+# Or start individual services
+npm run dev:backend    # API server
+npm run dev:billing    # Billing dashboard
+npm run dev:web        # Next.js web portal
+
+# Start Tauri desktop app
+cd apps/desktop-tauri
+npm run tauri dev
+```
 
 ---
 
@@ -158,6 +220,7 @@ Each generated build includes:
 ### Prerequisites
 
 - **Node.js** 18+
+- **Rust** (for Tauri builds)
 - **Gemini API Key** with Google Search grounding enabled ([Get one here](https://aistudio.google.com/))
 
 ### Installation
@@ -165,19 +228,25 @@ Each generated build includes:
 ```bash
 git clone https://github.com/Sliv3er/DraftCoach.git
 cd DraftCoach
-
-# Install all dependencies
 npm install
+```
 
-# Configure API key
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+GEMINI_API_KEY=your_api_key_here
+BACKEND_PORT=3210
 ```
 
 ### Development
 
 ```bash
-# Start desktop app (Vite dev server + Tauri)
+# Start all services (backend + billing + web)
+npm run dev:all
+
+# Start desktop app (requires backend running)
 cd apps/desktop-tauri
 npm run tauri dev
 ```
@@ -185,7 +254,7 @@ npm run tauri dev
 ### Production Build
 
 ```bash
-# Build Vite frontend + Tauri Rust app + NSIS Installer
+# Build Tauri desktop app + NSIS Installer
 cd apps/desktop-tauri
 npm run tauri build
 
@@ -195,7 +264,7 @@ npm run tauri build
 ### Running Tests
 
 ```bash
-# Run engine unit tests
+# Run all tests
 npm test
 
 # Run engine-only tests
@@ -205,16 +274,6 @@ npm run test:engine
 npm run validate:kb
 ```
 
-### Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GEMINI_API_KEY` | *(required)* | Google Gemini API key |
-| `GEMINI_MODEL` | `gemini-3.1-pro-preview` | AI model for builds (must support grounding) |
-| `BACKEND_PORT` | `3210` | Local backend port |
-
-In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next to the `.exe`, or the `resources/` folder.
-
 ---
 
 ## Tech Stack
@@ -223,11 +282,13 @@ In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next t
 |-------|-----------|
 | Desktop | Tauri v2 (Rust) |
 | Frontend | React 18 + TypeScript + Vite |
-| Backend | Node.js Sidecar running Express Proxy |
+| Web Portal | Next.js 14 (App Router) |
+| Backend | Node.js + Express |
+| Billing | Express + Usage Tracking |
 | AI (Builds) | Google Gemini 3.1 Pro with Search Grounding |
 | AI (Live) | Google Gemini 3 Flash (real-time advisor) |
 | Local Engine | Custom rules-based scoring engine (<30ms) |
-| Build | Tauri CLI (NSIS Installer) |
+| Build | Tauri CLI + NSIS |
 | Data | Riot DDragon CDN + CommunityDragon |
 | Client API | League Client Update (LCU) WebSocket |
 | Game API | Riot Live Client Data API |
@@ -246,6 +307,8 @@ In production, `.env` is loaded from (in order): `%APPDATA%/DraftCoach/`, next t
 - [x] Local decision engine
 - [x] Live build advisor
 - [x] App icon and installer
+- [x] Web portal with champion pages and leaderboards
+- [x] Usage tracking and billing system
 - [x] **Migrated from Electron to Tauri v2 (97% smaller installer, 74MB -> 2MB)**
 - [ ] Match history analysis with AI coaching
 - [ ] Multi-language support

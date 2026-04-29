@@ -35,19 +35,20 @@ async function getAllChampions() {
   return { champs, patch: ver };
 }
 
-// ── Batch fetch meta builds ──
+// ── Batch fetch meta builds (top 2 roles per champion) ──
 async function fetchMetaBuildBatch(champions, patch) {
   const model = genAI.getGenerativeModel({
     model: 'gemini-3-flash-preview',
     tools: [{ googleSearch: {} }],
   });
 
-  const champList = champions.map((c, i) => `${i + 1}. ${c.name} (most popular role)`).join('\n');
+  const champList = champions.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
 
   const prompt = `Search u.gg and op.gg for the highest winrate builds on League of Legends Patch ${patch} for these champions:
 ${champList}
 
-For EACH champion, return the build for their MOST POPULAR role.
+For EACH champion, return builds for their TOP 2 MOST PLAYED ROLES (by pick rate).
+If a champion is only meaningfully played in 1 role (e.g. Yuumi is only Support), return just 1 entry for that champion.
 
 Return ONLY a compact JSON array (no markdown, no code blocks, just raw JSON):
 [
@@ -69,13 +70,15 @@ Return ONLY a compact JSON array (no markdown, no code blocks, just raw JSON):
 ]
 
 Rules:
-- One entry per champion
+- Return 2 entries per champion (one per role) when they have 2+ viable roles
+- Return 1 entry if the champion only has 1 viable role
 - winRate and pickRate as numbers (e.g. 52.3, not "52.3%")
 - coreItems: the 3 most popular core items in build order
 - startingItems: exactly 2 (1 starting item + 1 potion)
 - boots: the most popular boots upgrade
 - skillOrder: max priority format "Q > W > E > R"
-- Use current patch ${patch} data, not outdated builds`;
+- Use current patch ${patch} data, not outdated builds
+- The secondary role must have meaningful pick rate (>1%). Do NOT invent off-meta roles.`;
 
   const result = await model.generateContent(prompt);
   const text = result.response.text().trim();

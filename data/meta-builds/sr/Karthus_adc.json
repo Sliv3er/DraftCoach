@@ -1,0 +1,25 @@
+{
+  "champion": "Karthus",
+  "championName": "Karthus",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:30:41.637Z",
+  "metaBuild": {
+    "winRate": 53.73,
+    "pickRate": 1.38,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Shadowflame",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

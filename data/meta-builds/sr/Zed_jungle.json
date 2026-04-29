@@ -1,0 +1,25 @@
+{
+  "champion": "Zed",
+  "championName": "Zed",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:40:20.706Z",
+  "metaBuild": {
+    "winRate": 45.7,
+    "pickRate": 2.5,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Serylda's Grudge",
+      "Opportunity"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

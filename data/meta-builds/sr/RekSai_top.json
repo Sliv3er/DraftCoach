@@ -1,0 +1,25 @@
+{
+  "champion": "RekSai",
+  "championName": "Rek'Sai",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:09.816Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 6.8,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Stridebreaker",
+      "Hullbreaker"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

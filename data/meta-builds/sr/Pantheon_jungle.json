@@ -1,0 +1,25 @@
+{
+  "champion": "Pantheon",
+  "championName": "Pantheon",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:34:23.072Z",
+  "metaBuild": {
+    "winRate": 49.5,
+    "pickRate": 2.6,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Eclipse",
+      "Black Cleaver",
+      "Sundered Sky"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Varus",
+  "championName": "Varus",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:38:34.728Z",
+  "metaBuild": {
+    "winRate": 48.2,
+    "pickRate": 2.1,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of The Ruined King",
+      "Guinsoo's Rageblade",
+      "Terminus"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

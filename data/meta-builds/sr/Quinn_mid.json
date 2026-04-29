@@ -1,0 +1,25 @@
+{
+  "champion": "Quinn",
+  "championName": "Quinn",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:09.813Z",
+  "metaBuild": {
+    "winRate": 54.2,
+    "pickRate": 1.2,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Opportunity",
+      "The Collector"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "W > Q > E > R"
+  }
+}

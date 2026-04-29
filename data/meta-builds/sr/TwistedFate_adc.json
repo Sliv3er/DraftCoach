@@ -1,0 +1,25 @@
+{
+  "champion": "TwistedFate",
+  "championName": "Twisted Fate",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:38:34.724Z",
+  "metaBuild": {
+    "winRate": 53,
+    "pickRate": 1.5,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Bow",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Rapid Firecannon",
+      "Hexoptics C44"
+    ],
+    "boots": "Gluttonous Greaves",
+    "skillOrder": "W > E > Q > R"
+  }
+}

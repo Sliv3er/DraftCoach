@@ -1,0 +1,25 @@
+{
+  "champion": "Renekton",
+  "championName": "Renekton",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:09.820Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 1.3,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Opportunity",
+      "Serylda's Grudge"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "Q > E > W > R"
+  }
+}

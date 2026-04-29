@@ -1,0 +1,25 @@
+{
+  "champion": "Anivia",
+  "championName": "Anivia",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:25:21.118Z",
+  "metaBuild": {
+    "winRate": 52.6,
+    "pickRate": 1.1,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Archangel's Staff",
+      "Malignance"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

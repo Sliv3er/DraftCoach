@@ -1,0 +1,25 @@
+{
+  "champion": "Qiyana",
+  "championName": "Qiyana",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:09.811Z",
+  "metaBuild": {
+    "winRate": 49.3,
+    "pickRate": 2.3,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Opportunity",
+      "Hubris"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

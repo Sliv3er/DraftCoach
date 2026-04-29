@@ -1,0 +1,25 @@
+{
+  "champion": "Sett",
+  "championName": "Sett",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.068Z",
+  "metaBuild": {
+    "winRate": 49.7,
+    "pickRate": 1,
+    "keystone": "Glacial Augment",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Dead Man's Plate",
+      "Trailblazer",
+      "Knight's Vow"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "W > E > Q > R"
+  }
+}

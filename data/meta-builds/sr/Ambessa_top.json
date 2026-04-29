@@ -1,0 +1,25 @@
+{
+  "champion": "Ambessa",
+  "championName": "Ambessa",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:25:21.115Z",
+  "metaBuild": {
+    "winRate": 46.9,
+    "pickRate": 4.6,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Eclipse",
+      "Sundered Sky",
+      "Spear of Shojin"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

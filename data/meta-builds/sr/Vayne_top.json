@@ -1,0 +1,25 @@
+{
+  "champion": "Vayne",
+  "championName": "Vayne",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:38:34.729Z",
+  "metaBuild": {
+    "winRate": 50.66,
+    "pickRate": 5.02,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of The Ruined King",
+      "Terminus",
+      "Experimental Hexplate"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "W > Q > E > R"
+  }
+}

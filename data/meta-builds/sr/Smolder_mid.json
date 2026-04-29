@@ -1,0 +1,25 @@
+{
+  "champion": "Smolder",
+  "championName": "Smolder",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:36:48.718Z",
+  "metaBuild": {
+    "winRate": 48,
+    "pickRate": 1.5,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Essence Reaver",
+      "Spear of Shojin",
+      "Liandry's Torment"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

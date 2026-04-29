@@ -1,0 +1,25 @@
+{
+  "champion": "Jax",
+  "championName": "Jax",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:30:41.631Z",
+  "metaBuild": {
+    "winRate": 59.21,
+    "pickRate": 1.36,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Sundered Sky",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

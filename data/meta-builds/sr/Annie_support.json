@@ -1,0 +1,25 @@
+{
+  "champion": "Annie",
+  "championName": "Annie",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:25:21.120Z",
+  "metaBuild": {
+    "winRate": 50.2,
+    "pickRate": 25.1,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Malignance",
+      "Stormsurge",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Yone",
+  "championName": "Yone",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:40:20.701Z",
+  "metaBuild": {
+    "winRate": 51,
+    "pickRate": 6.4,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of the Ruined King",
+      "Phantom Dancer",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

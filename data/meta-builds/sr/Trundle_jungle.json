@@ -1,0 +1,25 @@
+{
+  "champion": "Trundle",
+  "championName": "Trundle",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:37:44.614Z",
+  "metaBuild": {
+    "winRate": 41,
+    "pickRate": 1,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Blade of the Ruined King",
+      "Spirit Visage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

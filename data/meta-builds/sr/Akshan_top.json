@@ -1,0 +1,25 @@
+{
+  "champion": "Akshan",
+  "championName": "Akshan",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:25:21.110Z",
+  "metaBuild": {
+    "winRate": 51.9,
+    "pickRate": 9.1,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Terminus",
+      "Wit's End"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "Q > E > W > R"
+  }
+}

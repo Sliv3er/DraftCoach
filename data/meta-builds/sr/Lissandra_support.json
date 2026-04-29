@@ -1,0 +1,25 @@
+{
+  "champion": "Lissandra",
+  "championName": "Lissandra",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:32:51.450Z",
+  "metaBuild": {
+    "winRate": 48.8,
+    "pickRate": 2.4,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Zaz'Zak's Realmspike",
+      "Malignance",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Ekko",
+  "championName": "Ekko",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:27:22.205Z",
+  "metaBuild": {
+    "winRate": 52.7,
+    "pickRate": 1.5,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Lich Bane",
+      "Stormsurge",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

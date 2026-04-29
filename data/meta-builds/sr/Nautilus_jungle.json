@@ -1,0 +1,25 @@
+{
+  "champion": "Nautilus",
+  "championName": "Nautilus",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:34:23.065Z",
+  "metaBuild": {
+    "winRate": 49.6,
+    "pickRate": 3.7,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sunfire Aegis",
+      "Hollow Radiance",
+      "Undying Despair"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "E > Q > W > R"
+  }
+}

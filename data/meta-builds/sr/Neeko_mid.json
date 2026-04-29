@@ -1,0 +1,25 @@
+{
+  "champion": "Neeko",
+  "championName": "Neeko",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:34:23.065Z",
+  "metaBuild": {
+    "winRate": 52.3,
+    "pickRate": 4.2,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

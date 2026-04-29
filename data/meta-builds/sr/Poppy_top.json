@@ -1,0 +1,25 @@
+{
+  "champion": "Poppy",
+  "championName": "Poppy",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:09.804Z",
+  "metaBuild": {
+    "winRate": 51.2,
+    "pickRate": 4.8,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sunfire Aegis",
+      "Dead Man's Plate",
+      "Thornmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

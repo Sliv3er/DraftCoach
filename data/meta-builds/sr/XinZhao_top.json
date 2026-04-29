@@ -1,0 +1,25 @@
+{
+  "champion": "XinZhao",
+  "championName": "Xin Zhao",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.361Z",
+  "metaBuild": {
+    "winRate": 48,
+    "pickRate": 1.1,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of the Ruined King",
+      "Stridebreaker",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

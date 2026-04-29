@@ -1,0 +1,25 @@
+{
+  "champion": "Jhin",
+  "championName": "Jhin",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:30:41.634Z",
+  "metaBuild": {
+    "winRate": 45,
+    "pickRate": 1.1,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Youmuu's Ghostblade",
+      "The Collector",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

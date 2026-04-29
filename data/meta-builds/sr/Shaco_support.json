@@ -1,0 +1,25 @@
+{
+  "champion": "Shaco",
+  "championName": "Shaco",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.069Z",
+  "metaBuild": {
+    "winRate": 48.6,
+    "pickRate": 1.16,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Liandry's Torment",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > E > Q > R"
+  }
+}

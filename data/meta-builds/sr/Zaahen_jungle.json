@@ -1,0 +1,25 @@
+{
+  "champion": "Zaahen",
+  "championName": "Zaahen",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:40:20.705Z",
+  "metaBuild": {
+    "winRate": 47.7,
+    "pickRate": 2.1,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Ravenous Hydra",
+      "Black Cleaver"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

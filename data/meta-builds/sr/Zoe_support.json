@@ -1,0 +1,25 @@
+{
+  "champion": "Zoe",
+  "championName": "Zoe",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:41:24.058Z",
+  "metaBuild": {
+    "winRate": 50.5,
+    "pickRate": 3.5,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Echo",
+      "Shadowflame",
+      "Stormsurge"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

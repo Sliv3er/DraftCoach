@@ -1,0 +1,25 @@
+{
+  "champion": "Velkoz",
+  "championName": "Vel'Koz",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:38:34.730Z",
+  "metaBuild": {
+    "winRate": 51.62,
+    "pickRate": 1.17,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

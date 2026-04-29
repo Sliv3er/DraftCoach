@@ -1,0 +1,25 @@
+{
+  "champion": "Rell",
+  "championName": "Rell",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:09.817Z",
+  "metaBuild": {
+    "winRate": 48.7,
+    "pickRate": 1.3,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Mosstomper Seedling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sunfire Aegis",
+      "Hollow Radiance",
+      "Jak'Sho, The Protean"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

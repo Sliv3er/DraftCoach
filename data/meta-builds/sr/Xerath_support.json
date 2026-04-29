@@ -1,0 +1,25 @@
+{
+  "champion": "Xerath",
+  "championName": "Xerath",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.360Z",
+  "metaBuild": {
+    "winRate": 49.1,
+    "pickRate": 3.3,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Zaz'Zak's Realmspike",
+      "Luden's Companion",
+      "Horizon Focus"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

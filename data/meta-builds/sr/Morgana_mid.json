@@ -1,0 +1,25 @@
+{
+  "champion": "Morgana",
+  "championName": "Morgana",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:33:31.582Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 3.5,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Liandry's Torment",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > Q > E > R"
+  }
+}

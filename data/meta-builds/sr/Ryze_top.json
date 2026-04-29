@@ -1,0 +1,25 @@
+{
+  "champion": "Ryze",
+  "championName": "Ryze",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.062Z",
+  "metaBuild": {
+    "winRate": 49,
+    "pickRate": 26.5,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Sapphire Crystal",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Seraph's Embrace",
+      "Frozen Heart"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

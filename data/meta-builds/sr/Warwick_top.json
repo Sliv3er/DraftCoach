@@ -1,0 +1,25 @@
+{
+  "champion": "Warwick",
+  "championName": "Warwick",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.359Z",
+  "metaBuild": {
+    "winRate": 51.5,
+    "pickRate": 1.2,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Blade of the Ruined King",
+      "Iceborn Gauntlet"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > Q > E > R"
+  }
+}

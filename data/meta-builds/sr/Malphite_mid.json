@@ -1,0 +1,25 @@
+{
+  "champion": "Malphite",
+  "championName": "Malphite",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:32:51.454Z",
+  "metaBuild": {
+    "winRate": 52.33,
+    "pickRate": 1.5,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Stormsurge",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

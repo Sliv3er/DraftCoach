@@ -1,0 +1,25 @@
+{
+  "champion": "Yasuo",
+  "championName": "Yasuo",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.362Z",
+  "metaBuild": {
+    "winRate": 48.5,
+    "pickRate": 2,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Immortal Shieldbow",
+      "Kraken Slayer",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

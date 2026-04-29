@@ -1,0 +1,25 @@
+{
+  "champion": "Ziggs",
+  "championName": "Ziggs",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:40:20.709Z",
+  "metaBuild": {
+    "winRate": 51.3,
+    "pickRate": 2.1,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Liandry's Torment",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

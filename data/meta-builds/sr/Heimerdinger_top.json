@@ -1,0 +1,25 @@
+{
+  "champion": "Heimerdinger",
+  "championName": "Heimerdinger",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:29:40.786Z",
+  "metaBuild": {
+    "winRate": 52.9,
+    "pickRate": 1.1,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Liandry's Torment",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

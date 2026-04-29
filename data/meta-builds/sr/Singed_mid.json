@@ -1,0 +1,25 @@
+{
+  "champion": "Singed",
+  "championName": "Singed",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:36:48.715Z",
+  "metaBuild": {
+    "winRate": 51.4,
+    "pickRate": 1.1,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rylai's Crystal Scepter",
+      "Liandry's Torment",
+      "Dead Man's Plate"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > E > W > R"
+  }
+}

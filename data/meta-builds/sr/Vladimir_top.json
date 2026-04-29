@@ -1,0 +1,25 @@
+{
+  "champion": "Vladimir",
+  "championName": "Vladimir",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.357Z",
+  "metaBuild": {
+    "winRate": 52.4,
+    "pickRate": 1.5,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Riftmaker",
+      "Hextech Rocketbelt",
+      "Liandry's Torment"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

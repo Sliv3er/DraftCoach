@@ -1,0 +1,25 @@
+{
+  "champion": "Aatrox",
+  "championName": "Aatrox",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:25:21.106Z",
+  "metaBuild": {
+    "winRate": 51.3,
+    "pickRate": 1.6,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Sundered Sky",
+      "Serylda's Grudge"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

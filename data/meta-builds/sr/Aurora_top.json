@@ -1,0 +1,25 @@
+{
+  "champion": "Aurora",
+  "championName": "Aurora",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:26:17.485Z",
+  "metaBuild": {
+    "winRate": 46.6,
+    "pickRate": 5,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Riftmaker",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

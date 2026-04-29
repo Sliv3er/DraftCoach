@@ -1,0 +1,25 @@
+{
+  "champion": "Mel",
+  "championName": "Mel",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:33:31.577Z",
+  "metaBuild": {
+    "winRate": 44.39,
+    "pickRate": 2.48,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Zaz'Zak's Realmspike",
+      "Blackfire Torch",
+      "Liandry's Torment"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

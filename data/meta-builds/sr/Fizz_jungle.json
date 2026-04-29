@@ -1,0 +1,25 @@
+{
+  "champion": "Fizz",
+  "championName": "Fizz",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:28:21.007Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 1.2,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Dusk and Dawn",
+      "Nashor's Tooth",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > E > Q > R"
+  }
+}

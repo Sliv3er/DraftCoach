@@ -1,0 +1,25 @@
+{
+  "champion": "Brand",
+  "championName": "Brand",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:26:17.490Z",
+  "metaBuild": {
+    "winRate": 51.3,
+    "pickRate": 1.5,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Rylai's Crystal Scepter",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > Q > E > R"
+  }
+}

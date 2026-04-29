@@ -1,0 +1,25 @@
+{
+  "champion": "DrMundo",
+  "championName": "Dr. Mundo",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:27:22.204Z",
+  "metaBuild": {
+    "winRate": 50.6,
+    "pickRate": 3.4,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Heartsteel",
+      "Sunfire Aegis",
+      "Spirit Visage"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > E > W > R"
+  }
+}

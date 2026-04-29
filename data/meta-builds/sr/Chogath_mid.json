@@ -1,0 +1,25 @@
+{
+  "champion": "Chogath",
+  "championName": "Cho'Gath",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:27:22.200Z",
+  "metaBuild": {
+    "winRate": 53.4,
+    "pickRate": 1.2,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Riftmaker",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

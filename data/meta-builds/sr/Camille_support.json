@@ -1,0 +1,25 @@
+{
+  "champion": "Camille",
+  "championName": "Camille",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:27:22.197Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 3.2,
+    "keystone": "Hail of Blades",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Umbral Glaive",
+      "Eclipse",
+      "Sundered Sky"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "E > Q > W > R"
+  }
+}

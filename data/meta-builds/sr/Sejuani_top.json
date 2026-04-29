@@ -1,0 +1,25 @@
+{
+  "champion": "Sejuani",
+  "championName": "Sejuani",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.064Z",
+  "metaBuild": {
+    "winRate": 68.9,
+    "pickRate": 1.43,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Heartsteel",
+      "Hollow Radiance",
+      "Thornmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

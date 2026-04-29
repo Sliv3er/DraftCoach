@@ -1,0 +1,25 @@
+{
+  "champion": "Akali",
+  "championName": "Akali",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:25:21.109Z",
+  "metaBuild": {
+    "winRate": 50.3,
+    "pickRate": 2.9,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Riftmaker",
+      "Liandry's Torment",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

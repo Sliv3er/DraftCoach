@@ -1,0 +1,25 @@
+{
+  "champion": "Sylas",
+  "championName": "Sylas",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:37:44.608Z",
+  "metaBuild": {
+    "winRate": 45.31,
+    "pickRate": 5.8,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hextech Rocketbelt",
+      "Stormsurge",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > E > Q > R"
+  }
+}

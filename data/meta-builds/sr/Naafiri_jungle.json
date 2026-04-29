@@ -1,0 +1,25 @@
+{
+  "champion": "Naafiri",
+  "championName": "Naafiri",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:33:31.583Z",
+  "metaBuild": {
+    "winRate": 51.32,
+    "pickRate": 6.96,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Axiom Arc",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

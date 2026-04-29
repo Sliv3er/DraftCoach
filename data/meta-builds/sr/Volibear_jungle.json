@@ -1,0 +1,25 @@
+{
+  "champion": "Volibear",
+  "championName": "Volibear",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.358Z",
+  "metaBuild": {
+    "winRate": 39.29,
+    "pickRate": 1,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Dead Man's Plate",
+      "Spirit Visage"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

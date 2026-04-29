@@ -1,0 +1,25 @@
+{
+  "champion": "Zeri",
+  "championName": "Zeri",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:40:20.707Z",
+  "metaBuild": {
+    "winRate": 47.6,
+    "pickRate": 1.5,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stattik Shiv",
+      "Navori Flickerblade",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

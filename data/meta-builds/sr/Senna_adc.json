@@ -1,0 +1,25 @@
+{
+  "champion": "Senna",
+  "championName": "Senna",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.065Z",
+  "metaBuild": {
+    "winRate": 51.25,
+    "pickRate": 3.84,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Guinsoo's Rageblade",
+      "Terminus"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

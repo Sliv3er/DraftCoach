@@ -1,0 +1,25 @@
+{
+  "champion": "Maokai",
+  "championName": "Maokai",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:32:51.459Z",
+  "metaBuild": {
+    "winRate": 50,
+    "pickRate": 1.8,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hollow Radiance",
+      "Sunfire Aegis",
+      "Winter's Approach"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

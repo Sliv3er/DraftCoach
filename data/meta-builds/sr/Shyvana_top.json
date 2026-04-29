@@ -1,0 +1,25 @@
+{
+  "champion": "Shyvana",
+  "championName": "Shyvana",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:36:48.713Z",
+  "metaBuild": {
+    "winRate": 48.2,
+    "pickRate": 1.1,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Shojin's Resolve",
+      "Liandry's Torment"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > Q > W > R"
+  }
+}

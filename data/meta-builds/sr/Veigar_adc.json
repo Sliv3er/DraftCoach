@@ -1,0 +1,25 @@
+{
+  "champion": "Veigar",
+  "championName": "Veigar",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:38:34.730Z",
+  "metaBuild": {
+    "winRate": 52.4,
+    "pickRate": 1.1,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Archangel's Staff",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Elise",
+  "championName": "Elise",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:28:20.999Z",
+  "metaBuild": {
+    "winRate": 51.8,
+    "pickRate": 1.2,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stormsurge",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

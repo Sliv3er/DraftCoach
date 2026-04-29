@@ -1,0 +1,25 @@
+{
+  "champion": "Diana",
+  "championName": "Diana",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:27:22.202Z",
+  "metaBuild": {
+    "winRate": 52.1,
+    "pickRate": 7.5,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Nashor's Tooth",
+      "Lich Bane",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

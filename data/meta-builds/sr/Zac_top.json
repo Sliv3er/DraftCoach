@@ -1,0 +1,25 @@
+{
+  "champion": "Zac",
+  "championName": "Zac",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:40:20.706Z",
+  "metaBuild": {
+    "winRate": 44.4,
+    "pickRate": 1.2,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sunfire Aegis",
+      "Liandry's Torment",
+      "Hollow Radiance"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > W > Q > R"
+  }
+}

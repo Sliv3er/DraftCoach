@@ -1,0 +1,25 @@
+{
+  "champion": "Seraphine",
+  "championName": "Seraphine",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.067Z",
+  "metaBuild": {
+    "winRate": 54,
+    "pickRate": 1.1,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Archangel's Staff",
+      "Liandry's Torment",
+      "Cosmic Drive"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

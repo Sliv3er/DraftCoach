@@ -1,0 +1,25 @@
+{
+  "champion": "Zyra",
+  "championName": "Zyra",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:41:24.060Z",
+  "metaBuild": {
+    "winRate": 50.79,
+    "pickRate": 2.25,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

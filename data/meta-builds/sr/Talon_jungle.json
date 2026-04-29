@@ -1,0 +1,25 @@
+{
+  "champion": "Talon",
+  "championName": "Talon",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:37:44.611Z",
+  "metaBuild": {
+    "winRate": 50.07,
+    "pickRate": 4.02,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Opportunity",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > Q > E > R"
+  }
+}

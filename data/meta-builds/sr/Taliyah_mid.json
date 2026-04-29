@@ -1,0 +1,25 @@
+{
+  "champion": "Taliyah",
+  "championName": "Taliyah",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:37:44.611Z",
+  "metaBuild": {
+    "winRate": 48.56,
+    "pickRate": 1.37,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Liandry's Torment",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

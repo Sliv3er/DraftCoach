@@ -1,0 +1,25 @@
+{
+  "champion": "Viktor",
+  "championName": "Viktor",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:39:26.355Z",
+  "metaBuild": {
+    "winRate": 46.5,
+    "pickRate": 1.2,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Luden's Companion",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

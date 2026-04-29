@@ -1,0 +1,25 @@
+{
+  "champion": "Rengar",
+  "championName": "Rengar",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:35:59.058Z",
+  "metaBuild": {
+    "winRate": 51.3,
+    "pickRate": 3.1,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Edge of Night",
+      "Opportunity"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

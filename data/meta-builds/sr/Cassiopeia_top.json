@@ -1,0 +1,25 @@
+{
+  "champion": "Cassiopeia",
+  "championName": "Cassiopeia",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:27:22.198Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 1.7,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Rylai's Crystal Scepter",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

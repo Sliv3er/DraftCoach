@@ -1,0 +1,25 @@
+{
+  "champion": "Lux",
+  "championName": "Lux",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:32:51.453Z",
+  "metaBuild": {
+    "winRate": 51.41,
+    "pickRate": 3.99,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Horizon Focus",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

@@ -793,11 +793,98 @@ function seedRagFromBundle() {
 
 const META_BUILDS_DIR = path.join(RAG_DIR, 'meta-builds');
 const META_BUILDS_SR_DIR = path.join(META_BUILDS_DIR, 'sr');
+const AUGMENTS_DIR = path.join(RAG_DIR, 'augments');
 let isMetaSyncing = false;
 
 function ensureMetaBuildDirs() {
-  for (const dir of [META_BUILDS_DIR, META_BUILDS_SR_DIR]) {
+  for (const dir of [META_BUILDS_DIR, META_BUILDS_SR_DIR, AUGMENTS_DIR]) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+// ── Centralized RAG: Fetch from GitHub data branch ──
+const CDN_BASE = 'https://raw.githubusercontent.com/Sliv3er/DraftCoach/data';
+
+async function syncMetaFromCDN() {
+  ensureMetaBuildDirs();
+  log('INFO', '[cdn] Checking centralized meta data from GitHub...');
+  try {
+    // 1. Fetch manifest to check patch version
+    const manifestUrl = `${CDN_BASE}/data/meta-builds/manifest.json`;
+    const manifestRes = await fetch(manifestUrl, { signal: AbortSignal.timeout(10000) });
+    if (!manifestRes.ok) {
+      log('WARN', `[cdn] Manifest not available (${manifestRes.status}), skipping CDN sync`);
+      return false;
+    }
+    const manifest = await manifestRes.json();
+
+    // Check if local data is already up-to-date
+    const localMeta = getMetaBuildMeta();
+    if (localMeta && localMeta.patch === manifest.patch && localMeta.champCount >= manifest.champCount) {
+      log('INFO', `[cdn] Local meta data already up-to-date (patch ${manifest.patch}, ${localMeta.champCount} champs)`);
+      return true;
+    }
+
+    log('INFO', `[cdn] Downloading ${manifest.fileCount || '?'} champion meta files for patch ${manifest.patch}...`);
+
+    // 2. List files by fetching the GitHub API for the data branch tree
+    const treeUrl = `https://api.github.com/repos/Sliv3er/DraftCoach/git/trees/data?recursive=1`;
+    const treeRes = await fetch(treeUrl, {
+      headers: { 'Accept': 'application/vnd.github.v3+json' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!treeRes.ok) {
+      log('WARN', `[cdn] GitHub tree API failed (${treeRes.status})`);
+      return false;
+    }
+    const tree = await treeRes.json();
+    const metaFiles = tree.tree.filter(f => f.path.startsWith('data/meta-builds/sr/') && f.path.endsWith('.json'));
+    const augmentFiles = tree.tree.filter(f => f.path.startsWith('data/augments/') && f.path.endsWith('.json'));
+
+    // 3. Download meta build files (in parallel batches of 15)
+    let downloaded = 0;
+    for (let i = 0; i < metaFiles.length; i += 15) {
+      const batch = metaFiles.slice(i, i + 15);
+      await Promise.all(batch.map(async (file) => {
+        try {
+          const url = `${CDN_BASE}/${file.path}`;
+          const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+          if (res.ok) {
+            const data = await res.text();
+            const fileName = path.basename(file.path);
+            fs.writeFileSync(path.join(META_BUILDS_SR_DIR, fileName), data, 'utf-8');
+            downloaded++;
+          }
+        } catch {}
+      }));
+    }
+
+    // 4. Download augment files
+    for (const file of augmentFiles) {
+      try {
+        const url = `${CDN_BASE}/${file.path}`;
+        const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (res.ok) {
+          const data = await res.text();
+          const fileName = path.basename(file.path);
+          fs.writeFileSync(path.join(AUGMENTS_DIR, fileName), data, 'utf-8');
+        }
+      } catch {}
+    }
+
+    // 5. Update local meta
+    const metaData = {
+      patch: manifest.patch,
+      updatedAt: new Date().toISOString(),
+      champCount: downloaded,
+      source: 'cdn',
+    };
+    fs.writeFileSync(path.join(META_BUILDS_DIR, 'meta.json'), JSON.stringify(metaData, null, 2), 'utf-8');
+    log('INFO', `[cdn] Downloaded ${downloaded} meta builds + augments from CDN (patch ${manifest.patch})`);
+    return true;
+  } catch (err) {
+    log('WARN', `[cdn] CDN sync failed: ${err.message}. Will use local Gemini grounding as fallback.`);
+    return false;
   }
 }
 
@@ -857,6 +944,45 @@ function formatMetaReference(data, isOffRole = false) {
   if (mb.skillOrder) ref += `  Skill Order: ${mb.skillOrder}\n`;
   ref += `\n  INSTRUCTION: Start from this meta build as your baseline. Adapt 1-3 items and runes to counter the specific enemy threats. The core direction should align with meta unless matchup demands otherwise.\n`;
   return ref;
+}
+
+/**
+ * Load the augments master list and format as prompt reference.
+ * Returns empty string if no augment data is cached.
+ */
+function getAugmentsReference() {
+  try {
+    const augFile = path.join(AUGMENTS_DIR, 'augments-master.json');
+    if (!fs.existsSync(augFile)) return '';
+    const data = JSON.parse(fs.readFileSync(augFile, 'utf-8'));
+    if (!data.augments || !Array.isArray(data.augments) || data.augments.length === 0) return '';
+
+    let ref = `\n\nVALID ARAM MAYHEM AUGMENTS (Patch ${data.patch || '?'}):\n`;
+    ref += `Use ONLY augments from this list. NEVER invent augment names.\n`;
+    ref += `Total: ${data.augments.length} augments\n\n`;
+
+    // Group by tier
+    const byTier = { Prismatic: [], Gold: [], Silver: [] };
+    for (const aug of data.augments) {
+      const tier = aug.tier || 'Silver';
+      if (byTier[tier]) byTier[tier].push(aug);
+      else byTier.Silver.push(aug);
+    }
+
+    for (const [tier, augs] of Object.entries(byTier)) {
+      if (augs.length === 0) continue;
+      ref += `${tier.toUpperCase()} TIER:\n`;
+      for (const aug of augs) {
+        ref += `  - ${aug.name}${aug.set ? ` [Set: ${aug.set}]` : ''}: ${aug.effect || ''}\n`;
+      }
+      ref += `\n`;
+    }
+
+    return ref;
+  } catch (err) {
+    log('WARN', `[augments] Failed to load augments reference: ${err.message}`);
+    return '';
+  }
 }
 
 /**
@@ -2324,7 +2450,8 @@ ${userMessage.slice(0, 2000)}`;
         let fullUserMessage;
         if (isARAM) {
           const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems: []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${gameMode === 'aram-mayhem' ? ' Also recommend the best 4 augments for this champion.' : ''}\n\n⚠️ FINAL REMINDER: NEVER invent item names. Use ONLY items from the VALID COMPLETED ITEMS list. This is ${modeLabel} mode — no Doran's items, no jungle, no lane matchup.`;
+          const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference() : '';
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems: []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${gameMode === 'aram-mayhem' ? ' Also recommend the best 4 augments for this champion. Use ONLY augments from the VALID ARAM MAYHEM AUGMENTS list above.' : ''}\n\n⚠️ FINAL REMINDER: NEVER invent item names. Use ONLY items from the VALID COMPLETED ITEMS list. This is ${modeLabel} mode — no Doran's items, no jungle, no lane matchup.`;
         } else {
           fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY starting items from the VALID STARTING ITEMS list above. startingItems must be exactly 2 items (1 starter + 1 potion). Generate optimized build.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. startingItems MUST be from the VALID STARTING ITEMS list (exactly 2: one starter + one potion, ≤500g total). NEVER invent item names.`;
         }
@@ -7171,8 +7298,13 @@ app.whenReady().then(async () => {
       const livePatch = versions[0];
       log('INFO', '[main] Live patch: ' + livePatch);
       await checkAndSyncRag(livePatch);
-      // Fire-and-forget: sync meta builds for ALL champions in background
-      syncAllMetaBuilds(livePatch).catch(err => log('WARN', '[main] Meta build sync failed: ' + err.message));
+      // Try centralized CDN first for meta builds + augments
+      const cdnOk = await syncMetaFromCDN().catch(() => false);
+      if (!cdnOk) {
+        // CDN unavailable — fall back to local Gemini grounding
+        log('INFO', '[main] CDN unavailable, using Gemini grounding for meta builds');
+        syncAllMetaBuilds(livePatch).catch(err => log('WARN', '[main] Meta build sync failed: ' + err.message));
+      }
     } catch (err) {
       log('WARN', '[main] RAG sync on startup failed: ' + err.message);
     }

@@ -103,6 +103,15 @@ interface RagStatus {
   patch: string | null;
   updatedAt: string | null;
 }
+
+interface MetaStatus {
+  isSyncing: boolean;
+  patch: string | null;
+  updatedAt: string | null;
+  champCount: number;
+}
+
+type GameMode = 'sr' | 'aram' | 'aram-mayhem';
 const ROLE_ICON_URLS: Record<Role, string> = {
   top: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png',
   jungle: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png',
@@ -410,6 +419,11 @@ export function App() {
   // ── Ping Monitor state ─────────────────────────────────────────
   const [pingData, setPingData] = useState<any>({ ping: null, jitter: null, packetLoss: 0, status: 'disconnected', history: [] });
 
+  // ── Game Mode + Meta Build status ──────────────────────────────
+  const [gameMode, setGameMode] = useState<GameMode>('sr');
+  const [metaStatus, setMetaStatus] = useState<MetaStatus>({ isSyncing: false, patch: null, updatedAt: null, champCount: 0 });
+  const [showMetaDetail, setShowMetaDetail] = useState(false);
+
   useEffect(() => {
     const handler = (_event: any, advice: any) => { setLiveAdvice(advice); };
     const debugHandler = (_event: any, line: string) => { setAdvisorDebugLog(prev => [...prev.slice(-50), line]); };
@@ -580,10 +594,18 @@ export function App() {
         setSettings(s);
       } catch { /* ignore */ }
     };
+    const fetchMeta = async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/meta-builds/status`);
+        if (r.ok) setMetaStatus(await r.json());
+      } catch { /* ignore */ }
+    };
     fetchRag();
     fetchSettings();
+    fetchMeta();
     const ragPoll = setInterval(fetchRag, 3000); // poll every 3s
-    return () => clearInterval(ragPoll);
+    const metaPoll = setInterval(fetchMeta, 5000); // poll every 5s
+    return () => { clearInterval(ragPoll); clearInterval(metaPoll); };
   }, []);
 
   const handleForceSync = useCallback(async () => {
@@ -608,7 +630,7 @@ export function App() {
       const response = await fetch(`${API_BASE}/api/build-dual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patch: patchVersion, myChampion, role, allies, enemies, model: selectedModel }),
+        body: JSON.stringify({ patch: patchVersion, myChampion, role, allies, enemies, model: selectedModel, gameMode }),
       });
 
       if (!response.ok) {
@@ -1077,22 +1099,45 @@ export function App() {
             </div>
           )}
 
+          {/* ── Game Mode Selector ── */}
           <div className="field-group">
-            <label>Role</label>
-            <div className="role-picker">
-              {ROLES.map((r) => (
-                <button
-                  key={r}
-                  className={`role-btn ${role === r ? 'role-btn-active' : ''}`}
-                  onClick={() => setRole(r)}
-                  title={r.charAt(0).toUpperCase() + r.slice(1)}
-                >
-                  <img src={ROLE_ICON_URLS[r]} alt={r} className="role-icon-img" />
-                  <span className="role-label">{r === 'adc' ? 'ADC' : r.charAt(0).toUpperCase() + r.slice(1)}</span>
-                </button>
-              ))}
+            <label>Game Mode</label>
+            <div className="game-mode-selector">
+              <button className={`game-mode-btn ${gameMode === 'sr' ? 'active' : ''}`} onClick={() => setGameMode('sr')}>Summoner's Rift</button>
+              <button className={`game-mode-btn ${gameMode === 'aram' ? 'active' : ''}`} onClick={() => setGameMode('aram')}>ARAM</button>
+              <button className={`game-mode-btn ${gameMode === 'aram-mayhem' ? 'active' : ''}`} onClick={() => setGameMode('aram-mayhem')}>Mayhem</button>
             </div>
           </div>
+
+          {/* ── Game Mode Badge ── */}
+          <div className={`game-mode-badge ${gameMode === 'sr' ? 'mode-sr' : gameMode === 'aram' ? 'mode-aram' : 'mode-aram-mayhem'}`}>
+            <span className="game-mode-icon">
+              {gameMode === 'sr' && <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>}
+              {gameMode === 'aram' && <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>}
+              {gameMode === 'aram-mayhem' && <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>}
+            </span>
+            {gameMode === 'sr' ? "Summoner's Rift" : gameMode === 'aram' ? 'ARAM' : 'ARAM: Mayhem'}
+          </div>
+
+          {/* ── Role Picker (hidden for ARAM modes) ── */}
+          {gameMode === 'sr' && (
+            <div className="field-group">
+              <label>Role</label>
+              <div className="role-picker">
+                {ROLES.map((r) => (
+                  <button
+                    key={r}
+                    className={`role-btn ${role === r ? 'role-btn-active' : ''}`}
+                    onClick={() => setRole(r)}
+                    title={r.charAt(0).toUpperCase() + r.slice(1)}
+                  >
+                    <img src={ROLE_ICON_URLS[r]} alt={r} className="role-icon-img" />
+                    <span className="role-label">{r === 'adc' ? 'ADC' : r.charAt(0).toUpperCase() + r.slice(1)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="field-group">
             <label>Your Champion</label>
@@ -1129,25 +1174,154 @@ export function App() {
         </div>
 
         <div className="right-panel">
+          {/* ── Pipeline Status Bar ── */}
+          <div className="pipeline-bar">
+            <div className={`pipeline-pill ${ragStatus.patch ? 'pill-ready' : ragStatus.isUpdating ? 'pill-syncing' : 'pill-idle'}`}>
+              <span className="pipeline-dot" />
+              <span className="pipeline-pill-label">RAG</span>
+              {ragStatus.isUpdating ? 'Syncing' : ragStatus.patch ? `v${ragStatus.patch}` : 'Idle'}
+            </div>
+            <div className="pipeline-separator" />
+            <div className={`pipeline-pill ${metaStatus.champCount > 0 ? 'pill-ready' : metaStatus.isSyncing ? 'pill-syncing' : 'pill-idle'}`}>
+              <span className="pipeline-dot" />
+              <span className="pipeline-pill-label">Meta</span>
+              {metaStatus.isSyncing ? 'Syncing...' : metaStatus.champCount > 0 ? `${metaStatus.champCount} champs` : 'Idle'}
+            </div>
+            <div className="pipeline-separator" />
+            <div className={`pipeline-pill ${gameMode === 'sr' ? 'pill-ready' : gameMode === 'aram' ? 'pill-ready' : 'pill-ready'}`}>
+              <span className="pipeline-dot" />
+              <span className="pipeline-pill-label">Mode</span>
+              {gameMode === 'sr' ? 'SR' : gameMode === 'aram' ? 'ARAM' : 'Mayhem'}
+            </div>
+            <div className="pipeline-separator" />
+            <div className="pipeline-pill pill-ready">
+              <span className="pipeline-dot" />
+              <span className="pipeline-pill-label">Patch</span>
+              {patchVersion || '...'}
+            </div>
+          </div>
+
+          {status === 'fetching' && <div className="shimmer-bar" />}
+
           <div className="status-bar">
             <span className={`status-dot ${status}`} />
             <span>
-              {status === 'idle' && 'Ready — select a champion to begin'}
+              {status === 'idle' && 'Ready -- select a champion to begin'}
               {status === 'fetching' && 'Generating build with AI...'}
-              {status === 'grounded' && '✓ Grounded result'}
-              {status === 'cache' && '✓ From cache'}
-              {status === 'stale-cache' && '⚠ Stale cache (AI unavailable)'}
-              {status === 'error' && '✗ Error'}
+              {status === 'grounded' && 'Grounded result'}
+              {status === 'cache' && 'From cache'}
+              {status === 'stale-cache' && 'Stale cache (AI unavailable)'}
+              {status === 'error' && 'Error'}
             </span>
             {(runesModel || buildModel) && (status === 'grounded' || status === 'cache' || status === 'stale-cache') && (
               <span style={{ marginLeft: 10, fontSize: '10px', color: 'var(--text-secondary)', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                {runesModel && <span style={{ background: 'rgba(200, 170, 110, 0.12)', border: '1px solid rgba(200, 170, 110, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#c8aa6e' }}>⚡ {runesModel.replace('gemini-', '').replace('-preview', '')}</span>}
-                {buildModel && <span style={{ background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#6ba3f7' }}>🧠 {buildModel.replace('gemini-', '').replace('-preview', '')}</span>}
+                {runesModel && <span style={{ background: 'rgba(200, 170, 110, 0.12)', border: '1px solid rgba(200, 170, 110, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#c8aa6e' }}>{runesModel.replace('gemini-', '').replace('-preview', '')}</span>}
+                {buildModel && <span style={{ background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: 4, padding: '1px 6px', fontSize: '9px', color: '#6ba3f7' }}>{buildModel.replace('gemini-', '').replace('-preview', '')}</span>}
               </span>
             )}
           </div>
 
+          {/* ── Build Source Indicator ── */}
+          {buildResult && status !== 'fetching' && (
+            <div className={`build-source-tag ${
+              status === 'cache' ? 'source-cached' :
+              metaStatus.champCount > 0 ? 'source-meta-guided' : 'source-ai'
+            }`}>
+              <span className="source-dot" />
+              {status === 'cache' ? 'Cached Build' :
+               metaStatus.champCount > 0 ? 'Meta-Guided + AI Adapted' : 'AI Generated'}
+            </div>
+          )}
+
+          {/* ── Meta Reference Banner ── */}
+          {buildResult && metaStatus.champCount > 0 && status !== 'fetching' && (
+            <>
+              <div className="meta-ref-banner" onClick={() => setShowMetaDetail(v => !v)}>
+                <span className="meta-ref-tag">Meta-Guided</span>
+                <span className="meta-ref-stats">
+                  Based on <strong>{metaStatus.patch}</strong> meta data from u.gg / op.gg
+                </span>
+                <span className="meta-ref-expand">{showMetaDetail ? 'Collapse' : 'Details'}</span>
+              </div>
+              {showMetaDetail && (
+                <div className="meta-ref-detail">
+                  <div className="meta-ref-detail-row">
+                    <span className="meta-ref-detail-label">Coverage</span>
+                    <span className="meta-ref-detail-value">{metaStatus.champCount} champions cached</span>
+                  </div>
+                  <div className="meta-ref-detail-row">
+                    <span className="meta-ref-detail-label">Patch</span>
+                    <span className="meta-ref-detail-value">{metaStatus.patch || 'N/A'}</span>
+                  </div>
+                  <div className="meta-ref-detail-row">
+                    <span className="meta-ref-detail-label">Last Sync</span>
+                    <span className="meta-ref-detail-value">{metaStatus.updatedAt ? new Date(metaStatus.updatedAt).toLocaleString() : 'Never'}</span>
+                  </div>
+                  <div className="meta-ref-detail-row">
+                    <span className="meta-ref-detail-label">Strategy</span>
+                    <span className="meta-ref-detail-value">Start from meta baseline, adapt 1-3 items for enemy comp</span>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
           <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} liveUpdatedItems={liveUpdatedItems} />
+
+          {/* ── ARAM Mayhem Augment Recommendations Panel ── */}
+          {gameMode === 'aram-mayhem' && buildResult && 'text' in buildResult && buildResult.text && status !== 'fetching' && (() => {
+            // Parse augments from the build JSON response
+            let augments: { name: string; tier: string; reason: string; pickAt?: string }[] = [];
+            try {
+              const parsed = JSON.parse(buildResult.text);
+              if (parsed.augments && Array.isArray(parsed.augments)) {
+                augments = parsed.augments;
+              }
+            } catch {
+              // Try to extract from text if not JSON
+              const augSection = buildResult.text.match(/AUGMENTS?[\s\S]*?(?=\n\n|\nWIN|$)/i);
+              if (augSection) {
+                const lines = augSection[0].split('\n').filter((l: string) => l.trim() && !l.match(/^AUGMENT/i));
+                for (const line of lines.slice(0, 4)) {
+                  const parts = line.replace(/^\d+\.\s*/, '').replace(/\*\*/g, '').split(/[:\-\u2014]/);
+                  if (parts.length >= 2) {
+                    const tierMatch = parts[0].match(/\((Silver|Gold|Prismatic)\)/i);
+                    augments.push({
+                      name: parts[0].replace(/\(.*?\)/g, '').trim(),
+                      tier: tierMatch ? tierMatch[1] : 'Gold',
+                      reason: parts.slice(1).join(' ').trim(),
+                    });
+                  }
+                }
+              }
+            }
+
+            if (augments.length === 0) return null;
+            const pickLevels = ['LV 1', 'LV 7', 'LV 11', 'LV 15'];
+
+            return (
+              <div className="augment-panel">
+                <div className="augment-panel-header">
+                  <span className="augment-panel-title">Augment Recommendations</span>
+                  <span className="augment-panel-count">{augments.length} picks</span>
+                </div>
+                <div className="augment-grid">
+                  {augments.slice(0, 4).map((aug, i) => (
+                    <div className="augment-card" key={i}>
+                      <div className="augment-card-header">
+                        <span className="augment-level">{aug.pickAt || pickLevels[i] || `Pick ${i+1}`}</span>
+                        <span className="augment-name">{aug.name}</span>
+                        <span className={`augment-tier tier-${(aug.tier || 'gold').toLowerCase()}`}>
+                          {aug.tier || 'Gold'}
+                        </span>
+                      </div>
+                      <div className="augment-reason">{aug.reason}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ── Live Advisor Panel ── */}
           <div className="live-advisor-section">

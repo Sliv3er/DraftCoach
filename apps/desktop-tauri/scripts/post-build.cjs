@@ -36,6 +36,7 @@ console.log('[post-build] Copying backend/ to target/release/backend/');
 copyDir(path.join(BUNDLE, 'backend'), path.join(RELEASE, 'backend'));
 
 // Copy .env if present in bundle
+// TODO: Remove before production — use Cloudflare Worker proxy instead
 const envSrc = path.join(BUNDLE, '.env');
 if (fs.existsSync(envSrc)) {
   fs.copyFileSync(envSrc, path.join(RELEASE, '.env'));

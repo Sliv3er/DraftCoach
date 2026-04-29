@@ -19,7 +19,7 @@ const TrackerPanelLazy = React.lazy(() => import("./TrackerPanel").then(m => ({ 
 
 function Router({ showSplash, setShowSplash }: { showSplash: boolean; setShowSplash: (v: boolean) => void }) {
   // Show splash screen for main window while backend initializes
-  if (showSplash && route === '') {
+  if (showSplash && (route === '' || route === '/' || route === '/index.html')) {
     return <SplashScreen onReady={() => setShowSplash(false)} />;
   }
   

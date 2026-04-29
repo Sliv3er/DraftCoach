@@ -617,13 +617,7 @@ function EnemySpellPanel({ enemies, timers, isOpen, onToggle }: EnemySpellPanelP
     const getTimer = (champ: string, ability: string) =>
         timers.find(t => t.id === `${champ}-${ability}`);
 
-    // Toggle overlay click-through on mouse enter/leave
-    const handleMouseEnter = () => {
-        ipcSend('overlay-set-ignore-mouse', false);
-    };
-    const handleMouseLeave = () => {
-        ipcSend('overlay-set-ignore-mouse', true);
-    };
+    // Interactivity disabled per user request: overlay remains strictly click-through
 
     const handleClick = (championName: string, ability: string) => {
         const timerId = `${championName}-${ability}`;
@@ -651,7 +645,7 @@ function EnemySpellPanel({ enemies, timers, isOpen, onToggle }: EnemySpellPanelP
     };
 
     return (
-        <div className="ov-tracker" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div className="ov-tracker">
             {/* Toggle button */}
             <button className="ov-tracker-toggle" onClick={onToggle} title={isOpen ? 'Hide tracker' : 'Show tracker'}>
                 {isOpen ? '▸' : '◂'}

@@ -7,7 +7,9 @@
   "main": "src/main/main.js",
   "scripts": {
     "dev": "concurrently \"webpack serve --config webpack.config.js\" \"wait-on http://localhost:9000 && electron .\"",
-    "build": "webpack --mode production && electron-builder --win"
+    "prebuild": "node scripts/pre-build-check.cjs",
+    "build": "webpack --mode production && electron-builder --win",
+    "security-check": "node scripts/pre-build-check.cjs"
   },
   "build": {
     "appId": "com.draftcoach.app",
@@ -63,7 +65,10 @@
     ],
     "files": [
       "src/main/**/*",
-      "dist/**/*"
+      "dist/**/*",
+      "!**/.env",
+      "!**/.env.*",
+      "!**/scripts/**"
     ]
   },
   "dependencies": {

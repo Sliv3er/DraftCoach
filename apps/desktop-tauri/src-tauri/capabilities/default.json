@@ -25,6 +25,10 @@
     "shell:allow-kill",
     "process:default",
     "dialog:default",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "global-shortcut:default",
+    "core:window:allow-maximize",
+    "core:window:allow-unmaximize",
+    "core:window:allow-is-maximized"
   ]
 }

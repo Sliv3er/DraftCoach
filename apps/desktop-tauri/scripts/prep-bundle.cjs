@@ -53,7 +53,8 @@ for (const f of backendFiles) {
 // Cooldowns subdir
 cpDir(path.join(BACKEND_SRC, 'cooldowns'), path.join(backendOut, 'cooldowns'));
 
-// Copy .env if it exists (so production can find API keys)
+// Copy .env if it exists (API keys for pre-production builds)
+// TODO: Remove this before production launch — use Cloudflare Worker proxy instead
 const envSrc = path.resolve(ROOT, '..', '..', '.env');
 if (fs.existsSync(envSrc)) {
   cp(envSrc, path.join(OUT, '.env'));

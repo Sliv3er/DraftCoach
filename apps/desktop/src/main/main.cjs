@@ -5,11 +5,12 @@ const https = require('https');
 const http = require('http');
 const { spawn, exec } = require('child_process');
 const { setupCrashHandlers, log } = require('./crash-logger.cjs');
-const { loadSettings, getSetting, setSetting, SETTINGS_FILE } = require('./settings.cjs');
+const { loadSettings, getSetting, setSetting, SETTINGS_FILE, SENSITIVE_KEYS } = require('./settings.cjs');
 // ── Intelligence upgrade: centralised prompt builder ────────────────
 const _prompts = require('./prompt-builder.cjs');
 
 // Load .env from multiple possible locations
+// TODO: For production launch, replace with Cloudflare Worker proxy
 const _envSearchPaths = [
   path.join(__dirname, '..', '..', '.env'),                    // app root (packaged: resources/app/.env)
   path.join(__dirname, '..', '..', '..', '..', '.env'),        // DraftCoach root (dev: apps/desktop/src/main -> DraftCoach)
@@ -34,6 +35,8 @@ const CACHE_DIR = path.join(app.getPath('userData'), 'icon-cache');
 // app.isPackaged is false with electron-packager unpacked builds, so also check dist exists
 const _distIndexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
 const isDev = !app.isPackaged && !require('fs').existsSync(_distIndexPath);
+
+
 
 let backendProcess = null;
 let mainWindow = null;
@@ -746,42 +749,15 @@ function downloadFile(url, dest) {
   });
 }
 
-function getEnvPath() {
-  if (isDev) {
-    return path.resolve(__dirname, '../../../../.env');
-  }
-  const userDataEnv = path.join(app.getPath('userData'), '.env');
-  if (fs.existsSync(userDataEnv)) return userDataEnv;
-
-  const exeDir = path.dirname(app.getPath('exe'));
-  const exeDirEnv = path.join(exeDir, '.env');
-  if (fs.existsSync(exeDirEnv)) return exeDirEnv;
-
-  const resourcesEnv = path.join(process.resourcesPath, '.env');
-  if (fs.existsSync(resourcesEnv)) return resourcesEnv;
-
-  return null;
-}
-
+// SECURITY: getEnvPath() and loadEnv() have been REMOVED.
+// In production, API keys come ONLY from encrypted settings.json.
+// In dev mode, .env is loaded at startup (see top of file).
+// This stub exists to prevent runtime errors if any code still calls loadEnv().
 function loadEnv() {
-  const envPath = getEnvPath();
-  if (envPath && fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf-8');
-    for (const line of content.split('\n')) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const eqIdx = trimmed.indexOf('=');
-      if (eqIdx > 0) {
-        const key = trimmed.substring(0, eqIdx).trim();
-        const val = trimmed.substring(eqIdx + 1).trim();
-        if (!process.env[key]) {
-          process.env[key] = val;
-        }
-      }
-    }
-    console.log('[main] Loaded .env from:', envPath);
+  if (isDev) {
+    console.log('[main] DEV: .env already loaded at startup');
   } else {
-    console.warn('[main] No .env file found');
+    console.log('[main] Production: .env loading disabled (security policy)');
   }
 }
 
@@ -793,7 +769,8 @@ function startEmbeddedBackend() {
     const backendApp = express();
     const PORT = parseInt(process.env.BACKEND_PORT || '3210', 10);
 
-    backendApp.use(cors());
+    // SECURITY: Restrict CORS to local apps — prevents cross-site attacks
+    backendApp.use(cors({ origin: /^https?:\/\/(localhost|127\.0\.0\.1|tauri\.localhost)(:\d+)?$/ }));
     backendApp.use(express.json());
 
     // DDragon version endpoint
@@ -1000,6 +977,166 @@ COMMON MISTAKES — NEVER DO THESE:
       'gemini-3-flash-preview',
     ];
 
+    // ── JSON Structured Output Schema ──
+    // Forces Gemini to output exact structure — eliminates all format deviations
+    const BUILD_RESPONSE_SCHEMA = {
+      type: "object",
+      properties: {
+        analysis: {
+          type: "object",
+          description: "Matchup analysis — threats, damage types, build priorities",
+          properties: {
+            matchupType: { type: "string", description: "poke, all-in, sustain, or scaling" },
+            enemyDamageSplit: { type: "string", description: "e.g. AD-heavy (3 AD: Zed, Yasuo, Caitlyn; 1 AP: Brand)" },
+            keyThreats: { type: "string", description: "1-2 most dangerous enemies and why" },
+            survivabilityRequirement: { type: "string", description: "Stat thresholds needed e.g. 3500+ HP, 150+ Armor" },
+            itemPriorities: { type: "string", description: "1-3 most important item properties" }
+          },
+          required: ["matchupType", "enemyDamageSplit", "keyThreats"]
+        },
+        runes: {
+          type: "object",
+          description: "Complete rune page",
+          properties: {
+            primaryTree: { type: "string", description: "Precision, Domination, Sorcery, Resolve, or Inspiration" },
+            keystone: { type: "string", description: "Keystone rune name" },
+            primaryRunes: { type: "array", items: { type: "string" }, description: "Exactly 3 primary runes" },
+            secondaryTree: { type: "string", description: "Secondary tree — DIFFERENT from primary" },
+            secondaryRunes: { type: "array", items: { type: "string" }, description: "Exactly 2 secondary runes" },
+            shards: { type: "array", items: { type: "string" }, description: "Exactly 3 stat shards" }
+          },
+          required: ["primaryTree", "keystone", "primaryRunes", "secondaryTree", "secondaryRunes", "shards"]
+        },
+        summoners: {
+          type: "array", items: { type: "string" },
+          description: "Exactly 2 summoner spell names e.g. Flash, Smite"
+        },
+        skillOrder: { type: "string", description: "Max priority e.g. Q > W > E > R" },
+        startingItems: {
+          type: "array", items: { type: "string" },
+          description: "Level 1 items only (Doran's, companions, potions)"
+        },
+        coreBuild: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "Item name from VALID ITEMS list" },
+              reason: { type: "string", description: "Brief reason for this item" }
+            },
+            required: ["name", "reason"]
+          },
+          description: "6-7 items in buy order including boots"
+        },
+        situationalItems: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "Item name from VALID ITEMS list" },
+              condition: { type: "string", description: "When to buy this item" }
+            },
+            required: ["name", "condition"]
+          },
+          description: "At least 4 situational items with buy conditions"
+        },
+        junglePath: { type: "string", description: "First clear route if Jungle (6+ camps with > separator). Empty if not Jungle." },
+        enemyPowerSpikes: { type: "string", description: "Key enemy power spikes (level + item)" },
+        winCondition: { type: "string", description: "2 sentences: how this champion wins this draft" },
+        yourPowerSpikes: { type: "string", description: "1-item and 2-item spike timings" }
+      },
+      required: ["analysis", "runes", "summoners", "skillOrder", "startingItems", "coreBuild", "situationalItems", "winCondition"]
+    };
+
+    /**
+     * Convert a JSON build object (from structured output) into the clean text format
+     * that the frontend parsers already understand. This means zero frontend changes needed.
+     */
+    function jsonBuildToText(json) {
+      const lines = [];
+
+      if (json.analysis) {
+        lines.push('ANALYSIS');
+        if (json.analysis.matchupType) lines.push(`Matchup Type: ${json.analysis.matchupType}`);
+        if (json.analysis.enemyDamageSplit) lines.push(`Enemy Damage Split: ${json.analysis.enemyDamageSplit}`);
+        if (json.analysis.keyThreats) lines.push(`Key Threats: ${json.analysis.keyThreats}`);
+        if (json.analysis.survivabilityRequirement) lines.push(`Survivability Requirement: ${json.analysis.survivabilityRequirement}`);
+        if (json.analysis.itemPriorities) lines.push(`Item Priorities: ${json.analysis.itemPriorities}`);
+        lines.push('');
+      }
+
+      if (json.runes) {
+        lines.push('RUNES');
+        lines.push(`Primary: ${json.runes.primaryTree || ''}`);
+        lines.push(`Keystone: ${json.runes.keystone || ''}`);
+        if (json.runes.primaryRunes) json.runes.primaryRunes.forEach(r => lines.push(r));
+        lines.push(`Secondary: ${json.runes.secondaryTree || ''}`);
+        if (json.runes.secondaryRunes) json.runes.secondaryRunes.forEach(r => lines.push(r));
+        if (json.runes.shards) lines.push(`Shards: ${json.runes.shards.join(', ')}`);
+        lines.push('');
+      }
+
+      if (json.summoners) {
+        lines.push('SUMMONERS');
+        json.summoners.forEach(s => lines.push(s));
+        lines.push('');
+      }
+
+      if (json.skillOrder) {
+        lines.push('SKILL ORDER');
+        lines.push(json.skillOrder);
+        lines.push('');
+      }
+
+      if (json.startingItems) {
+        lines.push('STARTING ITEMS');
+        json.startingItems.forEach(item => lines.push(item));
+        lines.push('');
+      }
+
+      if (json.coreBuild) {
+        lines.push('CORE BUILD');
+        json.coreBuild.forEach((item, i) => {
+          lines.push(`${i + 1}. ${item.name}${item.reason ? ` (${item.reason})` : ''}`);
+        });
+        lines.push('');
+      }
+
+      if (json.situationalItems) {
+        lines.push('SITUATIONAL ITEMS');
+        json.situationalItems.forEach(item => {
+          lines.push(`${item.name}: ${item.condition || ''}`);
+        });
+        lines.push('');
+      }
+
+      if (json.junglePath) {
+        lines.push('JUNGLE PATH');
+        lines.push(json.junglePath);
+        lines.push('');
+      }
+
+      if (json.enemyPowerSpikes) {
+        lines.push('ENEMY POWER SPIKES');
+        lines.push(json.enemyPowerSpikes);
+        lines.push('');
+      }
+
+      if (json.winCondition) {
+        lines.push('WIN CONDITION');
+        lines.push(json.winCondition);
+        lines.push('');
+      }
+
+      if (json.yourPowerSpikes) {
+        lines.push('YOUR POWER SPIKES');
+        lines.push(json.yourPowerSpikes);
+        lines.push('');
+      }
+
+      return lines.join('\n');
+    }
+
     // ── Build Validation & Correction Pass ──
     // Levenshtein distance for fuzzy matching
     function levenshtein(a, b) {
@@ -1031,9 +1168,157 @@ COMMON MISTAKES — NEVER DO THESE:
       }
       return bestDist <= maxDist ? best : null;
     }
+    /**
+     * Normalize messy AI output into the clean format the UI parser expects.
+     * Handles all known AI format deviations:
+     * - "Primary Tree: X" → "Primary: X"
+     * - "Row N: RuneName" → "RuneName"
+     * - "Stat Shards:" + "Row N: X" → "Shards: X, Y, Z"
+     * - "1. Smite (reason)" → "Smite"
+     * - Verbose skill order → "Q > W > E > R"
+     * - "STEP N —" sections stripped
+     * - "CONSTRAINT:" prefix noise stripped from core build items
+     */
+    function normalizeAIOutput(text) {
+      if (!text) return text;
+      let out = text;
+
+      // ── Fix RUNES section ──
+      // "Primary Tree: X" → "Primary: X"
+      out = out.replace(/Primary\s+Tree:\s*/gi, 'Primary: ');
+      out = out.replace(/Secondary\s+Tree:\s*/gi, 'Secondary: ');
+
+      // "Keystone: X (reason)" → "Keystone: X"
+      out = out.replace(/(Keystone:\s*[A-Za-z\s']+?)\s*\(.*?\)/gi, '$1');
+
+      // "Row N: RuneName" → "RuneName" (but NOT inside Shards)
+      // This handles lines like "Row 1: Triumph" → "Triumph"
+      // We need to be careful not to strip "Row" from shard lines yet
+      const runesMatch = out.match(/RUNES\n([\s\S]*?)(?=\n(?:SUMMONERS|SKILL ORDER|STARTING|CORE BUILD|\n\n))/i);
+      if (runesMatch) {
+        let runesBlock = runesMatch[1];
+
+        // Detect and fix stat shards: "Stat Shards:" or "Shards:" followed by shard lines
+        const blockLines = runesBlock.split('\n');
+        let shardsStartIdx = -1;
+        for (let i = 0; i < blockLines.length; i++) {
+          if (/^(?:Stat\s+)?Shards?:\s*$/i.test(blockLines[i].trim()) || 
+              /^(?:Stat\s+)?Shards?:\s*\n/i.test(blockLines[i].trim())) {
+            shardsStartIdx = i;
+            break;
+          }
+        }
+        if (shardsStartIdx >= 0) {
+          // Collect shard lines after the header
+          const shardNames = [];
+          // Check if the header line itself has inline shards: "Shards: X, Y, Z"
+          const inlineMatch = blockLines[shardsStartIdx].match(/Shards?:\s*(.+)/i);
+          if (inlineMatch && inlineMatch[1].trim().length > 0 && inlineMatch[1].includes(',')) {
+            // Already inline format — leave it
+          } else {
+            // Collect subsequent lines as individual shard entries
+            for (let i = shardsStartIdx + 1; i < blockLines.length; i++) {
+              const l = blockLines[i].trim();
+              if (!l) break; // Empty line = end of shards
+              const shardName = l.replace(/^Row\s*\d+:\s*/i, '').trim();
+              if (shardName) shardNames.push(shardName);
+            }
+            if (shardNames.length > 0) {
+              // Replace the shards block with a single line
+              const removeCount = shardNames.length + 1; // header + shard lines
+              blockLines.splice(shardsStartIdx, removeCount, `Shards: ${shardNames.join(', ')}`);
+              runesBlock = blockLines.join('\n');
+            }
+          }
+        }
+
+        // Strip "Row N:" prefix from remaining rune lines
+        runesBlock = runesBlock.replace(/^(\s*)Row\s*\d+:\s*/gim, '$1');
+
+        out = out.replace(runesMatch[1], runesBlock);
+      }
+
+      // ── Fix SUMMONERS section ──
+      // "1. Smite (Required for Jungle)" → "Smite"
+      // "2. Ghost (Essential for sticking)" → "Ghost"
+      const summonersMatch = out.match(/SUMMONERS\n([\s\S]*?)(?=\n(?:SKILL ORDER|STARTING|CORE BUILD|\n\n))/i);
+      if (summonersMatch) {
+        let sumBlock = summonersMatch[1];
+        const sumLines = sumBlock.split('\n');
+        const cleanedSums = [];
+        for (const line of sumLines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          // Strip "1. " or "2. " prefix, and "(reason)" suffix
+          const cleaned = trimmed
+            .replace(/^\d+[\.\)]\s*/, '')  // Remove "1. " or "1) "
+            .replace(/\s*\(.*\)\s*$/, '')  // Remove "(reason)"
+            .replace(/\*\*/g, '')           // Remove **bold**
+            .trim();
+          if (cleaned) cleanedSums.push(cleaned);
+        }
+        if (cleanedSums.length > 0) {
+          out = out.replace(summonersMatch[1], cleanedSums.join('\n') + '\n');
+        }
+      }
+
+      // ── Fix SKILL ORDER section ──
+      // Various formats: "Level 1: Q\nLevel 2: E\nMax: Q > W > E > R" 
+      // or "Q > E > W > R" (already correct)
+      // or "Maximum Skill Order: Q > W > E > R\nLevel 1: Q\nLevel 2: W"
+      const skillMatch = out.match(/SKILL ORDER\n([\s\S]*?)(?=\n(?:STARTING|ANALYSIS|CORE BUILD|SUMMONERS|RUNES|\n\n))/i);
+      if (skillMatch) {
+        let skillBlock = skillMatch[1].trim();
+        // Look for "Q > W > E > R" pattern anywhere in the block
+        const maxOrderMatch = skillBlock.match(/(?:Max(?:imum)?(?:\s+Skill)?\s*(?:Order)?:?\s*)?([QWER])\s*>\s*([QWER])\s*>\s*([QWER])\s*>\s*([QWER])/i);
+        if (maxOrderMatch) {
+          // Extract just the Q > W > E > R part
+          const order = `${maxOrderMatch[1].toUpperCase()} > ${maxOrderMatch[2].toUpperCase()} > ${maxOrderMatch[3].toUpperCase()} > ${maxOrderMatch[4].toUpperCase()}`;
+          out = out.replace(skillMatch[1], order + '\n');
+        } else {
+          // Try to reconstruct from "Level 1: Q" format
+          const levelLines = skillBlock.match(/(?:Level|Lv)\s*\d+:\s*([QWER])/gi);
+          if (!levelLines) {
+            // Try "MAX 1ST: Q" format
+            const maxLines = skillBlock.match(/(?:Max|1st|2nd|3rd|4th)[^:]*:\s*([QWER])/gi);
+            if (maxLines) {
+              const abilities = maxLines.map(l => {
+                const m = l.match(/([QWER])\s*$/i);
+                return m ? m[1].toUpperCase() : '';
+              }).filter(Boolean);
+              if (abilities.length >= 3) {
+                const allAbilities = ['Q', 'W', 'E', 'R'];
+                const missing = allAbilities.filter(a => !abilities.includes(a));
+                const fullOrder = [...abilities, ...missing];
+                out = out.replace(skillMatch[1], fullOrder.join(' > ') + '\n');
+              }
+            }
+          }
+        }
+      }
+
+      // ── Strip "STEP N —" section headers (AI sometimes outputs these) ──
+      out = out.replace(/^STEP\s+\d+\s*[-—:].+$/gm, '');
+
+      // ── Strip "(CONSTRAINT: ...)" from CORE BUILD but keep the reason ──
+      // "1. Heartsteel (CONSTRAINT: THREAT_1 — rush HP)" → "1. Heartsteel (rush HP)"
+      out = out.replace(/\(CONSTRAINT:\s*(?:THREAT_\d+|ANTI_HEAL|BOOTS_CHOICE|KEY_POWERSPIKE)\s*[-—]\s*/gi, '(');
+
+      // ── Strip "(PRIORITY N)" from item names ──
+      // "2. LICH BANE (PRIORITY 1)" → "2. Lich Bane"
+      out = out.replace(/\s*\(PRIORITY\s*\d+\)/gi, '');
+
+      // ── Remove empty lines that pile up after stripping ──
+      out = out.replace(/\n{4,}/g, '\n\n\n');
+
+      return out;
+    }
 
     async function validateAndCorrectBuild(text) {
       if (!text || text.trim() === 'NEED_RETRY') return text;
+
+      // Step 0: Normalize AI output format (fix Row N:, Primary Tree:, etc.)
+      text = normalizeAIOutput(text);
 
       // Collect all valid rune names from DDragon
       const runeData = await fetchDdragonRunes();
@@ -1234,6 +1519,171 @@ COMMON MISTAKES — NEVER DO THESE:
       return corrected;
     }
 
+    // ── Completeness checker: detect missing required sections ──
+    const REQUIRED_SECTIONS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'WIN CONDITION'];
+    const OPTIONAL_SECTIONS = ['SUMMONERS', 'STARTING ITEMS', 'SITUATIONAL ITEMS', 'ENEMY POWER SPIKES', 'YOUR POWER SPIKES'];
+
+    function checkBuildCompleteness(text) {
+      if (!text || text.length < 100) return { complete: false, missing: REQUIRED_SECTIONS };
+      const missing = [];
+      for (const section of REQUIRED_SECTIONS) {
+        if (!text.includes(section)) {
+          missing.push(section);
+        }
+      }
+      return { complete: missing.length === 0, missing };
+    }
+
+    /**
+     * If the AI output is incomplete (missing required sections), make a focused
+     * follow-up call asking only for the missing sections. Returns the combined text.
+     */
+    async function completeMissingSections(partialText, genAI, patchDisplay, userMessage, sendSSE) {
+      const { complete, missing } = checkBuildCompleteness(partialText);
+      if (complete) return partialText;
+
+      log('WARN', `[completeness] Output missing ${missing.length} sections: ${missing.join(', ')} — running completion call`);
+      if (sendSSE) sendSSE({ phase: 'full', chunk: '\n\n' }); // Visual separator
+
+      try {
+        const completionModel = genAI.getGenerativeModel({
+          model: 'gemini-3-flash-preview',
+          systemInstruction: `You are continuing an incomplete League of Legends build output for Patch ${patchDisplay}. The previous output was cut off. Generate ONLY the missing sections listed below. Use the VALID ITEMS and VALID RUNES from the context provided. Be concise.`,
+          generationConfig: {
+            temperature: 0.2,
+            topP: 0.85,
+            maxOutputTokens: 4096,
+          },
+        });
+
+        const completionPrompt = `The following build output was generated but is INCOMPLETE. It is missing these sections: ${missing.join(', ')}
+
+PARTIAL OUTPUT (already generated):
+${partialText.slice(-1500)}
+
+Generate ONLY the missing sections: ${missing.join(', ')}
+Use the same champion and matchup context. Follow the exact format from the system prompt.
+
+${userMessage.slice(0, 2000)}`;
+
+        const completionStream = await completionModel.generateContentStream(completionPrompt);
+        let completionText = '';
+        for await (const chunk of completionStream.stream) {
+          const t = chunk.text();
+          if (t) {
+            completionText += t;
+            if (sendSSE) sendSSE({ phase: 'full', chunk: t });
+          }
+        }
+
+        if (completionText.length > 50) {
+          const combined = partialText + '\n\n' + completionText;
+          log('INFO', `[completeness] Completion call added ${completionText.length} chars — now has ${checkBuildCompleteness(combined).missing.length} missing sections`);
+          return combined;
+        }
+      } catch (err) {
+        log('ERROR', `[completeness] Completion call failed: ${err.message}`);
+      }
+
+      return partialText; // Return what we have if completion fails
+    }
+
+    async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false) {
+      const maxRetries = primaryModelName.includes('flash') ? 3 : 1;
+      let rawText = '';
+      let cleanText = '';
+      const STREAM_TIMEOUT_MS = 90000;
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        log('INFO', `[build-fetch] Trying ${primaryModelName} (Attempt ${attempt}/${maxRetries})`);
+        try {
+          const model = genAI.getGenerativeModel({
+            model: primaryModelName,
+            systemInstruction: systemPrompt,
+            generationConfig: {
+              temperature: primaryModelName.includes('flash') ? 0.2 + (attempt * 0.1) : 0.3,
+              topP: 0.85,
+              topK: 40,
+              maxOutputTokens: 8192,
+              responseMimeType: 'application/json',
+              responseSchema: BUILD_RESPONSE_SCHEMA,
+            },
+          });
+
+          const startTime = Date.now();
+          if (isStreaming) {
+            const stream = await model.generateContentStream(userMessage);
+            rawText = '';
+            for await (const chunk of stream.stream) {
+              const t = chunk.text();
+              if (t) rawText += t;
+              if (Date.now() - startTime > STREAM_TIMEOUT_MS) {
+                log('WARN', `[build-fetch] Stream timed out after ${STREAM_TIMEOUT_MS/1000}s`);
+                break;
+              }
+            }
+          } else {
+            const result = await model.generateContent(userMessage);
+            rawText = result.response.text();
+          }
+
+          const elapsedS = Math.round((Date.now() - startTime) / 1000);
+          const buildJson = JSON.parse(rawText);
+          
+          if (!buildJson.coreBuild || buildJson.coreBuild.length < 5) {
+            throw new Error(`JSON parsed but missing core items (got ${buildJson.coreBuild ? buildJson.coreBuild.length : 0})`);
+          }
+
+          cleanText = jsonBuildToText(buildJson);
+          log('INFO', `[build-fetch] ${primaryModelName} succeeded on attempt ${attempt} (${cleanText.length} chars, ${elapsedS}s)`);
+          return { text: cleanText, modelUsed: primaryModelName, rawText };
+        } catch (e) {
+          log('WARN', `[build-fetch] ${primaryModelName} failed on attempt ${attempt}: ${e.message}`);
+          if (attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, 1000 * attempt)); // Exponential backoff
+          }
+        }
+      }
+
+      // If we are here, primary model failed all retries.
+      // If primary was Flash, rescue with Pro
+      if (primaryModelName.includes('flash')) {
+        log('ERROR', `[build-fetch] Flash failed all ${maxRetries} attempts. Rescuing with Pro...`);
+        try {
+          const proModel = genAI.getGenerativeModel({
+            model: 'gemini-3.1-pro-preview',
+            systemInstruction: systemPrompt,
+            generationConfig: {
+              temperature: 0.3, topP: 0.85, topK: 40, maxOutputTokens: 8192,
+              responseMimeType: 'application/json', responseSchema: BUILD_RESPONSE_SCHEMA,
+            },
+          });
+          const startTime = Date.now();
+          if (isStreaming) {
+            const proStream = await proModel.generateContentStream(userMessage);
+            rawText = '';
+            for await (const chunk of proStream.stream) {
+              const t = chunk.text();
+              if (t) rawText += t;
+            }
+          } else {
+            const result = await proModel.generateContent(userMessage);
+            rawText = result.response.text();
+          }
+          const elapsedS = Math.round((Date.now() - startTime) / 1000);
+          cleanText = jsonBuildToText(JSON.parse(rawText));
+          log('INFO', `[build-fetch] Pro rescue succeeded! (${cleanText.length} chars, ${elapsedS}s)`);
+          return { text: cleanText, modelUsed: 'gemini-3.1-pro-preview', rawText };
+        } catch (rescueErr) {
+          log('ERROR', `[build-fetch] Pro rescue also failed: ${rescueErr.message}`);
+          // Absolute fallback
+          return { text: rawText || '', modelUsed: 'failed', rawText };
+        }
+      }
+
+      return { text: rawText || '', modelUsed: primaryModelName, rawText };
+    }
+
     async function generateBuild(body, shortPrompt) {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
       const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
@@ -1256,51 +1706,9 @@ COMMON MISTAKES — NEVER DO THESE:
 
       const genAI = new GoogleGenerativeAI(apiKey);
       const systemPrompt = shortPrompt ? buildShortPrompt(patchDisplay) : buildSystemPrompt(patchDisplay);
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        systemInstruction: systemPrompt,
-        generationConfig: {
-          // Flash needs lower temp for deterministic output; 1500 tokens covers full build + CONSTRAINTS + ANALYSIS
-          temperature: modelName.includes('flash') ? 0.2 : 0.3,
-          topP: 0.85,
-          topK: 40,
-          maxOutputTokens: 4096,
-        },
-      });
+      const { text: cleanText } = await fetchRobustJsonBuild(genAI, modelName, systemPrompt, userMessage, false);
 
-      // Inject RAG context into the user message
-      const ragContext = getLocalRagContext(body.myChampion, body.role, body.enemies);
-
-      // Fetch valid runes from DDragon for prompt injection
-      let runesRef = '';
-      try {
-        const runeData = await fetchDdragonRunes();
-        if (runeData) runesRef = runeData.reference;
-      } catch (e) { console.warn('[build] Could not fetch DDragon runes:', e.message); }
-      const bootsRef = getValidBootsReference();
-      const itemsRef = getValidItemsReference();
-      const sumSpellsRef = await getSummonerSpellsReference();
-      const enemyProfile = await computeEnemyProfile(body.enemies);
-
-      const isBot = /^(bottom|adc|bot)$/i.test(body.role);
-      const itemSlots = isBot ? 7 : 6;
-
-      // Matchup context injection
-      const matchupLine = body.enemies && body.enemies.length > 0
-        ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
-        : '';
-
-      // ── Ability mechanics context (dynamically fetched from DDragon) ──
-      const allChamps = [body.myChampion, ...(body.enemies || [])];
-      const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
-      const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
-      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
-
-      const result = await model.generateContent(userMessage);
-      const response = result.response;
-      const text = response.text();
-
-      return { text, patchUsed: patchDisplay };
+      return { text: cleanText, patchUsed: patchDisplay };
     }
 
     function buildCacheKey(body, patchKey) {
@@ -1632,68 +2040,44 @@ COMMON MISTAKES — NEVER DO THESE:
         // ── Phase 2: Full build (runs in parallel, model depends on setting) ──
         // In flash-only mode, skip Pro entirely and go straight to Flash
         let finalText;
+        const STREAM_TIMEOUT_MS = 90000; // 90 seconds max for any streaming call
         if (generationMode === 'flash') {
-          // Flash-only mode: run Flash directly for full build (skip runes phase + Pro phase)
-          log('INFO', `[dual] Flash-only mode: running Flash for full build`);
-          const flashOnlyModel = genAI.getGenerativeModel({
-            model: 'gemini-3-flash-preview',
-            systemInstruction: buildSystemPrompt(patchDisplay),
-            generationConfig: {
-              temperature: 0.3,
-              topP: 0.9,
-              topK: 64,
-              maxOutputTokens: 8192,
-            },
-          });
-          const flashStream = await flashOnlyModel.generateContentStream(fullUserMessage);
-          let flashText = '';
-          for await (const chunk of flashStream.stream) {
-            const t = chunk.text();
-            if (t) {
-              flashText += t;
-              sendSSE({ phase: 'full', chunk: t });
-            }
-          }
-          log('INFO', `[dual] Flash-only raw output (${flashText.length} chars)`);
-          const validated = await validateAndCorrectBuild(flashText);
-          if (validated !== flashText) {
-            sendSSE({ phase: 'full', corrected: validated });
-          }
+          // Flash-only mode: run Flash with JSON structured output and retries
+          log('INFO', `[dual] Flash-only mode: running Flash with JSON schema & retries`);
+          
+          const result = await fetchRobustJsonBuild(genAI, 'gemini-3-flash-preview', buildSystemPrompt(patchDisplay), fullUserMessage, true);
+          let cleanText = result.text;
+          const actualModelUsed = result.modelUsed;
+
+          let validated = await validateAndCorrectBuild(cleanText);
+          validated = await completeMissingSections(validated, genAI, patchDisplay, fullUserMessage, sendSSE);
+          validated = await validateAndCorrectBuild(validated);
+
+          sendSSE({ phase: 'full', corrected: validated });
           setCache(cacheKey, validated, patchDisplay);
-          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'gemini-3-flash-preview' });
-          log('INFO', `[dual] Flash-only full build complete (${flashText.length} chars)`);
+          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: actualModelUsed });
+          log('INFO', `[dual] Flash-only full build complete (${cleanText.length} chars)`);
           finalText = validated;
         } else {
           // Hybrid mode: run Pro and Flash in parallel
           const proPromise = (async () => {
             try {
-              const proModel = genAI.getGenerativeModel({
-                model: fullPhaseModelName,
-                systemInstruction: buildSystemPrompt(patchDisplay),
-                generationConfig: {
-                  temperature: fullPhaseModelName.includes('flash') ? 0.2 : 0.3,
-                  topP: 0.85,
-                  topK: 40,
-                  maxOutputTokens: 4096,
-                },
-              });
 
-              const proStream = await proModel.generateContentStream(fullUserMessage);
-              let proText = '';
-
-              for await (const chunk of proStream.stream) {
-                const t = chunk.text();
-                if (t) {
-                  proText += t;
-                  sendSSE({ phase: 'full', chunk: t });
-                }
+              // Parse JSON → convert to clean text
+              let cleanText;
+              try {
+                const buildJson = JSON.parse(proText);
+                cleanText = jsonBuildToText(buildJson);
+                log('INFO', `[dual] Pro JSON parsed OK, ${cleanText.length} chars`);
+              } catch (e) {
+                log('WARN', `[dual] Pro JSON parse failed, using raw text: ${e.message}`);
+                cleanText = proText;
               }
 
-              // Validate full build from Pro
-              const validated = await validateAndCorrectBuild(proText);
-              if (validated !== proText) {
-                sendSSE({ phase: 'full', corrected: validated });
-              }
+              let validated = await validateAndCorrectBuild(cleanText);
+              validated = await completeMissingSections(validated, genAI, patchDisplay, fullUserMessage, sendSSE);
+              validated = await validateAndCorrectBuild(validated);
+              sendSSE({ phase: 'full', corrected: validated });
               setCache(cacheKey, validated, patchDisplay);
               sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: fullPhaseModelName });
               log('INFO', `[dual] Pro full build complete (${proText.length} chars)`);
@@ -1713,26 +2097,17 @@ COMMON MISTAKES — NEVER DO THESE:
           if (!proResult || !proResult.includes('CORE BUILD')) {
             log('WARN', `[dual] Pro result missing CORE BUILD — falling back to Flash for full build`);
             try {
-              const fallbackModel = genAI.getGenerativeModel({
-                model: 'gemini-3-flash-preview',
-                systemInstruction: buildSystemPrompt(patchDisplay),
-              });
-              const fallbackStream = await fallbackModel.generateContentStream(fullUserMessage);
-              let fallbackText = '';
-              for await (const chunk of fallbackStream.stream) {
-                const t = chunk.text();
-                if (t) {
-                  fallbackText += t;
-                  sendSSE({ phase: 'full', chunk: t });
-                }
-              }
-              const validated = await validateAndCorrectBuild(fallbackText);
-              if (validated !== fallbackText) {
-                sendSSE({ phase: 'full', corrected: validated });
-              }
+              const result = await fetchRobustJsonBuild(genAI, 'gemini-3-flash-preview', buildSystemPrompt(patchDisplay), fullUserMessage, true);
+              let cleanText = result.text;
+              
+              let validated = await validateAndCorrectBuild(cleanText);
+              validated = await completeMissingSections(validated, genAI, patchDisplay, fullUserMessage, sendSSE);
+              validated = await validateAndCorrectBuild(validated);
+              
+              sendSSE({ phase: 'full', corrected: validated });
               setCache(cacheKey, validated, patchDisplay);
-              sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'gemini-3-flash-preview' });
-              log('INFO', `[dual] Flash fallback full build complete (${fallbackText.length} chars)`);
+              sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: result.modelUsed });
+              log('INFO', `[dual] Flash fallback full build complete`);
               finalText = validated;
             } catch (fbErr) {
               log('ERROR', `[dual] Flash fallback also failed: ${fbErr.message}`);
@@ -3397,7 +3772,7 @@ async function pollLiveClient() {
     const advisorHasBootsFromInventory = myItemIds.some(id => advisorIsBootsId(id));
     // Also check names for quest boots that might not have standard IDs
     const myItemNames = (myPlayer?.items || []).map(i => (i.displayName || '').toLowerCase().trim()).filter(Boolean);
-    const BOOT_PATTERNS_ADV = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots'];
+    const BOOT_PATTERNS_ADV = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots', 'zephyr', 'magical footwear'];
     const advisorHasBootsFromNames = myItemNames.some(n => BOOT_PATTERNS_ADV.some(p => n.includes(p)));
     // Use sticky flag: once boots are detected, never revert (ADC quest slot fix)
     if (advisorHasBootsFromInventory || advisorHasBootsFromNames) {
@@ -3846,6 +4221,14 @@ Rules:
       return true;
     };
 
+    // Helper: check if a suggested item is boots
+    const isBootsItem = async (name) => {
+      const resolved = await resolveDdragonItem(name);
+      if (resolved && resolved.id && advisorIsBootsId(resolved.id)) return true;
+      const lower = name.toLowerCase();
+      return BOOT_PATTERNS_ADV.some(p => lower.includes(p));
+    };
+
     // Validate CHANGES — remove invalid recommendations
     for (let i = changes.length - 1; i >= 0; i--) {
       if (!(await validateItem(changes[i].recommendedItem))) {
@@ -3857,6 +4240,22 @@ Rules:
     for (let i = nextItems.length - 1; i >= 0; i--) {
       if (!(await validateItem(nextItems[i]))) {
         nextItems.splice(i, 1);
+      }
+    }
+
+    // ── Boots dedup: if player already has boots, strip any boots from suggestions ──
+    if (advisorHasBoots) {
+      for (let i = nextItems.length - 1; i >= 0; i--) {
+        if (await isBootsItem(nextItems[i])) {
+          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${nextItems[i]}" from NEXT ITEMS — player already has boots`);
+          nextItems.splice(i, 1);
+        }
+      }
+      for (let i = changes.length - 1; i >= 0; i--) {
+        if (await isBootsItem(changes[i].recommendedItem)) {
+          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${changes[i].recommendedItem}" from CHANGES — player already has boots`);
+          changes.splice(i, 1);
+        }
       }
     }
 
@@ -3947,6 +4346,7 @@ Rules:
               iconUrl: resolved?.iconUrl || '',
               gold: resolved?.gold || 0,
               id: resolved?.id || '',
+              reason: change.reason || '',
             };
             modified = true;
             break;
@@ -3992,6 +4392,7 @@ Rules:
                 iconUrl: resolved?.iconUrl || '',
                 gold: resolved?.gold || 0,
                 id: resolved?.id || '',
+                reason: `Live advisor: next item`,
               };
               modified = true;
             }

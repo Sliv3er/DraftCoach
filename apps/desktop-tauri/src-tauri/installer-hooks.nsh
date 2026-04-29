@@ -18,7 +18,8 @@
   SetOutPath "$INSTDIR\backend"
   File /r "..\..\..\..\..\build-bundle\backend\*.*"
 
-  ; Copy .env if it exists (contains API keys)
+  ; Copy .env if it exists (API keys — pre-production only)
+  ; TODO: Remove before production launch
   SetOutPath "$INSTDIR"
   File /nonfatal "..\..\..\..\..\build-bundle\.env"
 

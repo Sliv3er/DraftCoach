@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { BuildResponse } from '../types';
 import { IconLookups } from '../App';
 import { ipcInvoke } from '../bridge';
@@ -92,7 +92,7 @@ interface Props {
 // Item name resolution and extraction now handled in main process
 
 const SECTION_KEYS = [
-  'ANALYSIS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
+  'ANALYSIS', 'CONSTRAINTS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
   'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
   'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES',
 ];
@@ -121,9 +121,8 @@ function parseSections(text: string): { title: string; content: string }[] {
   return sections;
 }
 
-function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text).catch(() => { });
-}
+
+
 
 function IconImg({ src, alt, className }: { src?: string; alt: string; className: string }) {
   if (!src) return null;
@@ -230,21 +229,30 @@ function renderRunes(content: string, lookups: IconLookups | null) {
   let section: 'primary' | 'secondary' | 'shards' = 'primary';
 
   for (const rawLine of lines) {
-    const line = rawLine.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+    let line = rawLine.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
 
-    if (/^primary:/i.test(line)) {
-      primaryTree = line.replace(/^primary:\s*/i, '').trim();
+    // Strip "Row N:" prefix from ANY line (e.g. "Row 1: Triumph" → "Triumph")
+    line = line.replace(/^Row\s*\d+:\s*/i, '');
+
+    // Handle "Primary Tree: X" or "Primary: X"
+    if (/^primary(?:\s+tree)?:/i.test(line)) {
+      primaryTree = line.replace(/^primary(?:\s+tree)?:\s*/i, '').trim();
       section = 'primary';
       continue;
     }
-    if (/^secondary:/i.test(line)) {
-      secondaryTree = line.replace(/^secondary:\s*/i, '').trim();
+    // Handle "Secondary Tree: X" or "Secondary: X"
+    if (/^secondary(?:\s+tree)?:/i.test(line)) {
+      secondaryTree = line.replace(/^secondary(?:\s+tree)?:\s*/i, '').trim();
       section = 'secondary';
       continue;
     }
-    if (/^shards?:/i.test(line)) {
-      const s = line.replace(/^shards?:\s*/i, '').split(',').map(x => x.trim()).filter(Boolean);
-      shards.push(...s);
+    // Handle "Stat Shards:" or "Shards: X, Y, Z" (inline or header-only)
+    if (/^(?:stat\s+)?shards?:/i.test(line)) {
+      const inlineShards = line.replace(/^(?:stat\s+)?shards?:\s*/i, '');
+      if (inlineShards.trim()) {
+        const s = inlineShards.split(',').map(x => x.trim()).filter(Boolean);
+        shards.push(...s);
+      }
       section = 'shards';
       continue;
     }
@@ -258,12 +266,17 @@ function renderRunes(content: string, lookups: IconLookups | null) {
 
     if (section === 'primary') primaryRunes.push(name);
     else if (section === 'secondary') secondaryRunes.push(name);
+    else if (section === 'shards') shards.push(name);
   }
 
   // If keystone was listed but also in primaryRunes, separate it
   if (!keystone && primaryRunes.length > 0) {
     keystone = primaryRunes.shift()!;
   }
+
+  // League always has exactly 3 shard slots and 2 secondary runes — cap to prevent phantom entries
+  const cappedShards = shards.slice(0, 3);
+  const cappedSecondary = secondaryRunes.slice(0, 2);
 
   const RuneCell = ({ name, isKeystone: ks }: { name: string; isKeystone?: boolean }) => {
     const cleanName = name.replace(/^(Legend|Rune):\s*/i, '').trim();
@@ -304,11 +317,11 @@ function renderRunes(content: string, lookups: IconLookups | null) {
       {/* Secondary tree + Shards underneath (like League client) */}
       <div className="rune-tree-column">
         <TreeHeader label="Secondary" treeName={secondaryTree} />
-        {secondaryRunes.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
+        {cappedSecondary.map((r, i) => <RuneCell key={`s${i}`} name={r} />)}
         {/* Stat Shards — icon left, stat text right, stacked vertically */}
-        {shards.length > 0 && (
+        {cappedShards.length > 0 && (
           <div className="rune-shards-section">
-            {shards.map((s, i) => {
+            {cappedShards.map((s, i) => {
               const shardSrc = findIcon(s, lookups?.runes);
               return (
                 <div key={`sh${i}`} className="rune-shard-row">
@@ -341,16 +354,17 @@ function renderSummoners(content: string, lookups: IconLookups | null) {
   return (
     <div className="summoners-row">
       {lines.map((line, i) => {
-        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
-        const match = cleaned.match(/^([A-Za-z\s]+?)(?:\s*\((.+)\))?\s*$/);
-        const name = match ? match[1].trim() : line.trim();
-        const reason = match ? match[2] : undefined;
+        let cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '');
+        // Strip numbered prefix: "1. Smite" or "2) Ghost"
+        cleaned = cleaned.replace(/^\d+[.)\s]+\s*/, '');
+        // Extract name and optional reason
+        const match = cleaned.match(/^([A-Za-z\s']+?)(?:\s*\((.+)\))?\s*$/);
+        const name = match ? match[1].trim() : cleaned.replace(/\s*\(.*\)\s*$/, '').trim();
         return (
           <div key={i} className="summoner-card">
             <IconImg src={findIcon(name, lookups?.spells)} alt={name} className="summoner-icon" />
             <div className="summoner-info">
               <span className="summoner-name">{name}</span>
-              {reason && <span className="summoner-reason">{reason}</span>}
             </div>
           </div>
         );
@@ -364,7 +378,29 @@ function renderSkillOrder(
   championSpells: ChampionSpell[],
   version: string,
 ) {
-  const parts = content.split('>').map(s => s.trim()).filter(Boolean);
+  // Try to extract "Q > W > E > R" from various AI formats
+  let skillText = content;
+  // Look for the Q > W > E > R pattern anywhere in the text
+  const orderMatch = content.match(/([QWER])\s*>\s*([QWER])\s*>\s*([QWER])\s*>\s*([QWER])/i);
+  if (orderMatch) {
+    skillText = `${orderMatch[1]} > ${orderMatch[2]} > ${orderMatch[3]} > ${orderMatch[4]}`;
+  } else {
+    // Try to reconstruct from "Max 1st: Q" or "Level 1: Q" format
+    const abilities: string[] = [];
+    const maxMatches = content.match(/(?:Max|1st|2nd|3rd|4th)[^:]*:\s*([QWER])/gi);
+    if (maxMatches) {
+      for (const m of maxMatches) {
+        const letter = m.match(/([QWER])\s*$/i);
+        if (letter) abilities.push(letter[1].toUpperCase());
+      }
+    }
+    if (abilities.length >= 3) {
+      const all = ['Q', 'W', 'E', 'R'];
+      const missing = all.filter(a => !abilities.includes(a));
+      skillText = [...abilities, ...missing].join(' > ');
+    }
+  }
+  const parts = skillText.split('>').map(s => s.trim()).filter(Boolean);
   if (parts.length === 0) return <div className="build-output">{content}</div>;
 
   const PRIORITY_LABELS = ['MAX 1ST', 'MAX 2ND', 'MAX 3RD', 'MAX 4TH'];
@@ -413,8 +449,11 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
         let num = '';
         let reason = '';
 
-        const numMatch = text.match(/^(\d+)\.\s*(.+)$/);
+        const numMatch = text.match(/^(\d+)[.)\s]+\s*(.+)$/);
         if (numMatch) { num = numMatch[1]; text = numMatch[2]; }
+
+        // Strip "(PRIORITY N)" labels
+        text = text.replace(/\s*\(PRIORITY\s*\d+\)/gi, '');
 
         // Match reason in parentheses - handle trailing punctuation like ).
         const reasonMatch = text.match(/^([^(]+)\((.+)\)[.),;\s]*$/);
@@ -425,6 +464,8 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
             .replace(/CONSTRAINT:\s*[\w_]+\s*[—–-]\s*/gi, '')
             .replace(/CONSTRAINT:\s*[\w_]+/gi, '')
             .trim();
+          // If reason is empty after stripping, clear it
+          if (!reason) reason = '';
         }
 
         const rawName = text.trim();
@@ -493,24 +534,43 @@ function renderSituational(content: string, lookups: IconLookups | null) {
   return (
     <div className="situational-grid">
       {lines.map((line, i) => {
-        const cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '').replace(/^\d+\.\s*/, '');
+        let cleaned = line.trim().replace(/\*\*/g, '').replace(/^\*\s*/, '').replace(/^-\s*/, '').replace(/^\d+[.)\s]+\s*/, '');
+        let name = '';
+        let condition = '';
+
+        // Try "Name: reason" format
         const colonIdx = cleaned.indexOf(':');
         if (colonIdx > 0 && colonIdx < 40) {
-          const name = cleaned.slice(0, colonIdx).trim();
-          const condition = cleaned.slice(colonIdx + 1).trim();
-          return (
-            <div key={i} className="sit-card">
-              <div className="sit-card-icon-wrap">
-                <IconImg src={findIcon(name, lookups?.items)} alt={name} className="sit-card-icon" />
-              </div>
-              <div className="sit-card-info">
-                <div className="sit-card-name">{name}</div>
-                <div className="sit-card-condition">{condition}</div>
-              </div>
-            </div>
-          );
+          name = cleaned.slice(0, colonIdx).trim();
+          condition = cleaned.slice(colonIdx + 1).trim();
+        } else {
+          // Try "Name (reason)" format
+          const parenMatch = cleaned.match(/^([^(]+)\((.+)\)\s*$/);
+          if (parenMatch) {
+            name = parenMatch[1].trim();
+            condition = parenMatch[2].trim();
+          } else {
+            name = cleaned;
+          }
         }
-        return <div key={i} className="sit-card"><div className="sit-card-info"><div className="sit-card-name">{cleaned}</div></div></div>;
+
+        // Strip CONSTRAINT: noise from condition
+        condition = condition
+          .replace(/CONSTRAINT:\s*[\w_]+\s*[—–-]\s*/gi, '')
+          .replace(/CONSTRAINT:\s*[\w_]+/gi, '')
+          .trim();
+
+        return (
+          <div key={i} className="sit-card">
+            <div className="sit-card-icon-wrap">
+              <IconImg src={findIcon(name, lookups?.items)} alt={name} className="sit-card-icon" />
+            </div>
+            <div className="sit-card-info">
+              <div className="sit-card-name">{name}</div>
+              {condition && <div className="sit-card-condition">{condition}</div>}
+            </div>
+          </div>
+        );
       })}
     </div>
   );
@@ -546,9 +606,9 @@ const CAMP_POSITIONS: Record<string, { x: number; y: number; label: string }> = 
   'baron nashor': { x: 33, y: 30, label: 'Baron' },
   'herald': { x: 33, y: 30, label: 'Herald' },
   'rift herald': { x: 33, y: 30, label: 'Herald' },
-  'scuttle': { x: 50, y: 50, label: 'Scuttle' },
-  'scuttle crab': { x: 50, y: 50, label: 'Scuttle' },
-  'rift scuttler': { x: 50, y: 50, label: 'Scuttle' },
+  'scuttle': { x: 63, y: 62, label: 'Scuttle' },
+  'scuttle crab': { x: 63, y: 62, label: 'Scuttle' },
+  'rift scuttler': { x: 63, y: 62, label: 'Scuttle' },
   // Gank waypoints
   'gank': { x: 50, y: 50, label: 'Gank' },
   'gank mid': { x: 50, y: 50, label: 'Gank Mid' },
@@ -963,7 +1023,7 @@ function renderSection(
   }
 }
 
-export function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems, enemies }: Props) {
+export const BuildOutput = memo(function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems, enemies }: Props) {
   const [exportStatus, setExportStatus] = React.useState<string | null>(null);
   const [championSpells, setChampionSpells] = useState<ChampionSpell[]>([]);
 
@@ -1059,9 +1119,11 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
   const sortByKeyOrder = (a: { title: string }, keyArray: string[]) => keyArray.indexOf(a.title);
   const sortedSections = [...sections].sort((a, b) => sortByKeyOrder(a, LEFT_COL_KEYS) - sortByKeyOrder(b, LEFT_COL_KEYS));
 
+  // Hide CONSTRAINTS — it's internal AI reasoning, not user-facing
+  const HIDDEN_SECTIONS = ['CONSTRAINTS'];
   const leftSections = sortedSections.filter(s => LEFT_COL_KEYS.includes(s.title));
   const rightSections = sortedSections.filter(s => RIGHT_COL_KEYS.includes(s.title));
-  const bottomSections = sortedSections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title));
+  const bottomSections = sortedSections.filter(s => !LEFT_COL_KEYS.includes(s.title) && !RIGHT_COL_KEYS.includes(s.title) && !HIDDEN_SECTIONS.includes(s.title));
 
   const renderSectionCard = (s: { title: string; content: string }, i: number) => (
     <SectionErrorBoundary key={`eb-${s.title}-${i}`} fallback={
@@ -1073,9 +1135,6 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
       <div key={i} className="build-section">
         <div className="build-section-header">
           <h3>{s.title}</h3>
-          <button className="btn-copy" onClick={() => copyToClipboard(`${s.title}\n${s.content}`)}>
-            Copy
-          </button>
         </div>
         {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
         {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
@@ -1113,4 +1172,4 @@ export function BuildOutput({ result, iconLookups, loading, championId, role, li
       {content}
     </div>
   );
-}
+});

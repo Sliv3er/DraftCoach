@@ -42,6 +42,25 @@ router.get('/me', async (req: Request, res: Response) => {
     const userId = req.headers['x-user-id'] as string || req.query.userId as string || 'anonymous';
     const days = parseInt(req.query.days as string) || 30;
 
+    // Special userId __all__ returns aggregate of ALL users
+    if (userId === '__all__') {
+      const allUsers = await getAllUsage(days);
+      // Aggregate daily data across all users
+      const totalCalls = allUsers.reduce((s, u) => s + (u.totalCalls || 0), 0);
+      const totalTokensIn = allUsers.reduce((s, u) => s + (u.totalTokensIn || 0), 0);
+      const totalTokensOut = allUsers.reduce((s, u) => s + (u.totalTokensOut || 0), 0);
+      const totalCost = allUsers.reduce((s, u) => s + (u.totalCost || 0), 0);
+      res.json({
+        totalCalls,
+        totalTokensIn,
+        totalTokensOut,
+        totalCost,
+        byModel: {},
+        daily: [],
+      });
+      return;
+    }
+
     const usage = await getUserUsage(userId, days);
     res.json(usage);
   } catch (e: any) {

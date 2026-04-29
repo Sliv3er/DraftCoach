@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 
 interface ChampionData {
   id: string;
@@ -15,7 +15,7 @@ interface Props {
   getIconUrl: (id: string) => string;
 }
 
-export function ChampionPicker({ champions, selected, onSelect, onRemove, max, getIconUrl }: Props) {
+export const ChampionPicker = memo(function ChampionPicker({ champions, selected, onSelect, onRemove, max, getIconUrl }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -102,4 +102,4 @@ export function ChampionPicker({ champions, selected, onSelect, onRemove, max, g
       )}
     </div>
   );
-}
+});

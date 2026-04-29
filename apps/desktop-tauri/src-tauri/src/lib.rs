@@ -88,8 +88,7 @@ async fn start_sidecar_watchdog(app: AppHandle) {
     }
 }
 
-// Global flag to stop the overlay cursor watch loop
-static OVERLAY_CURSOR_WATCH_ACTIVE: AtomicBool = AtomicBool::new(false);
+
 
 // ── Window Management Commands ──────────────────────────────────────
 
@@ -221,123 +220,17 @@ async fn create_overlay_window(app: AppHandle) -> Result<(), String> {
     let _ = window.set_ignore_cursor_events(true);
     let _ = window.set_always_on_top(true);
 
-    // Auto-start cursor watch for this overlay
-    let handle = app.clone();
-    tauri::async_runtime::spawn(async move {
-        start_overlay_cursor_watch_inner(handle).await;
-    });
+    // Interactivity disabled per user request: overlay remains strictly click-through
+    // let handle = app.clone();
+    // tauri::async_runtime::spawn(async move {
+    //     start_overlay_cursor_watch_inner(handle).await;
+    // });
 
-    println!("[tauri] Overlay window created (hidden, cursor watch started)");
+    println!("[tauri] Overlay window created (hidden, strictly click-through)");
     Ok(())
 }
 
-// ── Overlay Cursor Watch ───────────────────────────────────────────
-// Polls cursor position and toggles click-through based on whether
-// the cursor is in an interactive zone of the overlay.
 
-/// Get cursor position using Windows API
-#[cfg(target_os = "windows")]
-fn get_cursor_pos() -> Option<(i32, i32)> {
-    use std::mem::MaybeUninit;
-    #[repr(C)]
-    struct POINT { x: i32, y: i32 }
-    extern "system" { fn GetCursorPos(lp: *mut POINT) -> i32; }
-    unsafe {
-        let mut pt = MaybeUninit::<POINT>::uninit();
-        if GetCursorPos(pt.as_mut_ptr()) != 0 {
-            let pt = pt.assume_init();
-            Some((pt.x, pt.y))
-        } else {
-            None
-        }
-    }
-}
-
-#[cfg(not(target_os = "windows"))]
-fn get_cursor_pos() -> Option<(i32, i32)> {
-    None
-}
-
-/// Check if cursor is in an interactive overlay zone (percentage-based for DPI awareness)
-fn is_in_interactive_zone(x: i32, y: i32, screen_w: i32, screen_h: i32) -> bool {
-    // Convert to percentages for DPI-aware zones
-    let x_pct = (x as f64 / screen_w as f64) * 100.0;
-    let y_pct = (y as f64 / screen_h as f64) * 100.0;
-    
-    // Zone 1: Top-left item tracker (~18% width, ~46% height)
-    if x_pct < 18.0 && y_pct < 46.0 {
-        return true;
-    }
-    // Zone 2: Right edge — enemy spell tracker panel (~13% width, centered vertically, ~19% height)
-    if x_pct > 87.0 && y_pct > 40.0 && y_pct < 60.0 {
-        return true;
-    }
-    // Zone 3: Top-right cooldown timer strip (~16% width, ~11% height)
-    if y_pct < 11.0 && x_pct > 84.0 {
-        return true;
-    }
-    false
-}
-
-async fn start_overlay_cursor_watch_inner(app: AppHandle) {
-    OVERLAY_CURSOR_WATCH_ACTIVE.store(true, Ordering::SeqCst);
-    let mut was_interactive = false;
-
-    // Get screen dimensions from the overlay window
-    let (screen_w, screen_h) = if let Some(win) = app.get_webview_window("overlay") {
-        if let Ok(monitor) = win.current_monitor() {
-            if let Some(m) = monitor {
-                let size = m.size();
-                (size.width as i32, size.height as i32)
-            } else {
-                (1920, 1080)
-            }
-        } else {
-            (1920, 1080)
-        }
-    } else {
-        (1920, 1080)
-    };
-
-    while OVERLAY_CURSOR_WATCH_ACTIVE.load(Ordering::SeqCst) {
-        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
-
-        let overlay = match app.get_webview_window("overlay") {
-            Some(w) => w,
-            None => continue,
-        };
-
-        // Only check when overlay is visible
-        if !overlay.is_visible().unwrap_or(false) {
-            if was_interactive {
-                let _ = overlay.set_ignore_cursor_events(true);
-                was_interactive = false;
-            }
-            continue;
-        }
-
-        if let Some((cx, cy)) = get_cursor_pos() {
-            let in_zone = is_in_interactive_zone(cx, cy, screen_w, screen_h);
-            if in_zone && !was_interactive {
-                let _ = overlay.set_ignore_cursor_events(false);
-                was_interactive = true;
-            } else if !in_zone && was_interactive {
-                let _ = overlay.set_ignore_cursor_events(true);
-                was_interactive = false;
-            }
-        }
-    }
-
-    // Cleanup: ensure click-through is restored
-    if let Some(overlay) = app.get_webview_window("overlay") {
-        let _ = overlay.set_ignore_cursor_events(true);
-    }
-}
-
-#[tauri::command]
-async fn stop_overlay_cursor_watch() {
-    OVERLAY_CURSOR_WATCH_ACTIVE.store(false, Ordering::SeqCst);
-}
 
 // ── Sidecar Management ─────────────────────────────────────────────
 
@@ -536,7 +429,7 @@ pub fn run() {
             show_window,
             set_ignore_mouse,
             create_overlay_window,
-            stop_overlay_cursor_watch,
+
             ipc_proxy,
             ipc_send,
             start_sidecar,

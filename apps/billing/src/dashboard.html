@@ -3,272 +3,717 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DraftCoach Admin - API Usage & Billing</title>
+  <title>DraftCoach · Admin Billing Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    body { background: #111827; }
-    .card { background: #1f2937; border: 1px solid #374151; }
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #1a2332;
+      --border: #1e293b;
+      --border-active: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.15);
+      --green: #10b981;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Animated background */
+    .bg-grid {
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Glow effects */
+    .glow-top {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(245, 158, 11, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content { position: relative; z-index: 1; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      border-color: var(--border-active);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* Stat cards */
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 16px 16px 0 0;
+    }
+    .stat-card.calls::before { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+    .stat-card.tokens-in::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .stat-card.tokens-out::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .stat-card.users::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .stat-card.cost::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-container::-webkit-scrollbar {
+      height: 6px;
+    }
+    .table-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background: var(--border-active);
+      border-radius: 3px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody td {
+      padding: 14px 16px;
+      font-size: 0.875rem;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+      white-space: nowrap;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-active {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .badge-model {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    /* Pricing card */
+    .pricing-card {
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      position: relative;
+    }
+    .pricing-card.active {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.04);
+    }
+    .pricing-card.active::after {
+      content: 'ACTIVE';
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      background: rgba(245, 158, 11, 0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .pricing-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, #1a2332 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeInUp 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+    .delay-3 { animation-delay: 0.15s; }
+    .delay-4 { animation-delay: 0.2s; }
+    .delay-5 { animation-delay: 0.25s; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 3px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stat-value { font-size: 1.5rem; }
+      .card { border-radius: 12px; }
+    }
   </style>
 </head>
-<body class="min-h-screen text-white p-6">
-  <div class="max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
+<body>
+
+  <!-- Background -->
+  <div class="bg-grid"></div>
+  <div class="glow-top"></div>
+
+  <div class="content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- ═══ HEADER ═══ -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-in">
       <div>
-        <h1 class="text-3xl font-bold">🔒 Admin Dashboard</h1>
-        <p class="text-gray-400 mt-1">API Usage & Cost Tracking</p>
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center text-black font-bold text-sm">DC</div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Billing Dashboard</h1>
+          <span class="badge badge-active mono text-xs">LIVE</span>
+        </div>
+        <p class="text-sm text-slate-400">API usage monitoring &amp; cost analytics</p>
       </div>
-      <div class="flex items-center gap-4">
-        <label class="text-gray-400">Period:</label>
-        <select id="days" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white">
-          <option value="7">Last 7 days</option>
-          <option value="30" selected>Last 30 days</option>
-          <option value="90">Last 90 days</option>
-        </select>
-        <button onclick="fetchData()" class="bg-yellow-600 hover:bg-yellow-500 px-4 py-2 rounded font-bold">
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-700/50">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <select id="days" class="bg-transparent text-sm text-slate-300 border-none outline-none focus:ring-0 cursor-pointer appearance-none pr-6" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>'); background-repeat: no-repeat; background-position: right center;">
+            <option value="7" class="bg-slate-900">Last 7 days</option>
+            <option value="30" selected class="bg-slate-900">Last 30 days</option>
+            <option value="90" class="bg-slate-900">Last 90 days</option>
+          </select>
+        </div>
+        <button onclick="fetchData()" class="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-200 text-sm shadow-lg shadow-yellow-600/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           Refresh
         </button>
       </div>
     </div>
 
-    <!-- Current Model -->
-    <div id="model-info" class="card rounded-lg p-4 mb-6">
-      <span class="text-gray-400">Loading model info...</span>
-    </div>
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-      <div class="card rounded-lg p-6">
-        <div class="text-gray-400 text-sm mb-1">Total API Calls</div>
-        <div id="total-calls" class="text-3xl font-bold">-</div>
-      </div>
-      <div class="card rounded-lg p-6">
-        <div class="text-gray-400 text-sm mb-1">Input Tokens</div>
-        <div id="total-in" class="text-3xl font-bold text-green-400">-</div>
-      </div>
-      <div class="card rounded-lg p-6">
-        <div class="text-gray-400 text-sm mb-1">Output Tokens</div>
-        <div id="total-out" class="text-3xl font-bold text-red-400">-</div>
-      </div>
-      <div class="card rounded-lg p-6">
-        <div class="text-gray-400 text-sm mb-1">Unique Users</div>
-        <div id="total-users" class="text-3xl font-bold text-blue-400">-</div>
-      </div>
-      <div class="card rounded-lg p-6 border-yellow-700">
-        <div class="text-gray-400 text-sm mb-1">Estimated Cost</div>
-        <div id="total-cost" class="text-3xl font-bold text-yellow-400">-</div>
+    <!-- ═══ MODEL INFO BAR ═══ -->
+    <div id="model-info" class="card px-5 py-4 mb-6 animate-in delay-1">
+      <div class="flex items-center gap-2 text-slate-400 text-sm">
+        <div class="skeleton h-5 w-64 rounded"></div>
       </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <!-- Daily Usage Chart -->
-      <div class="card rounded-lg p-6">
-        <h2 class="text-xl font-bold mb-4">Daily Cost</h2>
-        <canvas id="daily-chart" height="200"></canvas>
+    <!-- ═══ SUMMARY CARDS ═══ -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
+      <div class="card stat-card calls p-5 animate-in delay-1">
+        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">API Calls</div>
+        <div id="total-calls" class="stat-value text-blue-400">—</div>
       </div>
-
-      <!-- Model Distribution -->
-      <div class="card rounded-lg p-6">
-        <h2 class="text-xl font-bold mb-4">Usage by Model</h2>
-        <canvas id="model-chart" height="200"></canvas>
+      <div class="card stat-card tokens-in p-5 animate-in delay-2">
+        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Input Tokens</div>
+        <div id="total-in" class="stat-value text-emerald-400">—</div>
+      </div>
+      <div class="card stat-card tokens-out p-5 animate-in delay-3">
+        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Output Tokens</div>
+        <div id="total-out" class="stat-value text-red-400">—</div>
+      </div>
+      <div class="card stat-card users p-5 animate-in delay-4">
+        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Users</div>
+        <div id="total-users" class="stat-value text-purple-400">—</div>
+      </div>
+      <div class="card stat-card cost p-5 animate-in delay-5 col-span-2 lg:col-span-1">
+        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Total Cost</div>
+        <div id="total-cost" class="stat-value text-yellow-400">—</div>
       </div>
     </div>
 
-    <!-- All Users Table -->
-    <div class="card rounded-lg p-6 mb-8">
-      <h2 class="text-xl font-bold mb-4">All Users</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full">
+    <!-- ═══ CHARTS ROW ═══ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Daily Cost Chart (2 cols) -->
+      <div class="card p-5 lg:col-span-2 animate-in delay-2">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-base font-semibold">Daily Cost</h2>
+          <span class="text-xs text-slate-500">Last <span id="chart-period-label">30</span> days</span>
+        </div>
+        <div class="relative" style="height: 260px;">
+          <canvas id="daily-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Model Distribution (1 col) -->
+      <div class="card p-5 animate-in delay-3">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-base font-semibold">By Model</h2>
+          <span class="text-xs text-slate-500">Cost share</span>
+        </div>
+        <div class="relative" style="height: 260px;">
+          <canvas id="model-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ USERS TABLE ═══ -->
+    <div class="card p-5 mb-8 animate-in delay-3">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h2 class="text-base font-semibold">All Users</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Usage breakdown by account</p>
+        </div>
+        <span id="user-count-badge" class="badge bg-slate-800 text-slate-400 text-xs border border-slate-700">0 users</span>
+      </div>
+      <div class="table-container">
+        <table>
           <thead>
-            <tr class="text-left text-gray-400 border-b border-gray-700">
-              <th class="pb-3">User ID</th>
-              <th class="pb-3">Calls</th>
-              <th class="pb-3">Input Tokens</th>
-              <th class="pb-3">Output Tokens</th>
-              <th class="pb-3">Cost</th>
-              <th class="pb-3">Last Active</th>
+            <tr>
+              <th>User</th>
+              <th>Calls</th>
+              <th>Input</th>
+              <th>Output</th>
+              <th>Cost</th>
+              <th>Last Active</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="users-table">
-            <tr><td colspan="6" class="py-4 text-gray-500">Loading...</td></tr>
+            <tr><td colspan="7" class="text-center text-slate-600 py-12 text-sm">Loading...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Pricing Reference -->
-    <div class="card rounded-lg p-6">
-      <h2 class="text-xl font-bold mb-4">Model Pricing Reference</h2>
-      <div id="pricing-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- ═══ PRICING REFERENCE ═══ -->
+    <div class="card p-5 animate-in delay-4">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h2 class="text-base font-semibold">Model Pricing</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Per-million-token rates</p>
+        </div>
+      </div>
+      <div id="pricing-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Filled by JS -->
       </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 pb-4 text-center text-xs text-slate-700">
+      DraftCoach Billing Service · Auto-refreshes every 30s
     </div>
   </div>
 
   <script>
-    const API_BASE = 'http://localhost:3211/api/billing';
-    let dailyChart, modelChart;
+    const API_BASE = '/api/billing';
+    let dailyChart = null;
+    let modelChart = null;
 
-    function formatNumber(num) {
-      if (num >= 1_000_000) return (num / 1_000_000).toFixed(2) + 'M';
-      if (num >= 1_000) return (num / 1_000).toFixed(2) + 'K';
-      return num.toString();
+    // ── Utilities ──
+    function n(v) {
+      if (v === null || v === undefined) return '—';
+      if (v >= 1_000_000) return (v / 1_000_000).toFixed(2) + 'M';
+      if (v >= 1_000) return (v / 1_000).toFixed(1) + 'K';
+      return v.toLocaleString();
     }
 
-    function formatCurrency(amount) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    function $(v) {
+      if (v === null || v === undefined) return '—';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6,
+      }).format(v);
     }
 
+    function date(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      const now = new Date();
+      const diff = (now - dt) / 1000;
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function shortDate(d) {
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    // ── Chart defaults ──
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // ── Fetch & render ──
     async function fetchData() {
       const days = document.getElementById('days').value;
+      document.getElementById('chart-period-label').textContent = days;
 
       try {
-        // Fetch all data in parallel
-        const [pricingRes, usageRes, allUsersRes] = await Promise.all([
+        const [pricingRes, allUsersRes] = await Promise.all([
           fetch(`${API_BASE}/pricing`),
-          fetch(`${API_BASE}/me?days=${days}`),
           fetch(`${API_BASE}/admin/all?days=${days}`),
         ]);
 
+        if (!pricingRes.ok || !allUsersRes.ok) {
+          throw new Error('API returned ' + pricingRes.status);
+        }
+
         const pricing = await pricingRes.json();
-        const usage = await usageRes.json();
         const allUsers = await allUsersRes.json();
 
-        // Update model info
+        // ── Aggregate totals ──
+        const totalCost = allUsers.reduce((s, u) => s + (u.totalCost || 0), 0);
+        const totalCalls = allUsers.reduce((s, u) => s + (u.totalCalls || 0), 0);
+        const totalIn = allUsers.reduce((s, u) => s + (u.totalTokensIn || 0), 0);
+        const totalOut = allUsers.reduce((s, u) => s + (u.totalTokensOut || 0), 0);
+
+        // ── Summary cards ──
+        document.getElementById('total-calls').textContent = n(totalCalls);
+        document.getElementById('total-in').textContent = n(totalIn);
+        document.getElementById('total-out').textContent = n(totalOut);
+        document.getElementById('total-users').textContent = allUsers.length;
+        document.getElementById('total-cost').textContent = $(totalCost);
+
+        // ── Model info bar ──
         const currentModel = pricing.models?.find(m => m.model === pricing.currentModel);
         document.getElementById('model-info').innerHTML = `
-          <div class="flex items-center gap-3 flex-wrap">
-            <span class="text-gray-400">Current Model:</span>
-            <span class="font-mono text-yellow-400">${pricing.currentModel}</span>
-            <span class="text-gray-600">|</span>
-            <span class="text-gray-400">Input:</span>
-            <span class="text-green-400">$${currentModel?.inputTokens || '?'}/M</span>
-            <span class="text-gray-400">Output:</span>
-            <span class="text-red-400">$${currentModel?.outputTokens || '?'}/M</span>
+          <div class="flex items-center gap-3 flex-wrap text-sm">
+            <span class="text-slate-500">Active Model</span>
+            <span class="mono text-yellow-400 bg-yellow-400/5 px-2.5 py-0.5 rounded-md border border-yellow-400/10 text-xs font-medium">${pricing.currentModel}</span>
+            <span class="text-slate-700 hidden sm:inline">|</span>
+            <span class="text-slate-500">Input</span>
+            <span class="mono text-emerald-400 font-medium">$${currentModel?.inputTokens ?? '?'}/M</span>
+            <span class="text-slate-700 hidden sm:inline">|</span>
+            <span class="text-slate-500">Output</span>
+            <span class="mono text-red-400 font-medium">$${currentModel?.outputTokens ?? '?'}/M</span>
+            <span class="text-slate-700 hidden sm:inline">|</span>
+            <span class="text-slate-500">Context</span>
+            <span class="mono text-slate-300">${(currentModel?.contextWindow ?? 0).toLocaleString()}</span>
           </div>
         `;
 
-        // Update summary cards
-        const totalCost = allUsers.reduce((sum, u) => sum + (u.totalCost || 0), 0);
-        const totalCalls = allUsers.reduce((sum, u) => sum + (u.totalCalls || 0), 0);
-        const totalIn = allUsers.reduce((sum, u) => sum + (u.totalTokensIn || 0), 0);
-        const totalOut = allUsers.reduce((sum, u) => sum + (u.totalTokensOut || 0), 0);
-
-        document.getElementById('total-calls').textContent = totalCalls;
-        document.getElementById('total-in').textContent = formatNumber(totalIn);
-        document.getElementById('total-out').textContent = formatNumber(totalOut);
-        document.getElementById('total-users').textContent = allUsers.length;
-        document.getElementById('total-cost').textContent = formatCurrency(totalCost);
-
-        // Update users table
+        // ── Users table ──
         const tbody = document.getElementById('users-table');
+        document.getElementById('user-count-badge').textContent = allUsers.length + ' user' + (allUsers.length !== 1 ? 's' : '');
+
         if (allUsers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="py-4 text-gray-500 text-center">No usage data yet</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-600 py-12 text-sm">No usage data yet</td></tr>';
         } else {
-          tbody.innerHTML = allUsers.map(u => `
-            <tr class="border-b border-gray-700/50">
-              <td class="py-3 font-mono text-sm">${u.userId}</td>
-              <td class="py-3">${u.totalCalls}</td>
-              <td class="py-3 text-green-400">${formatNumber(u.totalTokensIn)}</td>
-              <td class="py-3 text-red-400">${formatNumber(u.totalTokensOut)}</td>
-              <td class="py-3 text-yellow-400">${formatCurrency(u.totalCost)}</td>
-              <td class="py-3 text-gray-400">${new Date(u.lastCall).toLocaleDateString()}</td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = allUsers.map((u, i) => {
+            const colors = ['bg-blue-500/20 text-blue-400', 'bg-emerald-500/20 text-emerald-400', 'bg-purple-500/20 text-purple-400', 'bg-amber-500/20 text-amber-400', 'bg-rose-500/20 text-rose-400'];
+            const initial = (u.userId || '?')[0].toUpperCase();
+            const color = colors[i % colors.length];
+            return `
+              <tr>
+                <td>
+                  <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-full ${color} flex items-center justify-center text-xs font-bold">${initial}</div>
+                    <span class="mono text-xs text-slate-300">${u.userId}</span>
+                  </div>
+                </td>
+                <td class="font-medium">${u.totalCalls}</td>
+                <td class="text-emerald-400 mono text-xs">${n(u.totalTokensIn)}</td>
+                <td class="text-red-400 mono text-xs">${n(u.totalTokensOut)}</td>
+                <td class="text-yellow-400 mono text-xs font-medium">${$(u.totalCost)}</td>
+                <td class="text-slate-500 text-xs">${date(u.lastCall)}</td>
+                <td>
+                  <span class="inline-block w-1.5 h-1.5 rounded-full ${u.lastCall && new Date(u.lastCall) > new Date(Date.now() - 86400000) ? 'bg-emerald-500' : 'bg-slate-600'}"></span>
+                </td>
+              </tr>
+            `;
+          }).join('');
         }
 
-        // Update pricing cards
-        document.getElementById('pricing-cards').innerHTML = pricing.models?.map(m => `
-          <div class="p-4 rounded-lg border ${m.model === pricing.currentModel ? 'border-yellow-500 bg-yellow-500/10' : 'border-gray-700'}">
-            <div class="font-mono text-sm mb-2">${m.model}</div>
-            <div class="text-xs text-gray-400 mb-2">${m.displayName}</div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-400">Input:</span>
-              <span class="text-green-400">$${m.inputTokens}/M</span>
+        // ── Pricing cards ──
+        const pricingContainer = document.getElementById('pricing-cards');
+        if (pricing.models?.length) {
+          pricingContainer.innerHTML = pricing.models.map(m => `
+            <div class="pricing-card ${m.model === pricing.currentModel ? 'active' : ''}">
+              <div class="mono text-xs font-medium text-slate-200 mb-1">${m.model}</div>
+              <div class="text-xs text-slate-500 mb-4">${m.displayName}</div>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-500">Input</span>
+                  <span class="mono text-emerald-400 font-medium">$${m.inputTokens}/M</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-500">Output</span>
+                  <span class="mono text-red-400 font-medium">$${m.outputTokens}/M</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-slate-500">Context</span>
+                  <span class="mono text-slate-400">${(m.contextWindow || 0).toLocaleString()}</span>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-400">Output:</span>
-              <span class="text-red-400">$${m.outputTokens}/M</span>
-            </div>
-          </div>
-        `).join('') || '<div class="text-gray-500">No pricing data</div>';
+          `).join('');
+        } else {
+          pricingContainer.innerHTML = '<div class="text-slate-600 text-sm col-span-full text-center py-8">No pricing data available</div>';
+        }
 
-        // Update daily chart
-        updateDailyChart(usage.daily || []);
+        // ── Build chart data from allUsers ──
+        // We need daily data — fetch /me for anonymous to get daily breakdown
+        const meRes = await fetch(`${API_BASE}/me?days=${days}&userId=__all__`).catch(() => null);
+        const meData = meRes?.ok ? await meRes.json() : null;
+        const daily = meData?.daily || [];
+        const byModel = meData?.byModel || {};
 
-        // Update model chart
-        updateModelChart(usage.byModel || {});
+        updateDailyChart(daily);
+        updateModelChart(byModel);
 
       } catch (e) {
-        console.error('Failed to fetch data:', e);
-        document.getElementById('model-info').innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+        console.error('Dashboard error:', e);
+        document.getElementById('model-info').innerHTML = `
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+            <span class="text-red-400">Connection error</span>
+            <span class="text-slate-600">·</span>
+            <span class="text-slate-500 text-xs">${e.message}</span>
+          </div>
+        `;
       }
     }
 
+    // ── Daily cost chart ──
     function updateDailyChart(daily) {
       const ctx = document.getElementById('daily-chart').getContext('2d');
-      
-      if (dailyChart) dailyChart.destroy();
-      
+      if (dailyChart) { dailyChart.destroy(); dailyChart = null; }
+
+      if (!daily || daily.length === 0) {
+        dailyChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['No data'],
+            datasets: [{ label: 'Cost ($)', data: [0], backgroundColor: 'rgba(245, 158, 11, 0.1)' }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { display: false } },
+              x: { grid: { display: false }, ticks: { display: false } }
+            }
+          }
+        });
+        return;
+      }
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+      gradient.addColorStop(0, 'rgba(245, 158, 11, 0.25)');
+      gradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+
       dailyChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: daily.map(d => d.date.slice(5)),
+          labels: daily.map(d => shortDate(d.date)),
           datasets: [{
-            label: 'Cost ($)',
+            label: 'Cost',
             data: daily.map(d => d.cost),
-            backgroundColor: 'rgba(234, 179, 8, 0.6)',
-            borderColor: 'rgba(234, 179, 8, 1)',
-            borderWidth: 1,
+            backgroundColor: gradient,
+            borderColor: 'rgba(245, 158, 11, 0.8)',
+            borderWidth: 1.5,
+            borderRadius: 4,
+            borderSkipped: false,
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false } },
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleColor: '#f1f5f9',
+              bodyColor: '#f59e0b',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: ctx => '  ' + $(ctx.parsed.y)
+              }
+            }
+          },
           scales: {
-            y: { beginAtZero: true, grid: { color: '#374151' } },
-            x: { grid: { display: false } }
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+              ticks: {
+                color: '#64748b',
+                font: { size: 11 },
+                callback: v => $(v)
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: '#64748b',
+                font: { size: 10 },
+                maxTicksLimit: 10
+              }
+            }
           }
         }
       });
     }
 
+    // ── Model distribution chart ──
     function updateModelChart(byModel) {
       const ctx = document.getElementById('model-chart').getContext('2d');
-      
-      if (modelChart) modelChart.destroy();
-      
+      if (modelChart) { modelChart.destroy(); modelChart = null; }
+
       const labels = Object.keys(byModel);
-      const data = Object.values(byModel).map(m => m.cost);
-      
+      const data = Object.values(byModel).map(m => m.cost || 0);
+      const colors = [
+        'rgba(245, 158, 11, 0.85)',
+        'rgba(59, 130, 246, 0.85)',
+        'rgba(16, 185, 129, 0.85)',
+        'rgba(139, 92, 246, 0.85)',
+      ];
+      const borderColors = colors.map(c => c.replace('0.85', '1'));
+
+      if (!labels.length) {
+        modelChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['No data'],
+            datasets: [{ data: [1], backgroundColor: ['rgba(255,255,255,0.05)'], borderWidth: 0 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
+          }
+        });
+        return;
+      }
+
       modelChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels.length ? labels : ['No data'],
+          labels,
           datasets: [{
-            data: data.length ? data : [1],
-            backgroundColor: [
-              'rgba(234, 179, 8, 0.8)',
-              'rgba(59, 130, 246, 0.8)',
-              'rgba(16, 185, 129, 0.8)',
-            ],
+            data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderColor: borderColors.slice(0, labels.length),
+            borderWidth: 2,
+            hoverOffset: 8,
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
+          cutout: '68%',
           plugins: {
-            legend: { position: 'bottom', labels: { color: '#9ca3af' } }
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#94a3b8',
+                font: { size: 11, family: "'Inter', sans-serif" },
+                padding: 16,
+                usePointStyle: true,
+                pointStyle: 'circle',
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleColor: '#f1f5f9',
+              bodyColor: '#f59e0b',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: ctx => {
+                  const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                  const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                  return '  ' + $(ctx.parsed) + ' (' + pct + '%)';
+                }
+              }
+            }
           }
         }
       });
     }
 
-    // Initial load
+    // ── Initial load ──
     fetchData();
 
-    // Auto-refresh every 30 seconds
+    // ── Auto-refresh ──
     setInterval(fetchData, 30000);
   </script>
 </body>

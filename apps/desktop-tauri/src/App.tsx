@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { BuildResponse, Role, GeminiModel } from './types';
 import { ChampionPicker } from './components/ChampionPicker';
 import { BuildOutput } from './components/BuildOutput';
-import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow, backendReady } from './bridge';
+import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow, backendReady, registerGlobalHotkey, unregisterAllHotkeys } from './bridge';
 
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
@@ -681,6 +681,48 @@ export function App() {
     };
   }, []);
 
+  // ── Global Hotkey Registration ────────────────────────────────────
+  useEffect(() => {
+    if (!settings || Object.keys(settings).length === 0) return;
+
+    const registerHotkeys = async () => {
+      await unregisterAllHotkeys();
+
+      // Toggle Overlay
+      if (settings.hotkeyToggleOverlay) {
+        await registerGlobalHotkey(settings.hotkeyToggleOverlay, () => {
+          ipcInvoke('overlay-toggle').catch(() => {});
+        });
+      }
+      // Hide Overlay
+      if (settings.hotkeyHideOverlay) {
+        await registerGlobalHotkey(settings.hotkeyHideOverlay, () => {
+          ipcInvoke('overlay-hide').catch(() => {});
+        });
+      }
+      // Focus Main Window
+      if (settings.hotkeyFocusMain) {
+        await registerGlobalHotkey(settings.hotkeyFocusMain, async () => {
+          const { getCurrentWebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+          const win = getCurrentWebviewWindow();
+          await win.show();
+          await win.setFocus();
+        });
+      }
+      // Regenerate Build
+      if (settings.hotkeyRegenerate) {
+        await registerGlobalHotkey(settings.hotkeyRegenerate, () => {
+          // Trigger re-generate via same mechanism as the Generate button
+          document.getElementById('btn-generate')?.click();
+        });
+      }
+    };
+
+    registerHotkeys();
+
+    return () => { unregisterAllHotkeys(); };
+  }, [settings.hotkeyToggleOverlay, settings.hotkeyHideOverlay, settings.hotkeyFocusMain, settings.hotkeyRegenerate]);
+
   const handleForceSync = useCallback(async () => {
     try {
       await fetch(`${API_BASE}/api/rag/sync`, { method: 'POST' });
@@ -1152,8 +1194,9 @@ export function App() {
     }
   }, [autoDetect, pollLCU]);
 
-  const getChampIconUrl = (champId: string) =>
-    ddragonVersion ? `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/champion/${champId}.png` : '';
+  const getChampIconUrl = useCallback((champId: string) =>
+    ddragonVersion ? `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/champion/${champId}.png` : ''
+  , [ddragonVersion]);
 
   const handleSettingChange = useCallback(async (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -1321,7 +1364,7 @@ export function App() {
             />
           </div>
 
-          <button className="btn-generate" onClick={handleGenerate} disabled={!myChampion || status === 'fetching'}>
+          <button id="btn-generate" className="btn-generate" onClick={handleGenerate} disabled={!myChampion || status === 'fetching'}>
             {status === 'fetching' ? (
               <><span className="btn-generate-spinner" />Generating...</>
             ) : (

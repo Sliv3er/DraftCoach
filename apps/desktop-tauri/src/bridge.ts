@@ -418,3 +418,54 @@ export async function toggleMaximizeCurrentWindow() {
   const window = getCurrentWebviewWindow();
   await window.toggleMaximize();
 }
+
+// ── Global Hotkey Registration (replaces Electron globalShortcut) ──
+
+import { register, unregisterAll, isRegistered } from '@tauri-apps/plugin-global-shortcut';
+
+/**
+ * Convert Electron-style accelerator to Tauri shortcut format.
+ * Electron: "CommandOrControl+Shift+F" → Tauri: "CmdOrCtrl+Shift+F"
+ */
+function toTauriShortcut(electronAccelerator: string): string {
+  return electronAccelerator
+    .replace('CommandOrControl', 'CmdOrCtrl')
+    .replace('Command', 'Cmd')
+    .replace('Control', 'Ctrl');
+}
+
+/**
+ * Register a global hotkey. Callback fires when the shortcut is pressed.
+ * Returns true if registration succeeded.
+ */
+export async function registerGlobalHotkey(
+  accelerator: string,
+  callback: () => void
+): Promise<boolean> {
+  if (!accelerator || accelerator === 'none') return false;
+  const shortcut = toTauriShortcut(accelerator);
+  try {
+    const alreadyRegistered = await isRegistered(shortcut);
+    if (alreadyRegistered) return true;
+    await register(shortcut, (event) => {
+      if (event.state === 'Pressed') {
+        callback();
+      }
+    });
+    return true;
+  } catch (e) {
+    console.warn(`[bridge] Failed to register hotkey "${shortcut}":`, e);
+    return false;
+  }
+}
+
+/**
+ * Unregister all global hotkeys.
+ */
+export async function unregisterAllHotkeys(): Promise<void> {
+  try {
+    await unregisterAll();
+  } catch (e) {
+    console.warn('[bridge] Failed to unregister hotkeys:', e);
+  }
+}

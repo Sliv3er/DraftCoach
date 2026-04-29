@@ -11,7 +11,7 @@ interface IApiUsage extends Document {
   userId: string;
   apiProvider: string;
   endpoint: string;
-  model?: string;
+  modelName?: string;
   tokensIn: number;
   tokensOut: number;
   latencyMs: number;
@@ -25,7 +25,7 @@ const ApiUsageSchema = new Schema<IApiUsage>({
   userId: { type: String, required: true, index: true },
   apiProvider: { type: String, required: true },
   endpoint: { type: String, required: true },
-  model: { type: String },
+  modelName: { type: String },
   tokensIn: { type: Number, default: 0 },
   tokensOut: { type: Number, default: 0 },
   latencyMs: { type: Number, required: true },
@@ -37,7 +37,7 @@ const ApiUsageSchema = new Schema<IApiUsage>({
 
 ApiUsageSchema.index({ userId: 1, createdAt: -1 });
 ApiUsageSchema.index({ apiProvider: 1, createdAt: -1 });
-ApiUsageSchema.index({ model: 1, createdAt: -1 });
+ApiUsageSchema.index({ modelName: 1, createdAt: -1 });
 
 // ── Initialize DB and get model ──
 let ApiUsage: Model<IApiUsage>;
@@ -65,6 +65,7 @@ export interface TrackedCall {
   latencyMs: number;
   success: boolean;
   error?: string;
+  sessionId?: string;
 }
 
 // ── Track a single Gemini API call ──
@@ -78,7 +79,7 @@ export async function trackGeminiCall(call: TrackedCall): Promise<IApiUsage> {
     userId: call.userId,
     apiProvider: 'gemini',
     endpoint: `/v1/models/${call.model}:generateContent`,
-    model: call.model,
+    modelName: call.model,
     tokensIn: call.tokensIn,
     tokensOut: call.tokensOut,
     latencyMs: call.latencyMs,
@@ -268,8 +269,14 @@ export async function getPricingInfo(): Promise<{
     contextWindow: number;
   }> = [];
   
-  for (const [_, pricing] of pricingMap) {
-    models.push(pricing);
+  for (const [modelKey, pricing] of pricingMap.entries()) {
+    models.push({
+      model: modelKey,
+      displayName: pricing.displayName,
+      inputTokens: pricing.inputTokens,
+      outputTokens: pricing.outputTokens,
+      contextWindow: pricing.contextWindow,
+    });
   }
 
   return { currentModel, models };

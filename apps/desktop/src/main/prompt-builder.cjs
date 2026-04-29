@@ -463,6 +463,15 @@ BUILD RULES:
 - NEVER suggest the same item twice in coreBuild.
 - NEVER put starting items in coreBuild.
 - NEVER use the same tree for primaryTree and secondaryTree.
+
+STARTING ITEMS RULES:
+- startingItems: Exactly 2 items — 1 starting item + 1 potion (Health Potion or Refillable Potion).
+- Starting gold budget = 500g. Total cost of both items must be ≤500g.
+- Use ONLY items from the VALID STARTING ITEMS list.
+- Jungle: 1 companion (Scorchclaw Pup, Gustwalker Hatchling, or Mosstomper Seedling) + Health Potion.
+- Support: World Atlas + Health Potion.
+- NEVER put Doran's items, companions, or potions in coreBuild — they belong ONLY in startingItems.
+
 - If Jungle: include companion in startingItems, provide junglePath with complete first clear (6+ camps separated by >).
 - For suppression enemies: ALWAYS include QSS in situationalItems.
 - ANTI-HEAL: If enemy has significant healing, include anti-heal in coreBuild or situationalItems.
@@ -553,12 +562,107 @@ Rules:
 - If PREVIOUS ADVICE said Item X and situation unchanged → confirm X again.`;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  ARAM SYSTEM PROMPT
+// ═══════════════════════════════════════════════════════════════════
+
+function buildAramSystemPrompt(patch) {
+  return `You are a League of Legends ARAM Build Engine for Patch ${patch} (Season 2026).
+You generate JSON-formatted builds for ARAM (Howling Abyss) mode.
+
+ARAM-SPECIFIC RULES:
+- Map: Howling Abyss — constant teamfighting, no laning phase, single lane
+- No jungle, no wards, no roaming
+- Prioritize: Poke, sustain, AoE damage, teamfight power, waveclear
+- Champions get bonus healing/shielding/damage modifiers in ARAM (mode-specific balance)
+- Summoner Spells: Always Mark/Dash (Snowball) + Flash (or Clarity/Exhaust if applicable)
+- coreBuild: Exactly 6 items (including boots as item #1 or #2)
+- startingItems: Empty array [] — ARAM has no starting items (you die and buy on respawn)
+- No jungle path needed — omit junglePath field
+
+BUILD RULES:
+- Use ONLY items from the VALID COMPLETED ITEMS list. NEVER invent item names.
+- coreBuild: EXACTLY 6 items. Boots must be item #1 or #2.
+- situationalItems: At least 3 entries with specific buy conditions.
+- Use ONLY runes from the VALID RUNES list.
+- Pick shards from VALID STAT SHARDS list only.
+- NEVER suggest the same item twice in coreBuild.
+- NEVER use the same tree for primaryTree and secondaryTree.
+- For ARAM, prioritize items with poke, sustain, AoE, or teamfight value.
+- skillOrder: Use format "Q > W > E > R" (max priority order).
+- summoners: Mark/Dash is the ARAM snowball spell.
+
+ARAM ITEM PRIORITIES:
+- Poke champs: Maximize range, ability haste, magic/armor pen
+- Tanks: Prioritize team aura items and sustain
+- Enchanters: Heal/shield power, ability haste
+- ADC: Standard DPS builds work, but consider Bloodthirster for sustain
+- Assassins: May need to adapt to more bruiser-like builds for sustained fights
+
+Output valid JSON matching the provided schema. Do NOT include any text outside the JSON.`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ARAM MAYHEM SYSTEM PROMPT
+// ═══════════════════════════════════════════════════════════════════
+
+function buildAramMayhemSystemPrompt(patch) {
+  return `You are a League of Legends ARAM: Mayhem Build Engine for Patch ${patch} (Season 2026).
+You generate JSON-formatted builds AND augment recommendations for ARAM: Mayhem mode.
+
+ARAM: MAYHEM RULES:
+- Same map as ARAM (Howling Abyss) with Arena-style AUGMENTS
+- Players choose augments at Level 1, 7, 11, and 15
+- Augment tiers: Silver (common), Gold (rare), Prismatic (legendary)
+- Augment Sets: Collecting 2-4 augments from the same set activates bonus traits
+- All ARAM rules apply (no jungle, no wards, constant teamfighting)
+
+BUILD RULES:
+- Use ONLY items from the VALID COMPLETED ITEMS list. NEVER invent item names.
+- coreBuild: EXACTLY 6 items. Boots must be item #1 or #2.
+- situationalItems: At least 3 entries with specific buy conditions.
+- Use ONLY runes from the VALID RUNES list.
+- Pick shards from VALID STAT SHARDS list only.
+- NEVER suggest the same item twice in coreBuild.
+- NEVER use the same tree for primaryTree and secondaryTree.
+- startingItems: Empty array [] — ARAM Mayhem has no starting items.
+- summoners: Mark/Dash + Flash (or Clarity/Exhaust).
+
+AUGMENT RECOMMENDATIONS:
+- Recommend the TOP 4 best augments for this champion (1 per augment pick level)
+- Consider synergy with the champion's kit (e.g., "Scopiest Weapons" for ADCs, "Jeweled Gauntlet" for AP champs with crit)
+- Consider augment set bonuses for extra power
+- For each augment, explain WHY it's good for this specific champion
+- Order by pick priority (Level 1 pick first)
+
+Output valid JSON matching the provided schema. Do NOT include any text outside the JSON.`;
+}
+
+// ARAM Mayhem response schema extension (augments field)
+const ARAM_MAYHEM_AUGMENTS_SCHEMA = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      name: { type: "string", description: "Augment name exactly as it appears in-game" },
+      tier: { type: "string", description: "Silver, Gold, or Prismatic" },
+      reason: { type: "string", description: "Why this augment synergizes with this champion" },
+      pickAt: { type: "string", description: "Recommended pick level: Level 1, Level 7, Level 11, or Level 15" },
+    },
+    required: ["name", "tier", "reason"],
+  },
+  description: "Top 4 augment recommendations for this champion in ARAM: Mayhem",
+};
+
 
 module.exports = {
   buildSystemPrompt,
   buildShortPrompt,
   buildFlashRuneSystemPrompt,
   buildLiveAdvisorSystemPrompt,
+  buildAramSystemPrompt,
+  buildAramMayhemSystemPrompt,
+  ARAM_MAYHEM_AUGMENTS_SCHEMA,
   buildMechanicsContext,
   fetchChampionMechanics,
   fetchMultipleChampionMechanics,

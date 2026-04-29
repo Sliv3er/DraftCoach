@@ -118,10 +118,13 @@ async function fetchDdragonRunes() {
 }
 
 // Get valid boots list from item cache
-function getValidBootsReference() {
+function getValidBootsReference(mapId = 11) {
   if (!ddragonItemCache || !ddragonItemCache.byId) return '';
   const boots = [];
   for (const [id, item] of ddragonItemCache.byId) {
+    // Check map availability
+    const onMap = mapId === 12 ? item.isARAM : item.isSR;
+    if (!onMap) continue;
     // Boots have Boots of Speed (1001) in their recipe tree and cost > 300g (not base boots)
     if (item.from && item.from.includes('1001') && item.gold > 300) {
       boots.push(item.name);
@@ -132,13 +135,14 @@ function getValidBootsReference() {
 }
 
 // Get full valid item list from DDragon cache, grouped by tag
-function getValidItemsReference() {
+function getValidItemsReference(mapId = 11) {
   if (!ddragonItemCache || !ddragonItemCache.byId) return '';
   const categories = {};
   for (const [id, item] of ddragonItemCache.byId) {
-    // CRITICAL: Only include items available on Summoner's Rift
-    if (!item.isSR) continue;
-    // Only include truly completed items on Summoner's Rift:
+    // Check map availability
+    const onMap = mapId === 12 ? item.isARAM : item.isSR;
+    if (!onMap) continue;
+    // Only include truly completed items:
     // - Must cost >= 2000g (skip cheap components)
     // - Must have a build path (builds FROM something)
     // - Must NOT build INTO anything else (it's a final item)
@@ -155,11 +159,69 @@ function getValidItemsReference() {
     }
   }
   if (Object.keys(categories).length === 0) return '';
-  let ref = 'VALID COMPLETED ITEMS (Season 2026):\n';
+  const mapLabel = mapId === 12 ? 'ARAM' : 'Season 2026';
+  let ref = `VALID COMPLETED ITEMS (${mapLabel}):\n`;
   for (const [tag, items] of Object.entries(categories)) {
     ref += `${tag}: ${items.join(', ')}\n`;
   }
   ref += 'RULE: ONLY suggest items from this list. If an item is not here, it does NOT exist in the game.\n';
+  return ref;
+}
+
+// Get valid starting items from DDragon cache (items ≤500g, no recipe, base items)
+function getValidStartingItemsReference(role, mapId = 11) {
+  if (!ddragonItemCache || !ddragonItemCache.byId) return '';
+
+  // ARAM has no starting items in the traditional sense (you start with gold and buy on first death)
+  if (mapId === 12) {
+    return 'ARAM STARTING RULES: Players start with 1400g. Buy components or full items immediately. No Doran\'s items. No startingItems needed — put everything in coreBuild.\n';
+  }
+
+  const EXCLUDED_IDS = new Set([
+    '3599', '3600', // Kalista's Black Spear
+    '2138', '2139', '2140', // Elixirs (level 9+)
+    '3330', '3340', '3363', '3364', // Trinkets
+  ]);
+
+  const lanerItems = [];
+  const jungleItems = [];
+  const supportItems = [];
+  const potions = [];
+
+  for (const [id, item] of ddragonItemCache.byId) {
+    if (EXCLUDED_IDS.has(id)) continue;
+    if (id.length > 4 && id.startsWith('32')) continue; // Duplicate IDs (e.g. 323070)
+    if (!item.isSR) continue;
+    if (item.gold > 500) continue;
+    if (item.from && item.from.length > 0) continue; // Must be a base item
+    if (item.name.includes('Ornn') || item.name === 'Stat Bonus' || item.name === 'Anvil Voucher') continue;
+
+    const tags = item.tags || [];
+    const name = item.name;
+
+    if (name.includes('Potion') || name === 'Refillable Potion') {
+      potions.push(`${name} (${item.gold}g)`);
+    } else if (tags.includes('Jungle')) {
+      jungleItems.push(`${name} (${item.gold}g)`);
+    } else if (name === 'World Atlas') {
+      supportItems.push(`${name} (${item.gold}g)`);
+    } else if (tags.includes('Lane') || name.startsWith("Doran's") || name === 'Dark Seal' || name === 'Cull') {
+      lanerItems.push(`${name} (${item.gold}g)`);
+    }
+  }
+
+  // Deduplicate (some items have multiple IDs like Mosstomper)
+  const dedupe = arr => [...new Set(arr)];
+
+  let ref = 'VALID STARTING ITEMS (Starting gold = 500g):\n';
+  ref += `  Laner: ${dedupe(lanerItems).join(', ')}\n`;
+  ref += `  Jungle: ${dedupe(jungleItems).join(', ')}\n`;
+  ref += `  Support: ${dedupe(supportItems).join(', ')}\n`;
+  ref += `  Potions: ${dedupe(potions).join(', ')}\n`;
+  ref += `  RULE: Buy exactly 1 starting item + 1 potion (Health Potion or Refillable Potion). Total must be ≤500g.\n`;
+  ref += `  Jungle: Buy 1 companion + 1 Health Potion.\n`;
+  ref += `  Support: Buy World Atlas + 1 Health Potion.\n`;
+  ref += `  NEVER put starting items (Doran's, companions, potions) in coreBuild.\n`;
   return ref;
 }
 
@@ -496,6 +558,7 @@ async function resolveDdragonItem(itemName) {
             const norm = d.name.toLowerCase().replace(/['\u2019]/g, "'").replace(/\s+/g, ' ').trim();
             const iconUrl = `https://ddragon.leagueoflegends.com/cdn/${ver}/img/item/${id}.png`;
             const isSR = d.maps?.['11'] === true; // Summoner's Rift
+            const isARAM = d.maps?.['12'] === true; // Howling Abyss (ARAM)
             // CRITICAL: Only include Summoner's Rift items in the name lookup
             // This prevents Arena/ARAM-only items (Goredrinker, Stridebreaker, etc.) from being resolved
             if (isSR) {
@@ -503,8 +566,8 @@ async function resolveDdragonItem(itemName) {
                 items.set(norm, { id, name: d.name, iconUrl, gold: d.gold?.total || 0 });
               }
             }
-            // byId stores ALL items (needed for component resolution) but marks SR availability
-            byId.set(id, { name: d.name, from: d.from || [], into: d.into || [], gold: d.gold?.total || 0, base: d.gold?.base || 0, iconUrl, tags: d.tags || [], isSR });
+            // byId stores ALL items (needed for component resolution) but marks map availability
+            byId.set(id, { name: d.name, from: d.from || [], into: d.into || [], gold: d.gold?.total || 0, base: d.gold?.base || 0, iconUrl, tags: d.tags || [], isSR, isARAM });
           }
           console.log(`[ddragon] Cached ${items.size} SR items out of ${byId.size} total`);
           ddragonItemCache = { version: ver, items, byId };
@@ -719,6 +782,242 @@ function seedRagFromBundle() {
       log('INFO', '[RAG] Seeded from bundled data');
     }
   } catch { }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  META BUILD REFERENCE SYSTEM
+//  Fetches per-champion popular builds from u.gg/op.gg via Gemini
+//  Google Search grounding. Pre-fetched for ALL champions on patch
+//  change, cached to disk, injected as guidance into the AI prompt.
+// ═══════════════════════════════════════════════════════════════════
+
+const META_BUILDS_DIR = path.join(RAG_DIR, 'meta-builds');
+const META_BUILDS_SR_DIR = path.join(META_BUILDS_DIR, 'sr');
+let isMetaSyncing = false;
+
+function ensureMetaBuildDirs() {
+  for (const dir of [META_BUILDS_DIR, META_BUILDS_SR_DIR]) {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+function getMetaBuildMeta() {
+  const metaFile = path.join(META_BUILDS_DIR, 'meta.json');
+  if (!fs.existsSync(metaFile)) return null;
+  try { return JSON.parse(fs.readFileSync(metaFile, 'utf-8')); }
+  catch { return null; }
+}
+
+function saveMetaBuildMeta(meta) {
+  ensureMetaBuildDirs();
+  fs.writeFileSync(path.join(META_BUILDS_DIR, 'meta.json'), JSON.stringify(meta, null, 2), 'utf-8');
+}
+
+/**
+ * Get cached meta build reference for a champion+role.
+ * Returns formatted prompt string or '' if not cached.
+ */
+function getMetaBuildReference(champion, role) {
+  try {
+    // Try exact match first: Champion_Role.json
+    const exactFile = path.join(META_BUILDS_SR_DIR, `${champion}_${role}.json`);
+    if (fs.existsSync(exactFile)) {
+      const data = JSON.parse(fs.readFileSync(exactFile, 'utf-8'));
+      return formatMetaReference(data);
+    }
+
+    // Try any role for this champion (off-meta fallback)
+    const files = fs.readdirSync(META_BUILDS_SR_DIR).filter(f => f.startsWith(`${champion}_`) && f.endsWith('.json'));
+    if (files.length > 0) {
+      // Use the first available role as a partial reference
+      const data = JSON.parse(fs.readFileSync(path.join(META_BUILDS_SR_DIR, files[0]), 'utf-8'));
+      return formatMetaReference(data, true);
+    }
+
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+function formatMetaReference(data, isOffRole = false) {
+  if (!data || !data.metaBuild) return '';
+  const mb = data.metaBuild;
+  const offRoleNote = isOffRole
+    ? `\n  ⚠️ NOTE: No meta data for this exact role. Showing ${data.champion} ${data.role || 'main role'} as reference. Adapt heavily for the actual role.`
+    : '';
+
+  let ref = `META REFERENCE (Patch ${data.patch || '?'} popular build — use as baseline, adapt to enemy comp):${offRoleNote}\n`;
+  if (mb.winRate) ref += `  Win Rate: ${mb.winRate}% | `;
+  if (mb.pickRate) ref += `Pick Rate: ${mb.pickRate}%\n`;
+  if (mb.keystone) ref += `  Popular Keystone: ${mb.keystone}${mb.primaryTree ? ` (${mb.primaryTree})` : ''}\n`;
+  if (mb.startingItems && mb.startingItems.length > 0) ref += `  Popular Starting: ${mb.startingItems.join(' + ')}\n`;
+  if (mb.coreItems && mb.coreItems.length > 0) ref += `  Popular Core: ${mb.coreItems.join(' → ')}\n`;
+  if (mb.boots) ref += `  Popular Boots: ${mb.boots}\n`;
+  if (mb.skillOrder) ref += `  Skill Order: ${mb.skillOrder}\n`;
+  ref += `\n  INSTRUCTION: Start from this meta build as your baseline. Adapt 1-3 items and runes to counter the specific enemy threats. The core direction should align with meta unless matchup demands otherwise.\n`;
+  return ref;
+}
+
+/**
+ * Batch-fetch meta builds for a group of champions via Gemini + Google Search grounding.
+ * Returns array of { champion, role, metaBuild } objects.
+ */
+async function fetchMetaBuildBatch(genAI, champions, patch) {
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-3-flash-preview',
+    tools: [{ googleSearch: {} }],
+  });
+
+  const champList = champions.map((c, i) => `${i + 1}. ${c.name} (most popular role)`).join('\n');
+
+  const prompt = `Search u.gg and op.gg for the highest winrate builds on League of Legends Patch ${patch} for these champions:
+${champList}
+
+For EACH champion, return the build for their MOST POPULAR role.
+
+Return ONLY a compact JSON array (no markdown, no code blocks, just raw JSON):
+[
+  {
+    "champion": "ChampionName",
+    "role": "Top/Jungle/Mid/ADC/Support",
+    "metaBuild": {
+      "winRate": 52.3,
+      "pickRate": 8.5,
+      "keystone": "Lethal Tempo",
+      "primaryTree": "Precision",
+      "secondaryTree": "Domination",
+      "startingItems": ["Doran's Blade", "Health Potion"],
+      "coreItems": ["Kraken Slayer", "Phantom Dancer", "Infinity Edge"],
+      "boots": "Berserker's Greaves",
+      "skillOrder": "Q > W > E > R"
+    }
+  }
+]
+
+Rules:
+- One entry per champion
+- winRate and pickRate as numbers (e.g. 52.3, not "52.3%")
+- coreItems: the 3 most popular core items in build order
+- startingItems: exactly 2 (1 starting item + 1 potion)
+- boots: the most popular boots upgrade
+- skillOrder: max priority format "Q > W > E > R"
+- Use current patch data, not outdated builds`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim();
+    const cleanJson = text.replace(/^```(json)?[\s\n]*/i, '').replace(/[\s\n]*```$/i, '').trim();
+    return JSON.parse(cleanJson);
+  } catch (err) {
+    log('ERROR', `[MetaBuild] Batch fetch failed: ${err.message}`);
+    return [];
+  }
+}
+
+/**
+ * Sync meta builds for ALL champions. Runs in background on patch change.
+ * Batches 10 champions per Gemini call to minimize API usage.
+ */
+async function syncAllMetaBuilds(livePatch, force = false) {
+  if (isMetaSyncing) {
+    log('INFO', '[MetaBuild] Sync already in progress, skipping');
+    return;
+  }
+
+  const patchMajorMinor = livePatch.split('.').slice(0, 2).join('.');
+  const meta = getMetaBuildMeta();
+
+  if (!force && meta && meta.patch === patchMajorMinor) {
+    log('INFO', `[MetaBuild] Already synced for Patch ${patchMajorMinor} (${meta.champCount || '?'} champs)`);
+    return;
+  }
+
+  isMetaSyncing = true;
+  log('INFO', `[MetaBuild] Starting full meta build sync for Patch ${patchMajorMinor}...`);
+
+  try {
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
+    if (!apiKey) { log('WARN', '[MetaBuild] No API key, skipping'); return; }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    // Get ALL champions from DDragon
+    const champCache = await ensureDdragonChampCache();
+    if (!champCache || champCache.size === 0) {
+      log('ERROR', '[MetaBuild] No champion data available');
+      return;
+    }
+
+    const allChamps = [];
+    for (const [name, data] of champCache) {
+      allChamps.push({ name, id: data.id, tags: data.tags });
+    }
+    log('INFO', `[MetaBuild] Fetching meta builds for ${allChamps.length} champions...`);
+
+    ensureMetaBuildDirs();
+    const BATCH_SIZE = 10;
+    let totalCached = 0;
+    let batchNum = 0;
+
+    for (let i = 0; i < allChamps.length; i += BATCH_SIZE) {
+      batchNum++;
+      const batch = allChamps.slice(i, i + BATCH_SIZE);
+      const batchNames = batch.map(c => c.name).join(', ');
+      log('INFO', `[MetaBuild] Batch ${batchNum}: ${batchNames}`);
+
+      try {
+        const results = await fetchMetaBuildBatch(genAI, batch, patchMajorMinor);
+
+        if (Array.isArray(results)) {
+          for (const entry of results) {
+            if (!entry.champion || !entry.role || !entry.metaBuild) continue;
+
+            // Normalize champion name to DDragon ID (e.g. "Dr. Mundo" -> "DrMundo")
+            let champId = entry.champion;
+            const champData = champCache.get(entry.champion);
+            if (champData) champId = champData.id;
+
+            // Normalize role
+            const role = entry.role.toLowerCase().replace('bottom', 'adc').replace('bot', 'adc');
+            const normalizedRole = ['top', 'jungle', 'mid', 'adc', 'support'].includes(role) ? role : entry.role;
+
+            const outFile = path.join(META_BUILDS_SR_DIR, `${champId}_${normalizedRole}.json`);
+            const outData = {
+              champion: champId,
+              role: normalizedRole,
+              patch: patchMajorMinor,
+              fetchedAt: new Date().toISOString(),
+              metaBuild: entry.metaBuild,
+            };
+            fs.writeFileSync(outFile, JSON.stringify(outData, null, 2), 'utf-8');
+            totalCached++;
+          }
+        }
+      } catch (batchErr) {
+        log('ERROR', `[MetaBuild] Batch ${batchNum} failed: ${batchErr.message}`);
+      }
+
+      // Rate limit: 2s between batches
+      if (i + BATCH_SIZE < allChamps.length) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+
+    saveMetaBuildMeta({
+      patch: patchMajorMinor,
+      updatedAt: new Date().toISOString(),
+      champCount: totalCached,
+      source: 'gemini-grounding-search',
+    });
+
+    log('INFO', `[MetaBuild] Sync complete! Cached ${totalCached} champion builds for Patch ${patchMajorMinor}`);
+  } catch (err) {
+    log('ERROR', '[MetaBuild] Sync failed:', err.message);
+  } finally {
+    isMetaSyncing = false;
+  }
 }
 
 function ensureIconCache() {
@@ -1014,7 +1313,7 @@ COMMON MISTAKES — NEVER DO THESE:
         skillOrder: { type: "string", description: "Max priority e.g. Q > W > E > R" },
         startingItems: {
           type: "array", items: { type: "string" },
-          description: "Level 1 items only (Doran's, companions, potions)"
+          description: "Exactly 2 items: 1 starting item + 1 potion. Total cost must be ≤500g. Use ONLY items from the VALID STARTING ITEMS list. Example: ['Doran\\'s Blade', 'Health Potion']. Jungle: ['Scorchclaw Pup', 'Health Potion']. Support: ['World Atlas', 'Health Potion']."
         },
         coreBuild: {
           type: "array",
@@ -1706,6 +2005,35 @@ ${userMessage.slice(0, 2000)}`;
 
       const genAI = new GoogleGenerativeAI(apiKey);
       const systemPrompt = shortPrompt ? buildShortPrompt(patchDisplay) : buildSystemPrompt(patchDisplay);
+
+      // Inject RAG context into the user message
+      const ragContext = getLocalRagContext(body.myChampion, body.role, body.enemies);
+
+      // Fetch valid runes from DDragon for prompt injection
+      let runesRef = '';
+      try {
+        const runeData = await fetchDdragonRunes();
+        if (runeData) runesRef = runeData.reference;
+      } catch (e) { console.warn('[build] Could not fetch DDragon runes:', e.message); }
+      const bootsRef = getValidBootsReference();
+      const itemsRef = getValidItemsReference();
+      const startingItemsRef = getValidStartingItemsReference(body.role);
+      const sumSpellsRef = await getSummonerSpellsReference();
+      const enemyProfile = await computeEnemyProfile(body.enemies);
+
+      const isBot = /^(bottom|adc|bot)$/i.test(body.role);
+      const itemSlots = isBot ? 7 : 6;
+
+      const matchupLine = body.enemies && body.enemies.length > 0
+        ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
+        : '';
+
+      const allChamps = [body.myChampion, ...(body.enemies || [])];
+      const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
+      const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
+      const metaRef = getMetaBuildReference(body.myChampion, body.role);
+      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
+
       const { text: cleanText } = await fetchRobustJsonBuild(genAI, modelName, systemPrompt, userMessage, false);
 
       return { text: cleanText, patchUsed: patchDisplay };
@@ -1959,17 +2287,31 @@ ${userMessage.slice(0, 2000)}`;
 
         const genAI = new GoogleGenerativeAI(apiKey);
 
+        // ── Game Mode Detection ──
+        const gameMode = body.gameMode || 'sr'; // 'sr', 'aram', 'aram-mayhem'
+        const mapId = gameMode === 'sr' ? 11 : 12;
+        const isARAM = gameMode !== 'sr';
+
+        // ── Mode-specific system prompt ──
+        const systemPrompt = gameMode === 'aram-mayhem'
+          ? _prompts.buildAramMayhemSystemPrompt(patchDisplay)
+          : gameMode === 'aram'
+            ? _prompts.buildAramSystemPrompt(patchDisplay)
+            : buildSystemPrompt(patchDisplay);
+
         // Shared context
         const ragContext = getLocalRagContext(body.myChampion, body.role, body.enemies);
         let runesRef = '';
         try { const rd = await fetchDdragonRunes(); if (rd) runesRef = rd.reference; } catch {}
-        const bootsRef = getValidBootsReference();
-        const itemsRef = getValidItemsReference();
+        const bootsRef = getValidBootsReference(mapId);
+        const itemsRef = getValidItemsReference(mapId);
+        const startingItemsRef = getValidStartingItemsReference(body.role, mapId);
+        const metaRef = getMetaBuildReference(body.myChampion, body.role);
         const sumSpellsRef = await getSummonerSpellsReference();
-        const enemyProfile = await computeEnemyProfile(body.enemies);
-        const isBot = /^(bottom|adc|bot)$/i.test(body.role);
+        const enemyProfile = isARAM ? '' : await computeEnemyProfile(body.enemies);
+        const isBot = !isARAM && /^(bottom|adc|bot)$/i.test(body.role);
         const itemSlots = isBot ? 7 : 6;
-        const matchupLine = body.enemies && body.enemies.length > 0
+        const matchupLine = !isARAM && body.enemies && body.enemies.length > 0
           ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
           : '';
 
@@ -1977,15 +2319,23 @@ ${userMessage.slice(0, 2000)}`;
         const allChamps3 = [body.myChampion, ...(body.enemies || [])];
         const mechMap3 = await _prompts.fetchMultipleChampionMechanics(allChamps3);
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
-        const fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
+
+        // ── Mode-specific user message ──
+        let fullUserMessage;
+        if (isARAM) {
+          const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems: []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${gameMode === 'aram-mayhem' ? ' Also recommend the best 4 augments for this champion.' : ''}\n\n⚠️ FINAL REMINDER: NEVER invent item names. Use ONLY items from the VALID COMPLETED ITEMS list. This is ${modeLabel} mode — no Doran's items, no jungle, no lane matchup.`;
+        } else {
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY starting items from the VALID STARTING ITEMS list above. startingItems must be exactly 2 items (1 starter + 1 potion). Generate optimized build.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. startingItems MUST be from the VALID STARTING ITEMS list (exactly 2: one starter + one potion, ≤500g total). NEVER invent item names.`;
+        }
 
         const generationMode = body.generationMode || getSetting('generationMode') || 'flash';
         const fullPhaseModelName = generationMode === 'flash' 
           ? 'gemini-3-flash-preview' 
           : (body.model || 'gemini-3.1-pro-preview');
 
-        sendSSE({ patchUsed: patchDisplay, dualMode: generationMode !== 'flash' });
-        log('INFO', `[dual] Starting generation: mode=${generationMode}, model=${fullPhaseModelName} for ${body.myChampion} ${body.role}`);
+        sendSSE({ patchUsed: patchDisplay, dualMode: generationMode !== 'flash', gameMode });
+        log('INFO', `[dual] Starting generation: mode=${generationMode}, gameMode=${gameMode}, model=${fullPhaseModelName} for ${body.myChampion} ${body.role || 'ARAM'}`);
 
         // ── Phase 1: Flash for fast runes (SKIP in flash-only mode to avoid duplicate runes) ──
         let flashPromise;
@@ -2045,7 +2395,7 @@ ${userMessage.slice(0, 2000)}`;
           // Flash-only mode: run Flash with JSON structured output and retries
           log('INFO', `[dual] Flash-only mode: running Flash with JSON schema & retries`);
           
-          const result = await fetchRobustJsonBuild(genAI, 'gemini-3-flash-preview', buildSystemPrompt(patchDisplay), fullUserMessage, true);
+          const result = await fetchRobustJsonBuild(genAI, 'gemini-3-flash-preview', systemPrompt, fullUserMessage, true);
           let cleanText = result.text;
           const actualModelUsed = result.modelUsed;
 
@@ -2161,10 +2511,28 @@ ${userMessage.slice(0, 2000)}`;
       try {
         const version = await fetchDDragonVersion();
         checkAndSyncRag(version, true); // fire-and-forget
-        res.json({ ok: true, message: 'RAG sync started' });
+        syncAllMetaBuilds(version, true).catch(err => log('WARN', '[api] Meta sync failed: ' + err.message)); // also sync meta
+        res.json({ ok: true, message: 'RAG + Meta Build sync started' });
       } catch (err) {
         res.status(500).json({ ok: false, error: err.message });
       }
+    });
+
+    // Meta build status endpoint
+    backendApp.get('/api/meta-builds/status', (_req, res) => {
+      const meta = getMetaBuildMeta();
+      let champCount = 0;
+      try {
+        if (fs.existsSync(META_BUILDS_SR_DIR)) {
+          champCount = fs.readdirSync(META_BUILDS_SR_DIR).filter(f => f.endsWith('.json')).length;
+        }
+      } catch {}
+      res.json({
+        isSyncing: isMetaSyncing,
+        patch: meta?.patch || null,
+        updatedAt: meta?.updatedAt || null,
+        champCount,
+      });
     });
 
     const server = backendApp.listen(PORT, '127.0.0.1', () => {
@@ -6803,6 +7171,8 @@ app.whenReady().then(async () => {
       const livePatch = versions[0];
       log('INFO', '[main] Live patch: ' + livePatch);
       await checkAndSyncRag(livePatch);
+      // Fire-and-forget: sync meta builds for ALL champions in background
+      syncAllMetaBuilds(livePatch).catch(err => log('WARN', '[main] Meta build sync failed: ' + err.message));
     } catch (err) {
       log('WARN', '[main] RAG sync on startup failed: ' + err.message);
     }

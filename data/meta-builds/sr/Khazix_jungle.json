@@ -1,0 +1,25 @@
+{
+  "champion": "Khazix",
+  "championName": "Kha'Zix",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.178Z",
+  "metaBuild": {
+    "winRate": 50.35,
+    "pickRate": 2.8,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Axiom Arc",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

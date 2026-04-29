@@ -1,0 +1,25 @@
+{
+  "champion": "Senna",
+  "championName": "Senna",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.044Z",
+  "metaBuild": {
+    "winRate": 50.01,
+    "pickRate": 4.68,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Black Cleaver",
+      "Rapid Firecannon",
+      "Infinity Edge"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

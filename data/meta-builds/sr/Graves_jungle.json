@@ -1,0 +1,25 @@
+{
+  "champion": "Graves",
+  "championName": "Graves",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.105Z",
+  "metaBuild": {
+    "winRate": 49.7,
+    "pickRate": 15.09,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "The Collector",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

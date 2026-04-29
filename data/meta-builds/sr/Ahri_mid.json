@@ -1,0 +1,25 @@
+{
+  "champion": "Ahri",
+  "championName": "Ahri",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.405Z",
+  "metaBuild": {
+    "winRate": 50.38,
+    "pickRate": 11.8,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Malignance",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

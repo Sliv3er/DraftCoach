@@ -1,0 +1,25 @@
+{
+  "champion": "Zed",
+  "championName": "Zed",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.431Z",
+  "metaBuild": {
+    "winRate": 50.1,
+    "pickRate": 7.1,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Long Sword",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Profane Hydra",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

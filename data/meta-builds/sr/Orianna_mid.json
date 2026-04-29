@@ -1,0 +1,25 @@
+{
+  "champion": "Orianna",
+  "championName": "Orianna",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.403Z",
+  "metaBuild": {
+    "winRate": 48.52,
+    "pickRate": 4.67,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Ivern",
+  "championName": "Ivern",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.109Z",
+  "metaBuild": {
+    "winRate": 55.56,
+    "pickRate": 0.8,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Redemption",
+      "Moonstone Renewer",
+      "Ardent Censer"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > Q > W > R"
+  }
+}

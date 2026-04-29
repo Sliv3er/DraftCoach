@@ -1,0 +1,25 @@
+{
+  "champion": "TwistedFate",
+  "championName": "Twisted Fate",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.657Z",
+  "metaBuild": {
+    "winRate": 51.5,
+    "pickRate": 4.5,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Lich Bane",
+      "Rapid Firecannon"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

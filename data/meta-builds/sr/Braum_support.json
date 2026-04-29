@@ -1,0 +1,25 @@
+{
+  "champion": "Braum",
+  "championName": "Braum",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.560Z",
+  "metaBuild": {
+    "winRate": 55,
+    "pickRate": 5.8,
+    "keystone": "Unsealed Spellbook",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Locket of the Iron Solari",
+      "Bandlepipes",
+      "Knight's Vow"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

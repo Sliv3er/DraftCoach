@@ -1,0 +1,25 @@
+{
+  "champion": "Renata",
+  "championName": "Renata Glasc",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.944Z",
+  "metaBuild": {
+    "winRate": 47.2,
+    "pickRate": 1.8,
+    "keystone": "Guardian",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Celestial Opposition",
+      "Shurelya's Battlesong",
+      "Imperial Mandate"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > W > Q > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Yuumi",
+  "championName": "Yuumi",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.429Z",
+  "metaBuild": {
+    "winRate": 41.7,
+    "pickRate": 5.2,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Moonstone Renewer",
+      "Mikael's Blessing",
+      "Ardent Censer"
+    ],
+    "boots": "None",
+    "skillOrder": "Q > E > W > R"
+  }
+}

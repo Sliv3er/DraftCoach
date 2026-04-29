@@ -1,0 +1,25 @@
+{
+  "champion": "Karma",
+  "championName": "Karma",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.908Z",
+  "metaBuild": {
+    "winRate": 48.6,
+    "pickRate": 14.3,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Moonstone Renewer",
+      "Imperial Mandate",
+      "Shurelya's Battlesong"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

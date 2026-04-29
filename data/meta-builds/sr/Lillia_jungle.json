@@ -1,0 +1,25 @@
+{
+  "champion": "Lillia",
+  "championName": "Lillia",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.066Z",
+  "metaBuild": {
+    "winRate": 51.7,
+    "pickRate": 8.2,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Riftmaker",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

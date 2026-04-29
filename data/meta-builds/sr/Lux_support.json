@@ -1,0 +1,25 @@
+{
+  "champion": "Lux",
+  "championName": "Lux",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.068Z",
+  "metaBuild": {
+    "winRate": 50.2,
+    "pickRate": 5.7,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Horizon Focus",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "XinZhao",
+  "championName": "Xin Zhao",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.046Z",
+  "metaBuild": {
+    "winRate": 47.49,
+    "pickRate": 10.9,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Black Cleaver",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

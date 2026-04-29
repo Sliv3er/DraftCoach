@@ -1,0 +1,984 @@
+{
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:11:25.950Z",
+  "augments": [
+    {
+      "name": "Scoped Weapon",
+      "tier": "Silver",
+      "effect": "Gain 100 Attack Range (200 for Melee).",
+      "set": null
+    },
+    {
+      "name": "Deft",
+      "tier": "Silver",
+      "effect": "Gain 40% Attack Speed.",
+      "set": null
+    },
+    {
+      "name": "Leg Day",
+      "tier": "Silver",
+      "effect": "Gain 50 Movement Speed and 40% slow resistance.",
+      "set": null
+    },
+    {
+      "name": "Heavy Hitter",
+      "tier": "Silver",
+      "effect": "Your attacks deal bonus physical damage equal to 5% of the target's maximum health.",
+      "set": null
+    },
+    {
+      "name": "Witchful Thinking",
+      "tier": "Silver",
+      "effect": "Gain 70 Ability Power.",
+      "set": null
+    },
+    {
+      "name": "Blunt Force",
+      "tier": "Silver",
+      "effect": "Gain 20% Attack Damage.",
+      "set": null
+    },
+    {
+      "name": "ReEnergize",
+      "tier": "Silver",
+      "effect": "Gain 40 Ability Haste.",
+      "set": null
+    },
+    {
+      "name": "Buff Buddies",
+      "tier": "Silver",
+      "effect": "Gain permanent Blue and Red buffs.",
+      "set": null
+    },
+    {
+      "name": "Tank It Or Leave It",
+      "tier": "Silver",
+      "effect": "Gain 25% Critical Strike chance and the ability to critically defend to reduce damage taken.",
+      "set": null
+    },
+    {
+      "name": "Frost Wraith",
+      "tier": "Silver",
+      "effect": "Every 7 seconds, your next attack roots the target.",
+      "set": "Fully Automated"
+    },
+    {
+      "name": "Homeguard",
+      "tier": "Silver",
+      "effect": "Gain the Homeguard movement speed effect at all times while out of combat.",
+      "set": null
+    },
+    {
+      "name": "Goredrink",
+      "tier": "Silver",
+      "effect": "Heal for a portion of your missing health when dealing damage.",
+      "set": null
+    },
+    {
+      "name": "Slap Around",
+      "tier": "Silver",
+      "effect": "Immobilizing an enemy increases your damage dealt to them.",
+      "set": null
+    },
+    {
+      "name": "Stats!",
+      "tier": "Silver",
+      "effect": "Gain a minor boost to all of your champion's base stats.",
+      "set": null
+    },
+    {
+      "name": "Upgrade Collector",
+      "tier": "Silver",
+      "effect": "Gain a Golden version of The Collector with improved stats.",
+      "set": null
+    },
+    {
+      "name": "ADAPt",
+      "tier": "Silver",
+      "effect": "Convert your Ability Power into Attack Damage.",
+      "set": null
+    },
+    {
+      "name": "Weighted Popoffs",
+      "tier": "Silver",
+      "effect": "Gain a burst of movement speed after casting an ability.",
+      "set": null
+    },
+    {
+      "name": "Speed Demon",
+      "tier": "Silver",
+      "effect": "Gain bonus movement speed based on your total Attack Speed.",
+      "set": null
+    },
+    {
+      "name": "Ice Cold",
+      "tier": "Silver",
+      "effect": "Increase the effectiveness of your slow effects.",
+      "set": null
+    },
+    {
+      "name": "Typhoon",
+      "tier": "Silver",
+      "effect": "Your attacks fire bolts at two nearby enemies.",
+      "set": null
+    },
+    {
+      "name": "Mind to Matter",
+      "tier": "Silver",
+      "effect": "Gain maximum health equal to a percentage of your maximum mana.",
+      "set": null
+    },
+    {
+      "name": "Dive Bomber",
+      "tier": "Silver",
+      "effect": "Explode on death, dealing massive damage to nearby enemies and reducing your death timer.",
+      "set": "Dive Bomb"
+    },
+    {
+      "name": "escAPADe",
+      "tier": "Silver",
+      "effect": "Convert your Attack Damage into Ability Power.",
+      "set": null
+    },
+    {
+      "name": "Infernal Soul",
+      "tier": "Silver",
+      "effect": "Gain the Infernal Dragon Soul.",
+      "set": null
+    },
+    {
+      "name": "Ocean Soul",
+      "tier": "Silver",
+      "effect": "Gain the Ocean Dragon Soul.",
+      "set": null
+    },
+    {
+      "name": "Mighty Shield",
+      "tier": "Silver",
+      "effect": "Increases the strength of shields you grant to yourself or allies.",
+      "set": null
+    },
+    {
+      "name": "Wind Beneath Blade",
+      "tier": "Silver",
+      "effect": "Gain Attack Speed for a short duration after using a dash, leap, or blink.",
+      "set": null
+    },
+    {
+      "name": "Adamant",
+      "tier": "Silver",
+      "effect": "Gain bonus Armor and Magic Resistance.",
+      "set": null
+    },
+    {
+      "name": "Self Destruct",
+      "tier": "Silver",
+      "effect": "Damaging an enemy also deals a portion of that damage to yourself but increases overall output.",
+      "set": "Dive Bomb"
+    },
+    {
+      "name": "Upgrade Zhonya's",
+      "tier": "Silver",
+      "effect": "Gain an upgraded Zhonya's Hourglass with lower active cooldown.",
+      "set": null
+    },
+    {
+      "name": "Transmute: Gold",
+      "tier": "Silver",
+      "effect": "Immediately transform this augment into a random Gold tier augment.",
+      "set": "Make it Rain"
+    },
+    {
+      "name": "Light 'em Up!",
+      "tier": "Silver",
+      "effect": "Every 4th attack deals bonus magic damage.",
+      "set": null
+    },
+    {
+      "name": "Upgrade Immolate",
+      "tier": "Silver",
+      "effect": "Gain an upgraded Sunfire Aegis burn effect.",
+      "set": null
+    },
+    {
+      "name": "Tormentor",
+      "tier": "Silver",
+      "effect": "Immobilizing enemies applies a burn dealing max health damage over time.",
+      "set": null
+    },
+    {
+      "name": "Spin To Win",
+      "tier": "Silver",
+      "effect": "Your spin abilities gain 30 Ability Haste and deal 30% more damage.",
+      "set": null
+    },
+    {
+      "name": "Flashbang",
+      "tier": "Silver",
+      "effect": "Your Flash blinds nearby enemies for 2 seconds.",
+      "set": null
+    },
+    {
+      "name": "First-Aid Kit",
+      "tier": "Silver",
+      "effect": "Gain 25% Heal and Shield Power.",
+      "set": "Wee Woo Wee Woo"
+    },
+    {
+      "name": "Executioner",
+      "tier": "Silver",
+      "effect": "Deal 10% increased damage to enemies below 30% health and reset basic abilities on takedown.",
+      "set": null
+    },
+    {
+      "name": "Erosion",
+      "tier": "Silver",
+      "effect": "Dealing damage reduces the target's Armor and Magic Resist stacking up to 20%.",
+      "set": null
+    },
+    {
+      "name": "Guilty Pleasure",
+      "tier": "Silver",
+      "effect": "Immobilizing an enemy champion heals you for a percentage of your max health.",
+      "set": null
+    },
+    {
+      "name": "Hat on a Hat",
+      "tier": "Silver",
+      "effect": "Gain Ability Power for every unique item in your inventory with a 'Hat' or 'Cap' in its name.",
+      "set": null
+    },
+    {
+      "name": "Poltergeist",
+      "tier": "Silver",
+      "effect": "Gain stacking Ability Haste every time you cast a spell.",
+      "set": null
+    },
+    {
+      "name": "Swift and Safe",
+      "tier": "Silver",
+      "effect": "Gain a shield after using a dash, blink, or leap.",
+      "set": null
+    },
+    {
+      "name": "Ultimate Unstoppable",
+      "tier": "Silver",
+      "effect": "Become Unstoppable for the duration of your ultimate's cast.",
+      "set": null
+    },
+    {
+      "name": "Upgrade Cutlass",
+      "tier": "Silver",
+      "effect": "Gain an upgraded Bilgewater Cutlass with increased active damage.",
+      "set": null
+    },
+    {
+      "name": "Veil of Warding",
+      "tier": "Silver",
+      "effect": "Gain a spell shield that refreshes every 40 seconds.",
+      "set": null
+    },
+    {
+      "name": "FireFox",
+      "tier": "Silver",
+      "effect": "Your next ability fires a homing flame at the target.",
+      "set": "Fully Automated"
+    },
+    {
+      "name": "Apex Inventor",
+      "tier": "Gold",
+      "effect": "Reduce item active and passive cooldowns by 75%.",
+      "set": null
+    },
+    {
+      "name": "Firebrand",
+      "tier": "Gold",
+      "effect": "Your attacks apply a stacking burn that deals magic damage over time.",
+      "set": null
+    },
+    {
+      "name": "Flashy",
+      "tier": "Gold",
+      "effect": "Gain 3 charges of Flash, but its range is reduced.",
+      "set": null
+    },
+    {
+      "name": "Soul Siphon",
+      "tier": "Gold",
+      "effect": "Gain 25% Critical Strike chance and 12% Lifesteal on critical strikes.",
+      "set": null
+    },
+    {
+      "name": "From Beginning to End",
+      "tier": "Gold",
+      "effect": "Gain the Dark Harvest and First Strike keystone runes.",
+      "set": null
+    },
+    {
+      "name": "Restless Restoration",
+      "tier": "Gold",
+      "effect": "Continuously heal while moving based on distance traveled.",
+      "set": null
+    },
+    {
+      "name": "Quest: Urf's Champion",
+      "tier": "Gold",
+      "effect": "Takedowns grant Spatulas; collect 10 to transform into Urf.",
+      "set": null
+    },
+    {
+      "name": "Perseverance",
+      "tier": "Gold",
+      "effect": "Gain massive Health Regeneration, which increases significantly when below 25% health.",
+      "set": null
+    },
+    {
+      "name": "It's Critical",
+      "tier": "Gold",
+      "effect": "Gain 50% Critical Strike chance.",
+      "set": null
+    },
+    {
+      "name": "With Haste",
+      "tier": "Gold",
+      "effect": "Gain bonus Movement Speed equal to your Ability Haste.",
+      "set": null
+    },
+    {
+      "name": "Vulnerability",
+      "tier": "Gold",
+      "effect": "Your item effects and damage-over-time effects can now critically strike.",
+      "set": null
+    },
+    {
+      "name": "OK Boomerang",
+      "tier": "Gold",
+      "effect": "Automatically fire a boomerang at enemies you attack.",
+      "set": "Fully Automated"
+    },
+    {
+      "name": "Shrink Ray",
+      "tier": "Gold",
+      "effect": "Your attacks reduce the target's size and damage dealt by 15%.",
+      "set": null
+    },
+    {
+      "name": "Magic Missile",
+      "tier": "Gold",
+      "effect": "Damaging an enemy with an ability fires a magic missile at them.",
+      "set": null
+    },
+    {
+      "name": "Quest: Steel Your Heart",
+      "tier": "Gold",
+      "effect": "Proc Heartsteel on enemies to gain permanent health; rewards an upgraded Heartsteel at completion.",
+      "set": "Stackasaurus Rex"
+    },
+    {
+      "name": "Overflow",
+      "tier": "Gold",
+      "effect": "Gain permanent health whenever a minion or monster dies nearby.",
+      "set": null
+    },
+    {
+      "name": "Get Excited",
+      "tier": "Gold",
+      "effect": "Takedowns grant a massive burst of movement speed and attack speed.",
+      "set": null
+    },
+    {
+      "name": "Holy Fire",
+      "tier": "Gold",
+      "effect": "Your heals apply a burn to enemies and grant damage to allies.",
+      "set": null
+    },
+    {
+      "name": "It's Killing Time",
+      "tier": "Gold",
+      "effect": "Takedowns reset your basic ability cooldowns.",
+      "set": null
+    },
+    {
+      "name": "Marksmage",
+      "tier": "Gold",
+      "effect": "Your basic attacks deal bonus magic damage equal to 100% of your Ability Power.",
+      "set": null
+    },
+    {
+      "name": "The Brutalizer",
+      "tier": "Gold",
+      "effect": "Gain 20 AD, 10 Ability Haste, and 5 Lethality.",
+      "set": null
+    },
+    {
+      "name": "Outlaw's Grit",
+      "tier": "Gold",
+      "effect": "Gain Armor and Magic Resist for a short duration after using a dash.",
+      "set": null
+    },
+    {
+      "name": "Thread the Needle",
+      "tier": "Gold",
+      "effect": "Gain 25% Armor Penetration and Magic Penetration.",
+      "set": null
+    },
+    {
+      "name": "Keystone Conjurer",
+      "tier": "Gold",
+      "effect": "Gain a random keystone rune that changes every few minutes.",
+      "set": null
+    },
+    {
+      "name": "Ethereal Weapon",
+      "tier": "Gold",
+      "effect": "Your abilities apply on-hit effects.",
+      "set": null
+    },
+    {
+      "name": "Demon's Dance",
+      "tier": "Gold",
+      "effect": "Gain a temporary shield and AD/AP after a takedown.",
+      "set": null
+    },
+    {
+      "name": "Impassable",
+      "tier": "Gold",
+      "effect": "Increases the duration of your Crowd Control effects by 20%.",
+      "set": null
+    },
+    {
+      "name": "Vampirism",
+      "tier": "Gold",
+      "effect": "Gain 20% Omnivamp.",
+      "set": null
+    },
+    {
+      "name": "Skilled Sniper",
+      "tier": "Gold",
+      "effect": "Hitting an enemy with a non-ultimate ability at over 700 range refunds its cooldown.",
+      "set": null
+    },
+    {
+      "name": "Minionmancer",
+      "tier": "Gold",
+      "effect": "Your summoned pets and clones deal 50% more damage and have 50% more health.",
+      "set": null
+    },
+    {
+      "name": "Phenomenal Evil",
+      "tier": "Gold",
+      "effect": "Gain permanent Ability Power when hitting enemies with spells.",
+      "set": "Stackasaurus Rex"
+    },
+    {
+      "name": "Transmute: Prismatic",
+      "tier": "Gold",
+      "effect": "Immediately transform this augment into a random Prismatic tier augment.",
+      "set": "Make it Rain"
+    },
+    {
+      "name": "Stats on Stats!",
+      "tier": "Gold",
+      "effect": "Increase all of your current stats by 10%.",
+      "set": null
+    },
+    {
+      "name": "Tank Engine",
+      "tier": "Gold",
+      "effect": "Gain Armor and Magic Resist based on a percentage of your bonus health.",
+      "set": null
+    },
+    {
+      "name": "Shrink Engine",
+      "tier": "Gold",
+      "effect": "Your abilities reduce the size and damage of enemies hit.",
+      "set": null
+    },
+    {
+      "name": "Upgrade Hubris",
+      "tier": "Gold",
+      "effect": "Gain an upgraded Hubris item with higher AD per statue.",
+      "set": null
+    },
+    {
+      "name": "Critical Missile",
+      "tier": "Gold",
+      "effect": "Critical strikes fire a homing missile at the target.",
+      "set": null
+    },
+    {
+      "name": "Grandma's Chili Oil",
+      "tier": "Gold",
+      "effect": "Your damage applies a spicy burn that deals magic damage and slows.",
+      "set": null
+    },
+    {
+      "name": "Lightning Strikes",
+      "tier": "Gold",
+      "effect": "Gain Attack Damage based on your total Attack Speed.",
+      "set": null
+    },
+    {
+      "name": "Soul Eater",
+      "tier": "Gold",
+      "effect": "Heal and gain permanent health when units die near you.",
+      "set": null
+    },
+    {
+      "name": "Bread and Butter",
+      "tier": "Gold",
+      "effect": "Your primary ability (Q) gains 150 Ability Haste.",
+      "set": null
+    },
+    {
+      "name": "Celestial Body",
+      "tier": "Gold",
+      "effect": "Gain 1000 health but deal 10% less damage.",
+      "set": null
+    },
+    {
+      "name": "Critical Healing",
+      "tier": "Gold",
+      "effect": "Your heals and shields can now critically strike for 50% more value.",
+      "set": "Wee Woo Wee Woo"
+    },
+    {
+      "name": "Critical Rhythm",
+      "tier": "Gold",
+      "effect": "Gaining a critical strike increases your Attack Speed significantly for 3 seconds.",
+      "set": null
+    },
+    {
+      "name": "Donation",
+      "tier": "Gold",
+      "effect": "A portion of your gold earned is shared with your allies.",
+      "set": null
+    },
+    {
+      "name": "Poro Blaster",
+      "tier": "Gold",
+      "effect": "Casting abilities fires a Poro that deals magic damage.",
+      "set": null
+    },
+    {
+      "name": "Rabble Rousing",
+      "tier": "Gold",
+      "effect": "Using an ability heals you for a percentage of your maximum health.",
+      "set": null
+    },
+    {
+      "name": "Recursion",
+      "tier": "Gold",
+      "effect": "Gain 60 Ability Haste.",
+      "set": null
+    },
+    {
+      "name": "Spiritual Purification",
+      "tier": "Gold",
+      "effect": "Automatically cleanse yourself after being hit by hard crowd control (30s cooldown).",
+      "set": null
+    },
+    {
+      "name": "Twice Thrice",
+      "tier": "Gold",
+      "effect": "Every third attack or ability hit triggers twice.",
+      "set": null
+    },
+    {
+      "name": "Upgrade Infinity Edge",
+      "tier": "Gold",
+      "effect": "Gain an upgraded Infinity Edge with increased Critical Strike Damage.",
+      "set": null
+    },
+    {
+      "name": "All For You",
+      "tier": "Gold",
+      "effect": "Healing or shielding an ally also applies a portion of the effect to yourself.",
+      "set": "Wee Woo Wee Woo"
+    },
+    {
+      "name": "Big Brain",
+      "tier": "Gold",
+      "effect": "Gain Ability Power equal to 10% of your maximum Mana.",
+      "set": null
+    },
+    {
+      "name": "Upgrade Sword of Blossoming Dawn",
+      "tier": "Gold",
+      "effect": "Gain an upgraded version of Sword of Blossoming Dawn.",
+      "set": null
+    },
+    {
+      "name": "Heat Death",
+      "tier": "Gold",
+      "effect": "Gain a Mordekaiser-themed aura that deals damage to nearby enemies.",
+      "set": null
+    },
+    {
+      "name": "Shieldmaiden",
+      "tier": "Gold",
+      "effect": "Gain massive Armor and Magic Resist while shielding yourself or an ally.",
+      "set": null
+    },
+    {
+      "name": "Sonata",
+      "tier": "Gold",
+      "effect": "Your abilities grant stacking aura effects to nearby allies.",
+      "set": "Wee Woo Wee Woo"
+    },
+    {
+      "name": "Divine Intervention",
+      "tier": "Gold",
+      "effect": "Become invulnerable for 2 seconds when falling below 15% health (90s cooldown).",
+      "set": "Fully Automated"
+    },
+    {
+      "name": "Archmage",
+      "tier": "Gold",
+      "effect": "Casting an ability refunds a percentage of the cooldown of another random ability.",
+      "set": "Archmage"
+    },
+    {
+      "name": "Make it Rain",
+      "tier": "Gold",
+      "effect": "Enemies drop gold coins on takedown that grant permanent stats.",
+      "set": "Make it Rain"
+    },
+    {
+      "name": "Stackosaurus Rex",
+      "tier": "Gold",
+      "effect": "Double all stacks gained from other augments and champion passives.",
+      "set": "Stackasaurus Rex"
+    },
+    {
+      "name": "Firecracker",
+      "tier": "Gold",
+      "effect": "Your attacks and abilities create explosions that bounce to nearby enemies.",
+      "set": "Firecracker"
+    },
+    {
+      "name": "High Roller",
+      "tier": "Gold",
+      "effect": "Minions have a chance to drop Stat Anvils on death.",
+      "set": "High Roller"
+    },
+    {
+      "name": "Scopiest Weapons",
+      "tier": "Prismatic",
+      "effect": "Gain 250 Attack Range (150 for Ranged).",
+      "set": null
+    },
+    {
+      "name": "Biggest Snowball Ever",
+      "tier": "Prismatic",
+      "effect": "Your Snowball is massive, passes through minions, and knocks up champions.",
+      "set": "Snowday"
+    },
+    {
+      "name": "Ultimate Revolution",
+      "tier": "Prismatic",
+      "effect": "Cast your ultimate a second time within 10 seconds of the first cast.",
+      "set": null
+    },
+    {
+      "name": "Ultimate Awakening",
+      "tier": "Prismatic",
+      "effect": "Gain 200 Ultimate Haste.",
+      "set": null
+    },
+    {
+      "name": "Jeweled Gauntlet",
+      "tier": "Prismatic",
+      "effect": "Your abilities can critically strike and you gain Crit Chance based on AP.",
+      "set": null
+    },
+    {
+      "name": "Infernal Conduit",
+      "tier": "Prismatic",
+      "effect": "Your abilities apply an infinitely stacking burn that reduces ability cooldowns on tick.",
+      "set": null
+    },
+    {
+      "name": "Goliath",
+      "tier": "Prismatic",
+      "effect": "Grow significantly in size, gaining 35% health and 15% AD/AP.",
+      "set": null
+    },
+    {
+      "name": "Fey Magic",
+      "tier": "Prismatic",
+      "effect": "Damaging an enemy with your ultimate polymorphs them for 2 seconds.",
+      "set": null
+    },
+    {
+      "name": "Clown College",
+      "tier": "Prismatic",
+      "effect": "Summon a Shaco-style clone when you use your ultimate or fall below 40% health.",
+      "set": "Dive Bomb"
+    },
+    {
+      "name": "Quest: Sneakerhead",
+      "tier": "Prismatic",
+      "effect": "Travel a long distance to gain permanent Movement Speed and a Golden Boots item.",
+      "set": "Stackasaurus Rex"
+    },
+    {
+      "name": "Back to Basics",
+      "tier": "Prismatic",
+      "effect": "Disable your item actives and passives to gain 50% increased damage and health.",
+      "set": null
+    },
+    {
+      "name": "Giant Slayer",
+      "tier": "Prismatic",
+      "effect": "Become tiny, gaining 20% Movement Speed and dealing more damage to larger enemies.",
+      "set": null
+    },
+    {
+      "name": "Transmute: Chaos",
+      "tier": "Prismatic",
+      "effect": "Immediately gain two random augments of any tier.",
+      "set": null
+    },
+    {
+      "name": "Tap Dancer",
+      "tier": "Prismatic",
+      "effect": "Your attacks grant stacking movement speed and attack speed indefinitely.",
+      "set": null
+    },
+    {
+      "name": "Quantum Computing",
+      "tier": "Prismatic",
+      "effect": "Automatically deal damage in a ring around you every few seconds.",
+      "set": "Fully Automated"
+    },
+    {
+      "name": "Symphony of War",
+      "tier": "Prismatic",
+      "effect": "Gain the Lethal Tempo and Conqueror keystone runes.",
+      "set": null
+    },
+    {
+      "name": "Omni Soul",
+      "tier": "Prismatic",
+      "effect": "Gain the effects of all Elemental Dragon Souls.",
+      "set": null
+    },
+    {
+      "name": "Mad Scientist",
+      "tier": "Prismatic",
+      "effect": "Randomly change size and gain various stat boosts every 30 seconds.",
+      "set": null
+    },
+    {
+      "name": "Goldrend",
+      "tier": "Prismatic",
+      "effect": "Steal gold from enemies on every attack or ability hit.",
+      "set": "Make it Rain"
+    },
+    {
+      "name": "Baby Kitty",
+      "tier": "Prismatic",
+      "effect": "Summon a large spectral cat that protects you and attacks nearby enemies.",
+      "set": null
+    },
+    {
+      "name": "Draw Your Sword",
+      "tier": "Prismatic",
+      "effect": "Lose all attack range (become melee) to gain massive AD, HP, and resistances.",
+      "set": null
+    },
+    {
+      "name": "Empyrean Promise",
+      "tier": "Prismatic",
+      "effect": "Gain stats for every nearby ally and grant them a portion of those stats.",
+      "set": null
+    },
+    {
+      "name": "Dashing",
+      "tier": "Prismatic",
+      "effect": "Your dash, leap, and blink abilities have 200 Ability Haste.",
+      "set": null
+    },
+    {
+      "name": "Mystic Punch",
+      "tier": "Prismatic",
+      "effect": "Your attacks reduce your ability cooldowns by 1 second on hit.",
+      "set": null
+    },
+    {
+      "name": "Snowball Roulette",
+      "tier": "Prismatic",
+      "effect": "Using Snowball replaces one of your summoner spells with a random powerful spell.",
+      "set": "Snowday"
+    },
+    {
+      "name": "Slow Cooker",
+      "tier": "Prismatic",
+      "effect": "Burn nearby enemies for a percentage of your maximum health every second.",
+      "set": null
+    },
+    {
+      "name": "Can't Touch This",
+      "tier": "Prismatic",
+      "effect": "Become invulnerable for 3 seconds after casting your ultimate.",
+      "set": null
+    },
+    {
+      "name": "Blade Waltz",
+      "tier": "Prismatic",
+      "effect": "Dash around enemies, becoming untargetable and dealing damage (Original Fiora Ultimate).",
+      "set": null
+    },
+    {
+      "name": "Windspeaker's Blessing",
+      "tier": "Prismatic",
+      "effect": "Your heals and shields grant the target increased Armor and Magic Resistance.",
+      "set": "Wee Woo Wee Woo"
+    },
+    {
+      "name": "Ominous Pact",
+      "tier": "Prismatic",
+      "effect": "Sacrifice 30% of your max health to gain a massive amount of adaptive force.",
+      "set": null
+    },
+    {
+      "name": "King Me",
+      "tier": "Prismatic",
+      "effect": "Transform into the Poro King, gaining new abilities and massive health.",
+      "set": null
+    },
+    {
+      "name": "Protein Shake",
+      "tier": "Prismatic",
+      "effect": "Takedowns grant permanent size and health.",
+      "set": null
+    },
+    {
+      "name": "Glass Cannon",
+      "tier": "Prismatic",
+      "effect": "Deal 30% more damage but take 30% more damage.",
+      "set": null
+    },
+    {
+      "name": "Circle of Death",
+      "tier": "Prismatic",
+      "effect": "Any healing you receive deals a portion of that healing as magic damage to nearby enemies.",
+      "set": null
+    },
+    {
+      "name": "Eureka",
+      "tier": "Prismatic",
+      "effect": "Gain Ability Haste equal to 30% of your Ability Power.",
+      "set": null
+    },
+    {
+      "name": "Infinite Recursion",
+      "tier": "Prismatic",
+      "effect": "For 5 seconds after using an ability, its cooldown is reduced to 0.5 seconds (60s cooldown).",
+      "set": null
+    },
+    {
+      "name": "Red Envelopes",
+      "tier": "Prismatic",
+      "effect": "Enemies drop red envelopes on death that grant gold and permanent stats to whoever picks them up.",
+      "set": null
+    },
+    {
+      "name": "Dual Wield",
+      "tier": "Prismatic",
+      "effect": "Gain 100% Attack Speed but your attacks deal 30% less damage.",
+      "set": null
+    },
+    {
+      "name": "Dropkick",
+      "tier": "Prismatic",
+      "effect": "Your first attack against a champion dashes you to them and deals bonus damage.",
+      "set": null
+    },
+    {
+      "name": "Void Rift",
+      "tier": "Prismatic",
+      "effect": "Periodically open a rift that summons Voidlings to attack nearby enemies.",
+      "set": null
+    },
+    {
+      "name": "Fan The Hammer",
+      "tier": "Prismatic",
+      "effect": "Your attacks fire additional projectiles in a cone.",
+      "set": null
+    },
+    {
+      "name": "Quest: Wooglet's Witchcap",
+      "tier": "Prismatic",
+      "effect": "Collect AP to unlock an upgraded Wooglet's Witchcap item.",
+      "set": "Stackasaurus Rex"
+    },
+    {
+      "name": "Cruelty",
+      "tier": "Prismatic",
+      "effect": "Dealing damage to enemies reduces their maximum health and resistances for the rest of the fight.",
+      "set": null
+    },
+    {
+      "name": "Final Form",
+      "tier": "Prismatic",
+      "effect": "After using your ultimate, enter an ascended state with massive stats for 10 seconds.",
+      "set": null
+    },
+    {
+      "name": "Pandora's Box",
+      "tier": "Prismatic",
+      "effect": "Your items are randomized into different items of the same tier every few minutes.",
+      "set": null
+    },
+    {
+      "name": "Quest: Icathia's Fall",
+      "tier": "Prismatic",
+      "effect": "Survive for a specific duration in combat to unleash a massive Void explosion.",
+      "set": null
+    },
+    {
+      "name": "Stats on Stats on Stats!",
+      "tier": "Prismatic",
+      "effect": "Increase all of your stats by 25%.",
+      "set": null
+    },
+    {
+      "name": "Cerberus",
+      "tier": "Prismatic",
+      "effect": "Gain two additional heads, increasing your ability damage and vision range.",
+      "set": null
+    },
+    {
+      "name": "Courage of the Colossus",
+      "tier": "Prismatic",
+      "effect": "Gain a large shield whenever you hit an enemy with hard crowd control.",
+      "set": null
+    },
+    {
+      "name": "Gash",
+      "tier": "Prismatic",
+      "effect": "Your attacks apply a bleed that deals true damage over time.",
+      "set": null
+    },
+    {
+      "name": "Heads Up Cupcake!",
+      "tier": "Prismatic",
+      "effect": "Drop traps around you that snare and damage enemies who step on them.",
+      "set": null
+    },
+    {
+      "name": "Master of Duality",
+      "tier": "Prismatic",
+      "effect": "Attacking grants Ability Power, and casting spells grants Attack Damage.",
+      "set": null
+    },
+    {
+      "name": "Prom Queen",
+      "tier": "Prismatic",
+      "effect": "Select an ally to be your escort; you both gain massive stats while near each other.",
+      "set": "Fully Automated"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Shyvana",
+  "championName": "Shyvana",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.159Z",
+  "metaBuild": {
+    "winRate": 51.52,
+    "pickRate": 2.95,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Dusk and Dawn",
+      "Spear of Shojin"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > W > Q > R"
+  }
+}

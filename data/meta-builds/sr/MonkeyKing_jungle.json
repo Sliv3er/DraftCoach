@@ -1,0 +1,25 @@
+{
+  "champion": "MonkeyKing",
+  "championName": "Wukong",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:02:13.652Z",
+  "metaBuild": {
+    "winRate": 47.5,
+    "pickRate": 2.1,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Trinity Force",
+      "Black Cleaver"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

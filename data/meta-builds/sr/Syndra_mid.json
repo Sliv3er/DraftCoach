@@ -1,0 +1,25 @@
+{
+  "champion": "Syndra",
+  "championName": "Syndra",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.332Z",
+  "metaBuild": {
+    "winRate": 50.2,
+    "pickRate": 4.8,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Echo",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Sylas",
+  "championName": "Sylas",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.331Z",
+  "metaBuild": {
+    "winRate": 48.1,
+    "pickRate": 7.5,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hextech Rocketbelt",
+      "Riftmaker",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > Q > E > R"
+  }
+}

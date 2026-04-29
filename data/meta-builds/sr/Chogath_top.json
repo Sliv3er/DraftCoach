@@ -1,0 +1,25 @@
+{
+  "champion": "Chogath",
+  "championName": "Cho'Gath",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.760Z",
+  "metaBuild": {
+    "winRate": 50.3,
+    "pickRate": 0.5,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Riftmaker",
+      "Sunfire Aegis"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "Q > W > E > R"
+  }
+}

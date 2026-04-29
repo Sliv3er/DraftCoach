@@ -1,0 +1,25 @@
+{
+  "champion": "Ziggs",
+  "championName": "Ziggs",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.432Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 1.7,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Archangel's Staff",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

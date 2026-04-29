@@ -1,0 +1,25 @@
+{
+  "champion": "Gangplank",
+  "championName": "Gangplank",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.823Z",
+  "metaBuild": {
+    "winRate": 58.64,
+    "pickRate": 3.97,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Essence Reaver",
+      "Navori Flickerblade",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

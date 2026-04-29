@@ -1,0 +1,25 @@
+{
+  "champion": "Poppy",
+  "championName": "Poppy",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.930Z",
+  "metaBuild": {
+    "winRate": 50.2,
+    "pickRate": 1.5,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Bloodsong",
+      "Dead Man's Plate",
+      "Thornmail"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > E > W > R"
+  }
+}

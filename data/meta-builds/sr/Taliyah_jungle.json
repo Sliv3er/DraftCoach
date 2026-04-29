@@ -1,0 +1,25 @@
+{
+  "champion": "Taliyah",
+  "championName": "Taliyah",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.333Z",
+  "metaBuild": {
+    "winRate": 52.8,
+    "pickRate": 5,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blackfire Torch",
+      "Liandry's Torment",
+      "Rylai's Crystal Scepter"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

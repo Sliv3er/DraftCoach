@@ -1,0 +1,25 @@
+{
+  "champion": "Nami",
+  "championName": "Nami",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:02:13.656Z",
+  "metaBuild": {
+    "winRate": 50.2,
+    "pickRate": 8.5,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Imperial Mandate",
+      "Shurelya's Battlesong",
+      "Moonstone Renewer"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > E > Q > R"
+  }
+}

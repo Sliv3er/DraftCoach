@@ -1,0 +1,25 @@
+{
+  "champion": "Zoe",
+  "championName": "Zoe",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:10:10.605Z",
+  "metaBuild": {
+    "winRate": 54.88,
+    "pickRate": 3.92,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Echo",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Janna",
+  "championName": "Janna",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.109Z",
+  "metaBuild": {
+    "winRate": 52.8,
+    "pickRate": 3.85,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Dream Maker",
+      "Moonstone Renewer",
+      "Redemption"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "W > E > Q > R"
+  }
+}

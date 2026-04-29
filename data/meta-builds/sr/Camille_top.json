@@ -1,0 +1,25 @@
+{
+  "champion": "Camille",
+  "championName": "Camille",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.758Z",
+  "metaBuild": {
+    "winRate": 50.6,
+    "pickRate": 3.2,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Ravenous Hydra",
+      "Spear of Shojin"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

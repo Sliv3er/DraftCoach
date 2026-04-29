@@ -1,0 +1,25 @@
+{
+  "champion": "Xayah",
+  "championName": "Xayah",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.044Z",
+  "metaBuild": {
+    "winRate": 51.7,
+    "pickRate": 9.2,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Essence Reaver",
+      "Navori Flickerblade",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "E > W > Q > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Urgot",
+  "championName": "Urgot",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.660Z",
+  "metaBuild": {
+    "winRate": 53.4,
+    "pickRate": 4.2,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Black Cleaver",
+      "Hullbreaker",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

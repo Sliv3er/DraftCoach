@@ -1,0 +1,25 @@
+{
+  "champion": "Qiyana",
+  "championName": "Qiyana",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.935Z",
+  "metaBuild": {
+    "winRate": 48.2,
+    "pickRate": 4.5,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Hubris",
+      "Opportunity"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

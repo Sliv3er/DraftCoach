@@ -1,0 +1,25 @@
+{
+  "champion": "Vladimir",
+  "championName": "Vladimir",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.042Z",
+  "metaBuild": {
+    "winRate": 50.1,
+    "pickRate": 4.3,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Riftmaker",
+      "Cosmic Drive",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Twitch",
+  "championName": "Twitch",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.658Z",
+  "metaBuild": {
+    "winRate": 56.49,
+    "pickRate": 1.98,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stormrazor",
+      "Runaan's Hurricane",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "E > Q > W > R"
+  }
+}

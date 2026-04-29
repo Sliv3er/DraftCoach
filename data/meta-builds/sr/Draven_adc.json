@@ -1,0 +1,25 @@
+{
+  "champion": "Draven",
+  "championName": "Draven",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.763Z",
+  "metaBuild": {
+    "winRate": 52.6,
+    "pickRate": 4.5,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Hexoptics C44",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > W > E > R"
+  }
+}

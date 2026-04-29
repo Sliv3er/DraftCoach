@@ -1,0 +1,25 @@
+{
+  "champion": "Rumble",
+  "championName": "Rumble",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.042Z",
+  "metaBuild": {
+    "winRate": 48.8,
+    "pickRate": 4.51,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Zhonya's Hourglass",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

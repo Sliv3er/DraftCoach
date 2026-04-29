@@ -1,0 +1,25 @@
+{
+  "champion": "Kennen",
+  "championName": "Kennen",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.177Z",
+  "metaBuild": {
+    "winRate": 50.75,
+    "pickRate": 2.05,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hextech Rocketbelt",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

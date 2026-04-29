@@ -1,0 +1,25 @@
+{
+  "champion": "Nasus",
+  "championName": "Nasus",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:02:13.656Z",
+  "metaBuild": {
+    "winRate": 51.1,
+    "pickRate": 3.5,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Frozen Heart",
+      "Spirit Visage"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

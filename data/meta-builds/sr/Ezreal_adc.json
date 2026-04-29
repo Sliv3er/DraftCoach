@@ -1,0 +1,25 @@
+{
+  "champion": "Ezreal",
+  "championName": "Ezreal",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.792Z",
+  "metaBuild": {
+    "winRate": 45.86,
+    "pickRate": 29.27,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Manamune",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

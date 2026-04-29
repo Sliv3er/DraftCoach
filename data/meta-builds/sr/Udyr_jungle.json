@@ -1,0 +1,25 @@
+{
+  "champion": "Udyr",
+  "championName": "Udyr",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.659Z",
+  "metaBuild": {
+    "winRate": 52.1,
+    "pickRate": 6.2,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Frozen Heart",
+      "Riftmaker"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "R > W > E > Q"
+  }
+}

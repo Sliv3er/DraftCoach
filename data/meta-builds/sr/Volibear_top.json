@@ -1,0 +1,25 @@
+{
+  "champion": "Volibear",
+  "championName": "Volibear",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.043Z",
+  "metaBuild": {
+    "winRate": 50.5,
+    "pickRate": 5.4,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Riftmaker",
+      "Nashor's Tooth",
+      "Spirit Visage"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > Q > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Ryze",
+  "championName": "Ryze",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.043Z",
+  "metaBuild": {
+    "winRate": 47.67,
+    "pickRate": 3.44,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Tear of the Goddess",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Seraph's Embrace",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

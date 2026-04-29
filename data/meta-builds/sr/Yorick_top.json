@@ -1,0 +1,25 @@
+{
+  "champion": "Yorick",
+  "championName": "Yorick",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.426Z",
+  "metaBuild": {
+    "winRate": 50.5,
+    "pickRate": 3.1,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Hullbreaker",
+      "Overlord's Bloodmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Kindred",
+  "championName": "Kindred",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.179Z",
+  "metaBuild": {
+    "winRate": 50.91,
+    "pickRate": 2.39,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Hexoptics C44",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

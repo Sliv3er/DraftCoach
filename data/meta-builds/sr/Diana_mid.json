@@ -1,0 +1,25 @@
+{
+  "champion": "Diana",
+  "championName": "Diana",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.763Z",
+  "metaBuild": {
+    "winRate": 52.98,
+    "pickRate": 3.03,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stormsurge",
+      "Dusk and Dawn",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

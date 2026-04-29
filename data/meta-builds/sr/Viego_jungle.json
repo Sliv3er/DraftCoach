@@ -1,0 +1,25 @@
+{
+  "champion": "Viego",
+  "championName": "Viego",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.041Z",
+  "metaBuild": {
+    "winRate": 49.66,
+    "pickRate": 10.26,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Mosstomper Seedling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Sundered Sky",
+      "Black Cleaver"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

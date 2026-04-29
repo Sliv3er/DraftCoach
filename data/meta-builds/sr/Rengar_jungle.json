@@ -1,0 +1,25 @@
+{
+  "champion": "Rengar",
+  "championName": "Rengar",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.040Z",
+  "metaBuild": {
+    "winRate": 55.63,
+    "pickRate": 2.08,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Sundered Sky",
+      "Eclipse"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

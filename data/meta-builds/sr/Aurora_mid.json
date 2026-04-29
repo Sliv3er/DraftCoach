@@ -1,0 +1,25 @@
+{
+  "champion": "Aurora",
+  "championName": "Aurora",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.555Z",
+  "metaBuild": {
+    "winRate": 54.3,
+    "pickRate": 4.1,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stormsurge",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

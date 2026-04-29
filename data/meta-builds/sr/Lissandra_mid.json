@@ -1,0 +1,25 @@
+{
+  "champion": "Lissandra",
+  "championName": "Lissandra",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.067Z",
+  "metaBuild": {
+    "winRate": 52.2,
+    "pickRate": 5.8,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Malignance",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

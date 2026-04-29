@@ -1,0 +1,25 @@
+{
+  "champion": "Veigar",
+  "championName": "Veigar",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.662Z",
+  "metaBuild": {
+    "winRate": 49.5,
+    "pickRate": 3.5,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Archangel's Staff",
+      "Rabadon's Deathcap",
+      "Void Staff"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

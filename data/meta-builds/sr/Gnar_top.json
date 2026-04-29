@@ -1,0 +1,25 @@
+{
+  "champion": "Gnar",
+  "championName": "Gnar",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.825Z",
+  "metaBuild": {
+    "winRate": 49.69,
+    "pickRate": 4.52,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Black Cleaver",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

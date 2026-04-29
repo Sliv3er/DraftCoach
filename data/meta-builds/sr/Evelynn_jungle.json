@@ -1,0 +1,25 @@
+{
+  "champion": "Evelynn",
+  "championName": "Evelynn",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.792Z",
+  "metaBuild": {
+    "winRate": 51.42,
+    "pickRate": 2.34,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Lich Bane",
+      "Stormsurge",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

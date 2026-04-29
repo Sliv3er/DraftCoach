@@ -1,0 +1,25 @@
+{
+  "champion": "KSante",
+  "championName": "K'Sante",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.180Z",
+  "metaBuild": {
+    "winRate": 47.89,
+    "pickRate": 6.27,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Iceborn Gauntlet",
+      "Sunfire Aegis",
+      "Thornmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

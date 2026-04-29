@@ -1,0 +1,25 @@
+{
+  "champion": "Gragas",
+  "championName": "Gragas",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.103Z",
+  "metaBuild": {
+    "winRate": 50.03,
+    "pickRate": 2.1,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hextech Rocketbelt",
+      "Zhonya's Hourglass",
+      "Seraph's Embrace"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

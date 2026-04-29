@@ -1,0 +1,25 @@
+{
+  "champion": "Amumu",
+  "championName": "Amumu",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.418Z",
+  "metaBuild": {
+    "winRate": 52.3,
+    "pickRate": 1.8,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Sunfire Aegis",
+      "Abyssal Mask"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "E > Q > W > R"
+  }
+}

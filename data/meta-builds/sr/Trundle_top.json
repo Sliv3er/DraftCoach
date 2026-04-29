@@ -1,0 +1,25 @@
+{
+  "champion": "Trundle",
+  "championName": "Trundle",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.338Z",
+  "metaBuild": {
+    "winRate": 45.9,
+    "pickRate": 1.5,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of the Ruined King",
+      "Ravenous Hydra",
+      "Trinity Force"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

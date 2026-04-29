@@ -1,0 +1,25 @@
+{
+  "champion": "Talon",
+  "championName": "Talon",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.334Z",
+  "metaBuild": {
+    "winRate": 49.5,
+    "pickRate": 2.4,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Sundered Sky",
+      "Serylda's Grudge"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "W > Q > E > R"
+  }
+}

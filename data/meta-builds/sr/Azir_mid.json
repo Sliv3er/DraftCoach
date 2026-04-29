@@ -1,0 +1,25 @@
+{
+  "champion": "Azir",
+  "championName": "Azir",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.556Z",
+  "metaBuild": {
+    "winRate": 52,
+    "pickRate": 2.5,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Hextech Rocketbelt",
+      "Riftmaker"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > Q > E > R"
+  }
+}

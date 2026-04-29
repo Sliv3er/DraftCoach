@@ -1,0 +1,25 @@
+{
+  "champion": "Zac",
+  "championName": "Zac",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.430Z",
+  "metaBuild": {
+    "winRate": 51.1,
+    "pickRate": 2.4,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sunfire Aegis",
+      "Spirit Visage",
+      "Thornmail"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > W > Q > R"
+  }
+}

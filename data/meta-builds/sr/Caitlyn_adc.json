@@ -1,0 +1,25 @@
+{
+  "champion": "Caitlyn",
+  "championName": "Caitlyn",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.756Z",
+  "metaBuild": {
+    "winRate": 53.5,
+    "pickRate": 16.3,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hexoptics C44",
+      "Infinity Edge",
+      "Rapid Firecannon"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Malzahar",
+  "championName": "Malzahar",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.069Z",
+  "metaBuild": {
+    "winRate": 51.4,
+    "pickRate": 6.8,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Malignance",
+      "Liandry's Torment",
+      "Rylai's Crystal Scepter"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

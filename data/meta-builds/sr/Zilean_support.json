@@ -1,0 +1,25 @@
+{
+  "champion": "Zilean",
+  "championName": "Zilean",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.432Z",
+  "metaBuild": {
+    "winRate": 52.1,
+    "pickRate": 2.9,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Shurelya's Battlesong",
+      "Imperial Mandate",
+      "Morellonomicon"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

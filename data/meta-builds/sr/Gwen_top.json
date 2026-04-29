@@ -1,0 +1,25 @@
+{
+  "champion": "Gwen",
+  "championName": "Gwen",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.106Z",
+  "metaBuild": {
+    "winRate": 49.1,
+    "pickRate": 2.4,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Dusk and Dawn",
+      "Nashor's Tooth",
+      "Riftmaker"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

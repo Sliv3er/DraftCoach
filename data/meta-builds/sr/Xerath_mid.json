@@ -1,0 +1,25 @@
+{
+  "champion": "Xerath",
+  "championName": "Xerath",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.045Z",
+  "metaBuild": {
+    "winRate": 52.4,
+    "pickRate": 6.04,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Shadowflame",
+      "Horizon Focus"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

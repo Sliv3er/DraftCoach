@@ -1,0 +1,25 @@
+{
+  "champion": "Akshan",
+  "championName": "Akshan",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.408Z",
+  "metaBuild": {
+    "winRate": 47.73,
+    "pickRate": 1.58,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Statikk Shiv",
+      "The Collector",
+      "Infinity Edge"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "Q > E > W > R"
+  }
+}

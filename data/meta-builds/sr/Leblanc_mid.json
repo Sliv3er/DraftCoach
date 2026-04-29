@@ -1,0 +1,25 @@
+{
+  "champion": "Leblanc",
+  "championName": "LeBlanc",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.181Z",
+  "metaBuild": {
+    "winRate": 50.39,
+    "pickRate": 4.49,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Echo",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > Q > E > R"
+  }
+}

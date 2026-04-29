@@ -1,0 +1,25 @@
+{
+  "champion": "Illaoi",
+  "championName": "Illaoi",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.108Z",
+  "metaBuild": {
+    "winRate": 50.37,
+    "pickRate": 2.33,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Iceborn Gauntlet",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "E > Q > W > R"
+  }
+}

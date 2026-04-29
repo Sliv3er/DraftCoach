@@ -1,0 +1,25 @@
+{
+  "champion": "Ambessa",
+  "championName": "Ambessa",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.409Z",
+  "metaBuild": {
+    "winRate": 49.4,
+    "pickRate": 5.4,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Axiom Arc",
+      "Death's Dance"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

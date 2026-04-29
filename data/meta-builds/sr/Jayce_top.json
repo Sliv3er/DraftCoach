@@ -1,0 +1,25 @@
+{
+  "champion": "Jayce",
+  "championName": "Jayce",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.900Z",
+  "metaBuild": {
+    "winRate": 47.9,
+    "pickRate": 8.7,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Eclipse",
+      "Manamune",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

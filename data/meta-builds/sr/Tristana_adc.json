@@ -1,0 +1,25 @@
+{
+  "champion": "Tristana",
+  "championName": "Tristana",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.337Z",
+  "metaBuild": {
+    "winRate": 51.1,
+    "pickRate": 6.5,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Navori Flickerblade",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "E > Q > W > R"
+  }
+}

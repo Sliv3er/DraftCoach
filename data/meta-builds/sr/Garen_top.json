@@ -1,0 +1,25 @@
+{
+  "champion": "Garen",
+  "championName": "Garen",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.824Z",
+  "metaBuild": {
+    "winRate": 51.12,
+    "pickRate": 8.9,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stridebreaker",
+      "Phantom Dancer",
+      "Dead Man's Plate"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "E > Q > W > R"
+  }
+}

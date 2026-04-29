@@ -1,0 +1,25 @@
+{
+  "champion": "Ornn",
+  "championName": "Ornn",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.404Z",
+  "metaBuild": {
+    "winRate": 52.2,
+    "pickRate": 5.09,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sunfire Aegis",
+      "Thornmail",
+      "Jak'Sho, The Protean"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > Q > E > R"
+  }
+}

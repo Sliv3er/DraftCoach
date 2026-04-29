@@ -1,0 +1,25 @@
+{
+  "champion": "Sejuani",
+  "championName": "Sejuani",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.044Z",
+  "metaBuild": {
+    "winRate": 50.81,
+    "pickRate": 1.84,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Heartsteel",
+      "Sunfire Aegis",
+      "Thornmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > Q > E > R"
+  }
+}

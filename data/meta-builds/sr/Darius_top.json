@@ -1,0 +1,25 @@
+{
+  "champion": "Darius",
+  "championName": "Darius",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.762Z",
+  "metaBuild": {
+    "winRate": 50.4,
+    "pickRate": 4.96,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stridebreaker",
+      "Sterak's Gage",
+      "Dead Man's Plate"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

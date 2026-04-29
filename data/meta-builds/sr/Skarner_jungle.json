@@ -1,0 +1,25 @@
+{
+  "champion": "Skarner",
+  "championName": "Skarner",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.166Z",
+  "metaBuild": {
+    "winRate": 51.15,
+    "pickRate": 0.9,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Heartsteel",
+      "Sunfire Aegis",
+      "Thornmail"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

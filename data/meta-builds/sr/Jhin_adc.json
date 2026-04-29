@@ -1,0 +1,25 @@
+{
+  "champion": "Jhin",
+  "championName": "Jhin",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.905Z",
+  "metaBuild": {
+    "winRate": 48.2,
+    "pickRate": 20.8,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stormrazor",
+      "Infinity Edge",
+      "Rapid Firecannon"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

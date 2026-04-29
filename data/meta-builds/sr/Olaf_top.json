@@ -1,0 +1,25 @@
+{
+  "champion": "Olaf",
+  "championName": "Olaf",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.403Z",
+  "metaBuild": {
+    "winRate": 52.19,
+    "pickRate": 2.37,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Experimental Hexplate",
+      "Death's Dance"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Belveth",
+  "championName": "Bel'Veth",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.558Z",
+  "metaBuild": {
+    "winRate": 59,
+    "pickRate": 5.3,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Stridebreaker",
+      "Death's Dance"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

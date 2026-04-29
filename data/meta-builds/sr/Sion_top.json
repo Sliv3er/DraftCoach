@@ -1,0 +1,25 @@
+{
+  "champion": "Sion",
+  "championName": "Sion",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.165Z",
+  "metaBuild": {
+    "winRate": 50.98,
+    "pickRate": 5.01,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Heartsteel",
+      "Sunfire Aegis",
+      "Thornmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

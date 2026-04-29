@@ -1,0 +1,25 @@
+{
+  "champion": "Renekton",
+  "championName": "Renekton",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.945Z",
+  "metaBuild": {
+    "winRate": 49.1,
+    "pickRate": 6,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Black Cleaver",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

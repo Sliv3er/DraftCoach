@@ -1,0 +1,25 @@
+{
+  "champion": "Sona",
+  "championName": "Sona",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.167Z",
+  "metaBuild": {
+    "winRate": 44.74,
+    "pickRate": 2.06,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Echoes of Helia",
+      "Ardent Censer",
+      "Moonstone Renewer"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > Q > E > R"
+  }
+}

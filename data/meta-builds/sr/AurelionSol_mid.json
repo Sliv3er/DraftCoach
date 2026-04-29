@@ -1,0 +1,25 @@
+{
+  "champion": "AurelionSol",
+  "championName": "Aurelion Sol",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.554Z",
+  "metaBuild": {
+    "winRate": 55.7,
+    "pickRate": 2.68,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Archangel's Staff",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

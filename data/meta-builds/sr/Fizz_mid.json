@@ -1,0 +1,25 @@
+{
+  "champion": "Fizz",
+  "championName": "Fizz",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.819Z",
+  "metaBuild": {
+    "winRate": 48.31,
+    "pickRate": 3.73,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Lich Bane",
+      "Zhonya's Hourglass",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > W > Q > R"
+  }
+}

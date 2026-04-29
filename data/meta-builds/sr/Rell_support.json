@@ -1,0 +1,25 @@
+{
+  "champion": "Rell",
+  "championName": "Rell",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.944Z",
+  "metaBuild": {
+    "winRate": 52.1,
+    "pickRate": 6.2,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Celestial Opposition",
+      "Zeke's Convergence",
+      "Knight's Vow"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > E > Q > R"
+  }
+}

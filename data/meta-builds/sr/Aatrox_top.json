@@ -1,0 +1,25 @@
+{
+  "champion": "Aatrox",
+  "championName": "Aatrox",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.376Z",
+  "metaBuild": {
+    "winRate": 50.3,
+    "pickRate": 15.9,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Eclipse",
+      "Sundered Sky",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

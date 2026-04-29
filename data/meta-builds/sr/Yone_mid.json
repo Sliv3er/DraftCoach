@@ -1,0 +1,25 @@
+{
+  "champion": "Yone",
+  "championName": "Yone",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.425Z",
+  "metaBuild": {
+    "winRate": 48.5,
+    "pickRate": 8.2,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Infinity Edge",
+      "Mortal Reminder"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

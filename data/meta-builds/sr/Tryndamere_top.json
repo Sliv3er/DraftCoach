@@ -1,0 +1,25 @@
+{
+  "champion": "Tryndamere",
+  "championName": "Tryndamere",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.656Z",
+  "metaBuild": {
+    "winRate": 51.4,
+    "pickRate": 3.8,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Navori Quickblades",
+      "Phantom Dancer"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

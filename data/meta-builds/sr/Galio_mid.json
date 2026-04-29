@@ -1,0 +1,25 @@
+{
+  "champion": "Galio",
+  "championName": "Galio",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.820Z",
+  "metaBuild": {
+    "winRate": 48.86,
+    "pickRate": 3.94,
+    "keystone": "Phase Rush",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hollow Radiance",
+      "Liandry's Torment",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "Q > W > E > R"
+  }
+}

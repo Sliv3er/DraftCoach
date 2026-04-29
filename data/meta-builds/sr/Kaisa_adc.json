@@ -1,0 +1,25 @@
+{
+  "champion": "Kaisa",
+  "championName": "Kai'Sa",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.907Z",
+  "metaBuild": {
+    "winRate": 51.4,
+    "pickRate": 25,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Guinsoo's Rageblade",
+      "Nashor's Tooth"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

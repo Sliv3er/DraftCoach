@@ -1,0 +1,25 @@
+{
+  "champion": "Aphelios",
+  "championName": "Aphelios",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.420Z",
+  "metaBuild": {
+    "winRate": 48.71,
+    "pickRate": 5.99,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "The Collector",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > W > E > R"
+  }
+}

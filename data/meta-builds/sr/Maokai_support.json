@@ -1,0 +1,25 @@
+{
+  "champion": "Maokai",
+  "championName": "Maokai",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.070Z",
+  "metaBuild": {
+    "winRate": 50.5,
+    "pickRate": 2,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trailblazer",
+      "Locket of the Iron Solari",
+      "Knight's Vow"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

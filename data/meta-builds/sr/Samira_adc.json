@@ -1,0 +1,25 @@
+{
+  "champion": "Samira",
+  "championName": "Samira",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.043Z",
+  "metaBuild": {
+    "winRate": 51.27,
+    "pickRate": 5.23,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "The Collector",
+      "Infinity Edge",
+      "Lord Dominik's Regards"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

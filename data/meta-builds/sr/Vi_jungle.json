@@ -1,0 +1,25 @@
+{
+  "champion": "Vi",
+  "championName": "Vi",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.040Z",
+  "metaBuild": {
+    "winRate": 45.85,
+    "pickRate": 6.89,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Sundered Sky",
+      "Black Cleaver",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

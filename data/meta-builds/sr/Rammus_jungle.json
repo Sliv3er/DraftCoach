@@ -1,0 +1,25 @@
+{
+  "champion": "Rammus",
+  "championName": "Rammus",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.941Z",
+  "metaBuild": {
+    "winRate": 52.5,
+    "pickRate": 1.8,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Thornmail",
+      "Sunfire Aegis",
+      "Jak'Sho, The Protean"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Zyra",
+  "championName": "Zyra",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:10:10.606Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 2.84,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Rylai's Crystal Scepter",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

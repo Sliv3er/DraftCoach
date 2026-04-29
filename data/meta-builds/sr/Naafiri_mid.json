@@ -1,0 +1,25 @@
+{
+  "champion": "Naafiri",
+  "championName": "Naafiri",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:02:13.655Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 6.8,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Axiom Arc",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

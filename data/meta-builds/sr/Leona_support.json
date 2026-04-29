@@ -1,0 +1,25 @@
+{
+  "champion": "Leona",
+  "championName": "Leona",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.065Z",
+  "metaBuild": {
+    "winRate": 52.1,
+    "pickRate": 16.9,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Locket of the Iron Solari",
+      "Knight's Vow",
+      "Thornmail"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "W > E > Q > R"
+  }
+}

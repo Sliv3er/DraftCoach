@@ -1,0 +1,25 @@
+{
+  "champion": "Jax",
+  "championName": "Jax",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.898Z",
+  "metaBuild": {
+    "winRate": 50.6,
+    "pickRate": 5.7,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Sundered Sky",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > E > Q > R"
+  }
+}

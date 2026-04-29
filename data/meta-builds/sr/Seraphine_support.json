@@ -1,0 +1,25 @@
+{
+  "champion": "Seraphine",
+  "championName": "Seraphine",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.045Z",
+  "metaBuild": {
+    "winRate": 51.96,
+    "pickRate": 6.86,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rylai's Crystal Scepter",
+      "Moonstone Renewer",
+      "Staff of Flowing Water"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

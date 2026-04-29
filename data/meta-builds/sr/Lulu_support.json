@@ -1,0 +1,25 @@
+{
+  "champion": "Lulu",
+  "championName": "Lulu",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.067Z",
+  "metaBuild": {
+    "winRate": 50.7,
+    "pickRate": 10.8,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Moonstone Renewer",
+      "Ardent Censer",
+      "Redemption"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > W > Q > R"
+  }
+}

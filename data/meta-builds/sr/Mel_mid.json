@@ -1,0 +1,25 @@
+{
+  "champion": "Mel",
+  "championName": "Mel",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:02:13.650Z",
+  "metaBuild": {
+    "winRate": 45.7,
+    "pickRate": 4.2,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Echo",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

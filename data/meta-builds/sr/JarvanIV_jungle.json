@@ -1,0 +1,25 @@
+{
+  "champion": "JarvanIV",
+  "championName": "Jarvan IV",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.896Z",
+  "metaBuild": {
+    "winRate": 50.7,
+    "pickRate": 7.2,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Eclipse",
+      "Sundered Sky",
+      "Spear of Shojin"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Ashe",
+  "championName": "Ashe",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.552Z",
+  "metaBuild": {
+    "winRate": 55.96,
+    "pickRate": 13.32,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Bow",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Phantom Dancer",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "W > Q > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Kayn",
+  "championName": "Kayn",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.176Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 5.9,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Hubris",
+      "Axiom Arc",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

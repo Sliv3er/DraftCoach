@@ -1,0 +1,25 @@
+{
+  "champion": "Velkoz",
+  "championName": "Vel'Koz",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.663Z",
+  "metaBuild": {
+    "winRate": 51.3,
+    "pickRate": 2.8,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Zaz'Zak's Realmspike",
+      "Luden's Companion",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

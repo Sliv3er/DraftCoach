@@ -1,0 +1,25 @@
+{
+  "champion": "Sivir",
+  "championName": "Sivir",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.166Z",
+  "metaBuild": {
+    "winRate": 50,
+    "pickRate": 5.38,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Yun Tal Wildarrows",
+      "Infinity Edge",
+      "Navori Flickerblade"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > W > E > R"
+  }
+}

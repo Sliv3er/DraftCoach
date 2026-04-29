@@ -1,0 +1,25 @@
+{
+  "champion": "Brand",
+  "championName": "Brand",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.559Z",
+  "metaBuild": {
+    "winRate": 53.4,
+    "pickRate": 12.5,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Rylai's Crystal Scepter",
+      "Liandry's Torment",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > Q > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Riven",
+  "championName": "Riven",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.042Z",
+  "metaBuild": {
+    "winRate": 50.9,
+    "pickRate": 3.28,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Sundered Sky",
+      "Death's Dance"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

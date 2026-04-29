@@ -1,0 +1,25 @@
+{
+  "champion": "Fiddlesticks",
+  "championName": "Fiddlesticks",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.793Z",
+  "metaBuild": {
+    "winRate": 51.13,
+    "pickRate": 2.6,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Malignance",
+      "Hextech Rocketbelt",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "W > Q > E > R"
+  }
+}

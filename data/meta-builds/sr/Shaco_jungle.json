@@ -1,0 +1,25 @@
+{
+  "champion": "Shaco",
+  "championName": "Shaco",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.046Z",
+  "metaBuild": {
+    "winRate": 50.35,
+    "pickRate": 4.01,
+    "keystone": "Hail of Blades",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Profane Hydra",
+      "Opportunity",
+      "Serylda's Grudge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "E > Q > W > R"
+  }
+}

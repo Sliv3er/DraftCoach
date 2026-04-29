@@ -1,0 +1,25 @@
+{
+  "champion": "MissFortune",
+  "championName": "Miss Fortune",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:02:13.651Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 7.9,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "The Collector",
+      "Hubris",
+      "Serylda's Grudge"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

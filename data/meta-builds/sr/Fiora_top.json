@@ -1,0 +1,25 @@
+{
+  "champion": "Fiora",
+  "championName": "Fiora",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:58:29.793Z",
+  "metaBuild": {
+    "winRate": 47.52,
+    "pickRate": 3.64,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Ravenous Hydra",
+      "Trinity Force",
+      "Spear of Shojin"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

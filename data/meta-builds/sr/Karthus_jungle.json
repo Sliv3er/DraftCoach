@@ -1,0 +1,25 @@
+{
+  "champion": "Karthus",
+  "championName": "Karthus",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.908Z",
+  "metaBuild": {
+    "winRate": 51.3,
+    "pickRate": 4.5,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Precision",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Malignance",
+      "Liandry's Torment",
+      "Shadowflame"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Yunara",
+  "championName": "Yunara",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.428Z",
+  "metaBuild": {
+    "winRate": 49,
+    "pickRate": 7.8,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Fiendhunter Bolts",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > E > W > R"
+  }
+}

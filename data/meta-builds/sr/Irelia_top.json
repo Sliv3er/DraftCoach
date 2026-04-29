@@ -1,0 +1,25 @@
+{
+  "champion": "Irelia",
+  "championName": "Irelia",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.109Z",
+  "metaBuild": {
+    "winRate": 50.65,
+    "pickRate": 4.55,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of The Ruined King",
+      "Hullbreaker",
+      "Wit's End"
+    ],
+    "boots": "Mercury's Treads",
+    "skillOrder": "Q > W > E > R"
+  }
+}

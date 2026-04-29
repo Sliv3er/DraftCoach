@@ -1,0 +1,25 @@
+{
+  "champion": "Heimerdinger",
+  "championName": "Heimerdinger",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:05.106Z",
+  "metaBuild": {
+    "winRate": 47.2,
+    "pickRate": 0.2,
+    "keystone": "Arcane Comet",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Zaz'Zak's Realmspike",
+      "Rylai's Crystal Scepter",
+      "Liandry's Torment"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > W > E > R"
+  }
+}

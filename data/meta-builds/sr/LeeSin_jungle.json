@@ -1,0 +1,25 @@
+{
+  "champion": "LeeSin",
+  "championName": "Lee Sin",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.064Z",
+  "metaBuild": {
+    "winRate": 51.6,
+    "pickRate": 13.2,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Eclipse",
+      "Sundered Sky",
+      "Death's Dance"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

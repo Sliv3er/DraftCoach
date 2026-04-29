@@ -1,0 +1,25 @@
+{
+  "champion": "Thresh",
+  "championName": "Thresh",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.336Z",
+  "metaBuild": {
+    "winRate": 52.2,
+    "pickRate": 10.5,
+    "keystone": "Glacial Augment",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trailblazer",
+      "Locket of the Iron Solari",
+      "Frozen Heart"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

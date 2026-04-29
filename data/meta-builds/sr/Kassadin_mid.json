@@ -1,0 +1,25 @@
+{
+  "champion": "Kassadin",
+  "championName": "Kassadin",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.909Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 2.7,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Dark Seal",
+      "Refillable Potion"
+    ],
+    "coreItems": [
+      "Rod of Ages",
+      "Archangel's Staff",
+      "Malignance"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

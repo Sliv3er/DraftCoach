@@ -1,0 +1,25 @@
+{
+  "champion": "Nocturne",
+  "championName": "Nocturne",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.401Z",
+  "metaBuild": {
+    "winRate": 52.72,
+    "pickRate": 7.21,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Mosstomper Seedling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Experimental Hexplate",
+      "Stridebreaker",
+      "Black Cleaver"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

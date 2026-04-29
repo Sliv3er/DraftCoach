@@ -1,0 +1,25 @@
+{
+  "champion": "Neeko",
+  "championName": "Neeko",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.398Z",
+  "metaBuild": {
+    "winRate": 48.86,
+    "pickRate": 2.09,
+    "keystone": "Summon Aery",
+    "primaryTree": "Sorcery",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Zaz'Zak's Realmspike",
+      "Hextech Rocketbelt",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

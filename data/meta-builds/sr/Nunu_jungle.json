@@ -1,0 +1,25 @@
+{
+  "champion": "Nunu",
+  "championName": "Nunu & Willump",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.402Z",
+  "metaBuild": {
+    "winRate": 54.31,
+    "pickRate": 1.51,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Mosstomper Seedling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Frozen Heart",
+      "Kaenic Rookern"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

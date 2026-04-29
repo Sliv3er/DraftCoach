@@ -1,0 +1,25 @@
+{
+  "champion": "Sett",
+  "championName": "Sett",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:46.046Z",
+  "metaBuild": {
+    "winRate": 51.83,
+    "pickRate": 3.93,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stridebreaker",
+      "Sundered Sky",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Blitzcrank",
+  "championName": "Blitzcrank",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.558Z",
+  "metaBuild": {
+    "winRate": 51.24,
+    "pickRate": 8.15,
+    "keystone": "Glacial Augment",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Locket of the Iron Solari",
+      "Bandlepipes",
+      "Zeke's Convergence"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Kled",
+  "championName": "Kled",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.179Z",
+  "metaBuild": {
+    "winRate": 53.8,
+    "pickRate": 1.7,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Titanic Hydra",
+      "Hullbreaker",
+      "Overlord's Bloodmail"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

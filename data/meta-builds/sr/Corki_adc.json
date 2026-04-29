@@ -1,0 +1,25 @@
+{
+  "champion": "Corki",
+  "championName": "Corki",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.761Z",
+  "metaBuild": {
+    "winRate": 50.3,
+    "pickRate": 3.3,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Manamune",
+      "Hexoptics C44"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

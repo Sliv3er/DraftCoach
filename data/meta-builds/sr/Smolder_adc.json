@@ -1,0 +1,25 @@
+{
+  "champion": "Smolder",
+  "championName": "Smolder",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.167Z",
+  "metaBuild": {
+    "winRate": 51.33,
+    "pickRate": 10.12,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Essence Reaver",
+      "Yun Tal Wildarrows",
+      "The Collector"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > W > E > R"
+  }
+}

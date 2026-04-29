@@ -1,0 +1,25 @@
+{
+  "champion": "Teemo",
+  "championName": "Teemo",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.335Z",
+  "metaBuild": {
+    "winRate": 49.5,
+    "pickRate": 2.8,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Liandry's Torment",
+      "Nashor's Tooth",
+      "Riftmaker"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

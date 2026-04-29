@@ -1,0 +1,25 @@
+{
+  "champion": "DrMundo",
+  "championName": "Dr. Mundo",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.764Z",
+  "metaBuild": {
+    "winRate": 53,
+    "pickRate": 3.4,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Warmog's Armor",
+      "Heartsteel",
+      "Titanic Hydra"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > E > W > R"
+  }
+}

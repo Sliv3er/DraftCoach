@@ -1,0 +1,25 @@
+{
+  "champion": "Ekko",
+  "championName": "Ekko",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:57:42.765Z",
+  "metaBuild": {
+    "winRate": 51.8,
+    "pickRate": 3.8,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Lich Bane",
+      "Nashor's Tooth",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "Q > E > W > R"
+  }
+}

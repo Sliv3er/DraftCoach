@@ -1,0 +1,25 @@
+{
+  "champion": "Zaahen",
+  "championName": "Zaahen",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:45.429Z",
+  "metaBuild": {
+    "winRate": 49.9,
+    "pickRate": 3,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Trinity Force",
+      "Sundered Sky",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

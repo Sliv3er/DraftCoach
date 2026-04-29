@@ -1,0 +1,25 @@
+{
+  "champion": "Alistar",
+  "championName": "Alistar",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:09.408Z",
+  "metaBuild": {
+    "winRate": 48.61,
+    "pickRate": 5.19,
+    "keystone": "Aftershock",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Locket of the Iron Solari",
+      "Zeke's Convergence",
+      "Knight's Vow"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

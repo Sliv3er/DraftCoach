@@ -1,0 +1,25 @@
+{
+  "champion": "Varus",
+  "championName": "Varus",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:08:18.661Z",
+  "metaBuild": {
+    "winRate": 50.8,
+    "pickRate": 8.5,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Guinsoo's Rageblade",
+      "Terminus"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > W > E > R"
+  }
+}

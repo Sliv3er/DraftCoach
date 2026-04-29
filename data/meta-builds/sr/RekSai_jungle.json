@@ -1,0 +1,25 @@
+{
+  "champion": "RekSai",
+  "championName": "Rek'Sai",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.943Z",
+  "metaBuild": {
+    "winRate": 52.3,
+    "pickRate": 3.3,
+    "keystone": "Conqueror",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Mosstomper Seedling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Stridebreaker",
+      "Black Cleaver",
+      "Sterak's Gage"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

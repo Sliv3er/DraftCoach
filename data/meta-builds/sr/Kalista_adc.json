@@ -1,0 +1,25 @@
+{
+  "champion": "Kalista",
+  "championName": "Kalista",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.907Z",
+  "metaBuild": {
+    "winRate": 48.7,
+    "pickRate": 1.4,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of the Ruined King",
+      "Guinsoo's Rageblade",
+      "Runaan's Hurricane"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "E > Q > W > R"
+  }
+}

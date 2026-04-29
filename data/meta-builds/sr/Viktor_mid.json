@@ -1,0 +1,25 @@
+{
+  "champion": "Viktor",
+  "championName": "Viktor",
+  "role": "mid",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.041Z",
+  "metaBuild": {
+    "winRate": 49.2,
+    "pickRate": 5.1,
+    "keystone": "First Strike",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Ring",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Luden's Companion",
+      "Shadowflame",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Sorcerer's Shoes",
+    "skillOrder": "E > Q > W > R"
+  }
+}

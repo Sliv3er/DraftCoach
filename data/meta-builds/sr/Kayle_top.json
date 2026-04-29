@@ -1,0 +1,25 @@
+{
+  "champion": "Kayle",
+  "championName": "Kayle",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.175Z",
+  "metaBuild": {
+    "winRate": 53.22,
+    "pickRate": 3.36,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Nashor's Tooth",
+      "Dusk and Dawn",
+      "Rabadon's Deathcap"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "E > Q > W > R"
+  }
+}

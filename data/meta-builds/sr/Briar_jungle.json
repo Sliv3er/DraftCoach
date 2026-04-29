@@ -1,0 +1,25 @@
+{
+  "champion": "Briar",
+  "championName": "Briar",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.560Z",
+  "metaBuild": {
+    "winRate": 52.3,
+    "pickRate": 5.1,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "Scorchclaw Pup",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of The Ruined King",
+      "Black Cleaver",
+      "Death's Dance"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > Q > E > R"
+  }
+}

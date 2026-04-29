@@ -1,0 +1,25 @@
+{
+  "champion": "Shen",
+  "championName": "Shen",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:06:55.158Z",
+  "metaBuild": {
+    "winRate": 52.06,
+    "pickRate": 4.47,
+    "keystone": "Grasp of the Undying",
+    "primaryTree": "Resolve",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Shield",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Heartsteel",
+      "Thornmail",
+      "Protoplasm Harness"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > E > W > R"
+  }
+}

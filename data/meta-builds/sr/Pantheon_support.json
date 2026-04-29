@@ -1,0 +1,25 @@
+{
+  "champion": "Pantheon",
+  "championName": "Pantheon",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.404Z",
+  "metaBuild": {
+    "winRate": 56,
+    "pickRate": 4.06,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Domination",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Bloodsong",
+      "Umbral Glaive",
+      "Eclipse"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "Q > W > E > R"
+  }
+}

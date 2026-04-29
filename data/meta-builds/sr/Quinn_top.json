@@ -1,0 +1,25 @@
+{
+  "champion": "Quinn",
+  "championName": "Quinn",
+  "role": "top",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:04:06.936Z",
+  "metaBuild": {
+    "winRate": 52.3,
+    "pickRate": 1.1,
+    "keystone": "Fleet Footwork",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Lord Dominik's Regards",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "W > Q > E > R"
+  }
+}

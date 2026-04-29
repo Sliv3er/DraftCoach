@@ -1,0 +1,25 @@
+{
+  "champion": "Taric",
+  "championName": "Taric",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:07:41.335Z",
+  "metaBuild": {
+    "winRate": 52.7,
+    "pickRate": 1.3,
+    "keystone": "Glacial Augment",
+    "primaryTree": "Inspiration",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Locket of the Iron Solari",
+      "Winter's Approach",
+      "Frozen Heart"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "E > W > Q > R"
+  }
+}

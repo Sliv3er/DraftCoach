@@ -1,0 +1,25 @@
+{
+  "champion": "Jinx",
+  "championName": "Jinx",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:59:47.906Z",
+  "metaBuild": {
+    "winRate": 55.1,
+    "pickRate": 14,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Kraken Slayer",
+      "Phantom Dancer",
+      "Infinity Edge"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "Q > W > E > R"
+  }
+}

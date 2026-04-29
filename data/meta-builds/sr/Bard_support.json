@@ -1,0 +1,25 @@
+{
+  "champion": "Bard",
+  "championName": "Bard",
+  "role": "support",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T10:56:53.557Z",
+  "metaBuild": {
+    "winRate": 52.7,
+    "pickRate": 6.8,
+    "keystone": "Electrocute",
+    "primaryTree": "Domination",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "World Atlas",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Dead Man's Plate",
+      "Bandlepipes",
+      "Locket of the Iron Solari"
+    ],
+    "boots": "Boots of Swiftness",
+    "skillOrder": "Q > W > E > R"
+  }
+}

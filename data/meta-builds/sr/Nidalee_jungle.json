@@ -1,0 +1,25 @@
+{
+  "champion": "Nidalee",
+  "championName": "Nidalee",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:03:28.399Z",
+  "metaBuild": {
+    "winRate": 49.69,
+    "pickRate": 2.24,
+    "keystone": "Dark Harvest",
+    "primaryTree": "Domination",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Gustwalker Hatchling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Lich Bane",
+      "Shadowflame",
+      "Zhonya's Hourglass"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Warwick",
+  "championName": "Warwick",
+  "role": "jungle",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:09:02.043Z",
+  "metaBuild": {
+    "winRate": 50.96,
+    "pickRate": 2.12,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Sorcery",
+    "startingItems": [
+      "Mosstomper Seedling",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Titanic Hydra",
+      "Stridebreaker",
+      "Sundered Sky"
+    ],
+    "boots": "Plated Steelcaps",
+    "skillOrder": "W > Q > E > R"
+  }
+}

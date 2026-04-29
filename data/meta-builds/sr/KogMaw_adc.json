@@ -1,0 +1,25 @@
+{
+  "champion": "KogMaw",
+  "championName": "Kog'Maw",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:00:36.179Z",
+  "metaBuild": {
+    "winRate": 58.44,
+    "pickRate": 0.99,
+    "keystone": "Lethal Tempo",
+    "primaryTree": "Precision",
+    "secondaryTree": "Resolve",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Blade of the Ruined King",
+      "Guinsoo's Rageblade",
+      "Runaan's Hurricane"
+    ],
+    "boots": "Berserker's Greaves",
+    "skillOrder": "W > Q > E > R"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "champion": "Lucian",
+  "championName": "Lucian",
+  "role": "adc",
+  "patch": "16.9",
+  "fetchedAt": "2026-04-29T11:01:30.067Z",
+  "metaBuild": {
+    "winRate": 50.9,
+    "pickRate": 7.4,
+    "keystone": "Press the Attack",
+    "primaryTree": "Precision",
+    "secondaryTree": "Inspiration",
+    "startingItems": [
+      "Doran's Blade",
+      "Health Potion"
+    ],
+    "coreItems": [
+      "Essence Reaver",
+      "The Collector",
+      "Infinity Edge"
+    ],
+    "boots": "Ionian Boots of Lucidity",
+    "skillOrder": "Q > E > W > R"
+  }
+}

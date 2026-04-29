@@ -3988,6 +3988,64 @@ ipcMain.handle('lcu-champ-select', async () => {
   return { ok: true, session };
 });
 
+// LCU auto-detect game mode from lobby/gameflow
+ipcMain.handle('lcu-game-mode', async () => {
+  // Queue ID → game mode mapping
+  // SR queues: 400 (Draft), 420 (Ranked Solo), 430 (Blind), 440 (Flex), 490 (Quickplay)
+  // ARAM queues: 450 (ARAM), 930 (Poro King on HA)
+  // ARAM Mayhem: queue ID TBD by Riot (we'll detect via gameMode string)
+  const QUEUE_MODE_MAP = {
+    400: 'sr', 420: 'sr', 430: 'sr', 440: 'sr', 490: 'sr',   // SR queues
+    450: 'aram', 930: 'aram',                                    // ARAM queues
+  };
+
+  try {
+    // Try gameflow session first — more reliable during champ select
+    const gameflow = await lcuCall('GET', '/lol-gameflow/v1/session');
+    if (gameflow && !gameflow.__lcuError && !gameflow.__lcuOk) {
+      const queueId = gameflow.gameData?.queue?.id;
+      const gameMode = gameflow.gameData?.queue?.gameMode;
+
+      // Check for ARAM Mayhem via gameMode string (Riot labels it differently)
+      if (gameMode && (gameMode.toLowerCase().includes('mayhem') || gameMode.toLowerCase().includes('ultbook'))) {
+        return { ok: true, mode: 'aram-mayhem', queueId, source: 'gameflow' };
+      }
+
+      if (queueId && QUEUE_MODE_MAP[queueId]) {
+        return { ok: true, mode: QUEUE_MODE_MAP[queueId], queueId, source: 'gameflow' };
+      }
+
+      // Fallback: check map ID (11 = SR, 12 = HA/ARAM)
+      const mapId = gameflow.map?.id || gameflow.gameData?.queue?.mapId;
+      if (mapId === 12) return { ok: true, mode: 'aram', queueId, source: 'gameflow-map' };
+      if (mapId === 11) return { ok: true, mode: 'sr', queueId, source: 'gameflow-map' };
+    }
+
+    // Fallback: try lobby endpoint
+    const lobby = await lcuCall('GET', '/lol-lobby/v2/lobby');
+    if (lobby && !lobby.__lcuError && !lobby.__lcuOk) {
+      const queueId = lobby.gameConfig?.queueId;
+      const gameMode = lobby.gameConfig?.gameMode;
+
+      if (gameMode && (gameMode.toLowerCase().includes('mayhem') || gameMode.toLowerCase().includes('ultbook'))) {
+        return { ok: true, mode: 'aram-mayhem', queueId, source: 'lobby' };
+      }
+
+      if (queueId && QUEUE_MODE_MAP[queueId]) {
+        return { ok: true, mode: QUEUE_MODE_MAP[queueId], queueId, source: 'lobby' };
+      }
+
+      const mapId = lobby.gameConfig?.mapId;
+      if (mapId === 12) return { ok: true, mode: 'aram', queueId, source: 'lobby-map' };
+      if (mapId === 11) return { ok: true, mode: 'sr', queueId, source: 'lobby-map' };
+    }
+
+    return { ok: false, error: 'No lobby or gameflow session found' };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
 // In-game detection fallback via Live Client API (port 2999)
 ipcMain.handle('lcu-live-game', async () => {
   const nodeFetch = require('node-fetch');

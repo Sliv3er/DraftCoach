@@ -423,6 +423,14 @@ export function App() {
   const [gameMode, setGameMode] = useState<GameMode>('sr');
   const [metaStatus, setMetaStatus] = useState<MetaStatus>({ isSyncing: false, patch: null, updatedAt: null, champCount: 0 });
   const [showMetaDetail, setShowMetaDetail] = useState(false);
+  const gameModeManualRef = useRef(false); // true when user manually picks a mode
+  const lastDetectedModeRef = useRef<string>(''); // avoid spamming console logs
+
+  // Wrapper: manual mode select sets the flag
+  const handleSetGameMode = useCallback((mode: GameMode) => {
+    gameModeManualRef.current = true;
+    setGameMode(mode);
+  }, []);
 
   useEffect(() => {
     const handler = (_event: any, advice: any) => { setLiveAdvice(advice); };
@@ -858,8 +866,27 @@ export function App() {
           lastSessionIdRef.current = sessionId;
           buildGeneratedRef.current = false;
           autoGenKeyRef.current = '';
+          gameModeManualRef.current = false; // new session → reset manual override
           console.log('[App] New champ select session detected — unlocking auto-generate');
         }
+
+        // ── Auto-detect game mode from LCU ──
+        if (!gameModeManualRef.current) {
+          try {
+            const modeResult = await ipcRenderer.invoke('lcu-game-mode');
+            if (modeResult?.ok && modeResult.mode) {
+              const detected = modeResult.mode as GameMode;
+              if (detected !== gameMode) {
+                setGameMode(detected);
+                if (lastDetectedModeRef.current !== detected) {
+                  console.log(`[App] Auto-detected game mode: ${detected} (source: ${modeResult.source}, queueId: ${modeResult.queueId})`);
+                  lastDetectedModeRef.current = detected;
+                }
+              }
+            }
+          } catch { /* LCU not available for game mode, keep current */ }
+        }
+
         const localCellId = session.localPlayerCellId;
         const keyMap = champKeyMapRef.current;
 
@@ -1103,9 +1130,9 @@ export function App() {
           <div className="field-group">
             <label>Game Mode</label>
             <div className="game-mode-selector">
-              <button className={`game-mode-btn ${gameMode === 'sr' ? 'active' : ''}`} onClick={() => setGameMode('sr')}>Summoner's Rift</button>
-              <button className={`game-mode-btn ${gameMode === 'aram' ? 'active' : ''}`} onClick={() => setGameMode('aram')}>ARAM</button>
-              <button className={`game-mode-btn ${gameMode === 'aram-mayhem' ? 'active' : ''}`} onClick={() => setGameMode('aram-mayhem')}>Mayhem</button>
+              <button className={`game-mode-btn ${gameMode === 'sr' ? 'active' : ''}`} onClick={() => handleSetGameMode('sr')}>Summoner's Rift</button>
+              <button className={`game-mode-btn ${gameMode === 'aram' ? 'active' : ''}`} onClick={() => handleSetGameMode('aram')}>ARAM</button>
+              <button className={`game-mode-btn ${gameMode === 'aram-mayhem' ? 'active' : ''}`} onClick={() => handleSetGameMode('aram-mayhem')}>Mayhem</button>
             </div>
           </div>
 

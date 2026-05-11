@@ -136,32 +136,18 @@ buildRouter.post('/build-dual', async (req: Request, res: Response) => {
     } catch {
       livePatch = body.patch || 'unknown';
     }
-    const patchKey = livePatch.split('.').slice(0, 2).join('.');
 
-    // Try Pro model first (gemini-3.1-pro-preview)
-    const proModel = 'gemini-3.1-pro-preview';
+    // Single generation — use the requested model or default to Flash for speed
+    const model = body.model || 'gemini-3-flash-preview';
     try {
-      const proResult = await generateBuild({ ...body, model: proModel }, false);
+      const result = await generateBuild({ ...body, model }, false);
       
-      // Stream the Pro result
-      res.write(`data: ${JSON.stringify({ phase: 'full', chunk: proResult.text, patchUsed: proResult.patchUsed, source: 'grounded', model: proModel })}\n\n`);
-      res.write(`data: ${JSON.stringify({ phase: 'full', done: true, fullText: proResult.text, source: 'grounded', model: proModel })}\n\n`);
-    } catch (proErr: any) {
-      console.error('[build-dual] Pro model failed:', proErr.message);
-      res.write(`data: ${JSON.stringify({ phase: 'full', error: proErr.message })}\n\n`);
-      
-      // Fall back to Flash model
-      const flashModel = 'gemini-3-flash-preview-0514';
-      try {
-        const flashResult = await generateBuild({ ...body, model: flashModel }, true);
-        
-        // Stream the Flash result
-        res.write(`data: ${JSON.stringify({ phase: 'full', chunk: flashResult.text, patchUsed: flashResult.patchUsed, source: 'grounded', model: flashModel })}\n\n`);
-        res.write(`data: ${JSON.stringify({ phase: 'full', done: true, fullText: flashResult.text, source: 'grounded', model: flashModel })}\n\n`);
-      } catch (flashErr: any) {
-        console.error('[build-dual] Flash model also failed:', flashErr.message);
-        res.write(`data: ${JSON.stringify({ phase: 'full', error: flashErr.message, done: true })}\n\n`);
-      }
+      // Stream the result as a single event
+      res.write(`data: ${JSON.stringify({ phase: 'full', chunk: result.text, patchUsed: result.patchUsed, source: 'grounded', model })}\n\n`);
+      res.write(`data: ${JSON.stringify({ phase: 'full', done: true, fullText: result.text, source: 'grounded', model })}\n\n`);
+    } catch (err: any) {
+      console.error('[build-dual] Generation failed:', err.message);
+      res.write(`data: ${JSON.stringify({ phase: 'full', error: err.message, done: true })}\n\n`);
     }
 
     res.end();

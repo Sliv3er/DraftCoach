@@ -2,6 +2,58 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { BuildRequest } from '../../../../shared/types';
 import { fetchDDragonVersion } from './ddragon';
 import { getLocalRagContext, getRagStatus } from './rag-updater';
+import buildTemplatesKb from '../../../../shared/kb/data/build-templates.json';
+
+const buildTemplatesData = (buildTemplatesKb as any).data as Record<string, any>;
+
+// ── KB Build Reference Builder ──
+function getKBBuildContext(champion: string, role: string): string {
+  // Normalize role for lookup
+  const roleMap: Record<string, string> = {
+    top: 'TOP', jungle: 'JUNGLE', mid: 'MID',
+    adc: 'ADC', bot: 'ADC', bottom: 'ADC', support: 'SUPPORT',
+  };
+  const engineRole = roleMap[role.toLowerCase()] || role.toUpperCase();
+
+  // Try direct key, then role-suffixed key
+  const template = buildTemplatesData[champion]
+    || buildTemplatesData[`${champion}_${engineRole}`]
+    || Object.values(buildTemplatesData).find(
+      (e: any) => e.championId?.toLowerCase() === champion.toLowerCase() && e.role === engineRole
+    );
+
+  if (!template?.variants) return '';
+
+  const lines: string[] = ['\n═══ REFERENCE BUILDS (Mobalytics real match stats — use as baseline) ═══'];
+  const variantLabels: Record<string, string> = {
+    DAMAGE: 'BUILD 1 — Most Popular',
+    SAFETY: 'BUILD 2 — Secondary',
+    UTILITY: 'BUILD 3 — Alternative',
+  };
+
+  for (const [vKey, vLabel] of Object.entries(variantLabels)) {
+    const v = template.variants[vKey];
+    if (!v) continue;
+
+    lines.push(`\n${vLabel} (${vKey}):`);
+    if (v.runes) {
+      lines.push(`  Runes: ${v.runes.primaryKeystone} (${v.runes.primaryTree}) / ${v.runes.secondaryTree}`);
+      lines.push(`  Primary: ${v.runes.primarySlots?.join(', ') || 'N/A'}`);
+      lines.push(`  Secondary: ${v.runes.secondarySlots?.join(', ') || 'N/A'}`);
+      if (v.runes.statShards) lines.push(`  Shards: ${v.runes.statShards.join(', ')}`);
+    }
+    if (v.summonerSpells) lines.push(`  Spells: ${v.summonerSpells.join(' + ')}`);
+    if (v.skillOrder) {
+      lines.push(`  Skill Order: ${v.skillOrder.maxOrder?.join(' > ') || 'N/A'} (first 3: ${v.skillOrder.first3?.join(' → ') || 'N/A'})`);
+    }
+    if (v.startingItems) lines.push(`  Starting: ${v.startingItems.map((i: any) => i.name).join(' + ')}`);
+    if (v.bootChoice) lines.push(`  Boots: ${v.bootChoice.name}`);
+    if (v.coreItems) lines.push(`  Core: ${v.coreItems.map((i: any) => i.name).join(' → ')}`);
+  }
+
+  lines.push('═══════════════════════════════════════════════════════════════════════');
+  return lines.join('\n');
+}
 
 type GeminiModel = 'gemini-3-pro-preview' | 'gemini-3.1-pro-preview' | 'gemini-3-flash-preview';
 
@@ -26,19 +78,19 @@ const REMOVED_ITEMS = [
 function buildSystemPrompt(patch: string): string {
   return `You are a Grandmaster League of Legends Draft & Itemization Engine for Season 2026, Patch ${patch}.
 
-You will receive RAG context containing verified patch data. Use it as your PRIMARY knowledge source. Only use Google Search grounding to supplement if the RAG context is insufficient.
+You will receive REFERENCE BUILDS from Mobalytics (real ranked match statistics). These are the proven meta builds — use them as your BASELINE. Your job is to SELECT the best base build for the matchup and make targeted adaptations to counter the specific enemy team.
 
 CRITICAL: The following items have been REMOVED from the game and MUST NEVER be suggested:
 ${REMOVED_ITEMS.join(', ')}
-If you are unsure whether an item still exists, use Google Search grounding to verify BEFORE suggesting it.
 
 FIRST, output this analysis section to reason about the matchup before building:
 
 ANALYSIS
+Base Build: <Which reference build you chose (BUILD 1/2/3) and why>
 Matchup Type: <poke/all-in/sustain/scaling — describe the lane dynamic>
 Enemy Damage Split: <AP-heavy / AD-heavy / mixed>
 Key Threats: <1-2 enemy champions that are most dangerous and why>
-Build Priority: <What stats/passives does my champion need MOST vs THIS specific enemy team?>
+Adaptations: <What changes you made from the base build and why>
 
 THEN output these sections in this exact format:
 
@@ -93,36 +145,27 @@ YOUR POWER SPIKES
 2-item spike: <Item1> + <Item2> — <why this combination is strong and what to do>
 
 Rules:
-- THINK THEN BUILD: Your ANALYSIS section must directly influence your item choices.
-- PLAY LIKE A GRANDMASTER: Analyze the lane matchup and enemy team composition's damage split.
-- ADAPTIVE KEYSTONES: Choose Keystones based on the lane matchup.
-- ADAPTIVE ITEMS: Build defensive items earlier if the enemy comp dictates it.
-- RUNE-ITEM COHERENCE: Keystone and items must form a coherent identity:
-  Conqueror → sustained trade items (BotRK, Death's Dance, Black Cleaver)
-  Lethal Tempo → attack speed items (Nashor's Tooth, Wit's End, Runaan's Hurricane)
-  Electrocute → burst items (Luden's, Shadowflame, Stormsurge)
-  Fleet Footwork → sustain/kiting items (Bloodthirster, Rapid Firecannon)
-  Grasp → bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
+- START FROM THE REFERENCE BUILD: Pick the best base build, then adapt 1-3 items if the enemy comp demands it.
+- EXPLAIN ADAPTATIONS: If you change an item from the reference, explain WHY in the item reason.
+- If the reference build is already optimal for the matchup, keep it as-is.
+- RUNE-ITEM COHERENCE: Keystone and items must form a coherent identity.
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC).
 - SITUATIONAL ITEMS must ALWAYS have at least 4 items with clear conditions.
 - Boots are mandatory. ONE pair of upgraded boots MUST be in CORE BUILD as item 1 or 2.
-- NEVER suggest any item from the removed items list above. Double-check every item name.
-- Adapt to enemy comp.
-- For jungle, include jungle companion start.
+- NEVER suggest any item from the removed items list above.
 - Keep names exactly as in-game (current patch ${patch}).
-- Do NOT add explanations or extra text outside the sections.
 - If role is Jungle, you MUST include a JUNGLE PATH section.
 - ALWAYS include ENEMY POWER SPIKES, YOUR POWER SPIKES, and WIN CONDITION.
 - Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.
 
 COMMON MISTAKES — NEVER DO THESE:
-❌ Do NOT put boots as item 5 or 6 — boots MUST be item 1 or 2 in CORE BUILD
+❌ Do NOT put boots as item 5 or 6 — boots MUST be item 1 or 2
 ❌ Do NOT suggest the same item twice in CORE BUILD
 ❌ Do NOT put starting items (Doran's, potions) in CORE BUILD
 ❌ Do NOT pick secondary runes from the SAME tree as primary
 ❌ Do NOT suggest 2 pairs of boots
-❌ Do NOT output a generic cookie-cutter build — you MUST adapt to the enemy team
-✅ ALWAYS adapt at least 1-2 items specifically to the enemy team composition
+❌ Do NOT ignore the reference builds — they are real statistical data
+✅ ALWAYS start from a reference build and adapt to the enemy team
 ✅ ALWAYS explain HOW an item counters a specific enemy in the reason`;
 }
 
@@ -181,10 +224,16 @@ export async function generateBuild(
   const isBot = /^(bottom|adc|bot)$/i.test(req.role);
   const itemSlots = isBot ? 7 : 6;
 
-  // ── Build user message with RAG context injected ──
-  const userMessage = `${ragContext}
+  // ── Build KB reference context ──
+  const kbContext = getKBBuildContext(req.myChampion, req.role);
 
-Champion: ${req.myChampion}, Role: ${req.role}, Allies: ${req.allies.join(', ') || 'none'}, Enemies: ${req.enemies.join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Make sure to place upgraded boots as the 1st or 2nd item in the CORE BUILD. Generate optimized build. Output the ANALYSIS section first, then all other sections.`;
+  // ── Build user message with RAG + KB context injected ──
+  const userMessage = `${ragContext}
+${kbContext}
+
+Champion: ${req.myChampion}, Role: ${req.role}, Allies: ${req.allies.join(', ') || 'none'}, Enemies: ${req.enemies.join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Make sure to place upgraded boots as the 1st or 2nd item in the CORE BUILD.
+
+INSTRUCTIONS: Review the REFERENCE BUILDS above. Select the best base build for this matchup. Adapt items/runes as needed to counter the enemy team. Output the ANALYSIS section first (including which base build you chose), then all other sections.`;
 
   const startTime = Date.now();
   const modelUsed = getModel(req.model);

@@ -655,15 +655,10 @@ export function App() {
         return;
       }
 
-      const decoder = new TextDecoder();
-      let runesStreamedText = '';
       let fullStreamedText = '';
       let patchUsed = '';
       let source = 'grounded';
-      let runesFinalText = '';
       let fullFinalText = '';
-      let runesAutoImported = false;
-      let fullPhaseDone = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -680,70 +675,34 @@ export function App() {
             if (payload.patchUsed) patchUsed = payload.patchUsed;
             if (payload.source) source = payload.source;
 
-            // ── Flash: Runes phase ──
-            if (payload.phase === 'runes') {
-              if (payload.chunk) {
-                runesStreamedText += payload.chunk;
-                // Show Flash runes until Pro's full build is done
-                if (!fullPhaseDone) {
-                  setBuildResult({ ok: true, source: 'grounded', patchDetected: patchUsed, text: runesStreamedText } as BuildResponse);
-                }
-              }
-              if (payload.corrected) runesFinalText = payload.corrected;
-              if (payload.done) {
-                runesFinalText = payload.fullText || runesFinalText || runesStreamedText;
-                if (payload.model) setRunesModel(payload.model);
-                console.log('[App] ⚡ Flash runes ready — auto-importing...');
-
-                // Auto-import runes IMMEDIATELY from Flash
-                if (!runesAutoImported) {
-                  runesAutoImported = true;
-                  const runeText = runesFinalText;
-                  (async () => {
-                    try {
-                      const currentSettings = await ipcRenderer.invoke('get-settings');
-                      if (currentSettings.autoExportRunes) {
-                        const runeResult = await ipcRenderer.invoke('export-runes', { championName: myChampion, rawText: runeText });
-                        if (runeResult?.ok) {
-                          console.log('[App] ⚡ Flash rune auto-import succeeded!');
-                        } else {
-                          console.warn('[App] Flash rune auto-import failed:', runeResult?.error);
-                        }
-                      }
-                    } catch (err: any) {
-                      console.error('[App] Flash rune auto-import error:', err.message);
-                    }
-                  })();
-                }
-              }
-            }
-
-            // ── Pro: Full build phase ──
+            // ── Full build phase (single generation) ──
             if (payload.phase === 'full') {
+              if (payload.error && payload.done) {
+                // Fatal error — show error state
+                setBuildResult({ ok: false, source: 'error', text: '', message: payload.error, canRetry: true } as any);
+                setStatus('error');
+                return;
+              }
               if (payload.error) {
-                // Pro model failed — backend will retry with Flash. Reset streamed text.
-                console.warn('[App] Pro full build error (retrying with Flash):', payload.error);
-                fullStreamedText = '';
+                console.warn('[App] Build generation error:', payload.error);
+                continue;
               }
               if (payload.chunk) {
                 fullStreamedText += payload.chunk;
-                // Only start showing Pro's text once it has enough content (RUNES section at minimum)
                 if (fullStreamedText.includes('CORE BUILD') || fullStreamedText.length > 500) {
                   setBuildResult({ ok: true, source, patchDetected: patchUsed, text: fullStreamedText } as BuildResponse);
                 }
               }
               if (payload.corrected) fullFinalText = payload.corrected;
               if (payload.done) {
-                fullPhaseDone = true;
                 fullFinalText = payload.fullText || fullFinalText || fullStreamedText;
                 source = payload.source || source;
                 if (payload.model) setBuildModel(payload.model);
-                // Immediately show the final Pro build
                 setBuildResult({ ok: true, source: source as any, patchDetected: patchUsed, text: fullFinalText } as BuildResponse);
               }
             }
 
-            // Handle non-phased events (cache hit returns without phase prefix in chunk)
+            // Handle non-phased events (cache hit etc)
             if (!payload.phase && payload.chunk) {
               fullStreamedText += payload.chunk;
               setBuildResult({ ok: true, source, patchDetected: patchUsed, text: fullStreamedText } as BuildResponse);
@@ -754,7 +713,7 @@ export function App() {
             }
 
             if (payload.error && !payload.phase) {
-              setBuildResult({ ok: false, source: 'error', text: fullStreamedText || runesStreamedText, message: payload.error, canRetry: true } as any);
+              setBuildResult({ ok: false, source: 'error', text: fullStreamedText, message: payload.error, canRetry: true } as any);
               setStatus('error');
               return;
             }
@@ -762,9 +721,8 @@ export function App() {
         }
       }
 
-      // Use Pro's full build as the final result (it has items, power spikes, win condition, etc.)
-      const proComplete = !!(fullFinalText || fullStreamedText);
-      const text = fullFinalText || fullStreamedText || runesFinalText || runesStreamedText;
+      // Final result
+      const text = fullFinalText || fullStreamedText;
       const data: BuildResponse = { ok: true, source: source as any, patchDetected: patchUsed, text };
       setBuildResult(data);
 
@@ -772,31 +730,29 @@ export function App() {
         setStatus(data.source === 'grounded' ? 'grounded' : data.source === 'cache' ? 'cache' : 'stale-cache');
         buildGeneratedRef.current = true; // Lock champion detection — no more Viego re-gen
 
-        // Only send overlay/advisor/item-export when Pro's FULL build is available
-        if (data.text && proComplete) {
+        if (data.text) {
           const overlayPayload = extractOverlayData(data.text, role, iconLookups, ddragonVersion, myChampion);
           ipcRenderer.send('overlay-data', overlayPayload);
           setOverlayHasData(true);
-          console.log('[App] 🧠 Pro full build sent to overlay');
+          console.log('[App] 🧠 Build sent to overlay');
 
-          // Store build text for live advisor (Pro) and auto-start it
+          // Store build text for live advisor and auto-start it
           ipcRenderer.send('store-original-build', data.text);
           ipcRenderer.invoke('live-advisor-start').then(() => setLiveAdvisorActive(true));
 
-          // Auto-export item sets from Pro's full build
+          // Auto-export runes + item sets (single export, no duplicate)
           (async () => {
             const currentSettings = await ipcRenderer.invoke('get-settings');
 
-            // Re-export runes from Pro's full build (more accurate than Flash)
             if (currentSettings.autoExportRunes) {
               try {
                 await ipcRenderer.invoke('export-runes', { championName: myChampion, rawText: data.text });
-                console.log('[App] 🧠 Pro rune re-export succeeded');
+                console.log('[App] ✅ Rune auto-export succeeded');
               } catch {}
             }
 
             if (currentSettings.autoExportItemSet && iconLookups?.itemIds) {
-              console.log('[App] 🧠 Auto-exporting item set from Pro build...');
+              console.log('[App] 🧠 Auto-exporting item set...');
               const itemIdMap: Record<string, string> = {};
               iconLookups.itemIds.forEach((id, name) => { itemIdMap[name] = id; });
               ipcRenderer.invoke('export-item-set', {

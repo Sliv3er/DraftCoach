@@ -1,5 +1,26 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { fetchDDragonVersion } from './ddragon';
+import buildTemplatesKb from '../../../../shared/kb/data/build-templates.json';
+
+const buildTemplatesData = (buildTemplatesKb as any).data as Record<string, any>;
+
+// Get KB recommended items for a champion+role to include as planned build
+function getKBPlannedBuild(championName: string): string {
+  // Find the template by champion name (case-insensitive)
+  const entry = Object.values(buildTemplatesData).find(
+    (e: any) => e.championId?.toLowerCase() === championName.toLowerCase()
+  ) as any;
+  if (!entry?.variants?.DAMAGE) return '';
+
+  const v = entry.variants.DAMAGE;
+  const items: string[] = [];
+  if (v.bootChoice) items.push(v.bootChoice.name);
+  if (v.coreItems) items.push(...v.coreItems.map((i: any) => i.name));
+
+  return items.length > 0
+    ? `\nPLANNED BUILD PATH (from Mobalytics meta data):\n${items.map((n, i) => `${i + 1}. ${n}`).join('\n')}\n`
+    : '';
+}
 
 export interface PlayerSnapshot {
     championName: string;
@@ -144,7 +165,7 @@ Can Afford: ${snapshot.activePlayerGold >= 3000 ? 'Full completed items' : snaps
 
     const userMessage = `GAME TIME: ${gameMinutes}:${gameSeconds.toString().padStart(2, '0')}
 ${precomputed}
-
+${getKBPlannedBuild(snapshot.myChampion)}
 MY CHAMPION: ${snapshot.myChampion}
 MY STATS: Level ${myPlayer?.level ?? '?'}, ${myPlayer?.kills ?? 0}/${myPlayer?.deaths ?? 0}/${myPlayer?.assists ?? 0}, Gold: ${snapshot.activePlayerGold}
 MY ITEMS: [${myPlayer?.items.map(i => i.displayName).filter(Boolean).join(', ') || 'None'}]
@@ -158,7 +179,7 @@ ${enemies.map(formatPlayer).join('\n')}
 ORIGINAL RECOMMENDED BUILD (pre-game):
 ${snapshot.originalBuildText}
 
-Analyze the current game state using the decision framework and provide live build advice.`;
+Compare my current items against the PLANNED BUILD PATH and the ORIGINAL RECOMMENDED BUILD. Suggest optimal adjustments for the current game state.`;
 
     const result = await model.generateContent(userMessage);
     const text = result.response.text();

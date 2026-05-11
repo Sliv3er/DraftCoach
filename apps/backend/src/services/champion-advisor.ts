@@ -38,7 +38,10 @@ interface KbBuildVariant {
     primarySlots: string[];
     secondaryTree: string;
     secondarySlots: string[];
+    statShards?: string[];
   };
+  summonerSpells?: string[];
+  skillOrder?: { first3: string[]; maxOrder: string[] };
   startingItems?: Array<{ id: string; name: string }>;
   coreItems?: Array<{ id: string; name: string; reason?: string }>;
   bootChoice?: { id: string; name: string };
@@ -196,6 +199,7 @@ function buildRolePayload(championId: string, role: KbRole, damageType: KbChampi
         runes: variant.runes.primarySlots,
         secondary: variant.runes.secondaryTree,
         secondaryRunes: variant.runes.secondarySlots,
+        statShards: variant.runes.statShards || [],
       }
     : fallbackRunes;
 
@@ -209,13 +213,21 @@ function buildRolePayload(championId: string, role: KbRole, damageType: KbChampi
     ? ['Sorcerer\'s Shoes', 'Luden\'s Companion', 'Zhonya\'s Hourglass']
     : ['Plated Steelcaps', 'Trinity Force', 'Sterak\'s Gage'];
 
+  // Summoner spells from KB or sensible defaults
+  const summonerSpells = variant?.summonerSpells || ['Flash', 'Ignite'];
+
+  // Skill order from KB
+  const skillOrder = variant?.skillOrder || null;
+
   return {
     runes: runePayload,
     items: {
       starting,
       core: core.length > 0 ? core : fallbackItems,
       situational: situational.length > 0 ? situational : ['Guardian Angel', 'Maw of Malmortius', 'Randuin\'s Omen']
-    }
+    },
+    summonerSpells,
+    skillOrder,
   };
 }
 

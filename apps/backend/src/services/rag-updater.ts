@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fetchDDragonVersion } from './ddragon';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const RAG_DIR = path.join(__dirname, '../../data/rag');
 const META_FILE = path.join(RAG_DIR, 'meta.json');
 const DATASET_FILE = path.join(RAG_DIR, 'dataset.json');
+const KB_BUILD_TEMPLATES = path.join(__dirname, '../../../../shared/kb/data/build-templates.json');
 
 interface RagMeta {
     patch: string;
@@ -50,13 +50,10 @@ export function getRagStatus() {
     };
 }
 
-function validateDataset(data: any): data is RagDataset {
-    if (!data || typeof data !== 'object') return false;
-    if (typeof data.patch !== 'string' || !data.patch) return false;
-    if (typeof data.metaContext !== 'string' || data.metaContext.length < 20) return false;
-    return true;
-}
-
+/**
+ * Sync RAG pipeline — reads patch info from the Mobalytics-synced
+ * build-templates.json meta field (no more Gemini Search grounding).
+ */
 export async function checkAndSyncRagPipeline(force: boolean = false): Promise<void> {
     if (isUpdating) {
         console.log('[RAG] Update already in progress, skipping request.');
@@ -73,123 +70,39 @@ export async function checkAndSyncRagPipeline(force: boolean = false): Promise<v
         const localPatchMajorMinor = localMeta?.patch ? localMeta.patch.split('.').slice(0, 2).join('.') : null;
 
         if (localPatchMajorMinor !== livePatchMajorMinor || force) {
-            console.log(`[RAG] Patch mismatch detected. Live: ${livePatch}, Local: ${localMeta?.patch || 'None'}`);
-            console.log(`[RAG] Triggering Grounded Pipeline for Patch ${livePatchMajorMinor}...`);
+            console.log(`[RAG] Patch change detected. Live: ${livePatch}, Local: ${localMeta?.patch || 'None'}`);
 
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) {
-                console.error('[RAG] GEMINI_API_KEY missing. Cannot run grounded update.');
-                return;
-            }
-
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({
-                model: process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview',
-                tools: [{ googleSearch: {} } as any],
-            });
-
-            const prompt = `Search for the official League of Legends Patch ${livePatchMajorMinor} notes on leagueoflegends.com.
-
-Return ONLY a compact JSON object with this EXACT structure (no markdown, no code blocks, just raw JSON):
-{
-  "metaContext": "<3-5 sentences summarizing the biggest meta shifts this patch: which champions got buffed/nerfed and why, which items changed, any new items or reworks. Focus on what matters for draft and itemization decisions.>",
-  "patch": "${livePatchMajorMinor}"
-}
-
-Rules:
-- metaContext must be a SINGLE string, 3-5 sentences max
-- Mention specific champion names that were buffed or nerfed
-- If ANY new items were added or existing items were reworked, mention them by name
-- If any champion was reworked, mention it
-- Include item cost changes if significant
-- Do NOT list every individual change — summarize the overall meta impact
-- Do NOT hallucinate changes not in the official notes`;
-
-            console.log(`[RAG] Making Gemini Search request for Patch ${livePatchMajorMinor} notes...`);
-
-            let newDataset: RagDataset;
-            const startTime = Date.now();
+            // Read meta from Mobalytics-synced KB data
+            let kbPatch = livePatchMajorMinor;
+            let kbSource = 'mobalytics-gql';
+            let kbStats = '';
             try {
-                const result = await model.generateContent(prompt);
-                const textResponse = result.response.text().trim();
-
-                // Track RAG/patch notes usage (fire-and-forget)
-                const usageMetadata = (result as any).response?.usageMetadata || {};
-                fetch(`http://localhost:3211/api/billing/track`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: 'system-rag', // System-level usage
-                        model: 'gemini-3.1-pro-preview',
-                        tokensIn: usageMetadata.promptTokenCount || 1500,
-                        tokensOut: usageMetadata.candidatesTokenCount || 500,
-                        latencyMs: Date.now() - startTime,
-                        success: true,
-                    }),
-                }).catch(() => {});
-
-                const cleanJson = textResponse
-                    .replace(/^```(json)?[\s\n]*/i, '')
-                    .replace(/[\s\n]*```$/i, '')
-                    .trim();
-
-                const parsed = JSON.parse(cleanJson);
-                parsed.patch = livePatchMajorMinor;
-
-                if (validateDataset(parsed)) {
-                    newDataset = { metaContext: parsed.metaContext, patch: parsed.patch };
-                    console.log(`[RAG] Validated: metaContext is ${parsed.metaContext.length} chars`);
-                } else {
-                    console.warn('[RAG] Validation failed, using raw metaContext if available.');
-                    newDataset = {
-                        metaContext: parsed.metaContext || `Patch ${livePatchMajorMinor} is live. Check official notes for details.`,
-                        patch: livePatchMajorMinor,
-                    };
+                if (fs.existsSync(KB_BUILD_TEMPLATES)) {
+                    const btData = JSON.parse(fs.readFileSync(KB_BUILD_TEMPLATES, 'utf-8'));
+                    kbPatch = btData.meta?.patch || livePatchMajorMinor;
+                    kbSource = btData.meta?.source || 'mobalytics-gql';
+                    const entryCount = Object.keys(btData.data || {}).length;
+                    kbStats = `${entryCount} build entries available from ${kbSource}.`;
                 }
-            } catch (apiError) {
-                console.error('[RAG] Gemini Grounding request failed:', apiError);
-                
-                // Track failed RAG request
-                fetch(`http://localhost:3211/api/billing/track`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: 'system-rag',
-                        model: 'gemini-3.1-pro-preview',
-                        tokensIn: 0,
-                        tokensOut: 0,
-                        latencyMs: Date.now() - startTime,
-                        success: false,
-                        error: String(apiError),
-                    }),
-                }).catch(() => {});
-
-                const oldDatasetExists = fs.existsSync(DATASET_FILE);
-                if (oldDatasetExists && !force) {
-                    console.log('[RAG] Keeping previous dataset as rollback.');
-                    saveLocalRagMeta({
-                        patch: localMeta?.patch || livePatchMajorMinor,
-                        updatedAt: localMeta?.updatedAt || new Date().toISOString(),
-                        source: 'rollback-kept'
-                    });
-                    return;
-                }
-                newDataset = {
-                    metaContext: `Patch ${livePatchMajorMinor} is live. Grounding failed — using minimal context.`,
-                    patch: livePatchMajorMinor,
-                };
+            } catch (err) {
+                console.warn('[RAG] Could not read build-templates.json meta:', err);
             }
 
+            const metaContext = `Patch ${kbPatch} is live. Meta build data sourced from Mobalytics (real match statistics). ${kbStats} Build recommendations are based on actual win rates and pick rates from ranked play.`;
+
+            const newDataset: RagDataset = { metaContext, patch: kbPatch };
+
+            ensureRagDir();
             fs.writeFileSync(DATASET_FILE, JSON.stringify(newDataset, null, 2), 'utf-8');
 
             saveLocalRagMeta({
-                patch: livePatchMajorMinor,
+                patch: kbPatch,
                 updatedAt: new Date().toISOString(),
-                source: 'gemini-grounding-search'
+                source: kbSource,
             });
-            console.log(`[RAG] Pipeline complete. Saved dataset for patch ${livePatchMajorMinor}.`);
+            console.log(`[RAG] Pipeline complete. Patch ${kbPatch} context saved (source: ${kbSource}).`);
         } else {
-            console.log(`[RAG] Dataset up to date (Patch ${localPatchMajorMinor}). Using instantly.`);
+            console.log(`[RAG] Dataset up to date (Patch ${localPatchMajorMinor}).`);
         }
     } catch (error) {
         console.error('[RAG] Failed to sync RAG pipeline:', error);

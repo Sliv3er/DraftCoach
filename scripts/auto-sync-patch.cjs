@@ -63,63 +63,17 @@ async function getAllChampions(patch) {
   return champs;
 }
 
-// ── Gemini setup ──
-function getGenAI() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('GEMINI_API_KEY not set');
-  const { GoogleGenerativeAI } = require('@google/generative-ai');
-  return new GoogleGenerativeAI(apiKey);
-}
-
-// ── Fetch meta builds (top 2 roles per champion) ──
-async function fetchMetaBuildBatch(genAI, champions, patch) {
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-3-flash-preview',
-    tools: [{ googleSearch: {} }],
+// ── Mobalytics Sync (replaces Gemini-based fetchMetaBuildBatch) ──
+function runMobalyticsSync() {
+  log('INFO', 'Running Mobalytics meta sync...');
+  const syncScript = path.join(__dirname, 'sync-mobalytics.cjs');
+  execSync(`node ${syncScript}`, {
+    cwd: path.resolve(__dirname, '..'),
+    encoding: 'utf-8',
+    stdio: 'inherit',
+    timeout: 600000, // 10 min timeout
   });
-
-  const champList = champions.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
-
-  const prompt = `Search u.gg and op.gg for the highest winrate builds on League of Legends Patch ${patch} for these champions:
-${champList}
-
-For EACH champion, return builds for their TOP 2 MOST PLAYED ROLES (by pick rate).
-If a champion is only meaningfully played in 1 role (e.g. Yuumi is only Support), return just 1 entry for that champion.
-
-Return ONLY a compact JSON array (no markdown, no code blocks, just raw JSON):
-[
-  {
-    "champion": "ChampionName",
-    "role": "Top/Jungle/Mid/ADC/Support",
-    "metaBuild": {
-      "winRate": 52.3,
-      "pickRate": 8.5,
-      "keystone": "Lethal Tempo",
-      "primaryTree": "Precision",
-      "secondaryTree": "Domination",
-      "startingItems": ["Doran's Blade", "Health Potion"],
-      "coreItems": ["Kraken Slayer", "Phantom Dancer", "Infinity Edge"],
-      "boots": "Berserker's Greaves",
-      "skillOrder": "Q > W > E > R"
-    }
-  }
-]
-
-Rules:
-- Return 2 entries per champion (one per role) when they have 2+ viable roles
-- Return 1 entry if the champion only has 1 viable role
-- winRate and pickRate as numbers (e.g. 52.3, not "52.3%")
-- coreItems: the 3 most popular core items in build order
-- startingItems: exactly 2 (1 starting item + 1 potion)
-- boots: the most popular boots upgrade
-- skillOrder: max priority format "Q > W > E > R"
-- Use current patch ${patch} data, not outdated builds
-- The secondary role must have meaningful pick rate (>1%). Do NOT invent off-meta roles.`;
-
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().trim();
-  const cleanJson = text.replace(/^```(json)?[\s\n]*/i, '').replace(/[\s\n]*```$/i, '').trim();
-  return JSON.parse(cleanJson);
+  log('INFO', 'Mobalytics sync completed successfully');
 }
 
 // ── Fetch augments master list ──
@@ -269,143 +223,60 @@ async function main() {
     if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
   }
 
-  // 4. Get all champions
-  const champs = await getAllChampions(fullPatch);
-  log('INFO', `Champions: ${champs.length}`);
-
-  // 5. Gemini setup
-  const genAI = getGenAI();
-
-  // 6. Batch sync
-  let totalCached = 0;
-  let batchErrors = 0;
-  const failedChamps = [];
-
-  for (let i = 0; i < champs.length; i += BATCH_SIZE) {
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(champs.length / BATCH_SIZE);
-    const batch = champs.slice(i, i + BATCH_SIZE);
-    const names = batch.map(c => c.name).join(', ');
-    log('INFO', `[Batch ${batchNum}/${totalBatches}] ${names}`);
-
-    try {
-      const results = await fetchMetaBuildBatch(genAI, batch, patch);
-      if (Array.isArray(results)) {
-        for (const entry of results) {
-          if (!entry.champion || !entry.role || !entry.metaBuild) continue;
-          let champId = entry.champion;
-          const champMatch = champs.find(c => c.name === entry.champion);
-          if (champMatch) champId = champMatch.id;
-
-          const role = entry.role.toLowerCase().replace('bottom', 'adc').replace('bot', 'adc');
-          const normalizedRole = VALID_ROLES.has(role) ? role : entry.role.toLowerCase();
-
-          const outFile = path.join(META_DIR, `${champId}_${normalizedRole}.json`);
-          fs.writeFileSync(outFile, JSON.stringify({
-            champion: champId,
-            championName: entry.champion,
-            role: normalizedRole,
-            patch,
-            fetchedAt: new Date().toISOString(),
-            metaBuild: entry.metaBuild,
-          }, null, 2), 'utf-8');
-          totalCached++;
-        }
-        log('INFO', `  → ${results.length} builds OK`);
-      }
-    } catch (err) {
-      log('ERROR', `  → Batch failed: ${err.message.slice(0, 80)}`);
-      batchErrors++;
-      failedChamps.push(...batch);
-    }
-
-    // Rate limit between batches
-    if (i + BATCH_SIZE < champs.length) {
-      await new Promise(r => setTimeout(r, 3000));
-    }
-  }
-
-  // 7. Retry failed batches (up to MAX_RETRIES)
-  if (failedChamps.length > 0) {
-    log('INFO', `Retrying ${failedChamps.length} failed champions...`);
-    for (let retry = 0; retry < MAX_RETRIES && failedChamps.length > 0; retry++) {
-      const toRetry = [...failedChamps];
-      failedChamps.length = 0;
-
-      for (let i = 0; i < toRetry.length; i += BATCH_SIZE) {
-        const batch = toRetry.slice(i, i + BATCH_SIZE);
-        try {
-          await new Promise(r => setTimeout(r, 5000));
-          const results = await fetchMetaBuildBatch(genAI, batch, patch);
-          if (Array.isArray(results)) {
-            for (const entry of results) {
-              if (!entry.champion || !entry.role || !entry.metaBuild) continue;
-              let champId = entry.champion;
-              const champMatch = champs.find(c => c.name === entry.champion);
-              if (champMatch) champId = champMatch.id;
-              const role = entry.role.toLowerCase().replace('bottom', 'adc').replace('bot', 'adc');
-              const normalizedRole = VALID_ROLES.has(role) ? role : role;
-
-              fs.writeFileSync(path.join(META_DIR, `${champId}_${normalizedRole}.json`), JSON.stringify({
-                champion: champId, championName: entry.champion, role: normalizedRole,
-                patch, fetchedAt: new Date().toISOString(), metaBuild: entry.metaBuild,
-              }, null, 2), 'utf-8');
-              totalCached++;
-            }
-          }
-        } catch {
-          failedChamps.push(...batch);
-        }
-      }
-      log('INFO', `  Retry ${retry + 1}: ${failedChamps.length} still failing`);
-    }
-  }
-
-  log('INFO', `Meta sync complete: ${totalCached} builds, ${batchErrors} initial errors, ${failedChamps.length} unrecoverable`);
-
-  // 8. Fetch augments
+  // 4. Run Mobalytics sync (writes to shared/kb/data/)
   try {
-    const augData = await fetchAugmentsMasterList(genAI, patch);
-    if (augData?.augments) {
-      augData.fetchedAt = new Date().toISOString();
-      augData.patch = patch;
-      fs.writeFileSync(path.join(AUGMENTS_DIR, 'augments-master.json'), JSON.stringify(augData, null, 2), 'utf-8');
-      log('INFO', `Augments: ${augData.augments.length} cached`);
-    }
+    runMobalyticsSync();
   } catch (err) {
-    log('ERROR', `Augments fetch failed: ${err.message}`);
+    log('ERROR', `Mobalytics sync failed: ${err.message}`);
+    process.exit(1);
   }
 
-  // 9. QC
-  log('INFO', '─── Quality Control ───');
-  const files = fs.readdirSync(META_DIR).filter(f => f.endsWith('.json'));
-  let qcPassed = 0, qcFailed = 0;
-  const qcFailures = [];
-
-  for (const file of files) {
-    const issues = qcFile(path.join(META_DIR, file));
-    if (issues.length === 0) qcPassed++;
-    else { qcFailed++; qcFailures.push({ file, issues }); }
-  }
-
-  log('INFO', `QC: ${qcPassed} passed, ${qcFailed} failed out of ${files.length}`);
-  if (qcFailures.length > 0) {
-    for (const f of qcFailures.slice(0, 10)) {
-      log('WARN', `  ${f.file}: ${f.issues.join(', ')}`);
+  // 5. Copy KB files to data repo if paths differ
+  const kbDir = path.resolve(__dirname, '../shared/kb/data');
+  if (fs.existsSync(kbDir) && kbDir !== META_DIR) {
+    for (const f of ['build-templates.json', 'rune-templates.json']) {
+      const src = path.join(kbDir, f);
+      if (fs.existsSync(src)) {
+        const dest = path.join(DATA_DIR, 'data', f);
+        if (!fs.existsSync(path.dirname(dest))) fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.copyFileSync(src, dest);
+        log('INFO', `Copied ${f} to data repo`);
+      }
     }
   }
 
-  // 10. Write manifest
+  // 6. Read sync results
+  const buildTemplates = JSON.parse(fs.readFileSync(path.join(kbDir, 'build-templates.json'), 'utf-8'));
+  const totalCached = Object.keys(buildTemplates.data).length;
+  log('INFO', `Meta sync complete: ${totalCached} build entries`);
+
+  // 7. QC — validate the generated KB files
+  log('INFO', '─── Quality Control ───');
+  const btData = buildTemplates.data;
+  let qcPassed = 0, qcFailed = 0;
+  for (const [key, entry] of Object.entries(btData)) {
+    const v = entry.variants?.DAMAGE;
+    if (v?.runes?.primaryKeystone && v?.coreItems?.length >= 2) {
+      qcPassed++;
+    } else {
+      qcFailed++;
+      if (qcFailed <= 5) log('WARN', `QC fail: ${key} — missing runes or items`);
+    }
+  }
+  log('INFO', `QC: ${qcPassed} passed, ${qcFailed} failed out of ${Object.keys(btData).length}`);
+
+  // 8. Write manifest
   const manifest = {
     patch,
     generatedAt: new Date().toISOString(),
     champCount: totalCached,
-    fileCount: files.length,
     qcPassed,
     qcFailed,
-    source: 'auto-sync-vps',
+    source: 'mobalytics-auto-sync',
   };
-  fs.writeFileSync(path.join(DATA_DIR, 'data', 'meta-builds', 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
+  if (fs.existsSync(META_DIR)) {
+    fs.writeFileSync(path.join(META_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
+  }
 
   // 11. Push to GitHub
   try {

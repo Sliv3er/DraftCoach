@@ -36,6 +36,160 @@ const CACHE_DIR = path.join(app.getPath('userData'), 'icon-cache');
 const _distIndexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
 const isDev = !app.isPackaged && !require('fs').existsSync(_distIndexPath);
 
+// ═══════════════════════════════════════════════════════════════════
+//  OPENROUTER / DEEPSEEK V4 FLASH — Universal LLM wrapper
+//  Replaces all Gemini SDK calls with OpenRouter API (OpenAI-compatible)
+// ═══════════════════════════════════════════════════════════════════
+const OPENROUTER_BASE = 'https://openrouter.ai/api/v1/chat/completions';
+const OPENROUTER_MODEL = 'deepseek/deepseek-v4-flash';
+
+function getOpenRouterKey() {
+  return getSetting('openrouterApiKey')
+    || process.env.OPENROUTER_API_KEY
+    || '';
+}
+
+/**
+ * Universal LLM generation via OpenRouter (DeepSeek V4 Flash).
+ * @param {string} systemPrompt - System instruction
+ * @param {string} userMessage - User message / context
+ * @param {object} [opts] - Options: { temperature, maxTokens, jsonMode }
+ * @returns {Promise<string>} Generated text
+ */
+async function llmGenerate(systemPrompt, userMessage, opts = {}) {
+  const { temperature = 0.2, maxTokens = 8192, jsonMode = false } = opts;
+  const apiKey = getOpenRouterKey();
+
+  const body = {
+    model: OPENROUTER_MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage },
+    ],
+    temperature,
+    max_tokens: maxTokens,
+    top_p: 0.85,
+  };
+
+  // If JSON mode requested, ask the model to output JSON
+  if (jsonMode) {
+    body.response_format = { type: 'json_object' };
+    // Also reinforce in system prompt
+    body.messages[0].content += '\n\nYou MUST respond with valid JSON only. No markdown, no code fences, no text before or after the JSON.';
+  }
+
+  const payload = JSON.stringify(body);
+
+  return new Promise((resolve, reject) => {
+    const url = new URL(OPENROUTER_BASE);
+    const reqOpts = {
+      hostname: url.hostname,
+      port: 443,
+      path: url.pathname,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://draftcoach.gg',
+        'X-Title': 'DraftCoach',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    };
+
+    const req = https.request(reqOpts, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.error) {
+            reject(new Error(`OpenRouter error: ${parsed.error.message || JSON.stringify(parsed.error)}`));
+            return;
+          }
+          const content = parsed.choices?.[0]?.message?.content || '';
+          resolve(content);
+        } catch (e) {
+          reject(new Error(`OpenRouter parse error: ${e.message} — raw: ${data.slice(0, 200)}`));
+        }
+      });
+    });
+
+    req.on('error', (e) => reject(new Error(`OpenRouter network error: ${e.message}`)));
+    req.setTimeout(120000, () => { req.destroy(); reject(new Error('OpenRouter request timed out (120s)')); });
+    req.write(payload);
+    req.end();
+  });
+}
+
+/**
+ * Stream LLM generation via OpenRouter (DeepSeek V4 Flash).
+ * Calls onChunk(text) for each SSE chunk, resolves with full text.
+ */
+async function llmGenerateStream(systemPrompt, userMessage, opts = {}, onChunk = null) {
+  const { temperature = 0.2, maxTokens = 8192 } = opts;
+  const apiKey = getOpenRouterKey();
+
+  const body = {
+    model: OPENROUTER_MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage },
+    ],
+    temperature,
+    max_tokens: maxTokens,
+    top_p: 0.85,
+    stream: true,
+  };
+
+  const payload = JSON.stringify(body);
+
+  return new Promise((resolve, reject) => {
+    const url = new URL(OPENROUTER_BASE);
+    const reqOpts = {
+      hostname: url.hostname,
+      port: 443,
+      path: url.pathname,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://draftcoach.gg',
+        'X-Title': 'DraftCoach',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    };
+
+    let fullText = '';
+    const req = https.request(reqOpts, (res) => {
+      let buffer = '';
+      res.on('data', chunk => {
+        buffer += chunk.toString();
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // Keep incomplete line in buffer
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const delta = parsed.choices?.[0]?.delta?.content || '';
+            if (delta) {
+              fullText += delta;
+              if (onChunk) onChunk(delta);
+            }
+          } catch {}
+        }
+      });
+      res.on('end', () => resolve(fullText));
+    });
+
+    req.on('error', (e) => reject(new Error(`OpenRouter stream error: ${e.message}`)));
+    req.setTimeout(120000, () => { req.destroy(); reject(new Error('OpenRouter stream timed out (120s)')); });
+    req.write(payload);
+    req.end();
+  });
+}
+
 
 
 let backendProcess = null;
@@ -2173,131 +2327,40 @@ ${userMessage.slice(0, 2000)}`;
     }
 
     async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false) {
-      let rawText = '';
-      let cleanText = '';
-
-      // Always try non-streaming first (more reliable for JSON completion)
-      log('INFO', `[build-fetch] Trying ${primaryModelName} (non-streaming)`);
+      // ── DeepSeek V4 Flash via OpenRouter — plain text, no JSON schema needed ──
+      log('INFO', `[build-fetch] Generating via DeepSeek V4 Flash (OpenRouter)...`);
+      const startTime = Date.now();
       try {
-        const model = genAI.getGenerativeModel({
-          model: primaryModelName,
-          systemInstruction: systemPrompt,
-          generationConfig: {
-            temperature: 0.2,
-            topP: 0.85,
-            topK: 40,
-            maxOutputTokens: 16384,
-            responseMimeType: 'application/json',
-            responseSchema: BUILD_RESPONSE_SCHEMA,
-          },
+        const rawText = await llmGenerate(systemPrompt, userMessage, {
+          temperature: 0.2,
+          maxTokens: 8192,
         });
-
-        const startTime = Date.now();
-        const result = await model.generateContent(userMessage);
-        rawText = result.response.text();
         const elapsedS = Math.round((Date.now() - startTime) / 1000);
 
-        let buildJson;
+        // Try to parse as JSON (if model outputs JSON despite text prompt)
+        let cleanText = rawText;
         try {
-          buildJson = JSON.parse(rawText);
-        } catch (parseErr) {
-          // Try to repair truncated JSON before giving up
-          log('WARN', `[build-fetch] JSON parse failed, attempting repair... (${parseErr.message})`);
-          buildJson = repairTruncatedJson(rawText);
-          if (buildJson) {
-            log('INFO', `[build-fetch] JSON repair successful!`);
-          } else {
-            throw parseErr;
+          const stripped = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+          const buildJson = JSON.parse(stripped);
+          if (buildJson.coreBuild && buildJson.coreBuild.length >= 5) {
+            cleanText = jsonBuildToText(buildJson);
+            log('INFO', `[build-fetch] DeepSeek JSON parsed (${cleanText.length} chars, ${elapsedS}s)`);
+            return { text: cleanText, modelUsed: 'deepseek-v4-flash', rawText };
           }
-        }
-        
-        if (!buildJson.coreBuild || buildJson.coreBuild.length < 5) {
-          throw new Error(`JSON parsed but missing core items (got ${buildJson.coreBuild ? buildJson.coreBuild.length : 0})`);
-        }
-
-        cleanText = jsonBuildToText(buildJson);
-        log('INFO', `[build-fetch] ${primaryModelName} succeeded (${cleanText.length} chars, ${elapsedS}s)`);
-        return { text: cleanText, modelUsed: primaryModelName, rawText };
-      } catch (e) {
-        log('WARN', `[build-fetch] ${primaryModelName} non-streaming failed: ${e.message}`);
-      }
-
-      // Retry once with streaming (different code path may avoid the same truncation)
-      log('INFO', `[build-fetch] Retrying ${primaryModelName} with streaming...`);
-      try {
-        const model = genAI.getGenerativeModel({
-          model: primaryModelName,
-          systemInstruction: systemPrompt,
-          generationConfig: {
-            temperature: 0.3,
-            topP: 0.85,
-            topK: 40,
-            maxOutputTokens: 16384,
-            responseMimeType: 'application/json',
-            responseSchema: BUILD_RESPONSE_SCHEMA,
-          },
-        });
-
-        const startTime = Date.now();
-        const stream = await model.generateContentStream(userMessage);
-        rawText = '';
-        for await (const chunk of stream.stream) {
-          const t = chunk.text();
-          if (t) rawText += t;
-          if (Date.now() - startTime > 60000) {
-            log('WARN', `[build-fetch] Stream timed out after 60s`);
-            break;
-          }
-        }
-        const elapsedS = Math.round((Date.now() - startTime) / 1000);
-
-        let buildJson;
-        try {
-          buildJson = JSON.parse(rawText);
         } catch {
-          buildJson = repairTruncatedJson(rawText);
-          if (buildJson) log('INFO', `[build-fetch] JSON repair successful on streaming attempt`);
+          // Not JSON — use as plain text (expected)
         }
 
-        if (buildJson && buildJson.coreBuild && buildJson.coreBuild.length >= 5) {
-          cleanText = jsonBuildToText(buildJson);
-          log('INFO', `[build-fetch] ${primaryModelName} streaming succeeded (${cleanText.length} chars, ${elapsedS}s)`);
-          return { text: cleanText, modelUsed: primaryModelName, rawText };
-        }
-        log('WARN', `[build-fetch] Streaming attempt also produced incomplete JSON`);
-      } catch (e2) {
-        log('WARN', `[build-fetch] ${primaryModelName} streaming failed: ${e2.message}`);
-      }
-
-      // Final rescue: plain text generation (no JSON schema — just ask for text format)
-      log('WARN', `[build-fetch] All JSON attempts failed. Falling back to plain text generation...`);
-      try {
-        const textModel = genAI.getGenerativeModel({
-          model: primaryModelName,
-          systemInstruction: systemPrompt.replace('Your output is a JSON object. The schema enforces the structure — focus on producing HIGH-QUALITY CONTENT for each field.', 'Output in plain text format with section headers.'),
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 8192,
-          },
-        });
-        const startTime = Date.now();
-        const result = await textModel.generateContent(userMessage);
-        rawText = result.response.text();
+        log('INFO', `[build-fetch] DeepSeek succeeded (${cleanText.length} chars, ${elapsedS}s)`);
+        return { text: cleanText, modelUsed: 'deepseek-v4-flash', rawText };
+      } catch (e) {
         const elapsedS = Math.round((Date.now() - startTime) / 1000);
-        log('INFO', `[build-fetch] Plain text fallback succeeded (${rawText.length} chars, ${elapsedS}s)`);
-        return { text: rawText, modelUsed: primaryModelName + '-text-fallback', rawText };
-      } catch (textErr) {
-        log('ERROR', `[build-fetch] Plain text fallback also failed: ${textErr.message}`);
+        log('ERROR', `[build-fetch] DeepSeek failed after ${elapsedS}s: ${e.message}`);
+        return { text: '', modelUsed: 'failed', rawText: '' };
       }
-
-      return { text: rawText || '', modelUsed: 'failed', rawText };
     }
 
     async function generateBuild(body, shortPrompt) {
-      const { GoogleGenerativeAI } = require('@google/generative-ai');
-      const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error('Gemini API key not set. Open Settings and paste your Gemini API key, or place a .env file with GEMINI_API_KEY=your_key in ' + app.getPath('userData'));
-
       // Get live patch from DDragon (never hardcoded)
       let livePatch;
       try {
@@ -2307,13 +2370,8 @@ ${userMessage.slice(0, 2000)}`;
       }
       const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
 
-      const requestedModel = body.model && VALID_MODELS.includes(body.model) ? body.model : null;
-      const modelName = requestedModel || getSetting('geminiModel') || process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview';
-      // Persist the user's model choice so ALL features (advisor, scout, etc.) use the same model
-      if (requestedModel) setSetting('geminiModel', requestedModel);
-      log('INFO', `[backend] Using model: ${modelName} (requested: ${body.model || 'none'}), patch: ${patchDisplay}`);
+      log('INFO', `[backend] Using model: DeepSeek V4 Flash (OpenRouter), patch: ${patchDisplay}`);
 
-      const genAI = new GoogleGenerativeAI(apiKey);
       const systemPrompt = shortPrompt ? buildShortPrompt(patchDisplay) : buildSystemPrompt(patchDisplay);
 
       // Inject RAG context into the user message
@@ -2344,7 +2402,7 @@ ${userMessage.slice(0, 2000)}`;
       const kbContext = getKBBuildContext(body.myChampion, body.role);
       const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
 
-      const { text: cleanText } = await fetchRobustJsonBuild(genAI, modelName, systemPrompt, userMessage, false);
+      const { text: cleanText } = await fetchRobustJsonBuild(null, null, systemPrompt, userMessage, false);
 
       return { text: cleanText, patchUsed: patchDisplay };
     }

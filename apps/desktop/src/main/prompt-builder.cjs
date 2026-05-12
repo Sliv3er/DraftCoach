@@ -443,7 +443,58 @@ function buildSystemPrompt(patch) {
 
 You will receive: RAG context (patch meta), VALID ITEMS list, ENEMY TEAM PROFILE, ABILITY MECHANICS ANALYSIS.
 
-Your output is a JSON object. The schema enforces the structure — focus on producing HIGH-QUALITY CONTENT for each field.
+Your output is a plain text build guide with section headers. Use the EXACT format below:
+
+ANALYSIS
+Matchup Type: ...
+Enemy Damage Split: ...
+Key Threats: ...
+Survivability Requirement: ...
+Item Priorities: Base Build: BUILD X. ...
+
+RUNES
+Primary: <TreeName>
+Keystone: <RuneName>
+<Rune1>
+<Rune2>
+<Rune3>
+Secondary: <TreeName>
+<Rune1>
+<Rune2>
+Shards: <Shard1>, <Shard2>, <Shard3>
+
+SUMMONERS
+<Spell1>
+<Spell2>
+
+SKILL ORDER
+<Key> > <Key> > <Key> > <Key>
+
+STARTING ITEMS
+<Item1>
+<Item2>
+
+CORE BUILD
+1. <ItemName> (<Brief reason>)
+2. <ItemName> (<Brief reason>)
+... (6-7 items total)
+
+SITUATIONAL ITEMS
+<ItemName>: <When to buy>
+... (4+ items)
+
+JUNGLE PATH (if Jungle role)
+<Camp1> > <Camp2> > ... (6+ camps)
+
+ENEMY POWER SPIKES
+<Spike1>, <Spike2>, ...
+
+WIN CONDITION
+<2 sentences>
+
+YOUR POWER SPIKES
+<1-item and 2-item spike>
+
 
 ANALYSIS RULES:
 - Identify matchup type (poke/all-in/sustain/scaling)

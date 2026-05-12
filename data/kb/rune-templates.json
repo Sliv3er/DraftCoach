@@ -2,12 +2,12 @@
     "meta": {
         "patch": "16.9",
         "source": "mobalytics-gql",
-        "generatedAt": "2026-05-12T00:26:00.074Z",
-        "buildHash": "moba-1778545560074",
+        "generatedAt": "2026-05-12T06:03:55.515Z",
+        "buildHash": "moba-1778565835516",
         "stats": {
             "champions": 172,
             "roles": 339,
-            "builds": 902,
+            "builds": 904,
             "failed": 0
         }
     },
@@ -657,13 +657,13 @@
             "primaryTree": "Inspiration",
             "primaryKeystone": "Glacial Augment",
             "primarySlots": [
-                "Hextech Flashtraption",
+                "Magical Footwear",
                 "Biscuit Delivery",
                 "Cosmic Insight"
             ],
             "secondaryTree": "Domination",
             "secondarySlots": [
-                "Cheap Shot",
+                "Sudden Impact",
                 "Ultimate Hunter"
             ],
             "statShards": [
@@ -3118,6 +3118,28 @@
             "championId": "DrMundo",
             "role": "TOP",
             "label": "DAMAGE",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Grasp of the Undying",
+            "primarySlots": [
+                "Demolish",
+                "Second Wind",
+                "Overgrowth"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Approach Velocity",
+                "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
+        "DrMundo_TOP_SAFETY": {
+            "championId": "DrMundo",
+            "role": "TOP",
+            "label": "SAFETY",
             "primaryTree": "Resolve",
             "primaryKeystone": "Grasp of the Undying",
             "primarySlots": [
@@ -7954,28 +7976,6 @@
                 "Health Scaling"
             ]
         },
-        "Lucian_ADC_SAFETY": {
-            "championId": "Lucian",
-            "role": "ADC",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Press the Attack",
-            "primarySlots": [
-                "Presence of Mind",
-                "Legend: Bloodline",
-                "Coup de Grace"
-            ],
-            "secondaryTree": "Inspiration",
-            "secondarySlots": [
-                "Biscuit Delivery",
-                "Magical Footwear"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Lucian_ADC_UTILITY": {
             "championId": "Lucian",
             "role": "ADC",
@@ -11412,28 +11412,6 @@
             "championId": "Pyke",
             "role": "SUPPORT",
             "label": "DAMAGE",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Hail of Blades",
-            "primarySlots": [
-                "Cheap Shot",
-                "Sixth Sense",
-                "Ultimate Hunter"
-            ],
-            "secondaryTree": "Resolve",
-            "secondarySlots": [
-                "Bone Plating",
-                "Unflinching"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Pyke_SUPPORT_SAFETY": {
-            "championId": "Pyke",
-            "role": "SUPPORT",
-            "label": "SAFETY",
             "primaryTree": "Domination",
             "primaryKeystone": "Hail of Blades",
             "primarySlots": [
@@ -15874,6 +15852,28 @@
                 "Health Scaling"
             ]
         },
+        "Trundle_JUNGLE_SAFETY": {
+            "championId": "Trundle",
+            "role": "JUNGLE",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Lethal Tempo",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Approach Velocity",
+                "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Trundle_JUNGLE_UTILITY": {
             "championId": "Trundle",
             "role": "JUNGLE",
@@ -16578,6 +16578,28 @@
                 "Health Scaling"
             ]
         },
+        "Varus_MID_SAFETY": {
+            "championId": "Varus",
+            "role": "MID",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Taste of Blood",
+                "Treasure Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Varus_MID_UTILITY": {
             "championId": "Varus",
             "role": "MID",
@@ -16941,6 +16963,28 @@
                 "Transcendence",
                 "Scorch"
             ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Cut Down",
+                "Legend: Haste"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Velkoz_MID_SAFETY": {
+            "championId": "Velkoz",
+            "role": "MID",
+            "label": "SAFETY",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Arcane Comet",
+            "primarySlots": [
+                "Manaflow Band",
+                "Transcendence",
+                "Scorch"
+            ],
             "secondaryTree": "Domination",
             "secondarySlots": [
                 "Cheap Shot",
@@ -16965,8 +17009,8 @@
             ],
             "secondaryTree": "Precision",
             "secondarySlots": [
-                "Legend: Haste",
-                "Cut Down"
+                "Cut Down",
+                "Legend: Haste"
             ],
             "statShards": [
                 "Adaptive Force",

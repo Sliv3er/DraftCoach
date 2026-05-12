@@ -903,24 +903,20 @@ function saveMetaBuildMeta(meta) {
 /**
  * Get cached meta build reference for a champion+role.
  * Returns formatted prompt string or '' if not cached.
+ * LEGACY: Kept for fallback if KB data is not available.
  */
 function getMetaBuildReference(champion, role) {
   try {
-    // Try exact match first: Champion_Role.json
     const exactFile = path.join(META_BUILDS_SR_DIR, `${champion}_${role}.json`);
     if (fs.existsSync(exactFile)) {
       const data = JSON.parse(fs.readFileSync(exactFile, 'utf-8'));
       return formatMetaReference(data);
     }
-
-    // Try any role for this champion (off-meta fallback)
     const files = fs.readdirSync(META_BUILDS_SR_DIR).filter(f => f.startsWith(`${champion}_`) && f.endsWith('.json'));
     if (files.length > 0) {
-      // Use the first available role as a partial reference
       const data = JSON.parse(fs.readFileSync(path.join(META_BUILDS_SR_DIR, files[0]), 'utf-8'));
       return formatMetaReference(data, true);
     }
-
     return '';
   } catch {
     return '';
@@ -933,7 +929,6 @@ function formatMetaReference(data, isOffRole = false) {
   const offRoleNote = isOffRole
     ? `\n  ⚠️ NOTE: No meta data for this exact role. Showing ${data.champion} ${data.role || 'main role'} as reference. Adapt heavily for the actual role.`
     : '';
-
   let ref = `META REFERENCE (Patch ${data.patch || '?'} popular build — use as baseline, adapt to enemy comp):${offRoleNote}\n`;
   if (mb.winRate) ref += `  Win Rate: ${mb.winRate}% | `;
   if (mb.pickRate) ref += `Pick Rate: ${mb.pickRate}%\n`;
@@ -944,6 +939,99 @@ function formatMetaReference(data, isOffRole = false) {
   if (mb.skillOrder) ref += `  Skill Order: ${mb.skillOrder}\n`;
   ref += `\n  INSTRUCTION: Start from this meta build as your baseline. Adapt 1-3 items and runes to counter the specific enemy threats. The core direction should align with meta unless matchup demands otherwise.\n`;
   return ref;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MOBALYTICS KB BUILD REFERENCE SYSTEM (replaces old Gemini meta)
+//  Reads build-templates.json from shared/kb/data (dev) or
+//  kb-data/ (production). Injects all 3 variants as AI baseline.
+// ═══════════════════════════════════════════════════════════════════
+
+let _kbBuildTemplatesCache = null;
+
+function loadKBBuildTemplates() {
+  if (_kbBuildTemplatesCache) return _kbBuildTemplatesCache;
+  const kbPaths = isDev
+    ? [
+        path.resolve(__dirname, '../../../../shared/kb/data/build-templates.json'),
+      ]
+    : [
+        path.join(process.resourcesPath, 'kb-data', 'build-templates.json'),
+        path.join(__dirname, '..', 'kb-data', 'build-templates.json'),
+      ];
+  for (const p of kbPaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
+        _kbBuildTemplatesCache = raw.data || {};
+        log('INFO', `[KB] Loaded build-templates.json from: ${p} (${Object.keys(_kbBuildTemplatesCache).length} entries)`);
+        return _kbBuildTemplatesCache;
+      } catch (e) {
+        log('WARN', `[KB] Failed to parse ${p}: ${e.message}`);
+      }
+    }
+  }
+  log('WARN', '[KB] build-templates.json not found in any search path');
+  return {};
+}
+
+/**
+ * Get Mobalytics KB build context for a champion+role.
+ * Returns a formatted prompt string with all 3 variants (DAMAGE/SAFETY/UTILITY)
+ * that the AI uses as its baseline reference.
+ */
+function getKBBuildContext(champion, role) {
+  const roleMap = {
+    top: 'TOP', jungle: 'JUNGLE', mid: 'MID',
+    adc: 'ADC', bot: 'ADC', bottom: 'ADC', support: 'SUPPORT',
+  };
+  const engineRole = roleMap[role.toLowerCase()] || role.toUpperCase();
+  const data = loadKBBuildTemplates();
+
+  // Try direct key, then role-suffixed key, then fuzzy match
+  const template = data[champion]
+    || data[`${champion}_${engineRole}`]
+    || Object.values(data).find(
+      e => e.championId && e.championId.toLowerCase() === champion.toLowerCase() && e.role === engineRole
+    );
+
+  if (!template || !template.variants) {
+    // Fallback to old meta build reference if KB data not found
+    return getMetaBuildReference(champion, role);
+  }
+
+  const lines = ['\n═══ REFERENCE BUILDS (Mobalytics real match stats — use as baseline) ═══'];
+  const variantLabels = {
+    DAMAGE: 'BUILD 1 — Most Popular',
+    SAFETY: 'BUILD 2 — Secondary',
+    UTILITY: 'BUILD 3 — Alternative',
+  };
+
+  for (const [vKey, vLabel] of Object.entries(variantLabels)) {
+    const v = template.variants[vKey];
+    if (!v) continue;
+
+    lines.push(`\n${vLabel} (${vKey}):`);
+    if (v.runes) {
+      lines.push(`  Runes: ${v.runes.primaryKeystone} (${v.runes.primaryTree}) / ${v.runes.secondaryTree}`);
+      if (v.runes.primarySlots) lines.push(`  Primary: ${v.runes.primarySlots.join(', ')}`);
+      if (v.runes.secondarySlots) lines.push(`  Secondary: ${v.runes.secondarySlots.join(', ')}`);
+      if (v.runes.statShards) lines.push(`  Shards: ${v.runes.statShards.join(', ')}`);
+    }
+    if (v.summonerSpells) lines.push(`  Spells: ${v.summonerSpells.join(' + ')}`);
+    if (v.skillOrder) {
+      const maxOrder = v.skillOrder.maxOrder ? v.skillOrder.maxOrder.join(' > ') : 'N/A';
+      const first3 = v.skillOrder.first3 ? v.skillOrder.first3.join(' → ') : 'N/A';
+      lines.push(`  Skill Order: ${maxOrder} (first 3: ${first3})`);
+    }
+    if (v.startingItems) lines.push(`  Starting: ${v.startingItems.map(i => typeof i === 'string' ? i : i.name).join(' + ')}`);
+    if (v.bootChoice) lines.push(`  Boots: ${typeof v.bootChoice === 'string' ? v.bootChoice : v.bootChoice.name}`);
+    if (v.coreItems) lines.push(`  Core: ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' → ')}`);
+  }
+
+  lines.push('═══════════════════════════════════════════════════════════════════════');
+  lines.push('\nINSTRUCTIONS: Review the REFERENCE BUILDS above. Select the best base build for this matchup. Adapt items/runes as needed to counter the enemy team. In your ANALYSIS, state which base build you chose and why.');
+  return lines.join('\n');
 }
 
 /**
@@ -2157,8 +2245,8 @@ ${userMessage.slice(0, 2000)}`;
       const allChamps = [body.myChampion, ...(body.enemies || [])];
       const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
       const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
-      const metaRef = getMetaBuildReference(body.myChampion, body.role);
-      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
+      const kbContext = getKBBuildContext(body.myChampion, body.role);
+      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
 
       const { text: cleanText } = await fetchRobustJsonBuild(genAI, modelName, systemPrompt, userMessage, false);
 

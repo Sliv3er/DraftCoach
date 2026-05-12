@@ -464,6 +464,13 @@ BUILD RULES:
 - NEVER put starting items in coreBuild.
 - NEVER use the same tree for primaryTree and secondaryTree.
 
+REFERENCE BUILD RULES (CRITICAL — your highest priority):
+- You will receive REFERENCE BUILDS from Mobalytics (real match data with high win rates).
+- You MUST use BUILD 1 (Most Popular) as your default. Only use BUILD 2 or 3 if the enemy comp makes BUILD 1 truly unviable.
+- Your coreBuild MUST contain the SAME core items from your chosen base build. You may reorder them but NOT replace them unless the matchup is extreme (4+ of one damage type).
+- In your analysis, you MUST state "Base Build: BUILD 1" (or 2/3 if you switched) and explain why.
+- BOOTS and RUNES can be freely adapted to the matchup.
+
 STARTING ITEMS RULES:
 - startingItems: Exactly 2 items — 1 starting item + 1 potion (Health Potion or Refillable Potion).
 - Starting gold budget = 500g. Total cost of both items must be ≤500g.

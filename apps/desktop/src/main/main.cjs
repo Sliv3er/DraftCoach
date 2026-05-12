@@ -1045,12 +1045,13 @@ function getKBBuildContext(champion, role) {
 
   lines.push(`\n═══════════════════════════════════════════════════════════════════════`);
   lines.push(`\nCRITICAL RULES FOR USING REFERENCE BUILDS:`);
-  lines.push(`1. You MUST select one of the builds above as your base.`);
-  lines.push(`2. Your CORE BUILD output MUST contain the same core items from your chosen base build.`);
-  lines.push(`3. You may reorder items based on the matchup (e.g., rush MR item vs AP lane).`);
-  lines.push(`4. You may ONLY swap a core item in an extreme scenario (e.g., 4+ AP enemies demands MR stacking). If you swap, you MUST explain why in ANALYSIS.`);
-  lines.push(`5. Adapt RUNES, BOOTS, SUMMONER SPELLS, and SITUATIONAL ITEMS freely based on the enemy team.`);
-  lines.push(`6. In ANALYSIS, state: "Base Build: BUILD X (VARIANT)" and explain any adaptations.`);
+  lines.push(`1. You MUST use BUILD 1 (Most Popular) as your default base build.`);
+  lines.push(`2. Only switch to BUILD 2 or BUILD 3 if the enemy composition STRONGLY demands it (e.g., BUILD 1 is pure offense but enemy has 4+ assassins).`);
+  lines.push(`3. Your CORE BUILD output MUST contain the same core items from your chosen base build.`);
+  lines.push(`4. You may reorder items based on the matchup (e.g., rush MR item vs AP lane).`);
+  lines.push(`5. You may ONLY swap a core item in an extreme scenario (e.g., 4+ AP enemies demands MR stacking). If you swap, you MUST explain why in ANALYSIS.`);
+  lines.push(`6. Adapt RUNES, BOOTS, SUMMONER SPELLS, and SITUATIONAL ITEMS freely based on the enemy team.`);
+  lines.push(`7. In ANALYSIS, state: "Base Build: BUILD X" and explain any adaptations.`);
   return lines.join('\n');
 }
 
@@ -2139,7 +2140,7 @@ ${userMessage.slice(0, 2000)}`;
     }
 
     async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false) {
-      const maxRetries = primaryModelName.includes('flash') ? 3 : 1;
+      const maxRetries = primaryModelName.includes('flash') ? 2 : 1;
       let rawText = '';
       let cleanText = '';
       const STREAM_TIMEOUT_MS = 90000;
@@ -2154,7 +2155,7 @@ ${userMessage.slice(0, 2000)}`;
               temperature: primaryModelName.includes('flash') ? 0.2 + (attempt * 0.1) : 0.3,
               topP: 0.85,
               topK: 40,
-              maxOutputTokens: 8192,
+              maxOutputTokens: 16384,
               responseMimeType: 'application/json',
               responseSchema: BUILD_RESPONSE_SCHEMA,
             },
@@ -2204,7 +2205,7 @@ ${userMessage.slice(0, 2000)}`;
             model: 'gemini-3.1-pro-preview',
             systemInstruction: systemPrompt,
             generationConfig: {
-              temperature: 0.3, topP: 0.85, topK: 40, maxOutputTokens: 8192,
+              temperature: 0.3, topP: 0.85, topK: 40, maxOutputTokens: 16384,
               responseMimeType: 'application/json', responseSchema: BUILD_RESPONSE_SCHEMA,
             },
           });

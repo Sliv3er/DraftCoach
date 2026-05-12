@@ -937,7 +937,7 @@ function formatMetaReference(data, isOffRole = false) {
   if (mb.coreItems && mb.coreItems.length > 0) ref += `  Popular Core: ${mb.coreItems.join(' → ')}\n`;
   if (mb.boots) ref += `  Popular Boots: ${mb.boots}\n`;
   if (mb.skillOrder) ref += `  Skill Order: ${mb.skillOrder}\n`;
-  ref += `\n  INSTRUCTION: Start from this meta build as your baseline. Adapt 1-3 items and runes to counter the specific enemy threats. The core direction should align with meta unless matchup demands otherwise.\n`;
+  ref += `\n  INSTRUCTION: Start from this meta build as your baseline. You MUST strictly adhere to these CORE ITEMS. You may change their build order, but you should ONLY swap out a core item in extreme counter-matchup scenarios. Otherwise, keep the core items exactly as they appear. Adapt RUNES and BOOTS as needed to counter the enemy team.\n`;
   return ref;
 }
 
@@ -988,50 +988,87 @@ function getKBBuildContext(champion, role) {
   const engineRole = roleMap[role.toLowerCase()] || role.toUpperCase();
   const data = loadKBBuildTemplates();
 
-  // Try direct key, then role-suffixed key, then fuzzy match
-  const template = data[champion]
-    || data[`${champion}_${engineRole}`]
-    || Object.values(data).find(
+  // Priority 1: exact role-suffixed key (e.g. "Aatrox_JUNGLE")
+  // Priority 2: bare champion key ONLY if its stored role matches the requested role
+  // Priority 3: fuzzy match by championId + role
+  let template = data[`${champion}_${engineRole}`];
+  if (!template) {
+    const bareEntry = data[champion];
+    if (bareEntry && bareEntry.role === engineRole) {
+      template = bareEntry;
+    }
+  }
+  if (!template) {
+    template = Object.values(data).find(
       e => e.championId && e.championId.toLowerCase() === champion.toLowerCase() && e.role === engineRole
     );
+  }
 
   if (!template || !template.variants) {
-    // Fallback to old meta build reference if KB data not found
+    log('WARN', `[KB] No build data for ${champion} ${engineRole} — falling back to legacy meta`);
     return getMetaBuildReference(champion, role);
   }
 
-  const lines = ['\n═══ REFERENCE BUILDS (Mobalytics real match stats — use as baseline) ═══'];
+  const variantKeys = Object.keys(template.variants);
+  log('INFO', `[KB] Injecting ${champion} ${engineRole}: ${variantKeys.length} variants (${variantKeys.join(', ')})`);
+
+  const lines = [`\n═══ REFERENCE BUILDS for ${champion} ${engineRole} (Mobalytics Patch ${loadKBBuildTemplatesMeta()}) ═══`];
+  lines.push(`You MUST use one of these as your base build. State which one you chose in your ANALYSIS.`);
   const variantLabels = {
-    DAMAGE: 'BUILD 1 — Most Popular',
-    SAFETY: 'BUILD 2 — Secondary',
-    UTILITY: 'BUILD 3 — Alternative',
+    DAMAGE: 'BUILD 1 — Most Popular (highest pick rate)',
+    SAFETY: 'BUILD 2 — Secondary (alternative popular build)',
+    UTILITY: 'BUILD 3 — Alternative (situational build)',
   };
 
   for (const [vKey, vLabel] of Object.entries(variantLabels)) {
     const v = template.variants[vKey];
     if (!v) continue;
 
-    lines.push(`\n${vLabel} (${vKey}):`);
+    lines.push(`\n${vLabel}:`);
     if (v.runes) {
-      lines.push(`  Runes: ${v.runes.primaryKeystone} (${v.runes.primaryTree}) / ${v.runes.secondaryTree}`);
-      if (v.runes.primarySlots) lines.push(`  Primary: ${v.runes.primarySlots.join(', ')}`);
-      if (v.runes.secondarySlots) lines.push(`  Secondary: ${v.runes.secondarySlots.join(', ')}`);
-      if (v.runes.statShards) lines.push(`  Shards: ${v.runes.statShards.join(', ')}`);
+      lines.push(`  Keystone: ${v.runes.primaryKeystone} (${v.runes.primaryTree})`);
+      if (v.runes.primarySlots) lines.push(`  Primary Runes: ${v.runes.primarySlots.join(', ')}`);
+      lines.push(`  Secondary Tree: ${v.runes.secondaryTree}`);
+      if (v.runes.secondarySlots) lines.push(`  Secondary Runes: ${v.runes.secondarySlots.join(', ')}`);
+      if (v.runes.statShards) lines.push(`  Stat Shards: ${v.runes.statShards.join(', ')}`);
     }
-    if (v.summonerSpells) lines.push(`  Spells: ${v.summonerSpells.join(' + ')}`);
+    if (v.summonerSpells) lines.push(`  Summoner Spells: ${v.summonerSpells.join(' + ')}`);
     if (v.skillOrder) {
       const maxOrder = v.skillOrder.maxOrder ? v.skillOrder.maxOrder.join(' > ') : 'N/A';
       const first3 = v.skillOrder.first3 ? v.skillOrder.first3.join(' → ') : 'N/A';
-      lines.push(`  Skill Order: ${maxOrder} (first 3: ${first3})`);
+      lines.push(`  Skill Max Order: ${maxOrder} (first 3 levels: ${first3})`);
     }
-    if (v.startingItems) lines.push(`  Starting: ${v.startingItems.map(i => typeof i === 'string' ? i : i.name).join(' + ')}`);
+    if (v.startingItems) lines.push(`  Starting Items: ${v.startingItems.map(i => typeof i === 'string' ? i : i.name).join(' + ')}`);
     if (v.bootChoice) lines.push(`  Boots: ${typeof v.bootChoice === 'string' ? v.bootChoice : v.bootChoice.name}`);
-    if (v.coreItems) lines.push(`  Core: ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' → ')}`);
+    if (v.coreItems) lines.push(`  Core Items (in order): ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' → ')}`);
   }
 
-  lines.push('═══════════════════════════════════════════════════════════════════════');
-  lines.push('\nINSTRUCTIONS: Review the REFERENCE BUILDS above. Select the best base build for this matchup. Adapt items/runes as needed to counter the enemy team. In your ANALYSIS, state which base build you chose and why.');
+  lines.push(`\n═══════════════════════════════════════════════════════════════════════`);
+  lines.push(`\nCRITICAL RULES FOR USING REFERENCE BUILDS:`);
+  lines.push(`1. You MUST select one of the builds above as your base.`);
+  lines.push(`2. Your CORE BUILD output MUST contain the same core items from your chosen base build.`);
+  lines.push(`3. You may reorder items based on the matchup (e.g., rush MR item vs AP lane).`);
+  lines.push(`4. You may ONLY swap a core item in an extreme scenario (e.g., 4+ AP enemies demands MR stacking). If you swap, you MUST explain why in ANALYSIS.`);
+  lines.push(`5. Adapt RUNES, BOOTS, SUMMONER SPELLS, and SITUATIONAL ITEMS freely based on the enemy team.`);
+  lines.push(`6. In ANALYSIS, state: "Base Build: BUILD X (VARIANT)" and explain any adaptations.`);
   return lines.join('\n');
+}
+
+/** Helper to get the patch from KB meta */
+function loadKBBuildTemplatesMeta() {
+  try {
+    const kbPaths = isDev
+      ? [path.resolve(__dirname, '../../../../shared/kb/data/build-templates.json')]
+      : [path.join(process.resourcesPath, 'kb-data', 'build-templates.json'),
+         path.join(__dirname, '..', 'kb-data', 'build-templates.json')];
+    for (const p of kbPaths) {
+      if (fs.existsSync(p)) {
+        const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
+        return raw.meta?.patch || '?';
+      }
+    }
+  } catch {}
+  return '?';
 }
 
 /**

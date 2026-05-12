@@ -233,7 +233,7 @@ ${kbContext}
 
 Champion: ${req.myChampion}, Role: ${req.role}, Allies: ${req.allies.join(', ') || 'none'}, Enemies: ${req.enemies.join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items. Make sure to place upgraded boots as the 1st or 2nd item in the CORE BUILD.
 
-INSTRUCTIONS: Review the REFERENCE BUILDS above. Select the best base build for this matchup. Adapt items/runes as needed to counter the enemy team. Output the ANALYSIS section first (including which base build you chose), then all other sections.`;
+INSTRUCTIONS: Review the REFERENCE BUILDS above. Select the best base build for this matchup. You MUST strictly adhere to the CORE ITEMS of your chosen base build. You may change their build order, but you should ONLY swap out a core item in extreme counter-matchup scenarios (e.g., swapping a generic item for heavy anti-AP against a full AP team). Otherwise, keep the core items exactly as they appear in the base build. Adapt RUNES and BOOTS as needed to counter the enemy team. Output the ANALYSIS section first (including which base build you chose and justifying any rare item swaps), then all other sections.`;
 
   const startTime = Date.now();
   const modelUsed = getModel(req.model);

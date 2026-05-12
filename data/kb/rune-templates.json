@@ -2,12 +2,12 @@
     "meta": {
         "patch": "16.9",
         "source": "mobalytics-gql",
-        "generatedAt": "2026-05-12T12:03:54.344Z",
-        "buildHash": "moba-1778587434345",
+        "generatedAt": "2026-05-12T18:03:55.599Z",
+        "buildHash": "moba-1778609035600",
         "stats": {
             "champions": 172,
-            "roles": 341,
-            "builds": 907,
+            "roles": 345,
+            "builds": 916,
             "failed": 0
         }
     },
@@ -1442,28 +1442,6 @@
                 "Health Scaling"
             ]
         },
-        "Azir_TOP_SAFETY": {
-            "championId": "Azir",
-            "role": "TOP",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Lethal Tempo",
-            "primarySlots": [
-                "Presence of Mind",
-                "Legend: Alacrity",
-                "Cut Down"
-            ],
-            "secondaryTree": "Sorcery",
-            "secondarySlots": [
-                "Manaflow Band",
-                "Gathering Storm"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Azir_TOP_UTILITY": {
             "championId": "Azir",
             "role": "TOP",
@@ -2067,12 +2045,12 @@
             "primarySlots": [
                 "Triumph",
                 "Legend: Alacrity",
-                "Last Stand"
+                "Coup de Grace"
             ],
-            "secondaryTree": "Inspiration",
+            "secondaryTree": "Domination",
             "secondarySlots": [
-                "Cash Back",
-                "Biscuit Delivery"
+                "Sudden Impact",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -3070,28 +3048,6 @@
                 "Health Scaling"
             ]
         },
-        "Draven_ADC_SAFETY": {
-            "championId": "Draven",
-            "role": "ADC",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Lethal Tempo",
-            "primarySlots": [
-                "Presence of Mind",
-                "Legend: Alacrity",
-                "Cut Down"
-            ],
-            "secondaryTree": "Inspiration",
-            "secondarySlots": [
-                "Cash Back",
-                "Triple Tonic"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Draven_ADC_UTILITY": {
             "championId": "Draven",
             "role": "ADC",
@@ -3217,6 +3173,50 @@
             "secondarySlots": [
                 "Approach Velocity",
                 "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
+        "DrMundo_MID_DAMAGE": {
+            "championId": "DrMundo",
+            "role": "MID",
+            "label": "DAMAGE",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Grasp of the Undying",
+            "primarySlots": [
+                "Demolish",
+                "Second Wind",
+                "Overgrowth"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Approach Velocity",
+                "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
+        "DrMundo_MID_UTILITY": {
+            "championId": "DrMundo",
+            "role": "MID",
+            "label": "UTILITY",
+            "primaryTree": "Inspiration",
+            "primaryKeystone": "Unsealed Spellbook",
+            "primarySlots": [
+                "Magical Footwear",
+                "Biscuit Delivery",
+                "Approach Velocity"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Demolish",
+                "Overgrowth"
             ],
             "statShards": [
                 "Attack Speed",
@@ -3723,6 +3723,72 @@
             "secondarySlots": [
                 "Triple Tonic",
                 "Cosmic Insight"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Ezreal_TOP_DAMAGE": {
+            "championId": "Ezreal",
+            "role": "TOP",
+            "label": "DAMAGE",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Lethal Tempo",
+            "primarySlots": [
+                "Presence of Mind",
+                "Legend: Bloodline",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Biscuit Delivery",
+                "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Ezreal_TOP_SAFETY": {
+            "championId": "Ezreal",
+            "role": "TOP",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Presence of Mind",
+                "Legend: Bloodline",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Biscuit Delivery",
+                "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Ezreal_TOP_UTILITY": {
+            "championId": "Ezreal",
+            "role": "TOP",
+            "label": "UTILITY",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Deathfire Touch",
+            "primarySlots": [
+                "Manaflow Band",
+                "Transcendence",
+                "Scorch"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Legend: Haste",
+                "Cut Down"
             ],
             "statShards": [
                 "Attack Speed",
@@ -4460,6 +4526,28 @@
             "championId": "Gragas",
             "role": "JUNGLE",
             "label": "DAMAGE",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Dark Harvest",
+            "primarySlots": [
+                "Sudden Impact",
+                "Grisly Mementos",
+                "Treasure Hunter"
+            ],
+            "secondaryTree": "Sorcery",
+            "secondarySlots": [
+                "Transcendence",
+                "Waterwalking"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Gragas_JUNGLE_SAFETY": {
+            "championId": "Gragas",
+            "role": "JUNGLE",
+            "label": "SAFETY",
             "primaryTree": "Domination",
             "primaryKeystone": "Dark Harvest",
             "primarySlots": [
@@ -5314,6 +5402,28 @@
                 "Health Scaling"
             ]
         },
+        "Ivern_JUNGLE_SAFETY": {
+            "championId": "Ivern",
+            "role": "JUNGLE",
+            "label": "SAFETY",
+            "primaryTree": "Inspiration",
+            "primaryKeystone": "Glacial Augment",
+            "primarySlots": [
+                "Cash Back",
+                "Triple Tonic",
+                "Cosmic Insight"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Font of Life",
+                "Revitalize"
+            ],
+            "statShards": [
+                "Ability Haste",
+                "Move Speed",
+                "Health Scaling"
+            ]
+        },
         "Ivern_JUNGLE_UTILITY": {
             "championId": "Ivern",
             "role": "JUNGLE",
@@ -5483,6 +5593,72 @@
             "secondarySlots": [
                 "Cosmic Insight",
                 "Magical Footwear"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "JarvanIV_SUPPORT_DAMAGE": {
+            "championId": "JarvanIV",
+            "role": "SUPPORT",
+            "label": "DAMAGE",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Electrocute",
+            "primarySlots": [
+                "Sudden Impact",
+                "Deep Ward",
+                "Ultimate Hunter"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Triumph",
+                "Coup de Grace"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "JarvanIV_SUPPORT_SAFETY": {
+            "championId": "JarvanIV",
+            "role": "SUPPORT",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Conqueror",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Relentless Hunter",
+                "Sudden Impact"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "JarvanIV_SUPPORT_UTILITY": {
+            "championId": "JarvanIV",
+            "role": "SUPPORT",
+            "label": "UTILITY",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Hail of Blades",
+            "primarySlots": [
+                "Sudden Impact",
+                "Grisly Mementos",
+                "Treasure Hunter"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Magical Footwear",
+                "Approach Velocity"
             ],
             "statShards": [
                 "Attack Speed",
@@ -5699,10 +5875,10 @@
                 "Triple Tonic",
                 "Cosmic Insight"
             ],
-            "secondaryTree": "Precision",
+            "secondaryTree": "Domination",
             "secondarySlots": [
-                "Cut Down",
-                "Legend: Haste"
+                "Sudden Impact",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -7585,7 +7761,7 @@
             "role": "TOP",
             "label": "UTILITY",
             "primaryTree": "Resolve",
-            "primaryKeystone": "Aftershock",
+            "primaryKeystone": "Grasp of the Undying",
             "primarySlots": [
                 "Shield Bash",
                 "Second Wind",
@@ -10770,6 +10946,28 @@
                 "Health Scaling"
             ]
         },
+        "Nunu_MID_SAFETY": {
+            "championId": "Nunu",
+            "role": "MID",
+            "label": "SAFETY",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Electrocute",
+            "primarySlots": [
+                "Cheap Shot",
+                "Sixth Sense",
+                "Relentless Hunter"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Hextech Flashtraption",
+                "Triple Tonic"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Nunu_MID_UTILITY": {
             "championId": "Nunu",
             "role": "MID",
@@ -11606,28 +11804,6 @@
                 "Health Scaling"
             ]
         },
-        "Qiyana_JUNGLE_SAFETY": {
-            "championId": "Qiyana",
-            "role": "JUNGLE",
-            "label": "SAFETY",
-            "primaryTree": "Inspiration",
-            "primaryKeystone": "First Strike",
-            "primarySlots": [
-                "Magical Footwear",
-                "Triple Tonic",
-                "Cosmic Insight"
-            ],
-            "secondaryTree": "Domination",
-            "secondarySlots": [
-                "Sudden Impact",
-                "Ultimate Hunter"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Qiyana_JUNGLE_UTILITY": {
             "championId": "Qiyana",
             "role": "JUNGLE",
@@ -11883,8 +12059,8 @@
             ],
             "secondaryTree": "Precision",
             "secondarySlots": [
-                "Triumph",
-                "Legend: Alacrity"
+                "Legend: Alacrity",
+                "Triumph"
             ],
             "statShards": [
                 "Attack Speed",
@@ -12116,28 +12292,6 @@
             "championId": "Renata",
             "role": "SUPPORT",
             "label": "DAMAGE",
-            "primaryTree": "Resolve",
-            "primaryKeystone": "Guardian",
-            "primarySlots": [
-                "Shield Bash",
-                "Bone Plating",
-                "Unflinching"
-            ],
-            "secondaryTree": "Domination",
-            "secondarySlots": [
-                "Relentless Hunter",
-                "Sixth Sense"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Renata_SUPPORT_SAFETY": {
-            "championId": "Renata",
-            "role": "SUPPORT",
-            "label": "SAFETY",
             "primaryTree": "Resolve",
             "primaryKeystone": "Guardian",
             "primarySlots": [
@@ -13018,17 +13172,17 @@
             "championId": "Senna",
             "role": "TOP",
             "label": "UTILITY",
-            "primaryTree": "Resolve",
-            "primaryKeystone": "Grasp of the Undying",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Deathfire Touch",
             "primarySlots": [
-                "Font of Life",
-                "Bone Plating",
-                "Revitalize"
+                "Manaflow Band",
+                "Celerity",
+                "Gathering Storm"
             ],
             "secondaryTree": "Precision",
             "secondarySlots": [
-                "Legend: Alacrity",
-                "Presence of Mind"
+                "Presence of Mind",
+                "Cut Down"
             ],
             "statShards": [
                 "Attack Speed",
@@ -14092,10 +14246,10 @@
                 "Health Scaling"
             ]
         },
-        "Skarner_SUPPORT_UTILITY": {
+        "Skarner_SUPPORT_SAFETY": {
             "championId": "Skarner",
             "role": "SUPPORT",
-            "label": "UTILITY",
+            "label": "SAFETY",
             "primaryTree": "Domination",
             "primaryKeystone": "Hail of Blades",
             "primarySlots": [
@@ -14107,6 +14261,28 @@
             "secondarySlots": [
                 "Magical Footwear",
                 "Jack Of All Trades"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Skarner_SUPPORT_UTILITY": {
+            "championId": "Skarner",
+            "role": "SUPPORT",
+            "label": "UTILITY",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Arcane Comet",
+            "primarySlots": [
+                "Manaflow Band",
+                "Transcendence",
+                "Scorch"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Bone Plating",
+                "Overgrowth"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -15280,10 +15456,10 @@
                 "Health Scaling"
             ]
         },
-        "Taliyah_JUNGLE_UTILITY": {
+        "Taliyah_JUNGLE_SAFETY": {
             "championId": "Taliyah",
             "role": "JUNGLE",
-            "label": "UTILITY",
+            "label": "SAFETY",
             "primaryTree": "Domination",
             "primaryKeystone": "Dark Harvest",
             "primarySlots": [
@@ -15295,6 +15471,28 @@
             "secondarySlots": [
                 "Cosmic Insight",
                 "Magical Footwear"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Taliyah_JUNGLE_UTILITY": {
+            "championId": "Taliyah",
+            "role": "JUNGLE",
+            "label": "UTILITY",
+            "primaryTree": "Inspiration",
+            "primaryKeystone": "First Strike",
+            "primarySlots": [
+                "Cash Back",
+                "Triple Tonic",
+                "Cosmic Insight"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Cheap Shot",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -15676,6 +15874,72 @@
                 "Health Scaling"
             ]
         },
+        "Teemo_ADC_DAMAGE": {
+            "championId": "Teemo",
+            "role": "ADC",
+            "label": "DAMAGE",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Cut Down"
+            ],
+            "secondaryTree": "Inspiration",
+            "secondarySlots": [
+                "Magical Footwear",
+                "Triple Tonic"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Teemo_ADC_SAFETY": {
+            "championId": "Teemo",
+            "role": "ADC",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Sorcery",
+            "secondarySlots": [
+                "Gathering Storm",
+                "Manaflow Band"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Teemo_ADC_UTILITY": {
+            "championId": "Teemo",
+            "role": "ADC",
+            "label": "UTILITY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Last Stand"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Bone Plating",
+                "Overgrowth"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Thresh_SUPPORT_DAMAGE": {
             "championId": "Thresh",
             "role": "SUPPORT",
@@ -15924,28 +16188,6 @@
             "label": "DAMAGE",
             "primaryTree": "Precision",
             "primaryKeystone": "Press the Attack",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Alacrity",
-                "Coup de Grace"
-            ],
-            "secondaryTree": "Inspiration",
-            "secondarySlots": [
-                "Approach Velocity",
-                "Magical Footwear"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Trundle_JUNGLE_SAFETY": {
-            "championId": "Trundle",
-            "role": "JUNGLE",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Lethal Tempo",
             "primarySlots": [
                 "Triumph",
                 "Legend: Alacrity",
@@ -16270,6 +16512,28 @@
                 "Health Scaling"
             ]
         },
+        "Twitch_MID_SAFETY": {
+            "championId": "Twitch",
+            "role": "MID",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Lethal Tempo",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Cut Down"
+            ],
+            "secondaryTree": "Sorcery",
+            "secondarySlots": [
+                "Axiom Arcanist",
+                "Gathering Storm"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Twitch_MID_UTILITY": {
             "championId": "Twitch",
             "role": "MID",
@@ -16505,28 +16769,6 @@
             "secondarySlots": [
                 "Cash Back",
                 "Triple Tonic"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Varus_ADC_SAFETY": {
-            "championId": "Varus",
-            "role": "ADC",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Lethal Tempo",
-            "primarySlots": [
-                "Absorb Life",
-                "Legend: Alacrity",
-                "Cut Down"
-            ],
-            "secondaryTree": "Inspiration",
-            "secondarySlots": [
-                "Biscuit Delivery",
-                "Cosmic Insight"
             ],
             "statShards": [
                 "Attack Speed",
@@ -18272,6 +18514,50 @@
                 "Health Scaling"
             ]
         },
+        "XinZhao_MID_DAMAGE": {
+            "championId": "XinZhao",
+            "role": "MID",
+            "label": "DAMAGE",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Hail of Blades",
+            "primarySlots": [
+                "Sudden Impact",
+                "Grisly Mementos",
+                "Relentless Hunter"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Legend: Alacrity",
+                "Triumph"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "XinZhao_MID_UTILITY": {
+            "championId": "XinZhao",
+            "role": "MID",
+            "label": "UTILITY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Lethal Tempo",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Last Stand"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Bone Plating",
+                "Revitalize"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "XinZhao_TOP_DAMAGE": {
             "championId": "XinZhao",
             "role": "TOP",
@@ -18309,72 +18595,6 @@
             "secondarySlots": [
                 "Cosmic Insight",
                 "Magical Footwear"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "XinZhao_MID_DAMAGE": {
-            "championId": "XinZhao",
-            "role": "MID",
-            "label": "DAMAGE",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Hail of Blades",
-            "primarySlots": [
-                "Sudden Impact",
-                "Grisly Mementos",
-                "Relentless Hunter"
-            ],
-            "secondaryTree": "Precision",
-            "secondarySlots": [
-                "Legend: Alacrity",
-                "Triumph"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "XinZhao_MID_SAFETY": {
-            "championId": "XinZhao",
-            "role": "MID",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Press the Attack",
-            "primarySlots": [
-                "Presence of Mind",
-                "Legend: Alacrity",
-                "Last Stand"
-            ],
-            "secondaryTree": "Domination",
-            "secondarySlots": [
-                "Sudden Impact",
-                "Treasure Hunter"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "XinZhao_MID_UTILITY": {
-            "championId": "XinZhao",
-            "role": "MID",
-            "label": "UTILITY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Lethal Tempo",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Alacrity",
-                "Last Stand"
-            ],
-            "secondaryTree": "Resolve",
-            "secondarySlots": [
-                "Bone Plating",
-                "Revitalize"
             ],
             "statShards": [
                 "Attack Speed",
@@ -18474,28 +18694,6 @@
             "championId": "Yasuo",
             "role": "ADC",
             "label": "DAMAGE",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Lethal Tempo",
-            "primarySlots": [
-                "Absorb Life",
-                "Legend: Alacrity",
-                "Last Stand"
-            ],
-            "secondaryTree": "Resolve",
-            "secondarySlots": [
-                "Overgrowth",
-                "Second Wind"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Yasuo_ADC_SAFETY": {
-            "championId": "Yasuo",
-            "role": "ADC",
-            "label": "SAFETY",
             "primaryTree": "Precision",
             "primaryKeystone": "Lethal Tempo",
             "primarySlots": [

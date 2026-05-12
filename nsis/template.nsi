@@ -688,16 +688,12 @@ Section Install
   File "${MAINBINARYSRCPATH}"
 
   ; Copy resources
-    CreateDirectory "$INSTDIR\kb-data"
-    CreateDirectory "$INSTDIR\"
-    File /a "/oname=icon.png" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\assets\icon.png"
-    File /a "/oname=kb-data\build-templates.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\build-templates.json"
-    File /a "/oname=kb-data\champions.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\champions.json"
-    File /a "/oname=kb-data\items.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\items.json"
-    File /a "/oname=kb-data\matchups.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\matchups.json"
-    File /a "/oname=kb-data\rune-templates.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\rune-templates.json"
-    File /a "/oname=kb-data\synergy-counters.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\synergy-counters.json"
-    File /a "/oname=kb-data\weights.json" "C:\Users\n3tgg\.openclaw2\workspace\DraftCoach\apps\desktop-tauri\src-tauri\..\..\..\shared\kb\data\weights.json"
+  {{#each resources_dirs}}
+    CreateDirectory "$INSTDIR\\{{this}}"
+  {{/each}}
+  {{#each resources}}
+    File /a "/oname={{this.[1]}}" "{{@key}}"
+  {{/each}}
 
   ; Copy external binaries
 

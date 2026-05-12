@@ -2139,100 +2139,158 @@ ${userMessage.slice(0, 2000)}`;
       return partialText; // Return what we have if completion fails
     }
 
+    /**
+     * Attempt to repair truncated JSON from Gemini structured output.
+     * Closes unclosed strings, arrays, and objects.
+     */
+    function repairTruncatedJson(raw) {
+      if (!raw || raw.length < 50) return null;
+      let s = raw.trim();
+      // Close any unclosed string
+      const quoteCount = (s.match(/(?<!\\)"/g) || []).length;
+      if (quoteCount % 2 !== 0) s += '"';
+      // Walk through to figure out what brackets/braces are unclosed
+      const stack = [];
+      let inString = false;
+      let escape = false;
+      for (let i = 0; i < s.length; i++) {
+        const c = s[i];
+        if (escape) { escape = false; continue; }
+        if (c === '\\') { escape = true; continue; }
+        if (c === '"') { inString = !inString; continue; }
+        if (inString) continue;
+        if (c === '{') stack.push('}');
+        else if (c === '[') stack.push(']');
+        else if (c === '}' || c === ']') stack.pop();
+      }
+      // Close any unclosed structures
+      while (stack.length > 0) s += stack.pop();
+      try {
+        return JSON.parse(s);
+      } catch {
+        return null;
+      }
+    }
+
     async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false) {
-      const maxRetries = primaryModelName.includes('flash') ? 2 : 1;
       let rawText = '';
       let cleanText = '';
-      const STREAM_TIMEOUT_MS = 90000;
 
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        log('INFO', `[build-fetch] Trying ${primaryModelName} (Attempt ${attempt}/${maxRetries})`);
+      // Always try non-streaming first (more reliable for JSON completion)
+      log('INFO', `[build-fetch] Trying ${primaryModelName} (non-streaming)`);
+      try {
+        const model = genAI.getGenerativeModel({
+          model: primaryModelName,
+          systemInstruction: systemPrompt,
+          generationConfig: {
+            temperature: 0.2,
+            topP: 0.85,
+            topK: 40,
+            maxOutputTokens: 16384,
+            responseMimeType: 'application/json',
+            responseSchema: BUILD_RESPONSE_SCHEMA,
+          },
+        });
+
+        const startTime = Date.now();
+        const result = await model.generateContent(userMessage);
+        rawText = result.response.text();
+        const elapsedS = Math.round((Date.now() - startTime) / 1000);
+
+        let buildJson;
         try {
-          const model = genAI.getGenerativeModel({
-            model: primaryModelName,
-            systemInstruction: systemPrompt,
-            generationConfig: {
-              temperature: primaryModelName.includes('flash') ? 0.2 + (attempt * 0.1) : 0.3,
-              topP: 0.85,
-              topK: 40,
-              maxOutputTokens: 16384,
-              responseMimeType: 'application/json',
-              responseSchema: BUILD_RESPONSE_SCHEMA,
-            },
-          });
-
-          const startTime = Date.now();
-          if (isStreaming) {
-            const stream = await model.generateContentStream(userMessage);
-            rawText = '';
-            for await (const chunk of stream.stream) {
-              const t = chunk.text();
-              if (t) rawText += t;
-              if (Date.now() - startTime > STREAM_TIMEOUT_MS) {
-                log('WARN', `[build-fetch] Stream timed out after ${STREAM_TIMEOUT_MS/1000}s`);
-                break;
-              }
-            }
+          buildJson = JSON.parse(rawText);
+        } catch (parseErr) {
+          // Try to repair truncated JSON before giving up
+          log('WARN', `[build-fetch] JSON parse failed, attempting repair... (${parseErr.message})`);
+          buildJson = repairTruncatedJson(rawText);
+          if (buildJson) {
+            log('INFO', `[build-fetch] JSON repair successful!`);
           } else {
-            const result = await model.generateContent(userMessage);
-            rawText = result.response.text();
+            throw parseErr;
           }
+        }
+        
+        if (!buildJson.coreBuild || buildJson.coreBuild.length < 5) {
+          throw new Error(`JSON parsed but missing core items (got ${buildJson.coreBuild ? buildJson.coreBuild.length : 0})`);
+        }
 
-          const elapsedS = Math.round((Date.now() - startTime) / 1000);
-          const buildJson = JSON.parse(rawText);
-          
-          if (!buildJson.coreBuild || buildJson.coreBuild.length < 5) {
-            throw new Error(`JSON parsed but missing core items (got ${buildJson.coreBuild ? buildJson.coreBuild.length : 0})`);
+        cleanText = jsonBuildToText(buildJson);
+        log('INFO', `[build-fetch] ${primaryModelName} succeeded (${cleanText.length} chars, ${elapsedS}s)`);
+        return { text: cleanText, modelUsed: primaryModelName, rawText };
+      } catch (e) {
+        log('WARN', `[build-fetch] ${primaryModelName} non-streaming failed: ${e.message}`);
+      }
+
+      // Retry once with streaming (different code path may avoid the same truncation)
+      log('INFO', `[build-fetch] Retrying ${primaryModelName} with streaming...`);
+      try {
+        const model = genAI.getGenerativeModel({
+          model: primaryModelName,
+          systemInstruction: systemPrompt,
+          generationConfig: {
+            temperature: 0.3,
+            topP: 0.85,
+            topK: 40,
+            maxOutputTokens: 16384,
+            responseMimeType: 'application/json',
+            responseSchema: BUILD_RESPONSE_SCHEMA,
+          },
+        });
+
+        const startTime = Date.now();
+        const stream = await model.generateContentStream(userMessage);
+        rawText = '';
+        for await (const chunk of stream.stream) {
+          const t = chunk.text();
+          if (t) rawText += t;
+          if (Date.now() - startTime > 60000) {
+            log('WARN', `[build-fetch] Stream timed out after 60s`);
+            break;
           }
+        }
+        const elapsedS = Math.round((Date.now() - startTime) / 1000);
 
+        let buildJson;
+        try {
+          buildJson = JSON.parse(rawText);
+        } catch {
+          buildJson = repairTruncatedJson(rawText);
+          if (buildJson) log('INFO', `[build-fetch] JSON repair successful on streaming attempt`);
+        }
+
+        if (buildJson && buildJson.coreBuild && buildJson.coreBuild.length >= 5) {
           cleanText = jsonBuildToText(buildJson);
-          log('INFO', `[build-fetch] ${primaryModelName} succeeded on attempt ${attempt} (${cleanText.length} chars, ${elapsedS}s)`);
+          log('INFO', `[build-fetch] ${primaryModelName} streaming succeeded (${cleanText.length} chars, ${elapsedS}s)`);
           return { text: cleanText, modelUsed: primaryModelName, rawText };
-        } catch (e) {
-          log('WARN', `[build-fetch] ${primaryModelName} failed on attempt ${attempt}: ${e.message}`);
-          if (attempt < maxRetries) {
-            await new Promise(r => setTimeout(r, 1000 * attempt)); // Exponential backoff
-          }
         }
+        log('WARN', `[build-fetch] Streaming attempt also produced incomplete JSON`);
+      } catch (e2) {
+        log('WARN', `[build-fetch] ${primaryModelName} streaming failed: ${e2.message}`);
       }
 
-      // If we are here, primary model failed all retries.
-      // If primary was Flash, rescue with Pro
-      if (primaryModelName.includes('flash')) {
-        log('ERROR', `[build-fetch] Flash failed all ${maxRetries} attempts. Rescuing with Pro...`);
-        try {
-          const proModel = genAI.getGenerativeModel({
-            model: 'gemini-3.1-pro-preview',
-            systemInstruction: systemPrompt,
-            generationConfig: {
-              temperature: 0.3, topP: 0.85, topK: 40, maxOutputTokens: 16384,
-              responseMimeType: 'application/json', responseSchema: BUILD_RESPONSE_SCHEMA,
-            },
-          });
-          const startTime = Date.now();
-          if (isStreaming) {
-            const proStream = await proModel.generateContentStream(userMessage);
-            rawText = '';
-            for await (const chunk of proStream.stream) {
-              const t = chunk.text();
-              if (t) rawText += t;
-            }
-          } else {
-            const result = await proModel.generateContent(userMessage);
-            rawText = result.response.text();
-          }
-          const elapsedS = Math.round((Date.now() - startTime) / 1000);
-          cleanText = jsonBuildToText(JSON.parse(rawText));
-          log('INFO', `[build-fetch] Pro rescue succeeded! (${cleanText.length} chars, ${elapsedS}s)`);
-          return { text: cleanText, modelUsed: 'gemini-3.1-pro-preview', rawText };
-        } catch (rescueErr) {
-          log('ERROR', `[build-fetch] Pro rescue also failed: ${rescueErr.message}`);
-          // Absolute fallback
-          return { text: rawText || '', modelUsed: 'failed', rawText };
-        }
+      // Final rescue: plain text generation (no JSON schema — just ask for text format)
+      log('WARN', `[build-fetch] All JSON attempts failed. Falling back to plain text generation...`);
+      try {
+        const textModel = genAI.getGenerativeModel({
+          model: primaryModelName,
+          systemInstruction: systemPrompt.replace('Your output is a JSON object. The schema enforces the structure — focus on producing HIGH-QUALITY CONTENT for each field.', 'Output in plain text format with section headers.'),
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 8192,
+          },
+        });
+        const startTime = Date.now();
+        const result = await textModel.generateContent(userMessage);
+        rawText = result.response.text();
+        const elapsedS = Math.round((Date.now() - startTime) / 1000);
+        log('INFO', `[build-fetch] Plain text fallback succeeded (${rawText.length} chars, ${elapsedS}s)`);
+        return { text: rawText, modelUsed: primaryModelName + '-text-fallback', rawText };
+      } catch (textErr) {
+        log('ERROR', `[build-fetch] Plain text fallback also failed: ${textErr.message}`);
       }
 
-      return { text: rawText || '', modelUsed: primaryModelName, rawText };
+      return { text: rawText || '', modelUsed: 'failed', rawText };
     }
 
     async function generateBuild(body, shortPrompt) {

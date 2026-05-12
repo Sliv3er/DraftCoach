@@ -6,7 +6,7 @@ const http = require('http');
 const { spawn, exec } = require('child_process');
 const { setupCrashHandlers, log } = require('./crash-logger.cjs');
 const { loadSettings, getSetting, setSetting, SETTINGS_FILE, SENSITIVE_KEYS } = require('./settings.cjs');
-// ── Intelligence upgrade: centralised prompt builder ────────────────
+// â”€â”€ Intelligence upgrade: centralised prompt builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const _prompts = require('./prompt-builder.cjs');
 
 // Load .env from multiple possible locations
@@ -36,10 +36,10 @@ const CACHE_DIR = path.join(app.getPath('userData'), 'icon-cache');
 const _distIndexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
 const isDev = !app.isPackaged && !require('fs').existsSync(_distIndexPath);
 
-// ═══════════════════════════════════════════════════════════════════
-//  OPENROUTER / DEEPSEEK V4 FLASH — Universal LLM wrapper
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  OPENROUTER / DEEPSEEK V4 FLASH â€” Universal LLM wrapper
 //  Replaces all Gemini SDK calls with OpenRouter API (OpenAI-compatible)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_MODEL = 'deepseek/deepseek-v4-flash';
 
@@ -109,7 +109,7 @@ async function llmGenerate(systemPrompt, userMessage, opts = {}) {
           const content = parsed.choices?.[0]?.message?.content || '';
           resolve(content);
         } catch (e) {
-          reject(new Error(`OpenRouter parse error: ${e.message} — raw: ${data.slice(0, 200)}`));
+          reject(new Error(`OpenRouter parse error: ${e.message} â€” raw: ${data.slice(0, 200)}`));
         }
       });
     });
@@ -201,7 +201,7 @@ let scoreboardWindow = null;
 let trackerWindow = null;
 let cachedScoutReport = null;  // Cache for scout window
 let overlayData = null;
-let overlayGeneration = 0; // Increments on every overlay update — prevents stale renders
+let overlayGeneration = 0; // Increments on every overlay update â€” prevents stale renders
 let ddragonItemCache = null; // { version, items: Map<normalizedName, {id, name, iconUrl, gold}>, byId: Map<id, {name, from, gold, iconUrl}> }
 let ddragonItemCachePromise = null; // Lock to prevent duplicate fetches
 let ddragonRuneCache = null; // { version, trees: [{name, keystones, slots}], shardOptions, reference }
@@ -217,9 +217,9 @@ async function fetchDdragonRunes() {
     const runesRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${ver}/data/en_US/runesReforged.json`);
     const runesData = await runesRes.json();
     
-    // Build dynamic name→ID lookup map (replaces hardcoded PERK_IDS)
-    const perkMap = {}; // UPPER_NAME → perkId
-    const styleMap = {}; // UPPER_TREE_NAME → styleId
+    // Build dynamic nameâ†’ID lookup map (replaces hardcoded PERK_IDS)
+    const perkMap = {}; // UPPER_NAME â†’ perkId
+    const styleMap = {}; // UPPER_TREE_NAME â†’ styleId
 
     const trees = runesData.map(tree => {
       styleMap[tree.name.toUpperCase()] = tree.id;
@@ -241,7 +241,7 @@ async function fetchDdragonRunes() {
       };
     });
 
-    // Add stat shard IDs (Season 2026 — Armor and Magic Resist REMOVED from shards)
+    // Add stat shard IDs (Season 2026 â€” Armor and Magic Resist REMOVED from shards)
     // Row1: [Adaptive Force, Attack Speed, Ability Haste]
     // Row2: [Adaptive Force, Move Speed, Health Scaling]
     // Row3: [Health, Tenacity and Slow Resist, Health Scaling]
@@ -249,7 +249,7 @@ async function fetchDdragonRunes() {
       'ADAPTIVE FORCE': 5008, 'ATTACK SPEED': 5005, 'ABILITY HASTE': 5007,
       'HEALTH': 5011, 'HEALTH SCALING': 5001,
       'TENACITY AND SLOW RESIST': 5013, 'MOVEMENT SPEED': 5010,
-      // Old shard names that no longer exist — map to closest valid defense shard
+      // Old shard names that no longer exist â€” map to closest valid defense shard
       'ARMOR': 5011, 'MAGIC RESIST': 5011,
     };
     Object.assign(perkMap, shardIds);
@@ -322,13 +322,13 @@ function getValidItemsReference(mapId = 11) {
   return ref;
 }
 
-// Get valid starting items from DDragon cache (items ≤500g, no recipe, base items)
+// Get valid starting items from DDragon cache (items â‰¤500g, no recipe, base items)
 function getValidStartingItemsReference(role, mapId = 11) {
   if (!ddragonItemCache || !ddragonItemCache.byId) return '';
 
   // ARAM has no starting items in the traditional sense (you start with gold and buy on first death)
   if (mapId === 12) {
-    return 'ARAM STARTING RULES: Players start with 1400g. Buy components or full items immediately. No Doran\'s items. No startingItems needed — put everything in coreBuild.\n';
+    return 'ARAM STARTING RULES: Players start with 1400g. Buy components or full items immediately. No Doran\'s items. No startingItems needed â€” put everything in coreBuild.\n';
   }
 
   const EXCLUDED_IDS = new Set([
@@ -372,7 +372,7 @@ function getValidStartingItemsReference(role, mapId = 11) {
   ref += `  Jungle: ${dedupe(jungleItems).join(', ')}\n`;
   ref += `  Support: ${dedupe(supportItems).join(', ')}\n`;
   ref += `  Potions: ${dedupe(potions).join(', ')}\n`;
-  ref += `  RULE: Buy exactly 1 starting item + 1 potion (Health Potion or Refillable Potion). Total must be ≤500g.\n`;
+  ref += `  RULE: Buy exactly 1 starting item + 1 potion (Health Potion or Refillable Potion). Total must be â‰¤500g.\n`;
   ref += `  Jungle: Buy 1 companion + 1 Health Potion.\n`;
   ref += `  Support: Buy World Atlas + 1 Health Potion.\n`;
   ref += `  NEVER put starting items (Doran's, companions, potions) in coreBuild.\n`;
@@ -396,32 +396,32 @@ async function computeEnemyProfile(enemies) {
 
   // Fix #5: Champion-specific counter-item hints for common champions
   const CHAMPION_COUNTER_HINTS = {
-    'Zed': 'Zed [AD Burst] → Zhonya\'s negates R',
-    'Talon': 'Talon [AD Burst] → Early armor + Sterak\'s/Zhonya\'s',
-    'Fizz': 'Fizz [AP Burst] → Banshee\'s blocks R, MR rush',
-    'Katarina': 'Katarina [AP/AD Hybrid] → CC interrupts R, anti-heal',
-    'Malzahar': 'Malzahar [AP Suppress] → QSS removes R',
-    'Mordekaiser': 'Mordekaiser [AP Bruiser] → QSS cleanses R',
-    'Vayne': 'Vayne [True Dmg] → HP stacking > armor, burst < 3 autos',
-    'Fiora': 'Fiora [True Dmg] → Thornmail + Frozen Heart',
-    'Veigar': 'Veigar [AP Scaling] → Banshee\'s blocks E cage, MR',
-    'Sylas': 'Sylas [AP Bruiser] → Anti-heal CRITICAL, MR',
-    'Vladimir': 'Vladimir [AP Sustain] → Anti-heal MANDATORY',
-    'Aatrox': 'Aatrox [AD Drain] → Anti-heal MANDATORY',
-    'DrMundo': 'Dr. Mundo [HP Tank] → Anti-heal + % HP damage',
-    'Warwick': 'Warwick [Healing Fighter] → Anti-heal, CC interrupts R',
-    'Yasuo': 'Yasuo [AD Crit] → Randuin\'s (anti-crit)',
-    'Yone': 'Yone [AD/AP Hybrid] → Needs armor AND MR, Randuin\'s',
-    'Irelia': 'Irelia [AD Sustained] → Thornmail + Frozen Heart',
-    'Tryndamere': 'Tryndamere [AD Crit] → Randuin\'s, disengage during R',
-    'Kassadin': 'Kassadin [AP Scaling] → Punish early (weak pre-6)',
-    'Nasus': 'Nasus [AD Scaling] → Kite, % armor pen late',
-    'Akali': 'Akali [AP Assassin] → MR + HP, sweeper for shroud',
-    'LeBlanc': 'LeBlanc [AP Burst] → Banshee\'s, MR rush',
-    'Rengar': 'Rengar [AD Burst] → Zhonya\'s/GA, group up',
-    'KhaZix': 'Kha\'Zix [AD Assassin] → Stay grouped (isolation = death)',
-    'Samira': 'Samira [AD Melee ADC] → CC interrupts R',
-    'Kayn': 'Kayn [Shadow/Rhaast] → Red: anti-heal + armor. Blue: MR + burst',
+    'Zed': 'Zed [AD Burst] â†’ Zhonya\'s negates R',
+    'Talon': 'Talon [AD Burst] â†’ Early armor + Sterak\'s/Zhonya\'s',
+    'Fizz': 'Fizz [AP Burst] â†’ Banshee\'s blocks R, MR rush',
+    'Katarina': 'Katarina [AP/AD Hybrid] â†’ CC interrupts R, anti-heal',
+    'Malzahar': 'Malzahar [AP Suppress] â†’ QSS removes R',
+    'Mordekaiser': 'Mordekaiser [AP Bruiser] â†’ QSS cleanses R',
+    'Vayne': 'Vayne [True Dmg] â†’ HP stacking > armor, burst < 3 autos',
+    'Fiora': 'Fiora [True Dmg] â†’ Thornmail + Frozen Heart',
+    'Veigar': 'Veigar [AP Scaling] â†’ Banshee\'s blocks E cage, MR',
+    'Sylas': 'Sylas [AP Bruiser] â†’ Anti-heal CRITICAL, MR',
+    'Vladimir': 'Vladimir [AP Sustain] â†’ Anti-heal MANDATORY',
+    'Aatrox': 'Aatrox [AD Drain] â†’ Anti-heal MANDATORY',
+    'DrMundo': 'Dr. Mundo [HP Tank] â†’ Anti-heal + % HP damage',
+    'Warwick': 'Warwick [Healing Fighter] â†’ Anti-heal, CC interrupts R',
+    'Yasuo': 'Yasuo [AD Crit] â†’ Randuin\'s (anti-crit)',
+    'Yone': 'Yone [AD/AP Hybrid] â†’ Needs armor AND MR, Randuin\'s',
+    'Irelia': 'Irelia [AD Sustained] â†’ Thornmail + Frozen Heart',
+    'Tryndamere': 'Tryndamere [AD Crit] â†’ Randuin\'s, disengage during R',
+    'Kassadin': 'Kassadin [AP Scaling] â†’ Punish early (weak pre-6)',
+    'Nasus': 'Nasus [AD Scaling] â†’ Kite, % armor pen late',
+    'Akali': 'Akali [AP Assassin] â†’ MR + HP, sweeper for shroud',
+    'LeBlanc': 'LeBlanc [AP Burst] â†’ Banshee\'s, MR rush',
+    'Rengar': 'Rengar [AD Burst] â†’ Zhonya\'s/GA, group up',
+    'KhaZix': 'Kha\'Zix [AD Assassin] â†’ Stay grouped (isolation = death)',
+    'Samira': 'Samira [AD Melee ADC] â†’ CC interrupts R',
+    'Kayn': 'Kayn [Shadow/Rhaast] â†’ Red: anti-heal + armor. Blue: MR + burst',
   };
 
   let apCount = 0, adCount = 0, tankCount = 0, assassinCount = 0, hasHealing = false;
@@ -447,16 +447,16 @@ async function computeEnemyProfile(enemies) {
   let analysis = '\nENEMY TEAM PROFILE:\n';
   analysis += `Champions: ${details.join(', ')}\n`;
   analysis += `Damage Split: ${apCount} AP / ${adCount} AD / ${tankCount} Tanks / ${assassinCount} Assassins\n`;
-  if (apCount >= 3) analysis += '⚠️ HEAVY AP TEAM — Prioritize MR items (Wit\'s End, Maw of Malmortius, Kaenic Rookern, Spirit Visage, Mercury\'s Treads)\n';
-  if (adCount >= 3) analysis += '⚠️ HEAVY AD TEAM — Prioritize Armor items (Plated Steelcaps, Randuin\'s Omen, Frozen Heart, Dead Man\'s Plate)\n';
-  if (tankCount >= 2) analysis += '⚠️ TANKY TEAM — Prioritize penetration/% HP items (Lord Dominik\'s Regards, Void Staff, Liandry\'s Torment, Black Cleaver)\n';
-  if (assassinCount >= 2) analysis += '⚠️ ASSASSIN-HEAVY — Consider defensive items early (Zhonya\'s Hourglass, Guardian Angel, Sterak\'s Gage)\n';
-  if (hasHealing) analysis += '⚠️ ENEMY HAS HEALING — Consider anti-heal (Mortal Reminder, Morellonomicon, Thornmail)\n';
+  if (apCount >= 3) analysis += 'âš ï¸ HEAVY AP TEAM â€” Prioritize MR items (Wit\'s End, Maw of Malmortius, Kaenic Rookern, Spirit Visage, Mercury\'s Treads)\n';
+  if (adCount >= 3) analysis += 'âš ï¸ HEAVY AD TEAM â€” Prioritize Armor items (Plated Steelcaps, Randuin\'s Omen, Frozen Heart, Dead Man\'s Plate)\n';
+  if (tankCount >= 2) analysis += 'âš ï¸ TANKY TEAM â€” Prioritize penetration/% HP items (Lord Dominik\'s Regards, Void Staff, Liandry\'s Torment, Black Cleaver)\n';
+  if (assassinCount >= 2) analysis += 'âš ï¸ ASSASSIN-HEAVY â€” Consider defensive items early (Zhonya\'s Hourglass, Guardian Angel, Sterak\'s Gage)\n';
+  if (hasHealing) analysis += 'âš ï¸ ENEMY HAS HEALING â€” Consider anti-heal (Mortal Reminder, Morellonomicon, Thornmail)\n';
   if (counterHints.length > 0) analysis += '\nCHAMPION-SPECIFIC COUNTER TIPS:\n' + counterHints.join('\n') + '\n';
   return analysis;
 }
 
-// ── DDragon Summoner Spells Cache ──
+// â”€â”€ DDragon Summoner Spells Cache â”€â”€
 let ddragonSummonerCache = null; // { version, spells: Set<string>, spellNames: string[] }
 
 async function fetchDdragonSummoners() {
@@ -485,7 +485,7 @@ async function fetchDdragonSummoners() {
   }
 }
 
-// ── Cooldown Tracker State ──
+// â”€â”€ Cooldown Tracker State â”€â”€
 const cooldownData = require('./cooldowns/cooldown-data.cjs');
 let cooldownTimers = []; // Array of { id, championName, ability, totalDuration, endTime, startedAt }
 let cooldownTickInterval = null;
@@ -494,16 +494,16 @@ let lastLiveGameData = null; // Cache for latest /allgamedata response
 let champUltCooldowns = {}; // { championName: [rank1cd, rank2cd, rank3cd] }
 let ddragonVersion = null; // e.g. '15.1.1'
 
-// ── Ping Monitor ─────────────────────────────────────────────────────
+// â”€â”€ Ping Monitor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Hybrid approach:
 // PRE-GAME: TCP connect to Riot regional endpoints (the only endpoints that
-// respond — game server IPs block both ICMP and TCP). The regional API
+// respond â€” game server IPs block both ICMP and TCP). The regional API
 // endpoints route through Cloudflare's anycast, hitting the nearest edge node.
-// IN-GAME:  Read the real ping from /liveclientdata/allgamedata — 100% accurate.
+// IN-GAME:  Read the real ping from /liveclientdata/allgamedata â€” 100% accurate.
 
 const net = require('net');
 
-// Riot regional endpoints — these respond to TCP on port 443
+// Riot regional endpoints â€” these respond to TCP on port 443
 // (Game server IPs like 104.160.x.x block ALL external connections)
 const RIOT_SERVER_ENDPOINTS = {
   'EUW1':  'euw1.api.riotgames.com',
@@ -534,7 +534,7 @@ let pingGeneration = 0;       // Incremented on restart to discard stale in-flig
 let pingUsingLiveClient = false; // True when in-game (using real ping from Live Client API)
 
 /**
- * TCP connect ping — measures time to establish a TCP connection.
+ * TCP connect ping â€” measures time to establish a TCP connection.
  * Returns RTT in ms or null on failure/timeout.
  */
 function tcpPing(host, port, timeout) {
@@ -623,7 +623,7 @@ function startPingMonitor() {
   const region = settings.serverRegion || 'EUW1';
   const serverHost = RIOT_SERVER_ENDPOINTS[region] || RIOT_SERVER_ENDPOINTS['EUW1'];
   const gen = ++pingGeneration;
-  log('INFO', `[ping] Starting ping monitor → ${region} (${serverHost}:${PING_PORT}) [gen=${gen}]`);
+  log('INFO', `[ping] Starting ping monitor â†’ ${region} (${serverHost}:${PING_PORT}) [gen=${gen}]`);
   pingHistory = [];
   pingUsingLiveClient = false;
 
@@ -681,7 +681,7 @@ function restartPingMonitor() {
   setTimeout(() => startPingMonitor(), 200);
 }
 
-// IPC: renderer can request region change → restart ping with new target
+// IPC: renderer can request region change â†’ restart ping with new target
 ipcMain.on('set-ping-region', (_event, region) => {
   log('INFO', `[ping] Region changed to: ${region}`);
   try {
@@ -731,9 +731,9 @@ async function resolveDdragonItem(itemName) {
       await ddragonItemCachePromise;
     }
     const norm = itemName.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
-    // Exact match (primary — fastest)
+    // Exact match (primary â€” fastest)
     if (ddragonItemCache.items.has(norm)) return ddragonItemCache.items.get(norm);
-    // Strict prefix match only — no loose substring matching
+    // Strict prefix match only â€” no loose substring matching
     // This prevents removed items (e.g. "Divine Sunderer") from matching existing items (e.g. "Sundered Sky")
     for (const [key, val] of ddragonItemCache.items) {
       // Only match if one is a strict prefix of the other WITH a word boundary (space)
@@ -759,10 +759,10 @@ let overlayManuallyHidden = false;
 let liveClientInterval = null;
 let liveAdvisorInterval = null;  // separate from liveClientInterval!
 
-// ── LCU Lockfile Reader ─────────────────────────────────────────
+// â”€â”€ LCU Lockfile Reader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Duplicate getLcuCredentials declaration removed (already defined at line 3003)
 
-// ── RAG Pipeline ─────────────────────────────────────────────────────
+// â”€â”€ RAG Pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const RAG_DIR = path.join(app.getPath('userData'), 'rag');
 const RAG_META_FILE = path.join(RAG_DIR, 'meta.json');
 const RAG_DATASET_FILE = path.join(RAG_DIR, 'dataset.json');
@@ -856,15 +856,7 @@ async function checkAndSyncRag(livePatch, force = false) {
     }
 
     log('INFO', `[RAG] Patch mismatch. Live: ${livePatch}, Local: ${localMeta?.patch || 'None'}. Updating...`);
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
-    if (!apiKey) { log('WARN', '[RAG] No API key, skipping'); return; }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: getSetting('geminiModel') || process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview',
-      tools: [{ googleSearch: {} }],
-    });
+    // DeepSeek V4 Flash via OpenRouter (no Google Search grounding needed)
 
     const prompt = `Search for the official League of Legends Patch ${liveMajorMinor} notes on leagueoflegends.com.
 
@@ -887,13 +879,12 @@ Rules:
 - If ANY new items were added or existing items were reworked, mention them by name
 - If any champion was reworked, mention it
 - Include item cost changes if significant
-- Do NOT list every individual change — summarize the overall meta impact
+- Do NOT list every individual change â€” summarize the overall meta impact
 - Do NOT hallucinate changes not in the official notes`;
 
     let newDataset;
     try {
-      const result = await model.generateContent(prompt);
-      const textResponse = result.response.text().trim();
+      const textResponse = (await llmGenerate('Return ONLY valid JSON. No markdown. No code blocks.', prompt, { temperature: 0.2, maxTokens: 4096 })).trim();
       const cleanJson = textResponse.replace(/^```(json)?[\s\n]*/i, '').replace(/[\s\n]*```$/i, '').trim();
       const parsed = JSON.parse(cleanJson);
       newDataset = {
@@ -903,7 +894,7 @@ Rules:
       };
     } catch (apiError) {
       log('ERROR', '[RAG] Gemini grounding failed, using fallback:', apiError.message);
-      newDataset = { metaContext: `Patch ${liveMajorMinor} is live. Grounding failed — adapt to global changes.`, championMeta: {}, patch: liveMajorMinor };
+      newDataset = { metaContext: `Patch ${liveMajorMinor} is live. Grounding failed â€” adapt to global changes.`, championMeta: {}, patch: liveMajorMinor };
     }
 
     ensureRagDir();
@@ -938,12 +929,12 @@ function seedRagFromBundle() {
   } catch { }
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  META BUILD REFERENCE SYSTEM
 //  Fetches per-champion popular builds from u.gg/op.gg via Gemini
 //  Google Search grounding. Pre-fetched for ALL champions on patch
 //  change, cached to disk, injected as guidance into the AI prompt.
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const META_BUILDS_DIR = path.join(RAG_DIR, 'meta-builds');
 const META_BUILDS_SR_DIR = path.join(META_BUILDS_DIR, 'sr');
@@ -956,7 +947,7 @@ function ensureMetaBuildDirs() {
   }
 }
 
-// ── Centralized RAG: Fetch from GitHub data branch ──
+// â”€â”€ Centralized RAG: Fetch from GitHub data branch â”€â”€
 const CDN_BASE = 'https://raw.githubusercontent.com/Sliv3er/DraftCoach/data';
 
 async function syncMetaFromCDN() {
@@ -1081,25 +1072,25 @@ function formatMetaReference(data, isOffRole = false) {
   if (!data || !data.metaBuild) return '';
   const mb = data.metaBuild;
   const offRoleNote = isOffRole
-    ? `\n  ⚠️ NOTE: No meta data for this exact role. Showing ${data.champion} ${data.role || 'main role'} as reference. Adapt heavily for the actual role.`
+    ? `\n  âš ï¸ NOTE: No meta data for this exact role. Showing ${data.champion} ${data.role || 'main role'} as reference. Adapt heavily for the actual role.`
     : '';
-  let ref = `META REFERENCE (Patch ${data.patch || '?'} popular build — use as baseline, adapt to enemy comp):${offRoleNote}\n`;
+  let ref = `META REFERENCE (Patch ${data.patch || '?'} popular build â€” use as baseline, adapt to enemy comp):${offRoleNote}\n`;
   if (mb.winRate) ref += `  Win Rate: ${mb.winRate}% | `;
   if (mb.pickRate) ref += `Pick Rate: ${mb.pickRate}%\n`;
   if (mb.keystone) ref += `  Popular Keystone: ${mb.keystone}${mb.primaryTree ? ` (${mb.primaryTree})` : ''}\n`;
   if (mb.startingItems && mb.startingItems.length > 0) ref += `  Popular Starting: ${mb.startingItems.join(' + ')}\n`;
-  if (mb.coreItems && mb.coreItems.length > 0) ref += `  Popular Core: ${mb.coreItems.join(' → ')}\n`;
+  if (mb.coreItems && mb.coreItems.length > 0) ref += `  Popular Core: ${mb.coreItems.join(' â†’ ')}\n`;
   if (mb.boots) ref += `  Popular Boots: ${mb.boots}\n`;
   if (mb.skillOrder) ref += `  Skill Order: ${mb.skillOrder}\n`;
   ref += `\n  INSTRUCTION: Start from this meta build as your baseline. You MUST strictly adhere to these CORE ITEMS. You may change their build order, but you should ONLY swap out a core item in extreme counter-matchup scenarios. Otherwise, keep the core items exactly as they appear. Adapt RUNES and BOOTS as needed to counter the enemy team.\n`;
   return ref;
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  MOBALYTICS KB BUILD REFERENCE SYSTEM (replaces old Gemini meta)
 //  Reads build-templates.json from shared/kb/data (dev) or
 //  kb-data/ (production). Injects all 3 variants as AI baseline.
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 let _kbBuildTemplatesCache = null;
 
@@ -1159,19 +1150,19 @@ function getKBBuildContext(champion, role) {
   }
 
   if (!template || !template.variants) {
-    log('WARN', `[KB] No build data for ${champion} ${engineRole} — falling back to legacy meta`);
+    log('WARN', `[KB] No build data for ${champion} ${engineRole} â€” falling back to legacy meta`);
     return getMetaBuildReference(champion, role);
   }
 
   const variantKeys = Object.keys(template.variants);
   log('INFO', `[KB] Injecting ${champion} ${engineRole}: ${variantKeys.length} variants (${variantKeys.join(', ')})`);
 
-  const lines = [`\n═══ REFERENCE BUILDS for ${champion} ${engineRole} (Mobalytics Patch ${loadKBBuildTemplatesMeta()}) ═══`];
+  const lines = [`\nâ•â•â• REFERENCE BUILDS for ${champion} ${engineRole} (Mobalytics Patch ${loadKBBuildTemplatesMeta()}) â•â•â•`];
   lines.push(`You MUST use one of these as your base build. State which one you chose in your ANALYSIS.`);
   const variantLabels = {
-    DAMAGE: 'BUILD 1 — Most Popular (highest pick rate)',
-    SAFETY: 'BUILD 2 — Secondary (alternative popular build)',
-    UTILITY: 'BUILD 3 — Alternative (situational build)',
+    DAMAGE: 'BUILD 1 â€” Most Popular (highest pick rate)',
+    SAFETY: 'BUILD 2 â€” Secondary (alternative popular build)',
+    UTILITY: 'BUILD 3 â€” Alternative (situational build)',
   };
 
   for (const [vKey, vLabel] of Object.entries(variantLabels)) {
@@ -1189,15 +1180,15 @@ function getKBBuildContext(champion, role) {
     if (v.summonerSpells) lines.push(`  Summoner Spells: ${v.summonerSpells.join(' + ')}`);
     if (v.skillOrder) {
       const maxOrder = v.skillOrder.maxOrder ? v.skillOrder.maxOrder.join(' > ') : 'N/A';
-      const first3 = v.skillOrder.first3 ? v.skillOrder.first3.join(' → ') : 'N/A';
+      const first3 = v.skillOrder.first3 ? v.skillOrder.first3.join(' â†’ ') : 'N/A';
       lines.push(`  Skill Max Order: ${maxOrder} (first 3 levels: ${first3})`);
     }
     if (v.startingItems) lines.push(`  Starting Items: ${v.startingItems.map(i => typeof i === 'string' ? i : i.name).join(' + ')}`);
     if (v.bootChoice) lines.push(`  Boots: ${typeof v.bootChoice === 'string' ? v.bootChoice : v.bootChoice.name}`);
-    if (v.coreItems) lines.push(`  Core Items (in order): ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' → ')}`);
+    if (v.coreItems) lines.push(`  Core Items (in order): ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' â†’ ')}`);
   }
 
-  lines.push(`\n═══════════════════════════════════════════════════════════════════════`);
+  lines.push(`\nâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•`);
   lines.push(`\nCRITICAL RULES FOR USING REFERENCE BUILDS:`);
   lines.push(`1. You MUST use BUILD 1 (Most Popular) as your default base build.`);
   lines.push(`2. Only switch to BUILD 2 or BUILD 3 if the enemy composition STRONGLY demands it (e.g., BUILD 1 is pure offense but enemy has 4+ assassins).`);
@@ -1270,10 +1261,6 @@ function getAugmentsReference() {
  * Returns array of { champion, role, metaBuild } objects.
  */
 async function fetchMetaBuildBatch(genAI, champions, patch) {
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-3-flash-preview',
-    tools: [{ googleSearch: {} }],
-  });
 
   const champList = champions.map((c, i) => `${i + 1}. ${c.name} (most popular role)`).join('\n');
 
@@ -1311,8 +1298,8 @@ Rules:
 - Use current patch data, not outdated builds`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', prompt, { temperature: 0.2, maxTokens: 4096 });
+    const text = _rawText.trim();
     const cleanJson = text.replace(/^```(json)?[\s\n]*/i, '').replace(/[\s\n]*```$/i, '').trim();
     return JSON.parse(cleanJson);
   } catch (err) {
@@ -1343,11 +1330,8 @@ async function syncAllMetaBuilds(livePatch, force = false) {
   log('INFO', `[MetaBuild] Starting full meta build sync for Patch ${patchMajorMinor}...`);
 
   try {
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
-    if (!apiKey) { log('WARN', '[MetaBuild] No API key, skipping'); return; }
+    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
 
-    const genAI = new GoogleGenerativeAI(apiKey);
 
     // Get ALL champions from DDragon
     const champCache = await ensureDdragonChampCache();
@@ -1474,7 +1458,7 @@ function startEmbeddedBackend() {
     const backendApp = express();
     const PORT = parseInt(process.env.BACKEND_PORT || '3210', 10);
 
-    // SECURITY: Restrict CORS to local apps — prevents cross-site attacks
+    // SECURITY: Restrict CORS to local apps â€” prevents cross-site attacks
     backendApp.use(cors({ origin: /^https?:\/\/(localhost|127\.0\.0\.1|tauri\.localhost)(:\d+)?$/ }));
     backendApp.use(express.json());
 
@@ -1534,7 +1518,7 @@ function startEmbeddedBackend() {
       writeCache(all);
     }
 
-    // Gemini — Dynamic patch injection (delegated to prompt-builder.js)
+    // Gemini â€” Dynamic patch injection (delegated to prompt-builder.js)
     function buildSystemPrompt(patch) {
       return _prompts.buildSystemPrompt(patch);
     }
@@ -1546,8 +1530,8 @@ You will receive RAG context containing verified patch data, a VALID ITEMS list,
 FIRST, output this analysis section to reason about the matchup before building:
 
 ANALYSIS
-Matchup Type: <poke/all-in/sustain/scaling — describe the lane dynamic>
-Enemy Damage Split: <AP-heavy / AD-heavy / mixed — reference the ENEMY TEAM PROFILE provided>
+Matchup Type: <poke/all-in/sustain/scaling â€” describe the lane dynamic>
+Enemy Damage Split: <AP-heavy / AD-heavy / mixed â€” reference the ENEMY TEAM PROFILE provided>
 Key Threats: <1-2 enemy champions that are most dangerous and why>
 Build Priority: <What stats/passives does my champion need MOST vs THIS specific enemy team?>
 
@@ -1591,26 +1575,26 @@ SITUATIONAL ITEMS
 <ItemName>: <when to buy and why>
 
 JUNGLE PATH (ONLY include this section if the role is Jungle)
-Include the full jungle first clear route — list every camp you take in order, from start to first action. Use ➔ between camps. Minimum 6 camps.
-Example (RED SIDE): Red ➔ Krugs ➔ Raptors ➔ Wolves ➔ Blue ➔ Gromp ➔ Scuttle
-Example (BLUE SIDE): Blue ➔ Gromp ➔ Wolves ➔ Raptors ➔ Red ➔ Krugs ➔ Scuttle
+Include the full jungle first clear route â€” list every camp you take in order, from start to first action. Use âž” between camps. Minimum 6 camps.
+Example (RED SIDE): Red âž” Krugs âž” Raptors âž” Wolves âž” Blue âž” Gromp âž” Scuttle
+Example (BLUE SIDE): Blue âž” Gromp âž” Wolves âž” Raptors âž” Red âž” Krugs âž” Scuttle
 Adapt the route to your selected champion and matchup. Do NOT output only 1 or 2 camps.
 
 ENEMY POWER SPIKES
-<EnemyChampion>: <Level/Item spike — what to watch for>
-<EnemyChampion>: <Level/Item spike — what to watch for>
+<EnemyChampion>: <Level/Item spike â€” what to watch for>
+<EnemyChampion>: <Level/Item spike â€” what to watch for>
 
 WIN CONDITION
 <One or two sentences describing how to win this specific draft/matchup>
 
 YOUR POWER SPIKES
-1-item spike: <ItemName> — <why this is a power spike and how to play around it>
-2-item spike: <Item1> + <Item2> — <why this combination is strong and what to do>
+1-item spike: <ItemName> â€” <why this is a power spike and how to play around it>
+2-item spike: <Item1> + <Item2> â€” <why this combination is strong and what to do>
 
-EXAMPLE (showing the expected reasoning depth — adapt to the actual request):
+EXAMPLE (showing the expected reasoning depth â€” adapt to the actual request):
 ANALYSIS
-Matchup Type: Poke lane — Caitlyn outranges Jinx, expect harass with Q and headshots
-Enemy Damage Split: 3 AP / 1 AD / 1 Tank — heavy magic damage from mid, jungle, and support
+Matchup Type: Poke lane â€” Caitlyn outranges Jinx, expect harass with Q and headshots
+Enemy Damage Split: 3 AP / 1 AD / 1 Tank â€” heavy magic damage from mid, jungle, and support
 Key Threats: Syndra (burst mage, can one-shot at 6), Amumu (engage tank, R locks entire team)
 Build Priority: Need MR to survive AP threats, but also need core crit scaling for Jinx's identity
 
@@ -1627,13 +1611,13 @@ Shards: Attack Speed, Adaptive Force, Health
 
 CORE BUILD
 1. Berserker's Greaves (Essential AS boots for auto-attack ADC)
-2. Infinity Edge (Core crit multiplier — Jinx rockets scale with AD+crit multiplicatively)
-3. Rapid Firecannon (Extended range helps vs Caitlyn's 650 range — safer kiting in lane)
-4. Runaan's Hurricane (AOE rockets in teamfights — Jinx's identity item for multi-target DPS)
-5. Wit's End (ADAPTED: 3 AP enemies — on-hit MR + damage solves survivability AND DPS simultaneously)
+2. Infinity Edge (Core crit multiplier â€” Jinx rockets scale with AD+crit multiplicatively)
+3. Rapid Firecannon (Extended range helps vs Caitlyn's 650 range â€” safer kiting in lane)
+4. Runaan's Hurricane (AOE rockets in teamfights â€” Jinx's identity item for multi-target DPS)
+5. Wit's End (ADAPTED: 3 AP enemies â€” on-hit MR + damage solves survivability AND DPS simultaneously)
 6. Guardian Angel (Late game insurance vs AP burst flanks from Syndra)
 7. Bloodthirster (Lifesteal sustain for extended teamfights + overheal shield)
-(END OF EXAMPLE — do not copy this example, generate a unique build for the actual request)
+(END OF EXAMPLE â€” do not copy this example, generate a unique build for the actual request)
 
 Rules:
 - THINK THEN BUILD: Your ANALYSIS section must directly influence your item choices. If you identify "3 AP threats" in the analysis, at least 1-2 items in CORE BUILD must address that.
@@ -1641,12 +1625,12 @@ Rules:
 - ADAPTIVE KEYSTONES: Choose Keystones based on the lane. e.g. Fleet Footwork to survive heavy poke, Conqueror for extended melee trades, Grasp for short trades.
 - ADAPTIVE ITEMS: Build defensive items earlier if the enemy comp dictates it. Reference the ENEMY TEAM PROFILE data provided.
 - RUNE-ITEM COHERENCE: Your Keystone and items must form a coherent identity:
-  Conqueror → sustained trade items (Blade of the Ruined King, Death's Dance, Black Cleaver)
-  Lethal Tempo → attack speed items (Nashor's Tooth, Wit's End, Runaan's Hurricane)
-  Electrocute → burst items (Luden's, Shadowflame, Stormsurge)
-  Fleet Footwork → sustain/kiting items (Bloodthirster, Rapid Firecannon) 
-  Grasp → bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
-  Dark Harvest → snowball items (Mejai's Soulstealer, Shadowflame)
+  Conqueror â†’ sustained trade items (Blade of the Ruined King, Death's Dance, Black Cleaver)
+  Lethal Tempo â†’ attack speed items (Nashor's Tooth, Wit's End, Runaan's Hurricane)
+  Electrocute â†’ burst items (Luden's, Shadowflame, Stormsurge)
+  Fleet Footwork â†’ sustain/kiting items (Bloodthirster, Rapid Firecannon) 
+  Grasp â†’ bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
+  Dark Harvest â†’ snowball items (Mejai's Soulstealer, Shadowflame)
 - ITEMS: Use ONLY items from the VALID COMPLETED ITEMS list provided. NEVER invent item names or use removed items.
 - COUNTER-ITEMS: Use the CHAMPION-SPECIFIC COUNTER TIPS from the ENEMY TEAM PROFILE. If a tip says "Zhonya's negates R," include Zhonya's as a core or situational item.
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).
@@ -1656,20 +1640,20 @@ Rules:
 - SHARDS: Pick 1 from each row. Use ONLY from the VALID STAT SHARDS list.
 - For jungle, include jungle companion start.
 - Do NOT add explanations or extra text outside the sections.
-- If role is Jungle, include JUNGLE PATH with a complete first clear: every camp in order, 6+ camps with ➔ arrows.
+- If role is Jungle, include JUNGLE PATH with a complete first clear: every camp in order, 6+ camps with âž” arrows.
 - ALWAYS include ENEMY POWER SPIKES, YOUR POWER SPIKES, and WIN CONDITION.
 - Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.
 
-COMMON MISTAKES — NEVER DO THESE:
-❌ Do NOT put boots as item 5 or 6 — boots MUST be item 1 or 2 in CORE BUILD
-❌ Do NOT suggest the same item twice in CORE BUILD
-❌ Do NOT put starting items (Doran's, potions) in CORE BUILD
-❌ Do NOT pick secondary runes from the SAME tree as primary
-❌ Do NOT suggest 2 pairs of boots
-❌ Do NOT suggest items that only exist in ARAM/Arena
-❌ Do NOT output a generic cookie-cutter build — you MUST adapt to the enemy team profile
-✅ ALWAYS adapt at least 1-2 items specifically to the enemy team composition
-✅ ALWAYS explain HOW an item counters a specific enemy in the reason`;
+COMMON MISTAKES â€” NEVER DO THESE:
+âŒ Do NOT put boots as item 5 or 6 â€” boots MUST be item 1 or 2 in CORE BUILD
+âŒ Do NOT suggest the same item twice in CORE BUILD
+âŒ Do NOT put starting items (Doran's, potions) in CORE BUILD
+âŒ Do NOT pick secondary runes from the SAME tree as primary
+âŒ Do NOT suggest 2 pairs of boots
+âŒ Do NOT suggest items that only exist in ARAM/Arena
+âŒ Do NOT output a generic cookie-cutter build â€” you MUST adapt to the enemy team profile
+âœ… ALWAYS adapt at least 1-2 items specifically to the enemy team composition
+âœ… ALWAYS explain HOW an item counters a specific enemy in the reason`;
     }
 
     function buildShortPrompt(patch) {
@@ -1682,14 +1666,14 @@ COMMON MISTAKES — NEVER DO THESE:
       'gemini-3-flash-preview',
     ];
 
-    // ── JSON Structured Output Schema ──
-    // Forces Gemini to output exact structure — eliminates all format deviations
+    // â”€â”€ JSON Structured Output Schema â”€â”€
+    // Forces Gemini to output exact structure â€” eliminates all format deviations
     const BUILD_RESPONSE_SCHEMA = {
       type: "object",
       properties: {
         analysis: {
           type: "object",
-          description: "Matchup analysis — threats, damage types, build priorities",
+          description: "Matchup analysis â€” threats, damage types, build priorities",
           properties: {
             matchupType: { type: "string", description: "poke, all-in, sustain, or scaling" },
             enemyDamageSplit: { type: "string", description: "e.g. AD-heavy (3 AD: Zed, Yasuo, Caitlyn; 1 AP: Brand)" },
@@ -1706,7 +1690,7 @@ COMMON MISTAKES — NEVER DO THESE:
             primaryTree: { type: "string", description: "Precision, Domination, Sorcery, Resolve, or Inspiration" },
             keystone: { type: "string", description: "Keystone rune name" },
             primaryRunes: { type: "array", items: { type: "string" }, description: "Exactly 3 primary runes" },
-            secondaryTree: { type: "string", description: "Secondary tree — DIFFERENT from primary" },
+            secondaryTree: { type: "string", description: "Secondary tree â€” DIFFERENT from primary" },
             secondaryRunes: { type: "array", items: { type: "string" }, description: "Exactly 2 secondary runes" },
             shards: { type: "array", items: { type: "string" }, description: "Exactly 3 stat shards" }
           },
@@ -1719,7 +1703,7 @@ COMMON MISTAKES — NEVER DO THESE:
         skillOrder: { type: "string", description: "Max priority e.g. Q > W > E > R" },
         startingItems: {
           type: "array", items: { type: "string" },
-          description: "Exactly 2 items: 1 starting item + 1 potion. Total cost must be ≤500g. Use ONLY items from the VALID STARTING ITEMS list. Example: ['Doran\\'s Blade', 'Health Potion']. Jungle: ['Scorchclaw Pup', 'Health Potion']. Support: ['World Atlas', 'Health Potion']."
+          description: "Exactly 2 items: 1 starting item + 1 potion. Total cost must be â‰¤500g. Use ONLY items from the VALID STARTING ITEMS list. Example: ['Doran\\'s Blade', 'Health Potion']. Jungle: ['Scorchclaw Pup', 'Health Potion']. Support: ['World Atlas', 'Health Potion']."
         },
         coreBuild: {
           type: "array",
@@ -1842,7 +1826,7 @@ COMMON MISTAKES — NEVER DO THESE:
       return lines.join('\n');
     }
 
-    // ── Build Validation & Correction Pass ──
+    // â”€â”€ Build Validation & Correction Pass â”€â”€
     // Levenshtein distance for fuzzy matching
     function levenshtein(a, b) {
       const m = a.length, n = b.length;
@@ -1876,28 +1860,28 @@ COMMON MISTAKES — NEVER DO THESE:
     /**
      * Normalize messy AI output into the clean format the UI parser expects.
      * Handles all known AI format deviations:
-     * - "Primary Tree: X" → "Primary: X"
-     * - "Row N: RuneName" → "RuneName"
-     * - "Stat Shards:" + "Row N: X" → "Shards: X, Y, Z"
-     * - "1. Smite (reason)" → "Smite"
-     * - Verbose skill order → "Q > W > E > R"
-     * - "STEP N —" sections stripped
+     * - "Primary Tree: X" â†’ "Primary: X"
+     * - "Row N: RuneName" â†’ "RuneName"
+     * - "Stat Shards:" + "Row N: X" â†’ "Shards: X, Y, Z"
+     * - "1. Smite (reason)" â†’ "Smite"
+     * - Verbose skill order â†’ "Q > W > E > R"
+     * - "STEP N â€”" sections stripped
      * - "CONSTRAINT:" prefix noise stripped from core build items
      */
     function normalizeAIOutput(text) {
       if (!text) return text;
       let out = text;
 
-      // ── Fix RUNES section ──
-      // "Primary Tree: X" → "Primary: X"
+      // â”€â”€ Fix RUNES section â”€â”€
+      // "Primary Tree: X" â†’ "Primary: X"
       out = out.replace(/Primary\s+Tree:\s*/gi, 'Primary: ');
       out = out.replace(/Secondary\s+Tree:\s*/gi, 'Secondary: ');
 
-      // "Keystone: X (reason)" → "Keystone: X"
+      // "Keystone: X (reason)" â†’ "Keystone: X"
       out = out.replace(/(Keystone:\s*[A-Za-z\s']+?)\s*\(.*?\)/gi, '$1');
 
-      // "Row N: RuneName" → "RuneName" (but NOT inside Shards)
-      // This handles lines like "Row 1: Triumph" → "Triumph"
+      // "Row N: RuneName" â†’ "RuneName" (but NOT inside Shards)
+      // This handles lines like "Row 1: Triumph" â†’ "Triumph"
       // We need to be careful not to strip "Row" from shard lines yet
       const runesMatch = out.match(/RUNES\n([\s\S]*?)(?=\n(?:SUMMONERS|SKILL ORDER|STARTING|CORE BUILD|\n\n))/i);
       if (runesMatch) {
@@ -1919,7 +1903,7 @@ COMMON MISTAKES — NEVER DO THESE:
           // Check if the header line itself has inline shards: "Shards: X, Y, Z"
           const inlineMatch = blockLines[shardsStartIdx].match(/Shards?:\s*(.+)/i);
           if (inlineMatch && inlineMatch[1].trim().length > 0 && inlineMatch[1].includes(',')) {
-            // Already inline format — leave it
+            // Already inline format â€” leave it
           } else {
             // Collect subsequent lines as individual shard entries
             for (let i = shardsStartIdx + 1; i < blockLines.length; i++) {
@@ -1943,9 +1927,9 @@ COMMON MISTAKES — NEVER DO THESE:
         out = out.replace(runesMatch[1], runesBlock);
       }
 
-      // ── Fix SUMMONERS section ──
-      // "1. Smite (Required for Jungle)" → "Smite"
-      // "2. Ghost (Essential for sticking)" → "Ghost"
+      // â”€â”€ Fix SUMMONERS section â”€â”€
+      // "1. Smite (Required for Jungle)" â†’ "Smite"
+      // "2. Ghost (Essential for sticking)" â†’ "Ghost"
       const summonersMatch = out.match(/SUMMONERS\n([\s\S]*?)(?=\n(?:SKILL ORDER|STARTING|CORE BUILD|\n\n))/i);
       if (summonersMatch) {
         let sumBlock = summonersMatch[1];
@@ -1967,7 +1951,7 @@ COMMON MISTAKES — NEVER DO THESE:
         }
       }
 
-      // ── Fix SKILL ORDER section ──
+      // â”€â”€ Fix SKILL ORDER section â”€â”€
       // Various formats: "Level 1: Q\nLevel 2: E\nMax: Q > W > E > R" 
       // or "Q > E > W > R" (already correct)
       // or "Maximum Skill Order: Q > W > E > R\nLevel 1: Q\nLevel 2: W"
@@ -2002,18 +1986,18 @@ COMMON MISTAKES — NEVER DO THESE:
         }
       }
 
-      // ── Strip "STEP N —" section headers (AI sometimes outputs these) ──
-      out = out.replace(/^STEP\s+\d+\s*[-—:].+$/gm, '');
+      // â”€â”€ Strip "STEP N â€”" section headers (AI sometimes outputs these) â”€â”€
+      out = out.replace(/^STEP\s+\d+\s*[-â€”:].+$/gm, '');
 
-      // ── Strip "(CONSTRAINT: ...)" from CORE BUILD but keep the reason ──
-      // "1. Heartsteel (CONSTRAINT: THREAT_1 — rush HP)" → "1. Heartsteel (rush HP)"
-      out = out.replace(/\(CONSTRAINT:\s*(?:THREAT_\d+|ANTI_HEAL|BOOTS_CHOICE|KEY_POWERSPIKE)\s*[-—]\s*/gi, '(');
+      // â”€â”€ Strip "(CONSTRAINT: ...)" from CORE BUILD but keep the reason â”€â”€
+      // "1. Heartsteel (CONSTRAINT: THREAT_1 â€” rush HP)" â†’ "1. Heartsteel (rush HP)"
+      out = out.replace(/\(CONSTRAINT:\s*(?:THREAT_\d+|ANTI_HEAL|BOOTS_CHOICE|KEY_POWERSPIKE)\s*[-â€”]\s*/gi, '(');
 
-      // ── Strip "(PRIORITY N)" from item names ──
-      // "2. LICH BANE (PRIORITY 1)" → "2. Lich Bane"
+      // â”€â”€ Strip "(PRIORITY N)" from item names â”€â”€
+      // "2. LICH BANE (PRIORITY 1)" â†’ "2. Lich Bane"
       out = out.replace(/\s*\(PRIORITY\s*\d+\)/gi, '');
 
-      // ── Remove empty lines that pile up after stripping ──
+      // â”€â”€ Remove empty lines that pile up after stripping â”€â”€
       out = out.replace(/\n{4,}/g, '\n\n\n');
 
       return out;
@@ -2060,7 +2044,7 @@ COMMON MISTAKES — NEVER DO THESE:
       let corrected = text;
       const corrections = [];
 
-      // ── Validate RUNES section ──
+      // â”€â”€ Validate RUNES section â”€â”€
       const runesMatch = text.match(/RUNES\n([\s\S]*?)(?=\n(?:SUMMONERS|SKILL ORDER|\n\n))/);
       if (runesMatch && allValidRunes.length > 0) {
         const runesBlock = runesMatch[1];
@@ -2075,7 +2059,7 @@ COMMON MISTAKES — NEVER DO THESE:
               if (!treeSet.has(treeName)) {
                 const closest = findClosestMatch(treeName, validTreeNames, 4);
                 if (closest) {
-                  corrections.push(`Tree: "${treeName}" → "${closest}"`);
+                  corrections.push(`Tree: "${treeName}" â†’ "${closest}"`);
                   corrected = corrected.replace(treeName, closest);
                 }
               }
@@ -2088,7 +2072,7 @@ COMMON MISTAKES — NEVER DO THESE:
               if (!allKeystones.includes(ks)) {
                 const closest = findClosestMatch(ks, allKeystones, 5);
                 if (closest) {
-                  corrections.push(`Keystone: "${ks}" → "${closest}"`);
+                  corrections.push(`Keystone: "${ks}" â†’ "${closest}"`);
                   corrected = corrected.replace(ks, closest);
                 }
               }
@@ -2101,7 +2085,7 @@ COMMON MISTAKES — NEVER DO THESE:
                 if (shard && !shardSet.has(shard)) {
                   const closest = findClosestMatch(shard, uniqueShards, 4);
                   if (closest) {
-                    corrections.push(`Shard: "${shard}" → "${closest}"`);
+                    corrections.push(`Shard: "${shard}" â†’ "${closest}"`);
                     corrected = corrected.replace(shard, closest);
                   }
                 }
@@ -2113,14 +2097,14 @@ COMMON MISTAKES — NEVER DO THESE:
           if (trimmed && !runeSet.has(trimmed)) {
             const closest = findClosestMatch(trimmed, allValidRunes, 5);
             if (closest) {
-              corrections.push(`Rune: "${trimmed}" → "${closest}"`);
+              corrections.push(`Rune: "${trimmed}" â†’ "${closest}"`);
               corrected = corrected.replace(trimmed, closest);
             }
           }
         }
       }
 
-      // ── Validate items in CORE BUILD, STARTING ITEMS, SITUATIONAL ITEMS ──
+      // â”€â”€ Validate items in CORE BUILD, STARTING ITEMS, SITUATIONAL ITEMS â”€â”€
       if (validItemNames.length > 0) {
         // CORE BUILD: lines like "1. ItemName (reason)" or "1. ItemName"
         const coreMatch = corrected.match(/CORE BUILD\n([\s\S]*?)(?=\n(?:SITUATIONAL|JUNGLE PATH|ENEMY POWER|WIN CONDITION|\n\n))/);
@@ -2135,7 +2119,7 @@ COMMON MISTAKES — NEVER DO THESE:
               if (!exists) {
                 const closest = findClosestMatch(itemName, validItemNames, 5);
                 if (closest && closest.toLowerCase() !== itemName.toLowerCase()) {
-                  corrections.push(`Item: "${itemName}" → "${closest}"`);
+                  corrections.push(`Item: "${itemName}" â†’ "${closest}"`);
                   corrected = corrected.replace(itemName, closest);
                 }
               }
@@ -2144,7 +2128,7 @@ COMMON MISTAKES — NEVER DO THESE:
         }
       }
 
-      // ── Validate SUMMONERS section ──
+      // â”€â”€ Validate SUMMONERS section â”€â”€
       const summonerData = await fetchDdragonSummoners();
       if (summonerData && summonerData.spells) {
         const summonerMatch = corrected.match(/SUMMONERS\n([\s\S]*?)(?=\n(?:SKILL ORDER|\n\n))/);
@@ -2156,7 +2140,7 @@ COMMON MISTAKES — NEVER DO THESE:
             if (!summonerData.spells.has(trimmed)) {
               const closest = findClosestMatch(trimmed, summonerData.spellNames, 5);
               if (closest) {
-                corrections.push(`Summoner: "${trimmed}" → "${closest}"`);
+                corrections.push(`Summoner: "${trimmed}" â†’ "${closest}"`);
                 corrected = corrected.replace(trimmed, closest);
               }
             }
@@ -2164,7 +2148,7 @@ COMMON MISTAKES — NEVER DO THESE:
         }
       }
 
-      // ── Fix #7: Duplicate item dedup in CORE BUILD ──
+      // â”€â”€ Fix #7: Duplicate item dedup in CORE BUILD â”€â”€
       const coreDedupMatch = corrected.match(/CORE BUILD\n([\s\S]*?)(?=\n(?:SITUATIONAL|JUNGLE PATH|ENEMY POWER|WIN CONDITION|YOUR POWER|\n\n))/);
       if (coreDedupMatch) {
         const coreBlock = coreDedupMatch[1];
@@ -2193,7 +2177,7 @@ COMMON MISTAKES — NEVER DO THESE:
         }
       }
 
-      // ── Fix #8: Secondary tree must differ from primary tree ──
+      // â”€â”€ Fix #8: Secondary tree must differ from primary tree â”€â”€
       const primaryTreeMatch = corrected.match(/Primary:\s*(\w+)/);
       const secondaryTreeMatch = corrected.match(/Secondary:\s*(\w+)/);
       if (primaryTreeMatch && secondaryTreeMatch) {
@@ -2210,7 +2194,7 @@ COMMON MISTAKES — NEVER DO THESE:
               'resolve': 'Precision', 'inspiration': 'Sorcery',
             };
             const replacement = pairings[primaryTree] || alternatives[0];
-            corrections.push(`Secondary tree "${secondaryTreeMatch[1]}" same as primary "${primaryTreeMatch[1]}" → changed to "${replacement}"`);
+            corrections.push(`Secondary tree "${secondaryTreeMatch[1]}" same as primary "${primaryTreeMatch[1]}" â†’ changed to "${replacement}"`);
             corrected = corrected.replace(/Secondary:\s*\w+/, `Secondary: ${replacement}`);
           }
         }
@@ -2224,7 +2208,7 @@ COMMON MISTAKES — NEVER DO THESE:
       return corrected;
     }
 
-    // ── Completeness checker: detect missing required sections ──
+    // â”€â”€ Completeness checker: detect missing required sections â”€â”€
     const REQUIRED_SECTIONS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'WIN CONDITION'];
     const OPTIONAL_SECTIONS = ['SUMMONERS', 'STARTING ITEMS', 'SITUATIONAL ITEMS', 'ENEMY POWER SPIKES', 'YOUR POWER SPIKES'];
 
@@ -2247,19 +2231,10 @@ COMMON MISTAKES — NEVER DO THESE:
       const { complete, missing } = checkBuildCompleteness(partialText);
       if (complete) return partialText;
 
-      log('WARN', `[completeness] Output missing ${missing.length} sections: ${missing.join(', ')} — running completion call`);
+      log('WARN', `[completeness] Output missing ${missing.length} sections: ${missing.join(', ')} â€” running completion call`);
       if (sendSSE) sendSSE({ phase: 'full', chunk: '\n\n' }); // Visual separator
 
       try {
-        const completionModel = genAI.getGenerativeModel({
-          model: 'gemini-3-flash-preview',
-          systemInstruction: `You are continuing an incomplete League of Legends build output for Patch ${patchDisplay}. The previous output was cut off. Generate ONLY the missing sections listed below. Use the VALID ITEMS and VALID RUNES from the context provided. Be concise.`,
-          generationConfig: {
-            temperature: 0.2,
-            topP: 0.85,
-            maxOutputTokens: 4096,
-          },
-        });
 
         const completionPrompt = `The following build output was generated but is INCOMPLETE. It is missing these sections: ${missing.join(', ')}
 
@@ -2271,19 +2246,13 @@ Use the same champion and matchup context. Follow the exact format from the syst
 
 ${userMessage.slice(0, 2000)}`;
 
-        const completionStream = await completionModel.generateContentStream(completionPrompt);
-        let completionText = '';
-        for await (const chunk of completionStream.stream) {
-          const t = chunk.text();
-          if (t) {
-            completionText += t;
-            if (sendSSE) sendSSE({ phase: 'full', chunk: t });
-          }
-        }
+        const completionFullText = await llmGenerate('You are continuing an incomplete build. Generate only the missing sections. Be concise.', completionPrompt, { temperature: 0.2, maxTokens: 4096 });
+        let completionText = completionFullText;
+        if (sendSSE) sendSSE({ phase: 'full', chunk: completionText });
 
         if (completionText.length > 50) {
           const combined = partialText + '\n\n' + completionText;
-          log('INFO', `[completeness] Completion call added ${completionText.length} chars — now has ${checkBuildCompleteness(combined).missing.length} missing sections`);
+          log('INFO', `[completeness] Completion call added ${completionText.length} chars â€” now has ${checkBuildCompleteness(combined).missing.length} missing sections`);
           return combined;
         }
       } catch (err) {
@@ -2327,7 +2296,7 @@ ${userMessage.slice(0, 2000)}`;
     }
 
     async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false) {
-      // ── DeepSeek V4 Flash via OpenRouter — plain text, no JSON schema needed ──
+      // â”€â”€ DeepSeek V4 Flash via OpenRouter â€” plain text, no JSON schema needed â”€â”€
       log('INFO', `[build-fetch] Generating via DeepSeek V4 Flash (OpenRouter)...`);
       const startTime = Date.now();
       try {
@@ -2348,7 +2317,7 @@ ${userMessage.slice(0, 2000)}`;
             return { text: cleanText, modelUsed: 'deepseek-v4-flash', rawText };
           }
         } catch {
-          // Not JSON — use as plain text (expected)
+          // Not JSON â€” use as plain text (expected)
         }
 
         log('INFO', `[build-fetch] DeepSeek succeeded (${cleanText.length} chars, ${elapsedS}s)`);
@@ -2393,14 +2362,14 @@ ${userMessage.slice(0, 2000)}`;
       const itemSlots = isBot ? 7 : 6;
 
       const matchupLine = body.enemies && body.enemies.length > 0
-        ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
+        ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} â€” Analyze this matchup's dynamics and adapt the build accordingly.\n`
         : '';
 
       const allChamps = [body.myChampion, ...(body.enemies || [])];
       const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
       const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
       const kbContext = getKBBuildContext(body.myChampion, body.role);
-      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
+      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots â€” CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
 
       const { text: cleanText } = await fetchRobustJsonBuild(null, null, systemPrompt, userMessage, false);
 
@@ -2443,7 +2412,7 @@ ${userMessage.slice(0, 2000)}`;
             console.log(`[backend] Attempt ${attempt + 1} for ${body.myChampion} ${body.role}`);
             const result = await generateBuild(body, false);
 
-            // ── Build Validation & Correction Pass ──
+            // â”€â”€ Build Validation & Correction Pass â”€â”€
             result.text = await validateAndCorrectBuild(result.text);
 
             if (result.text.trim() === 'NEED_RETRY') {
@@ -2481,7 +2450,7 @@ ${userMessage.slice(0, 2000)}`;
       }
     });
 
-    // ── Streaming Build Endpoint (SSE) ──
+    // â”€â”€ Streaming Build Endpoint (SSE) â”€â”€
     backendApp.post('/api/build-stream', async (req, res) => {
       try {
         const body = req.body;
@@ -2511,30 +2480,14 @@ ${userMessage.slice(0, 2000)}`;
         }
 
         // Generate with streaming
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
+        // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
         if (!apiKey) {
-          sendSSE({ error: 'GEMINI_API_KEY not set' });
           return res.end();
         }
 
         const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
-        const requestedModel = body.model && VALID_MODELS.includes(body.model) ? body.model : null;
-        const modelName = requestedModel || getSetting('geminiModel') || process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview';
-        if (requestedModel) setSetting('geminiModel', requestedModel);
 
-        const genAI = new GoogleGenerativeAI(apiKey);
         const systemPrompt = buildSystemPrompt(patchDisplay);
-        const model = genAI.getGenerativeModel({
-          model: modelName,
-          systemInstruction: systemPrompt,
-          generationConfig: {
-            temperature: modelName.includes('flash') ? 0.2 : 0.3,
-            topP: 0.85,
-            topK: 40,
-            maxOutputTokens: 4096,
-          },
-        });
 
         const ragContext = getLocalRagContext(body.myChampion, body.role, body.enemies);
         let runesRef = '';
@@ -2552,28 +2505,20 @@ ${userMessage.slice(0, 2000)}`;
 
         // Matchup context injection
         const matchupLine = body.enemies && body.enemies.length > 0
-          ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
+          ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} â€” Analyze this matchup's dynamics and adapt the build accordingly.\n`
           : '';
 
-        // ── Ability mechanics context (dynamically fetched from DDragon) ──
+        // â”€â”€ Ability mechanics context (dynamically fetched from DDragon) â”€â”€
         const allChamps2 = [body.myChampion, ...(body.enemies || [])];
         const mechMap2 = await _prompts.fetchMultipleChampionMechanics(allChamps2);
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap2);
-        const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch — pick the closest valid alternative. NEVER invent item names.`;
+        const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots â€” CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\nâš ï¸ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch â€” pick the closest valid alternative. NEVER invent item names.`;
 
         sendSSE({ patchUsed: patchDisplay });
 
         try {
-          const streamResult = await model.generateContentStream(userMessage);
-          let fullText = '';
-
-          for await (const chunk of streamResult.stream) {
-            const chunkText = chunk.text();
-            if (chunkText) {
-              fullText += chunkText;
-              sendSSE({ chunk: chunkText });
-            }
-          }
+          const fullStreamText = await llmGenerateStream(buildSystemPrompt(patchDisplay), userMessage, { temperature: 0.2, maxTokens: 8192 }, (chunk) => { sendSSE({ chunk }); });
+          let fullText = fullStreamText;
 
           // Validate & correct
           const corrected = await validateAndCorrectBuild(fullText);
@@ -2587,7 +2532,7 @@ ${userMessage.slice(0, 2000)}`;
           }
 
           if (corrected.trim() === 'NEED_RETRY') {
-            sendSSE({ error: 'NEED_RETRY — build generation failed' });
+            sendSSE({ error: 'NEED_RETRY â€” build generation failed' });
             return res.end();
           }
 
@@ -2619,8 +2564,8 @@ ${userMessage.slice(0, 2000)}`;
       }
     });
 
-    // ── Dual-Model Build Endpoint (SSE) ──
-    // Flash for fast runes → Pro for deep item analysis, both in parallel
+    // â”€â”€ Dual-Model Build Endpoint (SSE) â”€â”€
+    // Now uses DeepSeek V4 Flash via OpenRouter for ALL generation
     backendApp.post('/api/build-dual', async (req, res) => {
       try {
         const body = req.body;
@@ -2636,7 +2581,7 @@ ${userMessage.slice(0, 2000)}`;
 
         const sendSSE = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
 
-        // Check cache — if we have a full Pro build cached, return immediately
+        // Check cache
         let livePatch;
         try { livePatch = await fetchDDragonVersion(); } catch { livePatch = body.patch || 'unknown'; }
         const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
@@ -2649,18 +2594,12 @@ ${userMessage.slice(0, 2000)}`;
           return res.end();
         }
 
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
-        if (!apiKey) { sendSSE({ error: 'GEMINI_API_KEY not set' }); return res.end(); }
-
-        const genAI = new GoogleGenerativeAI(apiKey);
-
-        // ── Game Mode Detection ──
-        const gameMode = body.gameMode || 'sr'; // 'sr', 'aram', 'aram-mayhem'
+        // â”€â”€ Game Mode Detection â”€â”€
+        const gameMode = body.gameMode || 'sr';
         const mapId = gameMode === 'sr' ? 11 : 12;
         const isARAM = gameMode !== 'sr';
 
-        // ── Mode-specific system prompt ──
+        // â”€â”€ Mode-specific system prompt â”€â”€
         const systemPrompt = gameMode === 'aram-mayhem'
           ? _prompts.buildAramMayhemSystemPrompt(patchDisplay)
           : gameMode === 'aram'
@@ -2680,161 +2619,50 @@ ${userMessage.slice(0, 2000)}`;
         const isBot = !isARAM && /^(bottom|adc|bot)$/i.test(body.role);
         const itemSlots = isBot ? 7 : 6;
         const matchupLine = !isARAM && body.enemies && body.enemies.length > 0
-          ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} — Analyze this matchup's dynamics and adapt the build accordingly.\n`
+          ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} â€” Analyze this matchup's dynamics and adapt the build accordingly.\n`
           : '';
 
-        // ── Ability mechanics context (dynamically fetched from DDragon) ──
+        // Ability mechanics context
         const allChamps3 = [body.myChampion, ...(body.enemies || [])];
         const mechMap3 = await _prompts.fetchMultipleChampionMechanics(allChamps3);
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
+        const kbContext = getKBBuildContext(body.myChampion, body.role);
 
-        // ── Mode-specific user message ──
+        // Build user message
         let fullUserMessage;
         if (isARAM) {
           const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
           const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference() : '';
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems: []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${gameMode === 'aram-mayhem' ? ' Also recommend the best 4 augments for this champion. Use ONLY augments from the VALID ARAM MAYHEM AUGMENTS list above.' : ''}\n\n⚠️ FINAL REMINDER: NEVER invent item names. Use ONLY items from the VALID COMPLETED ITEMS list. This is ${modeLabel} mode — no Doran's items, no jungle, no lane matchup.`;
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems: []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.\n\nNEVER invent item names. This is ${modeLabel} mode â€” no Doran's items, no jungle, no lane matchup.`;
         } else {
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots — CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY starting items from the VALID STARTING ITEMS list above. startingItems must be exactly 2 items (1 starter + 1 potion). Generate optimized build.\n\n⚠️ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. startingItems MUST be from the VALID STARTING ITEMS list (exactly 2: one starter + one potion, ≤500g total). NEVER invent item names.`;
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots â€” CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
         }
 
-        const generationMode = body.generationMode || getSetting('generationMode') || 'flash';
-        const fullPhaseModelName = generationMode === 'flash' 
-          ? 'gemini-3-flash-preview' 
-          : (body.model || 'gemini-3.1-pro-preview');
+        sendSSE({ patchUsed: patchDisplay, dualMode: false, gameMode });
+        log('INFO', `[dual] Starting DeepSeek generation: gameMode=${gameMode} for ${body.myChampion} ${body.role || 'ARAM'}`);
 
-        sendSSE({ patchUsed: patchDisplay, dualMode: generationMode !== 'flash', gameMode });
-        log('INFO', `[dual] Starting generation: mode=${generationMode}, gameMode=${gameMode}, model=${fullPhaseModelName} for ${body.myChampion} ${body.role || 'ARAM'}`);
+        // â”€â”€ Single DeepSeek call with streaming â”€â”€
+        try {
+          const fullText = await llmGenerateStream(systemPrompt, fullUserMessage, {
+            temperature: 0.2,
+            maxTokens: 8192,
+          }, (chunk) => {
+            sendSSE({ phase: 'full', chunk });
+          });
 
-        // ── Phase 1: Flash for fast runes (SKIP in flash-only mode to avoid duplicate runes) ──
-        let flashPromise;
-        if (generationMode === 'flash') {
-          // In flash-only mode, skip the separate runes phase entirely.
-          // The full build call below will include runes in its output.
-          flashPromise = Promise.resolve(null);
-        } else {
-          flashPromise = (async () => {
-            try {
-              const flashModel = genAI.getGenerativeModel({
-                model: 'gemini-3-flash-preview',
-                // ── Upgraded: full rune decision tree from prompt-builder ──
-                systemInstruction: _prompts.buildFlashRuneSystemPrompt(patchDisplay),
-                generationConfig: {
-                  temperature: 0.2,
-                  topP: 0.85,
-                  topK: 40,
-                },
-              });
-
-              // Inject mechanics context — reuse mechMap3 already fetched above
-              const runeMechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
-              const runeMessage = `${runesRef}${sumSpellsRef}${enemyProfile}\n${runeMechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay}. Generate runes, summoners, and skill order ONLY. Apply the KEYSTONE SELECTION RULES above.`;
-              const flashStream = await flashModel.generateContentStream(runeMessage);
-              let flashText = '';
-
-              for await (const chunk of flashStream.stream) {
-                const t = chunk.text();
-                if (t) {
-                  flashText += t;
-                  sendSSE({ phase: 'runes', chunk: t });
-                }
-              }
-
-              // Validate runes from Flash
-              const validated = await validateAndCorrectBuild(flashText);
-              if (validated !== flashText) {
-                sendSSE({ phase: 'runes', corrected: validated });
-              }
-              sendSSE({ phase: 'runes', done: true, fullText: validated, model: 'gemini-3-flash-preview' });
-              log('INFO', `[dual] Flash runes complete (${flashText.length} chars)`);
-              return validated;
-            } catch (err) {
-              log('ERROR', `[dual] Flash runes failed: ${err.message}`);
-              sendSSE({ phase: 'runes', error: err.message });
-              return null;
-            }
-          })();
-        }
-
-        // ── Phase 2: Full build (runs in parallel, model depends on setting) ──
-        // In flash-only mode, skip Pro entirely and go straight to Flash
-        let finalText;
-        const STREAM_TIMEOUT_MS = 90000; // 90 seconds max for any streaming call
-        if (generationMode === 'flash') {
-          // Flash-only mode: run Flash with JSON structured output and retries
-          log('INFO', `[dual] Flash-only mode: running Flash with JSON schema & retries`);
-          
-          const result = await fetchRobustJsonBuild(genAI, 'gemini-3-flash-preview', systemPrompt, fullUserMessage, true);
-          let cleanText = result.text;
-          const actualModelUsed = result.modelUsed;
-
-          let validated = await validateAndCorrectBuild(cleanText);
-          validated = await completeMissingSections(validated, genAI, patchDisplay, fullUserMessage, sendSSE);
-          validated = await validateAndCorrectBuild(validated);
-
-          sendSSE({ phase: 'full', corrected: validated });
+          let validated = await validateAndCorrectBuild(fullText);
+          if (validated !== fullText) {
+            sendSSE({ phase: 'full', corrected: validated });
+          }
           setCache(cacheKey, validated, patchDisplay);
-          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: actualModelUsed });
-          log('INFO', `[dual] Flash-only full build complete (${cleanText.length} chars)`);
-          finalText = validated;
-        } else {
-          // Hybrid mode: run Pro and Flash in parallel
-          const proPromise = (async () => {
-            try {
-
-              // Parse JSON → convert to clean text
-              let cleanText;
-              try {
-                const buildJson = JSON.parse(proText);
-                cleanText = jsonBuildToText(buildJson);
-                log('INFO', `[dual] Pro JSON parsed OK, ${cleanText.length} chars`);
-              } catch (e) {
-                log('WARN', `[dual] Pro JSON parse failed, using raw text: ${e.message}`);
-                cleanText = proText;
-              }
-
-              let validated = await validateAndCorrectBuild(cleanText);
-              validated = await completeMissingSections(validated, genAI, patchDisplay, fullUserMessage, sendSSE);
-              validated = await validateAndCorrectBuild(validated);
-              sendSSE({ phase: 'full', corrected: validated });
-              setCache(cacheKey, validated, patchDisplay);
-              sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: fullPhaseModelName });
-              log('INFO', `[dual] Pro full build complete (${proText.length} chars)`);
-              return validated;
-            } catch (err) {
-              log('ERROR', `[dual] Pro full build failed: ${err.message}`);
-              sendSSE({ phase: 'full', error: err.message });
-              return null;
-            }
-          })();
-
-          // Wait for both to finish
-          const [flashResult, proResult] = await Promise.all([flashPromise, proPromise]);
-
-          // ── Fallback: if Pro failed or missing CORE BUILD, retry with Flash ──
-          finalText = proResult;
-          if (!proResult || !proResult.includes('CORE BUILD')) {
-            log('WARN', `[dual] Pro result missing CORE BUILD — falling back to Flash for full build`);
-            try {
-              const result = await fetchRobustJsonBuild(genAI, 'gemini-3-flash-preview', buildSystemPrompt(patchDisplay), fullUserMessage, true);
-              let cleanText = result.text;
-              
-              let validated = await validateAndCorrectBuild(cleanText);
-              validated = await completeMissingSections(validated, genAI, patchDisplay, fullUserMessage, sendSSE);
-              validated = await validateAndCorrectBuild(validated);
-              
-              sendSSE({ phase: 'full', corrected: validated });
-              setCache(cacheKey, validated, patchDisplay);
-              sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: result.modelUsed });
-              log('INFO', `[dual] Flash fallback full build complete`);
-              finalText = validated;
-            } catch (fbErr) {
-              log('ERROR', `[dual] Flash fallback also failed: ${fbErr.message}`);
-              // Last resort: stale cache
-              if (cached) {
-                sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
-              }
-            }
+          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'deepseek-v4-flash' });
+          log('INFO', `[dual] DeepSeek build complete (${fullText.length} chars)`);
+        } catch (err) {
+          log('ERROR', `[dual] DeepSeek generation failed: ${err.message}`);
+          if (cached) {
+            sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
+          } else {
+            sendSSE({ error: err.message });
           }
         }
 
@@ -2916,7 +2744,7 @@ ${userMessage.slice(0, 2000)}`;
   });
 }
 
-// ── Window Management ───────────────────────────────────────────────
+// â”€â”€ Window Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function createWindow() {
   Menu.setApplicationMenu(null);
@@ -2965,7 +2793,7 @@ function createWindow() {
 function createOverlayWindow() {
   if (overlayWindow && !overlayWindow.isDestroyed()) return;
 
-  // Fullscreen transparent overlay — elements position themselves at screen edges
+  // Fullscreen transparent overlay â€” elements position themselves at screen edges
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenW, height: screenH } = primaryDisplay.bounds;
 
@@ -2989,7 +2817,7 @@ function createOverlayWindow() {
     show: false,
   });
 
-  // Highest always-on-top level — sits above fullscreen/borderless games
+  // Highest always-on-top level â€” sits above fullscreen/borderless games
   overlayWindow.setAlwaysOnTop(true, 'screen-saver');
   // Click-through: mouse events pass to the game underneath
   overlayWindow.setIgnoreMouseEvents(true, { forward: true });
@@ -3013,7 +2841,7 @@ function createOverlayWindow() {
     overlayWindow = null;
   });
 
-  // ── Crash Recovery (#16) ──
+  // â”€â”€ Crash Recovery (#16) â”€â”€
   overlayWindow.webContents.on('crashed', () => {
     console.error('[overlay] Renderer process crashed! Recreating...');
     overlayWindow = null;
@@ -3116,9 +2944,9 @@ function createStatsWindow() {
   console.log('[main] Stats window created');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// ── SCOREBOARD WINDOW + COOLDOWN TRACKER ──────────────────────────
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â”€â”€ SCOREBOARD WINDOW + COOLDOWN TRACKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 let _scoreboardCreating = false; // Lock to prevent duplicate window creation
 
@@ -3170,7 +2998,7 @@ function createScoreboardWindow() {
   console.log('[main] Scoreboard window created');
 }
 
-// ── Tracker Window (dedicated clickable panel, right edge) ──────
+// â”€â”€ Tracker Window (dedicated clickable panel, right edge) â”€â”€â”€â”€â”€â”€
 let _trackerCreating = false;
 
 function createTrackerWindow() {
@@ -3207,7 +3035,7 @@ function createTrackerWindow() {
   });
 
   trackerWindow.setAlwaysOnTop(true, 'screen-saver');
-  // NO setIgnoreMouseEvents — clicks go through normally!
+  // NO setIgnoreMouseEvents â€” clicks go through normally!
 
   if (isDev) {
     trackerWindow.loadURL('http://localhost:9000/#/tracker');
@@ -3228,7 +3056,7 @@ function createTrackerWindow() {
   });
 }
 
-// ── Scoreboard Data Polling ──────────────────────────────────────
+// â”€â”€ Scoreboard Data Polling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function startScoreboardPolling() {
   if (scoreboardDataInterval) return;
   console.log('[main] Starting scoreboard data polling');
@@ -3299,7 +3127,7 @@ function fetchAllGameData() {
 }
 
 function processAndSendScoreboardData(data) {
-  // Can run even if scoreboard is closed — overlay also needs this data
+  // Can run even if scoreboard is closed â€” overlay also needs this data
 
   const activePlayer = data.activePlayer;
   const players = data.allPlayers || [];
@@ -3393,7 +3221,7 @@ function processAndSendScoreboardData(data) {
   }
 }
 
-// ── Cooldown Timer Logic ─────────────────────────────────────────
+// â”€â”€ Cooldown Timer Logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function startCooldownTimer(championName, ability) {
   if (!lastLiveGameData) {
@@ -3470,7 +3298,7 @@ async function startCooldownTimer(championName, ability) {
   };
 
   cooldownTimers.push(timer);
-  console.log(`[cooldown] Timer started: ${timerId} → ${totalDuration}s`);
+  console.log(`[cooldown] Timer started: ${timerId} â†’ ${totalDuration}s`);
 
   // Immediate tick to show the timer right away
   tickCooldowns();
@@ -3514,7 +3342,7 @@ async function getChampionUltCooldowns(championName) {
   try {
     const ver = await ensureDdragonVersion();
     const fetch = require('node-fetch');
-    // DDragon champion data — use proper name mapping
+    // DDragon champion data â€” use proper name mapping
     const champKey = cooldownData.champToDdragonKey(championName);
     const url = `https://ddragon.leagueoflegends.com/cdn/${ver}/data/en_US/champion/${champKey}.json`;
     const res = await fetch(url);
@@ -3575,7 +3403,7 @@ async function autoRefreshStats() {
   }
 }
 
-// ── Live Client Data API — Item Purchase Detection ──────────────────
+// â”€â”€ Live Client Data API â€” Item Purchase Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Stats window control buttons (frameless)
 ipcMain.on('stats-win-minimize', () => { if (statsWindow && !statsWindow.isDestroyed()) statsWindow.minimize(); });
@@ -3587,7 +3415,7 @@ function startLiveClientPolling() {
 
   // ADC quest slot fix: Once boots are detected, NEVER revert.
   // When the ADC quest completes, boots move from inventory to a hidden quest
-  // slot and disappear from the Live Client API items[] — this flag persists.
+  // slot and disappear from the Live Client API items[] â€” this flag persists.
   global.__bootsEverDetected = false;
 
   // Pre-warm DDragon cache so component data is available immediately
@@ -3615,7 +3443,7 @@ function startLiveClientPolling() {
       });
     });
     req.on('error', () => {
-      // Game not in an active match or API not available — that's fine
+      // Game not in an active match or API not available â€” that's fine
     });
   }, 3000);
 }
@@ -3640,7 +3468,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
           const purchasedItemIds = me.items.map((item) => String(item.itemID));
           const purchasedItemNames = me.items.map((item) => (item.displayName || '').toLowerCase().trim()).filter(Boolean);
 
-          // ── Boots detection (handles quest slots + renamed boot variants) ──
+          // â”€â”€ Boots detection (handles quest slots + renamed boot variants) â”€â”€
           // Check if player owns ANY upgraded boots by DDragon 'Boots' tag OR name pattern
           const BOOT_NAME_PATTERNS = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots'];
           const isBootsId = (id) => {
@@ -3659,7 +3487,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
             return BOOT_NAME_PATTERNS.some(p => lower.includes(p));
           };
           const playerHasBootsFromInventory = purchasedItemIds.some(id => isBootsId(id)) || purchasedItemNames.some(n => isBootName(n));
-          // ADC quest slot fix: sticky flag — once boots are seen, they stay "seen"
+          // ADC quest slot fix: sticky flag â€” once boots are seen, they stay "seen"
           // (quest slot boots disappear from items[] but player still has them)
           if (playerHasBootsFromInventory) {
             global.__bootsEverDetected = true;
@@ -3672,7 +3500,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
               if (bi.id && isBootsId(bi.id)) buildBootIds.add(bi.id);
             }
           }
-          // ── Compute next component to buy and remaining gold ──
+          // â”€â”€ Compute next component to buy and remaining gold â”€â”€
           let nextComponent = null; // { name, iconUrl, gold } or null
           let remainingGold = 0; // actual gold needed to finish the next item
 
@@ -3685,7 +3513,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
           // Compute savings from owned sub-items in a recipe tree
           // Returns total gold value of owned items found (and consumes them from counts)
           const computeSavings = (itemId, counts) => {
-            // If player owns this completed item, consume it — savings = its full value
+            // If player owns this completed item, consume it â€” savings = its full value
             if ((counts.get(itemId) || 0) > 0) {
               counts.set(itemId, counts.get(itemId) - 1);
               const d = ddragonItemCache.byId.get(itemId);
@@ -3787,7 +3615,7 @@ function stopLiveClientPolling() {
   }
 }
 
-// ── Game Detection ──────────────────────────────────────────────────
+// â”€â”€ Game Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function checkGameState() {
   // Step 1: check if League of Legends game process is running
@@ -3795,7 +3623,7 @@ function checkGameState() {
     const gameProcessRunning = !err && stdout.toLowerCase().includes('league of legends');
 
     if (!gameProcessRunning) {
-      // Game not running — always hide overlay
+      // Game not running â€” always hide overlay
       if (isGameRunning) {
         console.log('[main] League of Legends game ended');
         isGameRunning = false;
@@ -3803,7 +3631,7 @@ function checkGameState() {
         // Auto-stop live advisor when game ends
         if (liveAdvisorState.isPolling) {
           stopLiveAdvisor();
-          sendAdvisorDebug('[stop] Game process ended — live advisor auto-stopped');
+          sendAdvisorDebug('[stop] Game process ended â€” live advisor auto-stopped');
           if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.webContents.send('live-advisor-stopped');
           }
@@ -3861,7 +3689,7 @@ function checkGameState() {
       // Auto-start live advisor for this game
       if (!liveAdvisorState.isPolling) {
         startLiveAdvisor();
-        sendAdvisorDebug('[start] Game detected — live advisor auto-started');
+        sendAdvisorDebug('[start] Game detected â€” live advisor auto-started');
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('live-advisor-started');
         }
@@ -3966,7 +3794,7 @@ function hideOverlay() {
   }
 }
 
-// ── Global Keyboard Shortcuts (Configurable) ────────────────────────
+// â”€â”€ Global Keyboard Shortcuts (Configurable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Shortcut action handlers
 const SHORTCUT_ACTIONS = {
@@ -4004,7 +3832,7 @@ const SHORTCUT_ACTIONS = {
   },
 };
 
-// Map of setting keys → action keys
+// Map of setting keys â†’ action keys
 const HOTKEY_MAP = {
   hotkeyToggleOverlay: { action: 'toggleOverlay', label: 'Toggle Overlay' },
   hotkeyHideOverlay: { action: 'hideOverlay', label: 'Hide Overlay' },
@@ -4030,13 +3858,13 @@ function registerShortcuts() {
     try {
       const ok = globalShortcut.register(accelerator, SHORTCUT_ACTIONS[meta.action]);
       if (ok) {
-        log('INFO', `[shortcuts] ✓ Registered: ${accelerator} → ${meta.label}`);
+        log('INFO', `[shortcuts] âœ“ Registered: ${accelerator} â†’ ${meta.label}`);
       } else {
-        log('WARN', `[shortcuts] ✗ FAILED: ${accelerator} → ${meta.label} — taken by another app`);
+        log('WARN', `[shortcuts] âœ— FAILED: ${accelerator} â†’ ${meta.label} â€” taken by another app`);
       }
       results[settingKey] = { key: accelerator, ok, label: meta.label };
     } catch (err) {
-      log('WARN', `[shortcuts] ✗ ERROR: ${accelerator} → ${meta.label}: ${err.message}`);
+      log('WARN', `[shortcuts] âœ— ERROR: ${accelerator} â†’ ${meta.label}: ${err.message}`);
       results[settingKey] = { key: accelerator, ok: false, label: meta.label };
     }
   }
@@ -4049,7 +3877,7 @@ function registerShortcuts() {
   return results;
 }
 
-// ── LoL Config Parser ──────────────────────────────────────────────
+// â”€â”€ LoL Config Parser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function parseLolConfig() {
   const settings = loadSettings();
@@ -4095,10 +3923,10 @@ function parseLolConfig() {
 
     // Corrected minimap size formula:
     // At 1080p with default MinimapScale=1.0, the League minimap is ~243px.
-    // MinimapScale 0.0→1.0 maps to roughly 70%→100% of base size.
+    // MinimapScale 0.0â†’1.0 maps to roughly 70%â†’100% of base size.
     // Scale linearly with screen height for other resolutions.
     const baseSize = 243;
-    const scaleFactor = 0.7 + 0.3 * minimapScale; // 0.0→0.7x, 1.0→1.0x
+    const scaleFactor = 0.7 + 0.3 * minimapScale; // 0.0â†’0.7x, 1.0â†’1.0x
     const size = baseSize * (height / 1080) * scaleFactor;
 
     console.log(`[main] Detected Minimap: ${Math.round(size)}px at ${width}x${height} (Scale: ${minimapScale})`);
@@ -4116,10 +3944,10 @@ function parseLolConfig() {
   }
 }
 
-// ── IPC Handlers ────────────────────────────────────────────────────
+// â”€â”€ IPC Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
-// Overlay data from renderer → forward to overlay window
+// Overlay data from renderer â†’ forward to overlay window
 ipcMain.on('overlay-data', (_event, data) => {
   log('INFO', '[main] Received overlay data from renderer');
   overlayGeneration++;
@@ -4130,7 +3958,7 @@ ipcMain.on('overlay-data', (_event, data) => {
   }
 });
 
-// Partial item update — merges new items into existing overlay data
+// Partial item update â€” merges new items into existing overlay data
 ipcMain.on('update-overlay-items', (_event, newItems) => {
   log('INFO', `[main] Overlay items updated: ${newItems.length} items`);
   overlayGeneration++;
@@ -4143,7 +3971,7 @@ ipcMain.on('update-overlay-items', (_event, newItems) => {
   }
 });
 
-// ── LCU Credentials & Communication ──────────────────────────────────
+// â”€â”€ LCU Credentials & Communication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getLcuCredentials() {
   const settings = loadSettings();
@@ -4198,7 +4026,7 @@ async function lcuCall(method, pathStr, body) {
     if (!res.ok) {
       let errorBody = '';
       try { errorBody = await res.text(); } catch { }
-      console.error(`[main] LCU ${method} ${pathStr} failed: HTTP ${res.status} — ${errorBody}`);
+      console.error(`[main] LCU ${method} ${pathStr} failed: HTTP ${res.status} â€” ${errorBody}`);
       return { __lcuError: true, status: res.status, body: errorBody };
     }
 
@@ -4232,7 +4060,7 @@ ipcMain.handle('lcu-champ-select', async () => {
 
 // LCU auto-detect game mode from lobby/gameflow
 ipcMain.handle('lcu-game-mode', async () => {
-  // Queue ID → game mode mapping
+  // Queue ID â†’ game mode mapping
   // SR queues: 400 (Draft), 420 (Ranked Solo), 430 (Blind), 440 (Flex), 490 (Quickplay)
   // ARAM queues: 450 (ARAM), 930 (Poro King on HA)
   // ARAM Mayhem: queue ID TBD by Riot (we'll detect via gameMode string)
@@ -4242,7 +4070,7 @@ ipcMain.handle('lcu-game-mode', async () => {
   };
 
   try {
-    // Try gameflow session first — more reliable during champ select
+    // Try gameflow session first â€” more reliable during champ select
     const gameflow = await lcuCall('GET', '/lol-gameflow/v1/session');
     if (gameflow && !gameflow.__lcuError && !gameflow.__lcuOk) {
       const queueId = gameflow.gameData?.queue?.id;
@@ -4346,7 +4174,7 @@ ipcMain.handle('lcu-live-game', async () => {
   }
 });
 
-// ── Live Game AI Advisor ─────────────────────────────────────────────
+// â”€â”€ Live Game AI Advisor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let liveAdvisorState = {
   lastAdviceTime: 0,
   lastPhase: '',            // 'early', 'mid', 'late'
@@ -4354,15 +4182,15 @@ let liveAdvisorState = {
   advisorCooldown: 90000,   // minimum 90s between AI calls
   originalBuildText: '',    // stored from the pre-game generation
   isPolling: false,
-  // ── Intelligence upgrades ──
-  previousAdvice: '',       // #6: memory — last AI response to prevent flip-flopping
+  // â”€â”€ Intelligence upgrades â”€â”€
+  previousAdvice: '',       // #6: memory â€” last AI response to prevent flip-flopping
   previousAdviceTime: 0,    // timestamp of last advice
   lastDeaths: 0,            // #2: death trigger
   lastGold: 0,              // #2: gold spike trigger
   lastEnemyItemCounts: {},  // #2: enemy major item completion trigger
 };
 
-// ── DDragon Champion Cache (for class-based item filtering) ──
+// â”€â”€ DDragon Champion Cache (for class-based item filtering) â”€â”€
 let ddragonChampCache = null; // Map<champName, { tags: string[] }>
 let ddragonChampCachePromise = null;
 
@@ -4409,7 +4237,7 @@ async function fetchLiveClientData() {
     sendAdvisorDebug(`[fetch] Got game data: ${data.allPlayers?.length || 0} players, time=${Math.floor((data.gameData?.gameTime || 0) / 60)}min`);
     return data;
   } catch (err) {
-    // Game not running — this is normal, don't spam
+    // Game not running â€” this is normal, don't spam
     return null;
   }
 }
@@ -4470,19 +4298,19 @@ function checkLiveAdvisorTriggers(gameData) {
     return `Enemy threat detected: ${names}`;
   }
 
-  // Trigger 3: Player died — best time to rethink build (on fountain with gold)
+  // Trigger 3: Player died â€” best time to rethink build (on fountain with gold)
   const myDeaths = myPlayer.scores?.deaths || 0;
   if (myDeaths > liveAdvisorState.lastDeaths && liveAdvisorState.lastDeaths >= 0) {
     liveAdvisorState.lastDeaths = myDeaths;
-    return `Player died (${myDeaths} deaths) — reassess build on respawn`;
+    return `Player died (${myDeaths} deaths) â€” reassess build on respawn`;
   }
   if (liveAdvisorState.lastDeaths < 0) liveAdvisorState.lastDeaths = myDeaths;
 
-  // Trigger 4: Gold spike (>800g increase since last check — can buy a component)
+  // Trigger 4: Gold spike (>800g increase since last check â€” can buy a component)
   const currentGold = activePlayer.currentGold || 0;
   if (currentGold > (liveAdvisorState.lastGold || 0) + 800 && gameTime >= 120) {
     liveAdvisorState.lastGold = currentGold;
-    return `Gold spike: ${currentGold}g available — check for item purchases`;
+    return `Gold spike: ${currentGold}g available â€” check for item purchases`;
   }
   liveAdvisorState.lastGold = currentGold;
 
@@ -4516,7 +4344,7 @@ function checkLiveAdvisorTriggers(gameData) {
 async function pollLiveClient() {
   const gameData = await fetchLiveClientData();
   if (!gameData) {
-    // API not ready (loading screen) or game not active — just wait
+    // API not ready (loading screen) or game not active â€” just wait
     // Game-end stopping is handled by checkGameState() which detects the process ending
     return;
   }
@@ -4554,10 +4382,10 @@ async function pollLiveClient() {
     const formatP = (p) => {
       const items = (p.items || []).map(i => i.displayName).filter(Boolean).join(', ') || 'No items';
       const kda = p.scores || {};
-      return `  ${p.championName} (Lv${p.level || 1}) — ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0} — Gold: ${p.currentGold || 0} — Items: [${items}]`;
+      return `  ${p.championName} (Lv${p.level || 1}) â€” ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0} â€” Gold: ${p.currentGold || 0} â€” Items: [${items}]`;
     };
 
-    // ── Boots detection helper for live advisor (same logic as fetchPlayerItems) ──
+    // â”€â”€ Boots detection helper for live advisor (same logic as fetchPlayerItems) â”€â”€
     const advisorIsBootsId = (id) => {
       if (!ddragonItemCache || !ddragonItemCache.byId) return false;
       const d = ddragonItemCache.byId.get(String(id));
@@ -4607,7 +4435,7 @@ async function pollLiveClient() {
       }
     }
 
-    // ── Game Phase Detection ──
+    // â”€â”€ Game Phase Detection â”€â”€
     const gameTime = gameData.gameData?.gameTime || 0;
     const gameMinutes = Math.floor(gameTime / 60);
     const gameSecs = Math.floor(gameTime % 60);
@@ -4621,7 +4449,7 @@ async function pollLiveClient() {
       phaseGuidance = 'Mid game: prioritize teamfight items, objective control items, and countering the strongest enemy threats.';
     }
 
-    // ── Build Complete Detection ──
+    // â”€â”€ Build Complete Detection â”€â”€
     // ADCs (Marksman) have 7-item builds: 6 regular slots + 1 quest boots slot
     // Quest boots can NEVER be sold, only swapped for other boots
     const myChampInfo = ddragonChampCache?.get(myPlayer?.championName);
@@ -4635,7 +4463,7 @@ async function pollLiveClient() {
     });
     const myItemCount = myCompletedItems.length;
     // ADC quest slot: if boots moved to quest slot, they're not in items[] anymore
-    // but the player still has them — count them toward completed items
+    // but the player still has them â€” count them toward completed items
     const hasBootsInInventory = myCompletedItems.some(i => {
       const d = ddragonItemCache?.byId?.get(String(i.itemID));
       return d && d.tags && d.tags.includes('Boots');
@@ -4660,15 +4488,15 @@ async function pollLiveClient() {
       let bootsAdvice;
       if (isADC) {
         // ADC quest boots can NEVER be sold, only swapped for other boots
-        bootsAdvice = `- BOOTS (ADC QUEST SLOT): This champion has a quest boots slot. Quest boots CANNOT be sold — they can only be swapped for a different pair of boots. NEVER suggest selling boots for a non-boots item on this champion.\n` +
-          `- If the current boots are suboptimal, suggest SWAPPING them for a different boots (e.g., Berserker's Greaves → Mercury's Treads). Use the SELL format: CurrentBoots → NewBoots.\n`;
+        bootsAdvice = `- BOOTS (ADC QUEST SLOT): This champion has a quest boots slot. Quest boots CANNOT be sold â€” they can only be swapped for a different pair of boots. NEVER suggest selling boots for a non-boots item on this champion.\n` +
+          `- If the current boots are suboptimal, suggest SWAPPING them for a different boots (e.g., Berserker's Greaves â†’ Mercury's Treads). Use the SELL format: CurrentBoots â†’ NewBoots.\n`;
       } else if (isFullBuild && isUltraLateGame) {
         bootsAdvice = `- BOOTS: Since ALL 6 slots are full and it's ultra-late game (${gameMinutes}min), boots CAN be sold for a 6th full item if the movement speed trade-off is worth it.\n`;
       } else {
         bootsAdvice = `- BOOTS: Do NOT suggest selling boots unless ALL 6 item slots are full AND it's 30+ minutes.\n`;
       }
-      buildCompleteContext = `\nBUILD STATUS: ✅ COMPLETE — All core items built. Current full build: [${currentBuild}]\n` +
-        `Champion type: ${isADC ? 'ADC/Marksman (has quest boots slot — 7 items total)' : 'Non-ADC (6 items total)'}\n` +
+      buildCompleteContext = `\nBUILD STATUS: âœ… COMPLETE â€” All core items built. Current full build: [${currentBuild}]\n` +
+        `Champion type: ${isADC ? 'ADC/Marksman (has quest boots slot â€” 7 items total)' : 'Non-ADC (6 items total)'}\n` +
         `Evaluate if any item should be REPLACED based on the current game state.\n` +
         `Consider:\n` +
         `- Is an item underperforming against the current enemy composition?\n` +
@@ -4678,21 +4506,21 @@ async function pollLiveClient() {
         `Only suggest a replacement if it's genuinely impactful. "No replacement needed" is a valid answer.\n`;
     }
 
-    // ── Enemy Items Breakdown (dedicated section) ──
+    // â”€â”€ Enemy Items Breakdown (dedicated section) â”€â”€
     const enemyItemBreakdown = enemies.map(e => {
       const items = (e.items || []).map(i => i.displayName).filter(Boolean);
       const kda = e.scores || {};
       const isFed = (kda.kills || 0) >= 5 || ((kda.kills || 0) - (kda.deaths || 0)) >= 4;
       const goldEarned = (kda.kills || 0) * 300 + (kda.assists || 0) * 150;
-      return `  ${e.championName} (Lv${e.level || 1}, ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0})${isFed ? ' ⚠️ FED' : ''}: [${items.join(', ') || 'No items'}]`;
+      return `  ${e.championName} (Lv${e.level || 1}, ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0})${isFed ? ' âš ï¸ FED' : ''}: [${items.join(', ') || 'No items'}]`;
     }).join('\n');
 
-    // ── My items summary ──
+    // â”€â”€ My items summary â”€â”€
     const myItems = (myPlayer?.items || []).map(i => i.displayName).filter(Boolean);
     // Use ID-based boots detection (catches quest slot boots that may not be in displayName list)
     const hasBoots = advisorHasBoots;
 
-    // ── #3: Enemy Damage-Type Classification ──
+    // â”€â”€ #3: Enemy Damage-Type Classification â”€â”€
     const classifyDamageType = (enemy) => {
       const champInfo = ddragonChampCache?.get(enemy.championName);
       const tags = champInfo?.tags || [];
@@ -4715,27 +4543,27 @@ async function pollLiveClient() {
     const apCount = enemyDamageProfile.filter(d => d.type === 'AP').length;
     const mixedCount = enemyDamageProfile.filter(d => d.type === 'MIXED').length;
     let damageVerdict = 'balanced';
-    if (adCount >= 4) damageVerdict = 'heavily AD — prioritize armor';
-    else if (apCount >= 4) damageVerdict = 'heavily AP — prioritize MR';
-    else if (adCount >= 3) damageVerdict = 'AD-leaning — consider armor';
-    else if (apCount >= 3) damageVerdict = 'AP-leaning — consider MR';
+    if (adCount >= 4) damageVerdict = 'heavily AD â€” prioritize armor';
+    else if (apCount >= 4) damageVerdict = 'heavily AP â€” prioritize MR';
+    else if (adCount >= 3) damageVerdict = 'AD-leaning â€” consider armor';
+    else if (apCount >= 3) damageVerdict = 'AP-leaning â€” consider MR';
     const damageProfileStr = enemyDamageProfile.map(d => `${d.name}=${d.type}`).join(', ');
-    const damageSection = `ENEMY DAMAGE PROFILE: ${adCount} AD / ${apCount} AP / ${mixedCount} Mixed — ${damageVerdict}\n  [${damageProfileStr}]`;
+    const damageSection = `ENEMY DAMAGE PROFILE: ${adCount} AD / ${apCount} AP / ${mixedCount} Mixed â€” ${damageVerdict}\n  [${damageProfileStr}]`;
 
-    // ── #4: Gold Efficiency Context ──
+    // â”€â”€ #4: Gold Efficiency Context â”€â”€
     const currentGold = activePlayer.currentGold || 0;
     let goldContext = '';
     if (currentGold < 800) {
-      goldContext = `GOLD CONTEXT: Very low gold (${currentGold}g) — can only afford basic components or wards.`;
+      goldContext = `GOLD CONTEXT: Very low gold (${currentGold}g) â€” can only afford basic components or wards.`;
     } else if (currentGold < 1300) {
-      goldContext = `GOLD CONTEXT: Low gold (${currentGold}g) — suggest components, not completed items.`;
+      goldContext = `GOLD CONTEXT: Low gold (${currentGold}g) â€” suggest components, not completed items.`;
     } else if (currentGold < 3000) {
-      goldContext = `GOLD CONTEXT: Moderate gold (${currentGold}g) — can afford mid-tier components or cheaper completed items.`;
+      goldContext = `GOLD CONTEXT: Moderate gold (${currentGold}g) â€” can afford mid-tier components or cheaper completed items.`;
     } else {
-      goldContext = `GOLD CONTEXT: High gold (${currentGold}g) — can buy a completed item directly.`;
+      goldContext = `GOLD CONTEXT: High gold (${currentGold}g) â€” can buy a completed item directly.`;
     }
 
-    // ── #7: Objective Awareness ──
+    // â”€â”€ #7: Objective Awareness â”€â”€
     let objectiveContext = '';
     try {
       const events = gameData.events?.Events || [];
@@ -4760,26 +4588,22 @@ async function pollLiveClient() {
       }
     } catch (e) { /* events may not exist in all API versions */ }
 
-    // ── Two-Step Prompting ──
+    // â”€â”€ Two-Step Prompting â”€â”€
     // Step 1: Quick threat analysis (cached for 60s to reduce latency)
     sendAdvisorDebug('[ai] Step 1: Threat analysis...');
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
+    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
     if (!apiKey) {
-      sendAdvisorDebug('[error] GEMINI_API_KEY not set in environment');
       return;
     }
-    const genAI = new GoogleGenerativeAI(apiKey);
 
-    const selectedModel = 'gemini-3-flash-preview'; // Flash for speed — pre-computed context makes it smart enough
-    sendAdvisorDebug(`[ai] Using model: ${selectedModel} (Flash + pre-computed context)`);
+    sendAdvisorDebug('[ai] Using model: DeepSeek V4 Flash (OpenRouter)');
 
-    // Fix #6: Eliminate Step 1 AI call — use pre-computed threat analysis instead
+    // Fix #6: Eliminate Step 1 AI call â€” use pre-computed threat analysis instead
     // The damage profile (damageSection) + enemy item breakdown is already computed above.
     // No need to waste an AI call asking "what are the threats?" when we've already calculated it.
     const threatAnalysis = `${damageSection}\nKey threat: ${(() => {
       const fedEnemy = enemies.find(e => (e.scores?.kills || 0) >= 5 || ((e.scores?.kills || 0) - (e.scores?.deaths || 0)) >= 4);
-      if (fedEnemy) return `${fedEnemy.championName} is FED (${fedEnemy.scores?.kills}/${fedEnemy.scores?.deaths}/${fedEnemy.scores?.assists}) — prioritize countering their damage type`;
+      if (fedEnemy) return `${fedEnemy.championName} is FED (${fedEnemy.scores?.kills}/${fedEnemy.scores?.deaths}/${fedEnemy.scores?.assists}) â€” prioritize countering their damage type`;
       const strongestEnemy = enemies.reduce((a, b) => ((b.scores?.kills || 0) - (b.scores?.deaths || 0)) > ((a.scores?.kills || 0) - (a.scores?.deaths || 0)) ? b : a, enemies[0]);
       return strongestEnemy ? `${strongestEnemy.championName} is the primary threat (${strongestEnemy.scores?.kills || 0}/${strongestEnemy.scores?.deaths || 0}/${strongestEnemy.scores?.assists || 0})` : 'No clear primary threat';
     })()}`;
@@ -4788,12 +4612,12 @@ async function pollLiveClient() {
     // Build recommendations using pre-computed analysis
     sendAdvisorDebug('[ai] Generating build recommendations...');
 
-    // ── #6: Advisor Memory — inject previous advice to prevent flip-flopping ──
+    // â”€â”€ #6: Advisor Memory â€” inject previous advice to prevent flip-flopping â”€â”€
     const prevAdviceSection = liveAdvisorState.previousAdvice
       ? `\nYOUR PREVIOUS ADVICE (${Math.round((Date.now() - liveAdvisorState.previousAdviceTime) / 60000)} min ago):\n${liveAdvisorState.previousAdvice}\nIMPORTANT: Do NOT flip-flop. Only change recommendations if the game state has SIGNIFICANTLY shifted since your last advice. If the same items are still correct, recommend them again.\n`
       : '';
 
-    // ── #5: Class-Filtered Valid Items ──
+    // â”€â”€ #5: Class-Filtered Valid Items â”€â”€
     const getFilteredValidItems = () => {
       if (!ddragonItemCache || !ddragonItemCache.byId) return 'Loading...';
       const champInfo = ddragonChampCache?.get(myPlayer?.championName);
@@ -4804,7 +4628,7 @@ async function pollLiveClient() {
         // CRITICAL: Only include Summoner's Rift items
         if (!d.isSR) continue;
         if (d.gold < 2000 || !d.from || d.from.length === 0) continue;
-        // Exclude mid-tier components that build INTO other items (e.g., Kindlegem → Spirit Visage)
+        // Exclude mid-tier components that build INTO other items (e.g., Kindlegem â†’ Spirit Visage)
         // Same logic as getValidItemsReference() for consistency
         if (d.into && d.into.length > 0) continue;
         // Check if item is relevant to champion class
@@ -4823,7 +4647,7 @@ async function pollLiveClient() {
         } else if (champTags.includes('Support')) {
           relevant = itemTags.some(t => ['SpellDamage', 'Health', 'Mana', 'ManaRegen', 'CooldownReduction', 'SpellBlock', 'Armor'].includes(t));
         } else {
-          relevant = true; // Unknown class — show everything
+          relevant = true; // Unknown class â€” show everything
         }
         // Always include defensive items
         if (!relevant && itemTags.some(t => alwaysIncludeTags.includes(t))) relevant = true;
@@ -4836,7 +4660,7 @@ async function pollLiveClient() {
       return validItems.sort().join(', ');
     };
 
-    const userMessage = `GAME TIME: ${gameMinutes}:${gameSecs.toString().padStart(2, '0')} — PHASE: ${gamePhase}
+    const userMessage = `GAME TIME: ${gameMinutes}:${gameSecs.toString().padStart(2, '0')} â€” PHASE: ${gamePhase}
 ${phaseGuidance}
 
 MY CHAMPION: ${myPlayer?.championName || '?'}
@@ -4844,7 +4668,7 @@ MY STATS: Level ${myPlayer?.level || '?'}, ${myPlayer?.scores?.kills || 0}/${myP
 MY ITEMS: [${myItems.join(', ') || 'None'}]
 HAS BOOTS: ${hasBoots ? 'Yes' : 'No'}
 ${goldContext}
-${currentlyBuilding ? `\nCURRENTLY BUILDING: ${currentlyBuilding} — I have components for this item. This MUST be NEXT ITEM 1.\n` : ''}
+${currentlyBuilding ? `\nCURRENTLY BUILDING: ${currentlyBuilding} â€” I have components for this item. This MUST be NEXT ITEM 1.\n` : ''}
 ${remainingBuildQueue ? `REMAINING BUILD QUEUE (in order):\n${remainingBuildQueue}\nFor NEXT ITEMS: Item 1 should be the first item in this queue (the one I'm building). Item 2 should be what comes after.\n` : ''}
 ${buildCompleteContext}
 ${damageSection}
@@ -4859,88 +4683,14 @@ ${allies.map(formatP).join('\n')}
 ORIGINAL RECOMMENDED BUILD (pre-game):
 ${liveAdvisorState.originalBuildText || 'No pre-game build available'}
 
-VALID ITEMS (current patch — ONLY suggest items from this list):
+VALID ITEMS (current patch â€” ONLY suggest items from this list):
 ${getFilteredValidItems()}
 
 Analyze the current game state and provide live build advice.`;
 
-    const model = genAI.getGenerativeModel({
-      model: selectedModel,
-      systemInstruction: `You are a League of Legends Live Game Advisor.
-You receive the current game state, ENEMY BUILDS, pre-computed threat analysis, and the player's REMAINING BUILD QUEUE.
 
-Use this decision framework to determine build adjustments:
-
-1. THREAT CHECK:
-   - If ENEMY DAMAGE PROFILE shows a primary threat with 5+ kills → counter their damage type FIRST
-   - If they are AP → prioritize MR (Wit's End, Maw, Kaenic Rookern, Mercury's Treads)
-   - If they are AD → prioritize Armor (Plated Steelcaps, Randuin's, Frozen Heart)
-
-2. DAMAGE SPLIT CHECK:
-   - If ENEMY DAMAGE PROFILE shows 3+ AP → your team needs MR items
-   - If ENEMY DAMAGE PROFILE shows 3+ AD → your team needs Armor items
-   - If damage is balanced → stick with the original build path
-
-3. GOLD EFFICIENCY:
-   - Check GOLD CONTEXT — NEVER suggest a 3400g item if player has 1200g
-   - If gold < 1000g → suggest components only
-   - If gold > 2500g → suggest completed items
-   - If player has components for an item (CURRENTLY BUILDING) → FINISH IT, don't pivot
-
-4. ANTI-HEAL CHECK:
-   - If any enemy has healing items (Bloodthirster, BotRK) or healing champions AND player has no Grievous Wounds → suggest anti-heal
-   - If player already has anti-heal → skip
-
-5. BOOT CHECK:
-   - If player has no boots at 10+ minutes → one of NEXT ITEMS must be boots
-   - If boots type doesn't match enemy damage profile → suggest swap (e.g., Berserker's → Merc Treads vs 3 AP)
-
-Return ONLY this format:
-
-ASSESSMENT
-<One sentence: build on track or needs changes? Reference specific enemy items/threats.>
-
-CHANGES
-<ItemToReplace> → <NewItem>: <reason referencing enemy builds>
-(Write "None needed" if no swaps)
-
-NEXT ITEMS
-1. <ItemName>
-2. <ItemName>
-(If build is complete, write "Build complete")
-
-SELL
-<CurrentItem> → <ReplacementItem>: <reason why this swap improves things>
-(Write "No replacement needed" if build is optimal. Only include this section when BUILD STATUS is COMPLETE.)
-
-THREAT
-<EnemyChampion> (<KDA>): <short counter tip based on their current items>
-
-Rules:
-- ONLY suggest items from the VALID ITEMS list provided. NEVER invent item names or use old/removed items.
-- USE THE ENEMY DAMAGE PROFILE: Build defensive items accordingly (armor vs MR).
-- REACT TO ENEMY BUILDS: If enemies have armor → suggest armor penetration. If enemies have MR → suggest magic pen.
-- GOLD CONTEXT: Do NOT recommend items the player can't afford.
-- BOOTS: If no upgraded boots past 10 minutes, one of NEXT ITEMS should be boots.
-- NEXT ITEMS: Item 1 = building RIGHT NOW. Item 2 = buy after that.
-- If CURRENTLY BUILDING an item (has components), Item 1 MUST be that same item. Do NOT suggest pivoting.
-- CHANGES is for swapping items later in the queue (positions 3+). Never swap Item 1 if player has components.
-- SELL SECTION: Only when build is 100% complete. Max 1 replacement.
-  - ADC quest boots CANNOT be sold — only boots→boots swap.
-  - Non-ADC boots only sold in ultra-late (30+ min) with all slots full.
-- CONSISTENCY: Do NOT flip-flop. Only change if game state significantly shifted.
-- Use EXACT item names from the VALID ITEMS list.
-- Be concise. Max 2-3 changes.
-- GAME PHASE MATTERS: ${phaseGuidance}`,
-      generationConfig: {
-        temperature: 0.3,
-        topP: 0.85,
-        topK: 40,
-      },
-    });
-
-    const result = await model.generateContent(userMessage);
-    const text = result.response.text();
+    const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', userMessage, { temperature: 0.2, maxTokens: 4096 });
+    const text = _rawText;
     sendAdvisorDebug(`[ai] Response received (${text.length} chars)`);
 
     // #6: Save response to memory for next advisor call (prevents flip-flopping)
@@ -4967,8 +4717,8 @@ Rules:
       if (!summary && !inChanges && !inNextItems && !inSell && trimmed && !trimmed.startsWith('CHANGES') && !trimmed.startsWith('NEXT ITEM') && !trimmed.startsWith('THREAT') && !trimmed.startsWith('SELL')) {
         summary = trimmed;
       }
-      if (inChanges && trimmed.includes('→')) {
-        const arrow = trimmed.indexOf('→');
+      if (inChanges && trimmed.includes('â†’')) {
+        const arrow = trimmed.indexOf('â†’');
         const colon = trimmed.indexOf(':', arrow);
         const cur = trimmed.substring(0, arrow).trim();
         const rec = colon > arrow ? trimmed.substring(arrow + 1, colon).trim() : trimmed.substring(arrow + 1).trim();
@@ -4977,9 +4727,9 @@ Rules:
           changes.push({ currentItem: cur, recommendedItem: rec, reason });
         }
       }
-      // Parse SELL section (same format as CHANGES: OldItem → NewItem: reason)
-      if (inSell && trimmed.includes('→')) {
-        const arrow = trimmed.indexOf('→');
+      // Parse SELL section (same format as CHANGES: OldItem â†’ NewItem: reason)
+      if (inSell && trimmed.includes('â†’')) {
+        const arrow = trimmed.indexOf('â†’');
         const colon = trimmed.indexOf(':', arrow);
         const cur = trimmed.substring(0, arrow).trim();
         const rec = colon > arrow ? trimmed.substring(arrow + 1, colon).trim() : trimmed.substring(arrow + 1).trim();
@@ -5006,11 +4756,11 @@ Rules:
       }
     }
 
-    // ── Validate all AI-suggested items against DDragon ──
+    // â”€â”€ Validate all AI-suggested items against DDragon â”€â”€
     const validateItem = async (name) => {
       const resolved = await resolveDdragonItem(name);
       if (!resolved) {
-        sendAdvisorDebug(`[validation] REJECTED invalid item: "${name}" — not found in DDragon`);
+        sendAdvisorDebug(`[validation] REJECTED invalid item: "${name}" â€” not found in DDragon`);
         return false;
       }
       return true;
@@ -5024,31 +4774,31 @@ Rules:
       return BOOT_PATTERNS_ADV.some(p => lower.includes(p));
     };
 
-    // Validate CHANGES — remove invalid recommendations
+    // Validate CHANGES â€” remove invalid recommendations
     for (let i = changes.length - 1; i >= 0; i--) {
       if (!(await validateItem(changes[i].recommendedItem))) {
         changes.splice(i, 1);
       }
     }
 
-    // Validate NEXT ITEMS — remove invalid items
+    // Validate NEXT ITEMS â€” remove invalid items
     for (let i = nextItems.length - 1; i >= 0; i--) {
       if (!(await validateItem(nextItems[i]))) {
         nextItems.splice(i, 1);
       }
     }
 
-    // ── Boots dedup: if player already has boots, strip any boots from suggestions ──
+    // â”€â”€ Boots dedup: if player already has boots, strip any boots from suggestions â”€â”€
     if (advisorHasBoots) {
       for (let i = nextItems.length - 1; i >= 0; i--) {
         if (await isBootsItem(nextItems[i])) {
-          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${nextItems[i]}" from NEXT ITEMS — player already has boots`);
+          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${nextItems[i]}" from NEXT ITEMS â€” player already has boots`);
           nextItems.splice(i, 1);
         }
       }
       for (let i = changes.length - 1; i >= 0; i--) {
         if (await isBootsItem(changes[i].recommendedItem)) {
-          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${changes[i].recommendedItem}" from CHANGES — player already has boots`);
+          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${changes[i].recommendedItem}" from CHANGES â€” player already has boots`);
           changes.splice(i, 1);
         }
       }
@@ -5078,16 +4828,16 @@ Rules:
     sendAdvisorDebug(`[advice] ${advice.summary}`);
     sendAdvisorDebug(`[advice] NEXT ITEMS parsed: [${nextItems.join(', ')}]`);
     if (sellReplacements.length > 0) {
-      sendAdvisorDebug(`[advice] SELL: ${sellReplacements.map(s => `${s.sellItem} → ${s.buyItem}`).join(', ')}`);
+      sendAdvisorDebug(`[advice] SELL: ${sellReplacements.map(s => `${s.sellItem} â†’ ${s.buyItem}`).join(', ')}`);
     }
     if (isBuildComplete) {
-      sendAdvisorDebug(`[advice] Build is COMPLETE — evaluating replacements`);
+      sendAdvisorDebug(`[advice] Build is COMPLETE â€” evaluating replacements`);
     }
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('live-advice', advice);
     }
 
-    // ── Apply updates to overlay ──
+    // â”€â”€ Apply updates to overlay â”€â”€
     if (overlayData && overlayData.buildItems && overlayData.buildItems.length > 0) {
       const updatedItems = [...overlayData.buildItems];
       let modified = false;
@@ -5109,7 +4859,7 @@ Rules:
       }
       sendAdvisorDebug(`[overlay] Lock index: ${lockIndex} (building: ${lockIndex < updatedItems.length ? updatedItems[lockIndex]?.name : 'end'})`);
 
-      // 1. Apply CHANGES (swap items) — skip lockIndex (currently building)
+      // 1. Apply CHANGES (swap items) â€” skip lockIndex (currently building)
       const safeChanges = changes.filter(c => {
         const curName = c.currentItem.toLowerCase().trim();
         if (lockIndex < updatedItems.length) {
@@ -5135,7 +4885,7 @@ Rules:
               updatedItems[i].name.toLowerCase().includes(curName) ||
               curName.includes(updatedItems[i].name.toLowerCase())) {
             const resolved = recResolved || await resolveDdragonItem(change.recommendedItem);
-            sendAdvisorDebug(`[overlay] Swapping item ${i}: ${updatedItems[i].name} → ${change.recommendedItem}${resolved ? ' (icon found)' : ' (no icon)'}`); 
+            sendAdvisorDebug(`[overlay] Swapping item ${i}: ${updatedItems[i].name} â†’ ${change.recommendedItem}${resolved ? ' (icon found)' : ' (no icon)'}`); 
             updatedItems[i] = {
               name: resolved?.name || change.recommendedItem,
               iconUrl: resolved?.iconUrl || '',
@@ -5149,9 +4899,9 @@ Rules:
         }
       }
 
-      // 2. Apply NEXT ITEMS — update overlay starting at lockIndex
-      //    NEXT ITEM 1 → lockIndex (the item to build now)
-      //    NEXT ITEM 2 → lockIndex+1 (the item after that) - UNLESS there's a boots/non-boots mismatch
+      // 2. Apply NEXT ITEMS â€” update overlay starting at lockIndex
+      //    NEXT ITEM 1 â†’ lockIndex (the item to build now)
+      //    NEXT ITEM 2 â†’ lockIndex+1 (the item after that) - UNLESS there's a boots/non-boots mismatch
       if (nextItems.length > 0) {
         let overlayIdx = lockIndex;
         for (let ni = 0; ni < nextItems.length && overlayIdx < updatedItems.length; ni++) {
@@ -5181,7 +4931,7 @@ Rules:
             if (resolved && resolved.id && updatedItems.some((ui, idx) => ui.id === resolved.id && idx !== targetIdx)) {
               sendAdvisorDebug(`[overlay] Skipped NEXT ITEM ${ni + 1}: ${suggestedName} already in build at another position (dedup)`);
             } else {
-              sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: replacing ${updatedItems[targetIdx].name} → ${suggestedName}${resolved ? ' (icon found)' : ' (no icon)'}`);
+              sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: replacing ${updatedItems[targetIdx].name} â†’ ${suggestedName}${resolved ? ' (icon found)' : ' (no icon)'}`);
               updatedItems[targetIdx] = {
                 name: resolved?.name || suggestedName,
                 iconUrl: resolved?.iconUrl || '',
@@ -5192,7 +4942,7 @@ Rules:
               modified = true;
             }
           } else {
-            sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: ${suggestedName} matches queue — no change`);
+            sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: ${suggestedName} matches queue â€” no change`);
           }
           
           overlayIdx++; // Advance to the next overlay slot for the next AI suggestion
@@ -5205,7 +4955,7 @@ Rules:
           const sellName = sell.sellItem.toLowerCase().trim();
           const resolved = await resolveDdragonItem(sell.buyItem);
           if (!resolved) {
-            sendAdvisorDebug(`[overlay] SELL: Could not resolve ${sell.buyItem} — skipping`);
+            sendAdvisorDebug(`[overlay] SELL: Could not resolve ${sell.buyItem} â€” skipping`);
             continue;
           }
 
@@ -5220,7 +4970,7 @@ Rules:
 
           // ADC quest boots: can NEVER be sold for a non-boots item
           if (isADC && isSellItemBoots && !isBuyItemBoots) {
-            sendAdvisorDebug(`[overlay] SELL: BLOCKED — ADC quest boots cannot be sold for non-boots item (${sell.sellItem} → ${sell.buyItem})`);
+            sendAdvisorDebug(`[overlay] SELL: BLOCKED â€” ADC quest boots cannot be sold for non-boots item (${sell.sellItem} â†’ ${sell.buyItem})`);
             continue;
           }
 
@@ -5235,7 +4985,7 @@ Rules:
           for (let i = 0; i < updatedItems.length; i++) {
             const biName = updatedItems[i].name.toLowerCase().trim();
             if (biName === sellName || biName.includes(sellName) || sellName.includes(biName)) {
-              sendAdvisorDebug(`[overlay] SELL: Replacing ${updatedItems[i].name} → ${sell.buyItem} (${sell.reason})`);
+              sendAdvisorDebug(`[overlay] SELL: Replacing ${updatedItems[i].name} â†’ ${sell.buyItem} (${sell.reason})`);
               updatedItems[i] = {
                 name: resolved.name || sell.buyItem,
                 iconUrl: resolved.iconUrl || '',
@@ -5255,7 +5005,7 @@ Rules:
       }
 
       if (modified) {
-        // Fix: Global safety net — deduplicate items by ID before pushing to overlay
+        // Fix: Global safety net â€” deduplicate items by ID before pushing to overlay
         const seenIds = new Set();
         for (let i = updatedItems.length - 1; i >= 0; i--) {
           if (updatedItems[i].id && seenIds.has(updatedItems[i].id)) {
@@ -5328,9 +5078,9 @@ ipcMain.handle('live-advisor-status', async () => {
   return { isPolling: liveAdvisorState.isPolling };
 });
 
-// ═══════════════════════════════════════════════════════════════
-// ── Loading Screen Scouting Report ────────────────────────────
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â”€â”€ Loading Screen Scouting Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 let scoutingState = {
   hasRun: false,        // only run once per game
@@ -5352,7 +5102,6 @@ async function riotApiGet(url) {
   const nodeFetch = require('node-fetch');
   // Settings key takes priority over .env
   const apiKey = getSetting('riotApiKey') || process.env.RIOT_API_KEY;
-  if (!apiKey) throw new Error('RIOT_API_KEY not set (check Settings > API Keys)');
   // Sync env in case other code reads it
   process.env.RIOT_API_KEY = apiKey;
   const res = await nodeFetch(url, {
@@ -5616,7 +5365,7 @@ async function runScoutingReport(gameData) {
   // Build richer AI prompt
   const formatStats = (ps) => {
     const soloLine = ps.soloQ
-      ? `SoloQ: ${ps.soloQ.tier} ${ps.soloQ.rank} ${ps.soloQ.lp}LP | ${ps.soloQ.winRate}% WR (${ps.soloQ.wins}W/${ps.soloQ.losses}L)${ps.soloQ.hotStreak ? ' 🔥STREAK' : ''}`
+      ? `SoloQ: ${ps.soloQ.tier} ${ps.soloQ.rank} ${ps.soloQ.lp}LP | ${ps.soloQ.winRate}% WR (${ps.soloQ.wins}W/${ps.soloQ.losses}L)${ps.soloQ.hotStreak ? ' ðŸ”¥STREAK' : ''}`
       : 'SoloQ: Unranked';
     const flexLine = ps.flexQ
       ? `FlexQ: ${ps.flexQ.tier} ${ps.flexQ.rank} | ${ps.flexQ.winRate}% WR (${ps.flexQ.totalGames} games)`
@@ -5630,7 +5379,7 @@ async function runScoutingReport(gameData) {
       ? `Recent 5: ${ps.recentWinRate}% WR, ${ps.recentAvgKDA} KDA, ${ps.recentAvgCS} CS/min`
       : '';
     return [
-      `${ps.riotId} — PLAYING: ${ps.championName} — Level ${ps.level}`,
+      `${ps.riotId} â€” PLAYING: ${ps.championName} â€” Level ${ps.level}`,
       `  ${soloLine}`,
       flexLine ? `  ${flexLine}` : null,
       avgLine ? `  ${avgLine}` : null,
@@ -5660,7 +5409,7 @@ Return ONLY a valid JSON object with this EXACT structure (no markdown, no code 
       "playstyleTag": "<3-6 word playstyle, e.g. 'Aggressive all-in diver', 'KDA farmer avoids fights', 'Tilted inter', 'Smurf will 1v9', 'First time champion', 'Safe laner scales well'>",
       "laneNote": "<one-line laning tip if they lane against you, or general warning>",
       "smurfProbability": <0-100 integer>,
-      "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE — based on recent W/L pattern, death trends, game durations>"
+      "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE â€” based on recent W/L pattern, death trends, game durations>"
     }
   ],
   "strategy": {
@@ -5674,7 +5423,7 @@ Return ONLY a valid JSON object with this EXACT structure (no markdown, no code 
     "winCondition": "<12-word max win condition>",
     "dangerLevel": "<LOW / MEDIUM / HIGH / EXTREME>"
   },
-  "coachBriefing": "<3 sentences MAX. Write as a coach talking to the player. Explain THE most important thing about this game: who is the biggest threat, what's the win condition, and what to absolutely avoid. Use player names and champion names. Be direct and confident, like a real analyst. Example: 'Tough game — their Vayne is on a 7-game win streak with 73% WR, likely a smurf. Your best shot is snowballing top where their Garen has a 38% WR. Force early drakes and close before Vayne scales.'>",
+  "coachBriefing": "<3 sentences MAX. Write as a coach talking to the player. Explain THE most important thing about this game: who is the biggest threat, what's the win condition, and what to absolutely avoid. Use player names and champion names. Be direct and confident, like a real analyst. Example: 'Tough game â€” their Vayne is on a 7-game win streak with 73% WR, likely a smurf. Your best shot is snowballing top where their Garen has a 38% WR. Force early drakes and close before Vayne scales.'>",
   "winProbability": <0-100 integer, your honest estimated pre-game win probability based on all 10 players stats, ranks, winrates, hot streaks, and champion matchups. 50 = even, 20 = very hard, 80 = very easy>,
   "laneMatchup": {
     "myChamp": "${myPlayer?.championName || '?'}",
@@ -5708,19 +5457,13 @@ IMPORTANT: Output ONLY the JSON object. No text before or after it.`;
 
   try {
     sendScoutDebug('[ai] Sending to Gemini...');
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
+    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
     if (!apiKey) {
-      sendScoutDebug('[error] GEMINI_API_KEY not set');
       return;
     }
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-05-20',
-    });
 
-    const result = await model.generateContent(scoutPrompt);
-    const text = result.response.text();
+    const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', scoutPrompt, { temperature: 0.2, maxTokens: 4096 });
+    const text = _rawText;
     sendScoutDebug(`[ai] Response received (${text.length} chars)`);
 
     // Parse structured JSON response from AI
@@ -5860,7 +5603,7 @@ ipcMain.handle('open-scout-window', async () => {
   return { ok: true };
 });
 
-// ── Scoreboard & Cooldown IPC ────────────────────────────────────
+// â”€â”€ Scoreboard & Cooldown IPC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ipcMain.handle('open-scoreboard-window', async () => {
   createScoreboardWindow();
   startScoreboardPolling();
@@ -5906,11 +5649,11 @@ ipcMain.on('overlay-set-ignore-mouse', (_e, ignore) => {
   }
 });
 
-// ═══════════════════════════════════════════════════════════════
-// ── Stats/Profile Window Data ────────────────────────────────
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â”€â”€ Stats/Profile Window Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// Champion name → DDragon filename normalization
+// Champion name â†’ DDragon filename normalization
 const CHAMP_NAME_MAP = {
   'Wukong': 'MonkeyKing',
   'FiddleSticks': 'Fiddlesticks',
@@ -5991,7 +5734,7 @@ async function fetchMyStats() {
   try {
     summoner = await riotApiGet(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`);
   } catch (e) {
-    log('WARN', `[stats] Summoner v4 failed (${e.message}) — some features unavailable`);
+    log('WARN', `[stats] Summoner v4 failed (${e.message}) â€” some features unavailable`);
   }
 
   // Get ranked data via PUUID (summoner.id is deprecated)
@@ -6001,7 +5744,7 @@ async function fetchMyStats() {
     soloQ = rankedData.find(r => r.queueType === 'RANKED_SOLO_5x5') || {};
     flexQ = rankedData.find(r => r.queueType === 'RANKED_FLEX_SR') || {};
   } catch (e) {
-    log('WARN', `[stats] League v4 failed (${e.message}) — rank data unavailable`);
+    log('WARN', `[stats] League v4 failed (${e.message}) â€” rank data unavailable`);
   }
 
   // Get match IDs (last 15)
@@ -6425,14 +6168,9 @@ ipcMain.handle('fetch-player-stats', async (_e, name, tag) => {
 
 async function analyzeMyStats(statsData) {
   try {
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
+    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
     if (!apiKey) return null;
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview',
-    });
 
     const matchSummary = statsData.matchHistory.map((m, i) =>
       `${i + 1}. ${m.championName} ${m.win ? 'WIN' : 'LOSS'} | KDA:${m.kills}/${m.deaths}/${m.assists} | KP:${m.kp || '?'}% | CS/m:${m.csMin} | DPM:${m.dpm}(avg:${m.avgDpm}) | DmgShare:${m.dmgShare || '?'}% | GoldShare:${m.goldShare || '?'}% | Vis:${m.visionScore} | ${m.isTopDmg ? 'TOP DMG' : ''} | ${m.duration} ${m.gameMode}`
@@ -6466,7 +6204,7 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
   "tip": "<one specific, actionable improvement tip, 15 words max>",
   "improvementAreas": ["<area1>", "<area2>"],
   "strengthAreas": ["<strength1>", "<strength2>"],
-  "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE — based on recent W/L pattern and death trends>",
+  "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE â€” based on recent W/L pattern and death trends>",
   "champRatings": {
     "<championName>": { "grade": "<S+/S/A/B/C/D/F>", "note": "<4-8 word strength/weakness note>" }
   }
@@ -6490,8 +6228,8 @@ GRADE CRITERIA:
 
 WIN with bad stats = got carried, not a good score. LOSS with great stats can still be 7-8/10.`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', prompt, { temperature: 0.2, maxTokens: 4096 });
+    const text = _rawText;
 
     // Parse structured JSON
     let aiResult = null;
@@ -6594,106 +6332,43 @@ ipcMain.handle('fetch-my-stats', async () => {
 
 ipcMain.handle('analyze-single-game', async (_event, gameIndex) => {
   try {
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const apiKey = getSetting('geminiApiKey') || process.env.GEMINI_API_KEY;
-    if (!apiKey) return JSON.stringify({ error: 'No Gemini API key configured.' });
-
     let stats = lastStatsData;
     if (!stats) { stats = await fetchMyStats(); lastStatsData = stats; }
 
     const m = stats.matchHistory[gameIndex];
     if (!m) return JSON.stringify({ error: 'Game not found.' });
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: getSetting('geminiModel') || process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview' });
+    const prompt = `Analyze this League of Legends game:
+Champion: ${m.championName || 'Unknown'} | Role: ${m.individualPosition || m.teamPosition || 'Unknown'}
+Result: ${m.win ? 'Victory' : 'Defeat'} | KDA: ${m.kills}/${m.deaths}/${m.assists}
+CS: ${m.totalMinionsKilled + (m.neutralMinionsKilled || 0)} | Gold: ${m.goldEarned}
+Game Duration: ${Math.round((m.gameDuration || 0) / 60)}min
+Damage Dealt: ${m.totalDamageDealtToChampions} | Damage Taken: ${m.totalDamageTaken}
+Vision Score: ${m.visionScore || 0}
+Items: ${(m.items || []).filter(Boolean).join(', ') || 'N/A'}
 
-    // Build detailed per-player stats with rankings
-    const allP = [...(m.myTeam || []), ...(m.enemyTeam || [])];
-    const sortDesc = (arr, fn) => [...arr].sort((a, b) => fn(b) - fn(a));
+Provide a concise analysis (3-5 bullet points) covering:
+1. Performance assessment (KDA, CS/min, damage contribution)
+2. What went well
+3. What could be improved
+4. Specific actionable tip for next time`;
 
-    const dpmRanked = sortDesc(allP, p => p.dpm);
-    const csRanked = sortDesc(allP, p => p.cs);
-    const goldRanked = sortDesc(allP, p => p.gold);
-    const visRanked = sortDesc(allP, p => p.vision);
-    const dmgRanked = sortDesc(allP, p => p.damage);
-
-    const me = allP.find(p => p.isMe);
-    const meStats = me ? {
-      dpmRank: dpmRanked.findIndex(p => p.isMe) + 1,
-      csRank: csRanked.findIndex(p => p.isMe) + 1,
-      goldRank: goldRanked.findIndex(p => p.isMe) + 1,
-      visRank: visRanked.findIndex(p => p.isMe) + 1,
-      dmgRank: dmgRanked.findIndex(p => p.isMe) + 1,
-    } : {};
-
-    const fmtPlayer = (p) => `  ${p.isMe ? '>>>' : '   '} ${p.championName.padEnd(14)} ${p.kills}/${p.deaths}/${p.assists} | ${p.dpm}DPM | ${p.cs}CS(${p.csMin}/m) | ${(p.gold/1000).toFixed(1)}kG(${p.goldMin}/m) | ${p.vision}vis | KP:${p.kp}% | ${(p.damage/1000).toFixed(1)}kDmg`;
-
-    const myTeamStr = (m.myTeam || []).map(fmtPlayer).join('\n');
-    const enemyStr = (m.enemyTeam || []).map(fmtPlayer).join('\n');
-
-    const prompt = `You're an elite League of Legends analyst. Perform a DEEP analysis of [THIS PLAYER] (marked with >>>) comparing against ALL 9 other players. Use actual numbers from the data.
-
-PLAYER: ${m.championName} (${stats.rank?.tier || 'UNRANKED'} ${stats.rank?.rank || ''})
-RESULT: ${m.win ? 'WIN' : 'LOSS'} | ${m.duration} | ${m.gameMode}
-MY STATS: ${m.kills}/${m.deaths}/${m.assists} | ${m.dpm}DPM | ${m.cs}CS (${m.csMin}/m) | ${m.visionScore}vis | KP:${m.kp||'?'}% | DmgShare:${m.dmgShare||'?'}% | GoldShare:${m.goldShare||'?'}%
-RANKINGS AMONG ALL 10 PLAYERS: DPM:#${meStats.dpmRank}/10 | CS:#${meStats.csRank}/10 | Gold:#${meStats.goldRank}/10 | Vision:#${meStats.visRank}/10 | TotalDmg:#${meStats.dmgRank}/10
-
-ALLY TEAM (${m.win ? 'WON' : 'LOST'}):
-${myTeamStr}
-
-ENEMY TEAM (${m.win ? 'LOST' : 'WON'}):
-${enemyStr}
-
-ANALYSIS REQUIREMENTS:
-- Compare THIS PLAYER's DPM, CS/min, Gold/min, Vision against EACH teammate and relevant enemies
-- Consider champion role (tank vs carry vs support) when judging stats
-- Judge if they carried, got carried, or were a liability based on ACTUAL NUMBERS
-- A WIN with bad stats = got carried. A LOSS with great stats can still be 7-8/10
-
-OUTPUT FORMAT (strictly this format, no additional text):
-RATING: <1-10>
-VERDICT: <Hard Carry / Carried Team / Strong / Solid / Got Carried / Below Average / Liability / Inted>
-RANK_IN_GAME: <1-10 ranking among ALL 10 players based on overall impact>
-STRENGTHS: <3 strengths WITH numbers, e.g. "#1 DPM at 1270 outperformed all 9", comma separated>
-WEAKNESSES: <3 weaknesses WITH numbers, e.g. "39% KP ranked #8 of 10", comma separated>
-DEEP_ANALYSIS: <2-3 sentences analyzing lane vs direct opponent, teamfight contribution, whether they deserved the win/loss. Reference specific champion names. Be brutally honest with numbers.>
-TIP: <one hyper-specific actionable improvement referencing actual stats, max 20 words>`;
-
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-
-    const getField = (label) => { const rx = new RegExp(label + '[:\\s]*(.+)', 'i'); const m2 = text.match(rx); return m2 ? m2[1].trim() : ''; };
-    const getMultiLine = (label) => {
-      const rx = new RegExp(label + '[:\\s]*(.+?)(?=\\n(?:RATING|VERDICT|RANK|STRENGTHS|WEAKNESSES|DEEP|TIP):|$)', 'is');
-      const m2 = text.match(rx);
-      return m2 ? m2[1].trim() : '';
-    };
-
-    const parsed = {
-      rating: parseInt(getField('RATING')) || m.aiScore,
-      verdict: getField('VERDICT') || 'Unknown',
-      rankInGame: parseInt(getField('RANK_IN_GAME')) || 5,
-      strengths: getField('STRENGTHS') || '',
-      weaknesses: getField('WEAKNESSES') || '',
-      deepAnalysis: getMultiLine('DEEP_ANALYSIS') || getField('DEEP_ANALYSIS') || '',
-      tip: getField('TIP') || '',
-    };
-    return JSON.stringify(parsed);
-  } catch (e) {
-    log('WARN', `[stats-ai] Single game analysis error: ${e.message}`);
-    return JSON.stringify({ error: `Analysis failed: ${e.message}` });
+    const analysis = await llmGenerate('You are a League of Legends coach. Be concise, specific, and constructive.', prompt, { temperature: 0.3, maxTokens: 2048 });
+    return JSON.stringify({ analysis });
+  } catch (err) {
+    console.error('[analyze-single-game] Error:', err.message);
+    return JSON.stringify({ error: err.message });
   }
 });
-
 
 ipcMain.handle('open-stats-window', async () => {
   createStatsWindow();
   return { ok: true };
 });
 
-// ═══════════════════════════════════════════════════════════════
-// ── Riot API Key Health Check ─────────────────────────────────
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â”€â”€ Riot API Key Health Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 let riotApiKeyState = {
   status: 'unknown',   // 'valid' | 'expired' | 'checking' | 'no-key' | 'unknown'
@@ -6805,7 +6480,7 @@ async function checkRiotApiKey() {
     }
   } catch (err) {
     console.log('[riot-api] Health check error:', err.message);
-    // Network error — keep previous status
+    // Network error â€” keep previous status
     if (riotApiKeyState.status === 'checking') {
       riotApiKeyState.status = riotApiKeyState.validatedAt ? 'valid' : 'unknown';
     }
@@ -6895,7 +6570,7 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
   }
 
   for (const rawLine of lines) {
-    const stripped = rawLine.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').replace(/^[-*•]\s*/, '');
+    const stripped = rawLine.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').replace(/^[-*â€¢]\s*/, '');
     const upperStripped = stripped.toUpperCase().replace(/[^A-Z\s]/g, '').trim();
 
     const matchedSection = ALL_SECTIONS.find(s => upperStripped === s || upperStripped.startsWith(s));
@@ -6951,7 +6626,7 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
     blocks,
   };
 
-  // ── Find League install path (multi-strategy) ──
+  // â”€â”€ Find League install path (multi-strategy) â”€â”€
   let targetDir = null;
 
   // Strategy 1: User's custom lolPath setting
@@ -7091,11 +6766,11 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
       'OVERHEAL': 9101, 'LEGEND: TENACITY': 9105, 'NULLIFYING ORB': 8224,
       'ZOMBIE WARD': 8137, 'GHOST PORO': 8141, 'EYEBALL COLLECTION': 8140,
       'INGENIOUS HUNTER': 8134,
-      // Shards (Season 2026 — Armor & Magic Resist REMOVED)
+      // Shards (Season 2026 â€” Armor & Magic Resist REMOVED)
       'ADAPTIVE FORCE': 5008, 'ATTACK SPEED': 5005, 'ABILITY HASTE': 5007,
       'HEALTH': 5011, 'HEALTH SCALING': 5001,
       'TENACITY AND SLOW RESIST': 5013, 'MOVEMENT SPEED': 5010,
-      // Old shard names → map to Health (closest defensive substitute)
+      // Old shard names â†’ map to Health (closest defensive substitute)
       'ARMOR': 5011, 'MAGIC RESIST': 5011,
     };
 
@@ -7123,7 +6798,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
 
     for (let i = 0; i < lines.length; i++) {
       const rawLine = lines[i];
-      const line = rawLine.trim().replace(/\*\*/g, '').replace(/^[-*•]\s*/, '').replace(/^#+\s*/, '');
+      const line = rawLine.trim().replace(/\*\*/g, '').replace(/^[-*â€¢]\s*/, '').replace(/^#+\s*/, '');
       const upper = line.toUpperCase().replace(/[^A-Z\s:,+]/g, '').trim();
 
       if (!line) continue;
@@ -7146,7 +6821,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
 
       if (!inRunesSection) continue;
 
-      // ── Tree Detection ──
+      // â”€â”€ Tree Detection â”€â”€
       // Handle: "Primary: Precision", "Primary Tree: Precision", "Primary (Precision)"
       const primaryMatch = line.match(/^(?:Primary|Primary Tree)\s*[:(]\s*(.+?)[\s)]*$/i);
       if (primaryMatch) {
@@ -7164,7 +6839,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         continue;
       }
 
-      // ── Keystone Detection ──
+      // â”€â”€ Keystone Detection â”€â”€
       const keystoneMatch = line.match(/^Keystone\s*:\s*(.+)$/i);
       if (keystoneMatch) {
         keystone = keystoneMatch[1].trim();
@@ -7172,7 +6847,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         continue;
       }
 
-      // ── Shard Detection ──
+      // â”€â”€ Shard Detection â”€â”€
       // Handle: "Shards: X, Y, Z" or "Stat Shards: X, Y, Z" or multi-line
       const shardsLineMatch = line.match(/^(?:Shards?|Stat Shards?|Offense|Flex|Defense)\s*:\s*(.+)$/i);
       if (shardsLineMatch || upper.includes('SHARDS')) {
@@ -7186,7 +6861,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         continue;
       }
 
-      // ── Slot Filling ──
+      // â”€â”€ Slot Filling â”€â”€
       if (section === 'primary' && line && !primaryTree.toUpperCase().includes(upper)) {
         primarySlots.push(line);
         logFn(`[line ${i}] Primary slot: "${line}"`);
@@ -7227,7 +6902,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
     }
 
     const perkIds = [];
-    // Shard aliases — map common AI variants to the exact PERK_IDS keys
+    // Shard aliases â€” map common AI variants to the exact PERK_IDS keys
     const SHARD_ALIASES = {
       'MOVE SPEED': 'MOVEMENT SPEED',
       'MOVESPEED': 'MOVEMENT SPEED',
@@ -7256,26 +6931,26 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         .trim();
 
       // Direct match
-      if (PERK_IDS[n]) { logFn(`  ✓ ${context}: "${name}" → ${PERK_IDS[n]} (direct)`); return PERK_IDS[n]; }
+      if (PERK_IDS[n]) { logFn(`  âœ“ ${context}: "${name}" â†’ ${PERK_IDS[n]} (direct)`); return PERK_IDS[n]; }
 
       // Legend prefix
-      if (PERK_IDS[`LEGEND: ${n}`]) { logFn(`  ✓ ${context}: "${name}" → ${PERK_IDS[`LEGEND: ${n}`]} (legend prefix)`); return PERK_IDS[`LEGEND: ${n}`]; }
+      if (PERK_IDS[`LEGEND: ${n}`]) { logFn(`  âœ“ ${context}: "${name}" â†’ ${PERK_IDS[`LEGEND: ${n}`]} (legend prefix)`); return PERK_IDS[`LEGEND: ${n}`]; }
 
       // Shard alias
       if (SHARD_ALIASES[n] && PERK_IDS[SHARD_ALIASES[n]]) {
-        logFn(`  ✓ ${context}: "${name}" → ${PERK_IDS[SHARD_ALIASES[n]]} (alias: ${SHARD_ALIASES[n]})`);
+        logFn(`  âœ“ ${context}: "${name}" â†’ ${PERK_IDS[SHARD_ALIASES[n]]} (alias: ${SHARD_ALIASES[n]})`);
         return PERK_IDS[SHARD_ALIASES[n]];
       }
 
-      // Fuzzy match — key contains name or name contains key
+      // Fuzzy match â€” key contains name or name contains key
       for (const [key, id] of Object.entries(PERK_IDS)) {
         if (key.includes(n) || n.includes(key)) {
-          logFn(`  ✓ ${context}: "${name}" → ${id} (fuzzy: ${key})`);
+          logFn(`  âœ“ ${context}: "${name}" â†’ ${id} (fuzzy: ${key})`);
           return id;
         }
       }
 
-      logFn(`  ✗ ${context}: "${name}" → FAILED TO RESOLVE`);
+      logFn(`  âœ— ${context}: "${name}" â†’ FAILED TO RESOLVE`);
       return null;
     };
 
@@ -7315,7 +6990,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
     ];
     const DEFAULT_SHARDS = [5008, 5008, 5011]; // Safe defaults per row
     // Remapping for removed shards (Season 2026)
-    const REMOVED_SHARD_REMAP = { 5002: 5011, 5003: 5011 }; // Armor→Health, MR→Health
+    const REMOVED_SHARD_REMAP = { 5002: 5011, 5003: 5011 }; // Armorâ†’Health, MRâ†’Health
 
     for (let i = 0; i < 3; i++) {
       const shard = statShards[i];
@@ -7323,12 +6998,12 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         let id = resolve(shard, `Shard[${i}]`);
         // Remap removed shards (Armor 5002, MR 5003)
         if (id && REMOVED_SHARD_REMAP[id]) {
-          logFn(`  ⚠ Shard[${i}]: Remapped removed shard ${id} → ${REMOVED_SHARD_REMAP[id]} (Season 2026)`);
+          logFn(`  âš  Shard[${i}]: Remapped removed shard ${id} â†’ ${REMOVED_SHARD_REMAP[id]} (Season 2026)`);
           id = REMOVED_SHARD_REMAP[id];
         }
         // Validate shard belongs to this row
         if (id && !SHARD_ROWS[i].includes(id)) {
-          logFn(`  ⚠ Shard[${i}]: ID ${id} not valid for row ${i+1} (valid: [${SHARD_ROWS[i]}]), using default ${DEFAULT_SHARDS[i]}`);
+          logFn(`  âš  Shard[${i}]: ID ${id} not valid for row ${i+1} (valid: [${SHARD_ROWS[i]}]), using default ${DEFAULT_SHARDS[i]}`);
           id = DEFAULT_SHARDS[i];
         }
         if (id) perkIds.push(id);
@@ -7344,27 +7019,27 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
 
     logFn(`Resolved ${perkIds.length}/9 perks: [${perkIds.join(', ')}]`);
 
-    // ══════════════════════════════════════════════════
-    // CRITICAL: 9/9 validation gate — NEVER send broken rune pages to LCU
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // CRITICAL: 9/9 validation gate â€” NEVER send broken rune pages to LCU
     // A broken page = random runes in game = lost games
-    // ══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     if (perkIds.length !== 9) {
-      logFn(`BLOCKED: Only resolved ${perkIds.length}/9 perks — refusing to send broken rune page to LCU`);
+      logFn(`BLOCKED: Only resolved ${perkIds.length}/9 perks â€” refusing to send broken rune page to LCU`);
       logFn(`  Keystone: ${keystone ? 'OK' : 'MISSING'}`);
       logFn(`  Primary slots: ${primarySlots.length}/3`);
       logFn(`  Secondary slots: ${secondarySlots.length}/2`);
       logFn(`  Shards: ${statShards.length}/3`);
-      return { ok: false, error: `Only resolved ${perkIds.length}/9 perks — rune export aborted to prevent broken rune page` };
+      return { ok: false, error: `Only resolved ${perkIds.length}/9 perks â€” rune export aborted to prevent broken rune page` };
     }
 
     if (!primaryStyleId || !subStyleId) {
-      logFn(`BLOCKED: Missing tree IDs — Primary=${primaryStyleId}, Secondary=${subStyleId}`);
-      return { ok: false, error: `Missing rune tree — Primary: "${primaryTree}", Secondary: "${secondaryTree}"` };
+      logFn(`BLOCKED: Missing tree IDs â€” Primary=${primaryStyleId}, Secondary=${subStyleId}`);
+      return { ok: false, error: `Missing rune tree â€” Primary: "${primaryTree}", Secondary: "${secondaryTree}"` };
     }
 
     if (perkIds.some(id => !id || id === 0)) {
       logFn(`BLOCKED: Found null/zero perk ID in: [${perkIds.join(', ')}]`);
-      return { ok: false, error: 'Found null/zero perk ID — rune export aborted' };
+      return { ok: false, error: 'Found null/zero perk ID â€” rune export aborted' };
     }
 
     const payload = {
@@ -7374,7 +7049,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
       selectedPerkIds: perkIds,
     };
 
-    logFn(`VALIDATED ✓ — Sending 9/9 perks to LCU`);
+    logFn(`VALIDATED âœ“ â€” Sending 9/9 perks to LCU`);
 
     // 3. Send to LCU
     logFn(`Payload: ${JSON.stringify(payload)}`);
@@ -7382,7 +7057,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
     const pages = await lcuCall('GET', '/lol-perks/v1/pages');
     if (!pages || pages.__lcuError || !Array.isArray(pages)) {
       logFn(`Failed to fetch rune pages. Response: ${JSON.stringify(pages)}`);
-      throw new Error('Could not fetch rune pages from LCU — is the client running?');
+      throw new Error('Could not fetch rune pages from LCU â€” is the client running?');
     }
     logFn(`Found ${pages.length} existing rune pages`);
 
@@ -7522,7 +7197,7 @@ ipcMain.handle('get-icon', async (_event, url, cacheKey) => {
   }
 });
 
-// ── App Lifecycle ───────────────────────────────────────────────────
+// â”€â”€ App Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 app.whenReady().then(async () => {
   // Initialize crash handlers first
@@ -7545,7 +7220,7 @@ app.whenReady().then(async () => {
   // Start embedded backend
   await startEmbeddedBackend();
 
-  // ── DDragon Cache Warming ──
+  // â”€â”€ DDragon Cache Warming â”€â”€
   // Pre-cache items, runes, and summoner spells so first build generation is instant
   (async () => {
     try {
@@ -7579,10 +7254,10 @@ app.whenReady().then(async () => {
     try {
       const lcuCreds = getLcuCredentials();
       if (lcuCreds) {
-        log('INFO', '[main] League client detected on startup — auto-opening stats');
+        log('INFO', '[main] League client detected on startup â€” auto-opening stats');
         autoRefreshStats();
       } else {
-        log('INFO', '[main] No League client on startup — stats will open manually');
+        log('INFO', '[main] No League client on startup â€” stats will open manually');
       }
     } catch (e) {
       log('WARN', '[main] Startup LCU check failed: ' + e.message);
@@ -7601,7 +7276,7 @@ app.whenReady().then(async () => {
       // Try centralized CDN first for meta builds + augments
       const cdnOk = await syncMetaFromCDN().catch(() => false);
       if (!cdnOk) {
-        // CDN unavailable — fall back to local Gemini grounding
+        // CDN unavailable â€” fall back to local Gemini grounding
         log('INFO', '[main] CDN unavailable, using Gemini grounding for meta builds');
         syncAllMetaBuilds(livePatch).catch(err => log('WARN', '[main] Meta build sync failed: ' + err.message));
       }
@@ -7639,7 +7314,7 @@ app.on('will-quit', () => {
     if (fs.existsSync(scriptPath)) fs.unlinkSync(scriptPath);
   } catch { }
 
-  // Force exit after cleanup — backend server keeps event loop alive
+  // Force exit after cleanup â€” backend server keeps event loop alive
   setTimeout(() => process.exit(0), 500);
 });
 

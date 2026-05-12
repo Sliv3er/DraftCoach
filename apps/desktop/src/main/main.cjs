@@ -2481,9 +2481,7 @@ ${userMessage.slice(0, 2000)}`;
 
         // Generate with streaming
         // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
-        if (!apiKey) {
-          return res.end();
-        }
+
 
         const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
 
@@ -4592,9 +4590,7 @@ async function pollLiveClient() {
     // Step 1: Quick threat analysis (cached for 60s to reduce latency)
     sendAdvisorDebug('[ai] Step 1: Threat analysis...');
     // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
-    if (!apiKey) {
-      return;
-    }
+
 
     sendAdvisorDebug('[ai] Using model: DeepSeek V4 Flash (OpenRouter)');
 
@@ -5458,9 +5454,7 @@ IMPORTANT: Output ONLY the JSON object. No text before or after it.`;
   try {
     sendScoutDebug('[ai] Sending to Gemini...');
     // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
-    if (!apiKey) {
-      return;
-    }
+
 
     const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', scoutPrompt, { temperature: 0.2, maxTokens: 4096 });
     const text = _rawText;
@@ -6169,7 +6163,7 @@ ipcMain.handle('fetch-player-stats', async (_e, name, tag) => {
 async function analyzeMyStats(statsData) {
   try {
     // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
-    if (!apiKey) return null;
+
 
 
     const matchSummary = statsData.matchHistory.map((m, i) =>

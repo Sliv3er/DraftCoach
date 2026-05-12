@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prep-bundle.cjs",
+    "build": "vite build && cd sidecar && npm install --omit=dev && cd .. && node scripts/prep-bundle.cjs",
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:build": "tauri build && node scripts/post-build.cjs"

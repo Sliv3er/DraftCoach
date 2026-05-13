@@ -4243,6 +4243,7 @@ async function fetchLiveClientData() {
 function sendAdvisorDebug(msg) {
   const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
   console.log('[live-advisor]', msg);
+  try { const _lp = require('path').join(process.env.APPDATA || '', 'DraftCoach', 'advisor.log'); require('fs').appendFileSync(_lp, line + '\n'); } catch(e) {}
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('live-advisor-debug', line);
   }
@@ -4685,7 +4686,35 @@ ${getFilteredValidItems()}
 Analyze the current game state and provide live build advice.`;
 
 
-    const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', userMessage, { temperature: 0.2, maxTokens: 4096 });
+    const advisorSystemPrompt = `You are a League of Legends live game build advisor. Respond in this EXACT format:
+
+ASSESSMENT
+One-line summary of the game state and recommendation.
+
+CHANGES
+OldItem → NewItem: reason
+(List item swaps from the current build. Write "None needed" if no swaps.)
+
+NEXT ITEMS
+1. ItemName: reason
+2. ItemName: reason
+(List the next 1-2 items to buy. Use exact item names from the VALID ITEMS list.)
+
+SELL
+OldItem → NewItem: reason
+(Only if build is complete and an item should be replaced. Otherwise omit.)
+
+THREAT
+One-line about the biggest enemy threat.
+
+RULES:
+- Use EXACT item names from the VALID ITEMS list provided
+- Use the → arrow character for item swaps
+- Keep each section short (1-3 lines max)
+- NEXT ITEMS must be a numbered list
+- If CURRENTLY BUILDING is specified, that MUST be NEXT ITEM 1`;
+
+    const _rawText = await llmGenerate(advisorSystemPrompt, userMessage, { temperature: 0.2, maxTokens: 4096 });
     const text = _rawText;
     sendAdvisorDebug(`[ai] Response received (${text.length} chars)`);
 

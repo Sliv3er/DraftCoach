@@ -4,7 +4,7 @@
   "private": true,
   "description": "League of Legends champ select assistance app",
   "scripts": {
-    "build:engine": "cd shared/engine && npx tsc -p tsconfig.engine.json",
+    "build:engine": "npx tsc -p shared/engine/tsconfig.engine.json",
     "build:backend": "cd apps/backend && npm run build",
     "build:renderer": "cd apps/desktop && npx webpack --mode production",
     "build:web": "cd apps/web && npm run build",
@@ -17,18 +17,20 @@
     "dev:all": "npx concurrently \"npm run dev:backend\" \"npm run dev:billing\" \"npm run dev:web\"",
     "dev": "npm run dev:all",
     "start:all": "node start-all.js",
-    "test": "cd shared && npx jest --config jest.config.js",
-    "test:engine": "cd shared && npx jest --config jest.config.js --testPathPattern=engine",
+    "test": "npx jest --config shared/jest.config.js",
+    "test:engine": "npx jest --config shared/jest.config.js --testPathPattern=engine",
     "validate:kb": "node tools/meta-builder/validate.js shared/kb/data",
     "postinstall": "cd apps/backend && npm install && cd apps/desktop && npm install && cd apps/web && npm install && cd apps/billing && npm install"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.11.5",
     "@types/jest": "^30.0.0",
     "docx": "^9.6.1",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
+    "typescript": "~5.8.3",
     "webpack-cli": "^7.0.2"
   },
   "dependencies": {

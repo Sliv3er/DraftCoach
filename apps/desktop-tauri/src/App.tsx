@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { BuildResponse, Role, GeminiModel } from './types';
+import { BuildResponse, Role, AiModel } from './types';
 import { ChampionPicker } from './components/ChampionPicker';
 import { BuildOutput } from './components/BuildOutput';
 import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow, backendReady, registerGlobalHotkey, unregisterAllHotkeys } from './bridge';
@@ -113,10 +113,8 @@ const ROLE_ICON_URLS: Record<Role, string> = {
   support: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png',
 };
 
-const MODEL_OPTIONS: { value: GeminiModel; label: string }[] = [
-  { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' },
-  { value: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro' },
-  { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash' },
+const MODEL_OPTIONS: { value: AiModel; label: string }[] = [
+  { value: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash' },
 ];
 
 // Map LCU position strings to our Role type
@@ -380,7 +378,7 @@ export function App() {
   const [status, setStatus] = useState<Status>('idle');
   const [buildResult, setBuildResult] = useState<BuildResponse | null>(null);
   const [iconLookups, setIconLookups] = useState<IconLookups | null>(null);
-  const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3-flash-preview');
+  const [selectedModel, setSelectedModel] = useState<AiModel>('deepseek/deepseek-v4-flash');
   const [autoDetect, setAutoDetect] = useState(true);
   const [autoDetectStatus, setAutoDetectStatus] = useState<'off' | 'searching' | 'connected' | 'error'>('off');
   const autoDetectRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -396,8 +394,8 @@ export function App() {
   const [overlayHasData, setOverlayHasData] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<Record<string, any>>({});
-  const [geminiKeyInput, setGeminiKeyInput] = useState('');
-  const [geminiKeySaveStatus, setGeminiKeySaveStatus] = useState<string>('');
+  const [openrouterKeyInput, setOpenrouterKeyInput] = useState('');
+  const [openrouterKeySaveStatus, setOpenrouterKeySaveStatus] = useState<string>('');
   const [runesModel, setRunesModel] = useState('');
   const [buildModel, setBuildModel] = useState('');
 
@@ -1191,13 +1189,10 @@ export function App() {
               className="model-select"
               value={selectedModel}
               onChange={async (e) => {
-                const model = e.target.value as GeminiModel;
+                const model = e.target.value as AiModel;
                 setSelectedModel(model);
-                if (model === 'gemini-3-flash-preview') {
-                  await handleSettingChange('generationMode', 'flash');
-                } else {
-                  await handleSettingChange('generationMode', 'hybrid');
-                }
+                await handleSettingChange('aiModel', model);
+                await handleSettingChange('generationMode', 'flash');
               }}
             >
               {MODEL_OPTIONS.map((m) => (
@@ -1528,22 +1523,22 @@ export function App() {
             <div className="settings-group-title">AI & Generation</div>
             <div style={{ padding: '10px 0' }}>
               <div style={{ marginBottom: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
-                Gemini API Key {settings.geminiApiKey && <span style={{ color: 'var(--accent-green)', fontSize: 10, marginLeft: 6 }}>● SAVED</span>}
+                OpenRouter API Key {settings.openrouterApiKey && <span style={{ color: 'var(--accent-green)', fontSize: 10, marginLeft: 6 }}>● SAVED</span>}
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <input
                   type="password"
-                  placeholder={settings.geminiApiKey ? '•••••••••••• (saved — paste to replace)' : 'Paste your Gemini API key here'}
-                  value={geminiKeyInput}
-                  onChange={e => setGeminiKeyInput(e.target.value)}
+                  placeholder={settings.openrouterApiKey ? '•••••••••••• (saved — paste to replace)' : 'Paste your OpenRouter API key here'}
+                  value={openrouterKeyInput}
+                  onChange={e => setOpenrouterKeyInput(e.target.value)}
                   onKeyDown={async e => {
-                    if (e.key === 'Enter' && geminiKeyInput.trim()) {
-                      setGeminiKeySaveStatus('Saving...');
-                      await ipcInvoke('set-setting', 'geminiApiKey', geminiKeyInput.trim());
-                      setSettings(prev => ({ ...prev, geminiApiKey: geminiKeyInput.trim() }));
-                      setGeminiKeyInput('');
-                      setGeminiKeySaveStatus('Saved! Restart the app to apply.');
-                      setTimeout(() => setGeminiKeySaveStatus(''), 5000);
+                    if (e.key === 'Enter' && openrouterKeyInput.trim()) {
+                      setOpenrouterKeySaveStatus('Saving...');
+                      await ipcInvoke('set-setting', 'openrouterApiKey', openrouterKeyInput.trim());
+                      setSettings(prev => ({ ...prev, openrouterApiKey: openrouterKeyInput.trim() }));
+                      setOpenrouterKeyInput('');
+                      setOpenrouterKeySaveStatus('Saved! Restart the app to apply.');
+                      setTimeout(() => setOpenrouterKeySaveStatus(''), 5000);
                     }
                   }}
                   style={{
@@ -1559,22 +1554,22 @@ export function App() {
                 />
                 <button
                   onClick={async () => {
-                    if (!geminiKeyInput.trim()) {
-                      setGeminiKeySaveStatus('Please enter a key first');
-                      setTimeout(() => setGeminiKeySaveStatus(''), 3000);
+                    if (!openrouterKeyInput.trim()) {
+                      setOpenrouterKeySaveStatus('Please enter a key first');
+                      setTimeout(() => setOpenrouterKeySaveStatus(''), 3000);
                       return;
                     }
-                    setGeminiKeySaveStatus('Saving...');
-                    const result = await ipcInvoke('set-setting', 'geminiApiKey', geminiKeyInput.trim());
+                    setOpenrouterKeySaveStatus('Saving...');
+                    const result = await ipcInvoke('set-setting', 'openrouterApiKey', openrouterKeyInput.trim());
                     if (result === null) {
-                      setGeminiKeySaveStatus('Failed — backend not running');
-                      setTimeout(() => setGeminiKeySaveStatus(''), 5000);
+                      setOpenrouterKeySaveStatus('Failed — backend not running');
+                      setTimeout(() => setOpenrouterKeySaveStatus(''), 5000);
                       return;
                     }
-                    setSettings(prev => ({ ...prev, geminiApiKey: geminiKeyInput.trim() }));
-                    setGeminiKeyInput('');
-                    setGeminiKeySaveStatus('Saved! Restart app to apply.');
-                    setTimeout(() => setGeminiKeySaveStatus(''), 5000);
+                    setSettings(prev => ({ ...prev, openrouterApiKey: openrouterKeyInput.trim() }));
+                    setOpenrouterKeyInput('');
+                    setOpenrouterKeySaveStatus('Saved! Restart app to apply.');
+                    setTimeout(() => setOpenrouterKeySaveStatus(''), 5000);
                   }}
                   style={{
                     padding: '8px 16px',
@@ -1591,18 +1586,18 @@ export function App() {
                   Save Key
                 </button>
               </div>
-              {geminiKeySaveStatus && (
+              {openrouterKeySaveStatus && (
                 <div style={{
                   marginTop: 8,
                   fontSize: 11,
-                  color: geminiKeySaveStatus.includes('Saved') ? 'var(--accent-green)' :
-                         geminiKeySaveStatus.includes('Failed') ? '#E84057' : 'var(--text-secondary)',
+                  color: openrouterKeySaveStatus.includes('Saved') ? 'var(--accent-green)' :
+                         openrouterKeySaveStatus.includes('Failed') ? '#E84057' : 'var(--text-secondary)',
                 }}>
-                  {geminiKeySaveStatus}
+                  {openrouterKeySaveStatus}
                 </div>
               )}
               <div className="settings-desc" style={{ marginTop: 8 }}>
-                Get your API key at <span style={{ color: 'var(--gold)' }}>https://aistudio.google.com/apikey</span>
+                Get your API key at <span style={{ color: 'var(--gold)' }}>https://openrouter.ai/settings/keys</span>
               </div>
             </div>
             <label className="settings-toggle-row" style={{ marginTop: 10 }}>

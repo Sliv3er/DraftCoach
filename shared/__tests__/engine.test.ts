@@ -3,6 +3,7 @@
 
 import { buildCompProfile } from '../engine/comp-profiler';
 import { recommend, buildDraftFromUI, toEngineRole } from '../engine/engine';
+import { initKB } from '../kb/kb-loader';
 import { validateKBDirectory } from '../kb/kb-validator';
 import { EngineDraftState, CompProfile, ChampionKBEntry, BuildPlan } from '../engine-types';
 
@@ -102,14 +103,18 @@ describe('kb-validator', () => {
 
     test('patch consistency is checked', () => {
         const result = validateKBDirectory(KB_DIR);
-        // All files should have the same patch
-        expect(result.patch).toBe('26.4');
+        // All files should have the same current patch.
+        expect(result.patch).toBe('26.5');
     });
 });
 
 // ─── Engine Integration Test ────────────────────────────────────────
 
 describe('engine integration', () => {
+    beforeAll(async () => {
+        await initKB();
+    }, 60000);
+
     test('recommend() produces valid output for Xerath SUPPORT', () => {
         const draft = makeDraft();
         const result = recommend(draft);

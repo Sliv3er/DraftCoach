@@ -42,7 +42,8 @@ export interface CacheEntry {
 }
 
 export interface AppConfig {
-  geminiModel: 'gemini-3-flash-preview' | 'gemini-3.1-pro-preview';
+  aiProvider: 'openrouter';
+  aiModel: 'deepseek/deepseek-v4-flash';
   backendPort: number;
 }
 

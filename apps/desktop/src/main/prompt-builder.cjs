@@ -1,6 +1,6 @@
 /**
  * prompt-builder.js
- * Centralised home for all Gemini system prompts and context builders.
+ * Centralised home for all DeepSeek/OpenRouter system prompts and context builders.
  *
  * ALL champion data is fetched DYNAMICALLY from DDragon API at runtime —
  * zero hardcoded champions, always current patch, covers all 160+ champions.

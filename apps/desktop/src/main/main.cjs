@@ -38,7 +38,7 @@ const isDev = !app.isPackaged && !require('fs').existsSync(_distIndexPath);
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  OPENROUTER / DEEPSEEK V4 FLASH â€” Universal LLM wrapper
-//  Replaces all Gemini SDK calls with OpenRouter API (OpenAI-compatible)
+//  Uses OpenRouter API (OpenAI-compatible) for DeepSeek generation.
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_MODEL = 'deepseek/deepseek-v4-flash';
@@ -893,13 +893,13 @@ Rules:
         patch: liveMajorMinor,
       };
     } catch (apiError) {
-      log('ERROR', '[RAG] Gemini grounding failed, using fallback:', apiError.message);
+      log('ERROR', '[RAG] DeepSeek/OpenRouter grounding failed, using fallback:', apiError.message);
       newDataset = { metaContext: `Patch ${liveMajorMinor} is live. Grounding failed â€” adapt to global changes.`, championMeta: {}, patch: liveMajorMinor };
     }
 
     ensureRagDir();
     fs.writeFileSync(RAG_DATASET_FILE, JSON.stringify(newDataset, null, 2), 'utf-8');
-    saveRagMeta({ patch: liveMajorMinor, updatedAt: new Date().toISOString(), source: 'gemini-grounding-search' });
+    saveRagMeta({ patch: liveMajorMinor, updatedAt: new Date().toISOString(), source: 'openrouter-deepseek' });
     log('INFO', `[RAG] Pipeline completed for Patch ${liveMajorMinor}`);
   } catch (err) {
     log('ERROR', '[RAG] Sync failed:', err.message);
@@ -931,8 +931,8 @@ function seedRagFromBundle() {
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  META BUILD REFERENCE SYSTEM
-//  Fetches per-champion popular builds from u.gg/op.gg via Gemini
-//  Google Search grounding. Pre-fetched for ALL champions on patch
+//  Fetches per-champion popular builds from reference sites via DeepSeek/OpenRouter.
+//  Pre-fetched for ALL champions on patch
 //  change, cached to disk, injected as guidance into the AI prompt.
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
@@ -1028,7 +1028,7 @@ async function syncMetaFromCDN() {
     log('INFO', `[cdn] Downloaded ${downloaded} meta builds + augments from CDN (patch ${manifest.patch})`);
     return true;
   } catch (err) {
-    log('WARN', `[cdn] CDN sync failed: ${err.message}. Will use local Gemini grounding as fallback.`);
+    log('WARN', `[cdn] CDN sync failed: ${err.message}. Will use local DeepSeek/OpenRouter grounding as fallback.`);
     return false;
   }
 }
@@ -1087,7 +1087,7 @@ function formatMetaReference(data, isOffRole = false) {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  MOBALYTICS KB BUILD REFERENCE SYSTEM (replaces old Gemini meta)
+//  MOBALYTICS KB BUILD REFERENCE SYSTEM
 //  Reads build-templates.json from shared/kb/data (dev) or
 //  kb-data/ (production). Injects all 3 variants as AI baseline.
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1257,7 +1257,7 @@ function getAugmentsReference() {
 }
 
 /**
- * Batch-fetch meta builds for a group of champions via Gemini + Google Search grounding.
+ * Batch-fetch meta builds for a group of champions via DeepSeek/OpenRouter reference lookup.
  * Returns array of { champion, role, metaBuild } objects.
  */
 async function fetchMetaBuildBatch(genAI, champions, patch) {
@@ -1310,7 +1310,7 @@ Rules:
 
 /**
  * Sync meta builds for ALL champions. Runs in background on patch change.
- * Batches 10 champions per Gemini call to minimize API usage.
+ * Batches 10 champions per OpenRouter call to minimize API usage.
  */
 async function syncAllMetaBuilds(livePatch, force = false) {
   if (isMetaSyncing) {
@@ -1330,7 +1330,7 @@ async function syncAllMetaBuilds(livePatch, force = false) {
   log('INFO', `[MetaBuild] Starting full meta build sync for Patch ${patchMajorMinor}...`);
 
   try {
-    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
+    // Using DeepSeek V4 Flash via OpenRouter.
 
 
     // Get ALL champions from DDragon
@@ -1399,7 +1399,7 @@ async function syncAllMetaBuilds(livePatch, force = false) {
       patch: patchMajorMinor,
       updatedAt: new Date().toISOString(),
       champCount: totalCached,
-      source: 'gemini-grounding-search',
+      source: 'openrouter-deepseek',
     });
 
     log('INFO', `[MetaBuild] Sync complete! Cached ${totalCached} champion builds for Patch ${patchMajorMinor}`);
@@ -1517,8 +1517,7 @@ function startEmbeddedBackend() {
       all[key] = { key, timestamp: Date.now(), text, patchDetected, source: 'grounded' };
       writeCache(all);
     }
-
-    // Gemini â€” Dynamic patch injection (delegated to prompt-builder.js)
+    // DeepSeek/OpenRouter dynamic patch injection (delegated to prompt-builder.js)
     function buildSystemPrompt(patch) {
       return _prompts.buildSystemPrompt(patch);
     }
@@ -1660,14 +1659,8 @@ COMMON MISTAKES â€” NEVER DO THESE:
       return _prompts.buildShortPrompt(patch);
     }
 
-    const VALID_MODELS = [
-      'gemini-3-pro-preview',
-      'gemini-3.1-pro-preview',
-      'gemini-3-flash-preview',
-    ];
-
     // â”€â”€ JSON Structured Output Schema â”€â”€
-    // Forces Gemini to output exact structure â€” eliminates all format deviations
+    // Keeps DeepSeek/OpenRouter output aligned with the expected response shape.
     const BUILD_RESPONSE_SCHEMA = {
       type: "object",
       properties: {
@@ -2263,7 +2256,7 @@ ${userMessage.slice(0, 2000)}`;
     }
 
     /**
-     * Attempt to repair truncated JSON from Gemini structured output.
+     * Attempt to repair truncated JSON from structured AI output.
      * Closes unclosed strings, arrays, and objects.
      */
     function repairTruncatedJson(raw) {
@@ -2379,7 +2372,7 @@ ${userMessage.slice(0, 2000)}`;
     function buildCacheKey(body, patchKey) {
       const allies = [...(body.allies || [])].sort().join(',');
       const enemies = [...(body.enemies || [])].sort().join(',');
-      const modelKey = body.model || process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview';
+      const modelKey = body.model || process.env.OPENROUTER_MODEL || OPENROUTER_MODEL;
       return `${patchKey}|${modelKey}|${body.myChampion}|${body.role}|${allies}|${enemies}`;
     }
 
@@ -2480,7 +2473,7 @@ ${userMessage.slice(0, 2000)}`;
         }
 
         // Generate with streaming
-        // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
+        // Using DeepSeek V4 Flash via OpenRouter.
 
 
         const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
@@ -4590,7 +4583,7 @@ async function pollLiveClient() {
     // â”€â”€ Two-Step Prompting â”€â”€
     // Step 1: Quick threat analysis (cached for 60s to reduce latency)
     sendAdvisorDebug('[ai] Step 1: Threat analysis...');
-    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
+    // Using DeepSeek V4 Flash via OpenRouter.
 
 
     sendAdvisorDebug('[ai] Using model: DeepSeek V4 Flash (OpenRouter)');
@@ -5481,8 +5474,8 @@ IMPORTANT: Output ONLY the JSON object. No text before or after it.`;
 
 
   try {
-    sendScoutDebug('[ai] Sending to Gemini...');
-    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
+    sendScoutDebug('[ai] Sending to DeepSeek via OpenRouter...');
+    // Using DeepSeek V4 Flash via OpenRouter.
 
 
     const _rawText = await llmGenerate('You are a League of Legends expert analyst. Be concise and accurate.', scoutPrompt, { temperature: 0.2, maxTokens: 4096 });
@@ -6191,7 +6184,7 @@ ipcMain.handle('fetch-player-stats', async (_e, name, tag) => {
 
 async function analyzeMyStats(statsData) {
   try {
-    // Using DeepSeek V4 Flash via OpenRouter (replaces Gemini)
+    // Using DeepSeek V4 Flash via OpenRouter.
 
 
 
@@ -7299,8 +7292,8 @@ app.whenReady().then(async () => {
       // Try centralized CDN first for meta builds + augments
       const cdnOk = await syncMetaFromCDN().catch(() => false);
       if (!cdnOk) {
-        // CDN unavailable â€” fall back to local Gemini grounding
-        log('INFO', '[main] CDN unavailable, using Gemini grounding for meta builds');
+        // CDN unavailable: fall back to local DeepSeek/OpenRouter grounding.
+        log('INFO', '[main] CDN unavailable, using DeepSeek/OpenRouter grounding for meta builds');
         syncAllMetaBuilds(livePatch).catch(err => log('WARN', '[main] Meta build sync failed: ' + err.message));
       }
     } catch (err) {

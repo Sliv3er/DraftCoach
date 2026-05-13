@@ -1096,14 +1096,15 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
     );
   }
 
-  if (!result.ok) {
+  if (result.ok === false) {
+    const errorResult = result;
     return (
       <div className="build-section build-section-error">
         <div className="build-section-header">
           <h3 className="error-title">Error</h3>
         </div>
-        <div className="error-message">{result.message}</div>
-        {result.canRetry && <div className="error-retry-hint">You can retry the request.</div>}
+        <div className="error-message">{errorResult.message}</div>
+        {errorResult.canRetry && <div className="error-retry-hint">You can retry the request.</div>}
       </div>
     );
   }

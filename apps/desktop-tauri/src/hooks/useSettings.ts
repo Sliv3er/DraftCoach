@@ -15,7 +15,8 @@ const DEFAULT_SETTINGS: Settings = {
   showScoreboard: true,
   showLiveAdvisor: true,
   pingRegion: 'na1',
-  geminiModel: 'gemini-2.0-flash',
+  aiProvider: 'openrouter',
+  aiModel: 'deepseek/deepseek-v4-flash',
   hotkeys: {},
 };
 

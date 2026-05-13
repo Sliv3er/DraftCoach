@@ -55,7 +55,7 @@ describe('Integration Tests - 5 Critical Scenarios', () => {
         const hasHealthPotion = startingItems.some(i => i.id === '2003');
         
         // Check for jungle starters
-        const jungleStarterIds = ['1039', '1041', '1042', '1043', '1101', '1102', '1103', '1104'];
+        const jungleStarterIds = ['1101', '1102', '1103', '1105', '1106', '1107'];
         const hasJungleStarter = startingItems.some(i => jungleStarterIds.includes(i.id));
         
         console.log(`- Total items: ${startingItems.length} (expected: 2)`);
@@ -148,7 +148,7 @@ describe('Integration Tests - 5 Critical Scenarios', () => {
         const supportItemIds = ['3850', '3851', '3853', '3854', '3855', '3856', '3857', '3858', '3859', 
                                '4860', '4861', '4862', '4863', '4864'];
         // Jungle items
-        const jungleItemIds = ['1039', '1041', '1042', '1043', '1101', '1102', '1103', '1104'];
+        const jungleItemIds = ['1101', '1102', '1103', '1105', '1106', '1107'];
 
         const hasSupportItem = 
             startingItems.some(i => supportItemIds.includes(i.id)) ||

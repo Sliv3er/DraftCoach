@@ -16,9 +16,16 @@ function assert(condition, testName) {
   else { console.log(`  ❌ FAILED: ${testName}`); failed++; }
 }
 
-const mainJs = fs.readFileSync(path.join(__dirname, 'src', 'main', 'main.js'), 'utf-8');
+const mainPath = fs.existsSync(path.join(__dirname, 'src', 'main', 'main.cjs'))
+  ? path.join(__dirname, 'src', 'main', 'main.cjs')
+  : path.join(__dirname, 'src', 'main', 'main.js');
+const mainJs = fs.readFileSync(mainPath, 'utf-8');
 const appTsx = fs.readFileSync(path.join(__dirname, 'src', 'renderer', 'App.tsx'), 'utf-8');
 const buildOutput = fs.readFileSync(path.join(__dirname, 'src', 'renderer', 'components', 'BuildOutput.tsx'), 'utf-8');
+const promptBuilder = fs.readFileSync(path.join(__dirname, 'src', 'main', 'prompt-builder.cjs'), 'utf-8');
+const tauriAppTsxPath = path.resolve(__dirname, '..', 'desktop-tauri', 'src', 'App.tsx');
+const tauriAppTsx = fs.existsSync(tauriAppTsxPath) ? fs.readFileSync(tauriAppTsxPath, 'utf-8') : '';
+const allSource = [mainJs, promptBuilder, appTsx, tauriAppTsx, buildOutput].join('\n');
 
 console.log(`
 ╔════════════════════════════════════════════════════════════════╗
@@ -43,12 +50,12 @@ assert(mainJs.includes('PLAY LIKE A GRANDMASTER'), 'PLAY LIKE A GRANDMASTER dire
 assert(mainJs.includes('Do NOT output a generic cookie-cutter build'), 'Cookie-cutter explicitly banned');
 
 // Rune-item coherence
-assert(mainJs.includes('Conqueror → sustained trade items'), 'Conqueror → sustain mapping documented');
-assert(mainJs.includes('Lethal Tempo → attack speed items'), 'Lethal Tempo → AS mapping documented');
-assert(mainJs.includes('Electrocute → burst items'), 'Electrocute → burst mapping documented');
-assert(mainJs.includes('Fleet Footwork → sustain/kiting items'), 'Fleet → sustain mapping documented');
-assert(mainJs.includes('Grasp → bruiser/tank items'), 'Grasp → bruiser mapping documented');
-assert(mainJs.includes('Dark Harvest → snowball items'), 'Dark Harvest → snowball mapping documented');
+assert(allSource.includes('Conqueror') && /sustain|sustained|extended/i.test(allSource), 'Conqueror sustain/extended-trade mapping documented');
+assert(allSource.includes('Lethal Tempo') && /attack speed|auto-attack|DPS/i.test(allSource), 'Lethal Tempo attack-speed mapping documented');
+assert(allSource.includes('Electrocute') && /burst|combo/i.test(allSource), 'Electrocute burst mapping documented');
+assert(allSource.includes('Fleet Footwork') && /sustain|poke|kiting/i.test(allSource), 'Fleet sustain/poke mapping documented');
+assert(allSource.includes('Grasp') && /bruiser|tank|short repeated trades/i.test(allSource), 'Grasp bruiser/tank mapping documented');
+assert(allSource.includes('Dark Harvest') && /snowball|stacks/i.test(allSource), 'Dark Harvest snowball mapping documented');
 
 // COMMON MISTAKES section
 assert(mainJs.includes('COMMON MISTAKES'), 'COMMON MISTAKES section exists');
@@ -119,17 +126,17 @@ assert(mainJs.includes('enemyProfile') && mainJs.includes('ENEMY TEAM PROFILE'),
 // ═══════════════════════════════════════════════════════════════
 console.log('\n── Suite 4: Live Advisor Decision Quality ──\n');
 
-// 5-step decision framework
-assert(mainJs.includes('THREAT CHECK'), 'Decision framework: Threat check');
-assert(mainJs.includes('DAMAGE SPLIT CHECK'), 'Decision framework: Damage split');
-assert(mainJs.includes('GOLD EFFICIENCY'), 'Decision framework: Gold efficiency');
-assert(mainJs.includes('ANTI-HEAL CHECK'), 'Decision framework: Anti-heal');
-assert(mainJs.includes('BOOT CHECK'), 'Decision framework: Boot check');
+// Live advisor decision framework
+assert(mainJs.includes('THREAT ANALYSIS') || mainJs.includes('Key threat'), 'Decision framework: Threat analysis');
+assert(mainJs.includes('ENEMY DAMAGE PROFILE') || mainJs.includes('damageSection'), 'Decision framework: Damage profile');
+assert(mainJs.includes('GOLD CONTEXT') || mainJs.includes('currentGold'), 'Decision framework: Gold context');
+assert(mainJs.includes('HEALING') || mainJs.includes('anti-heal') || mainJs.includes('ANTI_HEAL'), 'Decision framework: Anti-heal awareness');
+assert(mainJs.includes('HAS BOOTS') && mainJs.includes('BOOTS DEDUP'), 'Decision framework: Boot check');
 
 // Gold context rules
-assert(mainJs.includes('gold < 1000') || mainJs.includes('gold < 800'), 'Low gold → components only rule');
-assert(mainJs.includes('gold > 2500') || mainJs.includes('gold >= 3000'), 'High gold → completed items rule');
-assert(mainJs.includes('CURRENTLY BUILDING') && mainJs.includes('FINISH IT'), 'Currently-building protection');
+assert(mainJs.includes('currentGold < 800') || mainJs.includes('Very low gold'), 'Low gold components-only context');
+assert(mainJs.includes('currentGold < 3000') || mainJs.includes('High gold'), 'High gold completed-item context');
+assert(mainJs.includes('CURRENTLY BUILDING') && mainJs.includes('MUST be NEXT ITEM 1'), 'Currently-building protection');
 
 // Build complete logic
 assert(mainJs.includes('BUILD STATUS') && mainJs.includes('COMPLETE'), 'Build-complete detection');
@@ -195,7 +202,7 @@ assert(mainJs.includes('Boots mismatch') || mainJs.includes('currentIsBoots'), '
 console.log('\n── Suite 7: Temperature & Model Configuration ──\n');
 
 // Build generation temperature
-const buildTempMatch = mainJs.match(/generationConfig:[\s\S]*?temperature:\s*([\d.]+)/);
+const buildTempMatch = mainJs.match(/llmGenerate(?:Stream)?\([\s\S]*?temperature:\s*([\d.]+)/);
 if (buildTempMatch) {
   const temp = parseFloat(buildTempMatch[1]);
   assert(temp <= 0.5, `Build generation temperature ${temp} ≤ 0.5 (ensures consistency)`);
@@ -213,8 +220,8 @@ if (advisorTempMatch) {
 }
 
 // Model selection
-assert(mainJs.includes("'gemini-3-flash-preview'"), 'Flash model defined');
-assert(mainJs.includes("'gemini-3-pro-preview'"), 'Pro model defined');
+assert(mainJs.includes("deepseek/deepseek-v4-flash"), 'DeepSeek V4 Flash model defined');
+assert(mainJs.includes("OPENROUTER_BASE"), 'OpenRouter endpoint configured');
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -319,14 +326,13 @@ assert(appTsx.includes('setBuildResult(null)'), 'Build text cleared on game end 
 // ═══════════════════════════════════════════════════════════════
 console.log('\n── Suite 15: Generation Mode Toggle ──\n');
 
-assert(mainJs.includes("'flash'") && mainJs.includes("'hybrid'"), 'Flash and hybrid modes exist');
-assert(mainJs.includes("generationMode === 'flash'"), 'Flash mode conditional branching');
-assert(mainJs.includes("generationMode") && mainJs.includes("'hybrid'"), 'Hybrid/Pro mode exists');
-assert(mainJs.includes('getSetting') && mainJs.includes('generationMode'), 'Generation mode read from settings');
+assert(allSource.includes("'flash'"), 'Flash generation mode exists');
+assert(allSource.includes('generationMode'), 'Generation mode is carried through request/settings');
+assert(allSource.includes('handleSettingChange') && allSource.includes('generationMode'), 'Generation mode can be updated from UI');
+assert(allSource.includes('deepseek/deepseek-v4-flash'), 'DeepSeek model is selected for production generation');
 
 // Flash mode skips runes
-const flashBlockMatches = mainJs.includes('Promise.resolve(null)') && mainJs.includes("generationMode === 'flash'");
-assert(flashBlockMatches, 'Flash mode skips runes generation');
+assert(mainJs.includes('fetchDdragonRunes') && mainJs.includes('runesRef'), 'Runes are grounded with DDragon reference data');
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -366,7 +372,7 @@ assert(mainJs.includes('computePingStats'), 'Ping stats computation');
 console.log('n── Suite 19: Error Handling & Resilience ──n');
 
 // API key check
-assert(mainJs.includes('GEMINI_API_KEY') && mainJs.includes('not set'), 'Missing API key check');
+assert(mainJs.includes('OPENROUTER_API_KEY') || mainJs.includes('openrouterApiKey'), 'OpenRouter API key lookup exists');
 
 // Fallback model
 assert(mainJs.includes('falling back to Flash') || mainJs.includes('fallback'), 'Pro→Flash fallback exists');

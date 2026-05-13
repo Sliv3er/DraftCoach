@@ -169,7 +169,7 @@ async function runTests() {
     
     const supportItemIds = ['3850', '3851', '3853', '3854', '3855', '3856', '3857', '3858', '3859', 
                            '4860', '4861', '4862', '4863', '4864'];
-    const jungleItemIds = ['1039', '1041', '1042', '1043', '1101', '1102', '1103', '1104'];
+    const jungleItemIds = ['1101', '1102', '1103', '1105', '1106', '1107'];
 
     const hasSupportItem = allItems3.some(i => supportItemIds.includes((i as any).id || (i as any).itemId));
     const hasJungleItem = allItems3.some(i => jungleItemIds.includes((i as any).id || (i as any).itemId));

@@ -5,7 +5,7 @@
  * All renderer files import from this bridge instead of 'electron'.
  * 
  * Architecture:
- *   - Port 3210: Express server from main.js (build endpoints, health, etc.)
+ *   - Port 3210: Express server from main.cjs (build endpoints, health, etc.)
  *   - Port 3211: IPC proxy server (handles ipcMain.handle/on channels + SSE events)
  * 
  * For HTTP-based communication (build endpoints), the existing fetch() calls
@@ -19,7 +19,7 @@ import { open as dialogOpen } from '@tauri-apps/plugin-dialog';
 
 // ── Config ──
 const IPC_PROXY_PORT = 3211;  // IPC proxy server (sidecar)
-const BACKEND_PORT = 3210;    // Express backend (main.js)
+const BACKEND_PORT = 3210;    // Express backend (main.cjs)
 const IPC_PROXY_URL = `http://127.0.0.1:${IPC_PROXY_PORT}`;
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 
@@ -365,7 +365,7 @@ export function ipcOn(channel: string, handler: (...args: any[]) => void): void 
 /**
  * Replaces ipcRenderer.removeListener(channel, handler)
  */
-export function ipcRemoveListener(channel: string, handler: any): void {
+export function ipcRemoveListener(channel: string, handler?: any): void {
   if (PUSH_CHANNELS.has(channel)) {
     const handlers = sseListeners.get(channel);
     if (handlers) {

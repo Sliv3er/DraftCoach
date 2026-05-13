@@ -66,6 +66,8 @@ function applyEffect(effect: RuleEffect, plan: BuildPlan, ctx: RuleContext): voi
     
     // Add situational items (resolved from tags via scored resolver)
     if (effect.situationalItemTags) {
+        let ruleAddedItems = 0;
+
         for (const { tag, reason } of effect.situationalItemTags) {
             // Skip if already added
             if (plan.situationalItems.some(si => si.triggerTag === tag)) continue;
@@ -75,8 +77,8 @@ function applyEffect(effect: RuleEffect, plan: BuildPlan, ctx: RuleContext): voi
                 continue;
             }
 
-            // Cap situational items
-            if (plan.situationalItems.length >= MAX_SITUATIONAL_ITEMS) {
+            // Cap items added by rules, not template-provided situational pools.
+            if (ruleAddedItems >= MAX_SITUATIONAL_ITEMS) {
                 break;
             }
 
@@ -105,6 +107,7 @@ function applyEffect(effect: RuleEffect, plan: BuildPlan, ctx: RuleContext): voi
                     reason,
                     triggerTag: tag,
                 });
+                ruleAddedItems++;
             }
         }
     }

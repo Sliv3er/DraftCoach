@@ -1,4 +1,4 @@
-export type GeminiModel = 'gemini-3-pro-preview' | 'gemini-3.1-pro-preview' | 'gemini-3-flash-preview';
+export type AiModel = 'deepseek/deepseek-v4-flash';
 
 export interface DraftState {
   myChampion: string;
@@ -43,7 +43,8 @@ export interface CacheEntry {
 }
 
 export interface AppConfig {
-  geminiModel: 'gemini-3-flash-preview' | 'gemini-3.1-pro-preview';
+  aiProvider: 'openrouter';
+  aiModel: AiModel;
   backendPort: number;
 }
 

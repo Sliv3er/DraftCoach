@@ -7,7 +7,7 @@
   <p align="center">
     <img src="https://img.shields.io/badge/Season-2026-gold?style=flat-square" alt="Season 2026" />
     <img src="https://img.shields.io/badge/Patch-26.5-blue?style=flat-square" alt="Patch 26.5" />
-    <img src="https://img.shields.io/badge/Gemini_AI-Grounded-green?style=flat-square" alt="Gemini AI" />
+    <img src="https://img.shields.io/badge/DeepSeek_V4_Flash-OpenRouter-green?style=flat-square" alt="DeepSeek via OpenRouter" />
     <img src="https://img.shields.io/badge/Platform-Windows-lightgrey?style=flat-square" alt="Windows" />
     <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT" />
   </p>
@@ -19,7 +19,7 @@
 
 DraftCoach is a full-featured desktop companion for League of Legends that goes far beyond simple build recommendations. It connects to the League Client and Live Game APIs to provide **real-time intelligence** throughout every phase of the game — from champion select to post-game analysis.
 
-Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini AI with Search Grounding** to analyze your draft, scout your opponents, track enemy cooldowns, and adapt your build live during the game.
+Unlike static tier lists or basic build sites, DraftCoach uses **DeepSeek V4 Flash via OpenRouter** to analyze your draft, scout your opponents, track enemy cooldowns, and adapt your build live during the game.
 
 ---
 
@@ -27,7 +27,7 @@ Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini A
 
 ### 🧠 AI-Grounded Builds
 - **Draft-aware build generation** — input your champion, role, allies, and enemies to get comp-specific itemization
-- **Gemini 3.1 Pro with Google Search Grounding** ensures recommendations reflect the current meta
+- **DeepSeek V4 Flash via OpenRouter** adapts proven meta references to the current draft context
 - Complete builds: runes, summoner spells, skill order, starting items, core build (6-7 items), and situationals
 - **Local Decision Engine** — instant (<30ms) build recommendations from a rules-based knowledge base, with AI fallback
 
@@ -82,7 +82,7 @@ Unlike static tier lists or basic build sites, DraftCoach uses **Google Gemini A
 - **Pricing tiers** — manage different pricing plans and limits
 
 ### 🔄 Live Advisor (Mid-Game)
-- **Real-time build adaptation** during the game via Gemini Flash
+- **Real-time build adaptation** during the game via DeepSeek V4 Flash
 - Monitors enemy items, KDA, and gold to suggest build pivots
 - Identifies **fed threats** and recommends counters
 - Suggests **next purchase** based on current game state, not just the pre-game plan
@@ -120,7 +120,7 @@ DraftCoach/
 │   │       │   ├── billing.ts     # Usage tracking
 │   │       │   └── ...
 │   │       ├── services/          # Business logic
-│   │       │   ├── gemini.ts      # AI integration
+│   │       │   ├── gemini.ts      # Legacy AI integration
 │   │       │   └── rag-updater.ts # Knowledge base updates
 │   │       └── models/            # Data models
 │   │
@@ -221,7 +221,7 @@ Each generated build includes:
 
 - **Node.js** 18+
 - **Rust** (for Tauri builds)
-- **Gemini API Key** with Google Search grounding enabled ([Get one here](https://aistudio.google.com/))
+- **OpenRouter API Key** for DeepSeek V4 Flash ([Get one here](https://openrouter.ai/settings/keys))
 
 ### Installation
 
@@ -236,7 +236,7 @@ npm install
 Create a `.env` file in the project root:
 
 ```bash
-GEMINI_API_KEY=your_api_key_here
+OPENROUTER_API_KEY=your_api_key_here
 BACKEND_PORT=3210
 ```
 
@@ -285,8 +285,8 @@ npm run validate:kb
 | Web Portal | Next.js 14 (App Router) |
 | Backend | Node.js + Express |
 | Billing | Express + Usage Tracking |
-| AI (Builds) | Google Gemini 3.1 Pro with Search Grounding |
-| AI (Live) | Google Gemini 3 Flash (real-time advisor) |
+| AI (Builds) | DeepSeek V4 Flash via OpenRouter |
+| AI (Live) | DeepSeek V4 Flash via OpenRouter |
 | Local Engine | Custom rules-based scoring engine (<30ms) |
 | Build | Tauri CLI + NSIS |
 | Data | Riot DDragon CDN + CommunityDragon |
@@ -324,5 +324,5 @@ MIT
 ---
 
 <p align="center">
-  <sub>Built with Gemini AI • Not endorsed by Riot Games • League of Legends is a trademark of Riot Games, Inc.</sub>
+  <sub>Built with DeepSeek V4 Flash via OpenRouter • Not endorsed by Riot Games • League of Legends is a trademark of Riot Games, Inc.</sub>
 </p>

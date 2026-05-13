@@ -1,5 +1,7 @@
+const path = require('path');
+
 module.exports = {
-    preset: 'ts-jest',
+    rootDir: __dirname,
     testEnvironment: 'node',
     roots: ['<rootDir>'],
     testMatch: [
@@ -7,8 +9,8 @@ module.exports = {
         '**/*.test.ts',
     ],
     transform: {
-        '^.+\\.tsx?$': ['ts-jest', {
-            tsconfig: './tsconfig.json',
+        '^.+\\.tsx?$': [require.resolve('ts-jest'), {
+            tsconfig: path.join(__dirname, 'tsconfig.json'),
         }],
     },
     moduleNameMapper: {

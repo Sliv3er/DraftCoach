@@ -26,7 +26,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://ddragon.leagueoflegends.com https://raw.githubusercontent.com https://raw.communitydragon.org; connect-src 'self' http://localhost:* http://127.0.0.1:* https://127.0.0.1:* https://ddragon.leagueoflegends.com https://generativelanguage.googleapis.com; font-src 'self' data:; frame-src 'none'; object-src 'none'"
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://ddragon.leagueoflegends.com https://raw.githubusercontent.com https://raw.communitydragon.org; connect-src 'self' http://localhost:* http://127.0.0.1:* https://127.0.0.1:* https://ddragon.leagueoflegends.com https://openrouter.ai; font-src 'self' data:; frame-src 'none'; object-src 'none'"
     }
   },
   "bundle": {

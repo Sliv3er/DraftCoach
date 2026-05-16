@@ -1,0 +1,12 @@
+{
+  "patch": "16.10",
+  "generatedAt": "2026-05-16T20:54:57.992Z",
+  "champCount": 339,
+  "modes": {
+    "sr": 339,
+    "aram": 172,
+    "aramMayhem": 172,
+    "augmentChampions": 172
+  },
+  "source": "mobalytics-mode-sync-local"
+}

@@ -707,11 +707,13 @@ BUILD RULES:
 - summoners: Mark/Dash + Flash (or Clarity/Exhaust).
 
 AUGMENT RECOMMENDATIONS:
-- Recommend the TOP 4 best augments for this champion (1 per augment pick level)
-- Consider synergy with the champion's kit (e.g., "Scopiest Weapons" for ADCs, "Jeweled Gauntlet" for AP champs with crit)
-- Consider augment set bonuses for extra power
-- For each augment, explain WHY it's good for this specific champion
-- Order by pick priority (Level 1 pick first)
+- You MUST output an AUGMENTS section with exactly 4 recommendations.
+- Choose from the provided Mobalytics champion augment pool first; use the full valid augment list only when the matchup clearly demands a different answer.
+- Consider champion kit, item build, enemy threats, damage profile, teamfight pattern, and tier power.
+- Tier matters, but fit matters more: do not choose a Prismatic/Gold augment if its effect does not help this champion in this draft.
+- For each augment, explain WHY it is good for this champion against this enemy team.
+- Order by pick priority/pick timing.
+- Use only exact augment names from VALID ARAM MAYHEM AUGMENTS. Never invent augment names.
 
 Output valid JSON matching the provided schema. Do NOT include any text outside the JSON.`;
 }

@@ -581,6 +581,12 @@ async function fetchDdragonSummoners() {
       spells.add(spell.name);
       spellNames.push(spell.name);
     }
+    if (spells.has('Mark')) {
+      for (const alias of ['Snowball', 'Mark/Dash', 'Mark Dash']) {
+        spells.add(alias);
+        spellNames.push(alias);
+      }
+    }
     
     ddragonSummonerCache = { version: ver, spells, spellNames };
     console.log(`[ddragon] Cached ${spells.size} summoner spells from DDragon v${ver}`);
@@ -3005,6 +3011,87 @@ function formatAugmentLine(augment, index) {
   return `${index + 1}. ${name} (${tier}Mobalytics recommended${rate})${effect}`;
 }
 
+function extractAugmentsSection(text) {
+  const match = String(text || '').match(/(?:^|\n)AUGMENTS\n([\s\S]*?)(?=\n(?:SITUATIONAL ITEMS|JUNGLE PATH|ENEMY POWER SPIKES|WIN CONDITION|YOUR POWER SPIKES|ANALYSIS|RUNES|SUMMONERS|SKILL ORDER|STARTING ITEMS|CORE BUILD)\n|$)/i);
+  return match ? match[0].trim() : '';
+}
+
+function ensureMayhemAugmentsSection(text, champion) {
+  if (!text) return text;
+  const existing = extractAugmentsSection(text);
+  if (existing) return normalizeMayhemAugmentsSection(text, champion);
+  const fallback = buildInstantAugmentsSection(champion);
+  if (fallback.length <= 2) return text;
+
+  const augmentText = fallback.join('\n').trim();
+  if (/\nSITUATIONAL ITEMS\n/i.test(text)) {
+    return text.replace(/\nSITUATIONAL ITEMS\n/i, `\n${augmentText}\n\nSITUATIONAL ITEMS\n`);
+  }
+  if (/\nWIN CONDITION\n/i.test(text)) {
+    return text.replace(/\nWIN CONDITION\n/i, `\n${augmentText}\n\nWIN CONDITION\n`);
+  }
+  return `${text.trim()}\n\n${augmentText}`;
+}
+
+function normalizeMayhemAugmentsSection(text, champion) {
+  const section = extractAugmentsSection(text);
+  if (!section) return text;
+
+  const master = loadKBAugmentsMaster().augments || [];
+  const championTemplate = loadKBAugmentTemplates().data?.[champion];
+  const validNames = new Map(master.map(aug => [String(aug.name || '').toLowerCase(), aug]));
+  const preferred = new Map((championTemplate?.recommended || []).map(aug => [String(aug.name || '').toLowerCase(), aug]));
+  const allNames = master.map(aug => aug.name).filter(Boolean);
+
+  function nearest(name) {
+    const target = String(name || '').toLowerCase();
+    let best = null;
+    let bestScore = Infinity;
+    for (const candidate of allNames) {
+      const c = String(candidate || '').toLowerCase();
+      if (c === target) return candidate;
+      if (c.includes(target) || target.includes(c)) {
+        const score = Math.abs(c.length - target.length);
+        if (score < bestScore) { best = candidate; bestScore = score; }
+      }
+    }
+    return bestScore <= 4 ? best : null;
+  }
+
+  const rawLines = section.split('\n').slice(1).map(line => line.trim()).filter(Boolean);
+  const normalized = [];
+  const seen = new Set();
+  for (const [idx, raw] of rawLines.entries()) {
+    const withoutNumber = raw.replace(/^\d+[.)]\s*/, '').trim();
+    const namePart = withoutNumber.split(/\s+-\s+|:/)[0].replace(/\([^)]*\)/g, '').trim();
+    const exact = validNames.get(namePart.toLowerCase())?.name || preferred.get(namePart.toLowerCase())?.name || nearest(namePart) || namePart;
+    const source = validNames.get(exact.toLowerCase()) || preferred.get(exact.toLowerCase()) || {};
+    if (!exact || seen.has(exact.toLowerCase())) continue;
+    seen.add(exact.toLowerCase());
+    const tierText = source.tier && !new RegExp(`\\b${source.tier}\\b`, 'i').test(withoutNumber) ? `${source.tier} augment` : '';
+    const reason = withoutNumber.includes(' - ')
+      ? withoutNumber.split(/\s+-\s+/).slice(1).join(' - ').trim()
+      : '';
+    const effect = reason || source.effect || 'matchup-aware ARAM Mayhem pick';
+    normalized.push(`${normalized.length + 1}. ${exact}${tierText ? ` (${tierText})` : ''} - ${effect}`);
+    if (idx > 8 || normalized.length >= 4) break;
+  }
+
+  if (normalized.length < 4) {
+    const pool = championTemplate?.recommended?.length ? championTemplate.recommended : master;
+    for (const aug of pool) {
+      if (normalized.length >= 4) break;
+      const key = String(aug.name || '').toLowerCase();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      normalized.push(formatAugmentLine(aug, normalized.length));
+    }
+  }
+
+  if (!normalized.length) return text;
+  return text.replace(section, ['AUGMENTS', ...normalized].join('\n'));
+}
+
 function buildInstantAugmentsSection(champion) {
   const template = loadKBAugmentTemplates().data?.[champion];
   if (!template?.recommended?.length) return [];
@@ -3030,9 +3117,15 @@ function getAugmentsReference(champion = '') {
     ref += `Total: ${data.augments.length} augments\n\n`;
 
     if (championTemplate?.recommended?.length) {
-      ref += `MOBALYTICS RECOMMENDED AUGMENTS FOR ${champion}:\n`;
+      ref += `MOBALYTICS CHAMPION AUGMENT POOL FOR ${champion}:\n`;
+      ref += `These are the high-sample augments Mobalytics sees for this champion. Treat them like item/rune reference data, then choose the best 4 for the actual enemy draft.\n`;
       for (const aug of championTemplate.recommended.slice(0, 12)) {
-        ref += `  - ${aug.name} (${aug.tier || 'Unknown'}): pick priority ${Number(aug.bestPickRate || aug.pickRate || 0).toFixed(1)}%, ${aug.wins || 0}/${aug.matches || 0} wins/matches. ${aug.effect || ''}\n`;
+        ref += `  - ${aug.name} (${aug.tier || 'Unknown'}): priority ${Number(aug.bestPickRate || aug.pickRate || 0).toFixed(1)}%, sample ${aug.wins || 0}/${aug.matches || 0}. Effect: ${aug.effect || ''}\n`;
+      }
+      const rounds = Array.isArray(championTemplate.rounds) ? championTemplate.rounds : [];
+      for (const round of rounds.slice(0, 4)) {
+        const choices = (round.recommended || []).slice(0, 8).map(aug => `${aug.name} (${aug.tier || 'Unknown'}: ${aug.effect || 'no effect text'})`);
+        if (choices.length) ref += `  Pick ${round.pick} possible choices: ${choices.join(' | ')}\n`;
       }
       ref += `\n`;
     }
@@ -3527,6 +3620,20 @@ COMMON MISTAKES Ã¢â‚¬â€ NEVER DO THESE:
           },
           description: "At least 4 situational items with buy conditions"
         },
+        augments: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "ARAM Mayhem augment name exactly from VALID ARAM MAYHEM AUGMENTS" },
+              tier: { type: "string", description: "Silver, Gold, or Prismatic" },
+              pickAt: { type: "string", description: "Pick 1, Pick 2, Pick 3, Pick 4, or level timing" },
+              reason: { type: "string", description: "Why this augment is best for the champion and enemy matchup" }
+            },
+            required: ["name", "tier", "reason"]
+          },
+          description: "ARAM Mayhem only: exactly 4 matchup-aware augment recommendations"
+        },
         junglePath: { type: "string", description: "First clear route if Jungle (6+ camps with > separator). Empty if not Jungle." },
         enemyPowerSpikes: { type: "string", description: "Key enemy power spikes (level + item)" },
         winCondition: { type: "string", description: "2 sentences: how this champion wins this draft" },
@@ -3593,6 +3700,16 @@ COMMON MISTAKES Ã¢â‚¬â€ NEVER DO THESE:
         lines.push('SITUATIONAL ITEMS');
         json.situationalItems.forEach(item => {
           lines.push(`${item.name}: ${item.condition || ''}`);
+        });
+        lines.push('');
+      }
+
+      if (json.augments) {
+        lines.push('AUGMENTS');
+        json.augments.forEach((aug, i) => {
+          const pickAt = aug.pickAt ? `${aug.pickAt}, ` : '';
+          const tier = aug.tier ? `${aug.tier} ` : '';
+          lines.push(`${i + 1}. ${aug.name} (${pickAt}${tier}augment)${aug.reason ? ` - ${aug.reason}` : ''}`);
         });
         lines.push('');
       }
@@ -4488,7 +4605,10 @@ ${userMessage.slice(0, 2000)}`;
           const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
           const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference(body.myChampion) : '';
           const modeKbContext = getKBBuildContext(body.myChampion, body.role, gameMode);
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the Mobalytics ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
+          const mayhemAugmentTask = gameMode === 'aram-mayhem'
+            ? `\n\nARAM MAYHEM AUGMENT TASK:\n- You MUST output an AUGMENTS section with exactly 4 augment recommendations.\n- Choose from MOBALYTICS CHAMPION AUGMENT POOL first; only use the full VALID ARAM MAYHEM AUGMENTS list when the matchup makes another augment clearly better.\n- Each line must include: augment name, tier, pick timing/priority, and a matchup-specific reason.\n- Rank Prismatic/Gold/Silver by actual power, champion synergy, enemy threats, and whether the effect solves this draft. Do not blindly choose highest tier if it does not fit.\n- Never invent augment names. Never omit AUGMENTS in ARAM: Mayhem.`
+            : '';
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the Mobalytics ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${mayhemAugmentTask}\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
         } else {
           const variantContext = hasMetaBaseline ? getKBBuildContext(body.myChampion, body.role) : kbContext;
           const metaGuidance = refinementBaseline
@@ -4536,6 +4656,9 @@ ${userMessage.slice(0, 2000)}`;
             validated = dedupeAndPadCoreBuild(validated, body);
           }
           validated = enforceDraftCounterLogic(validated, body, mechMap3);
+          if (gameMode === 'aram-mayhem') {
+            validated = ensureMayhemAugmentsSection(validated, body.myChampion);
+          }
           validated = enforceRoleSafeItems(validated, body);
           validated = dedupeAndPadCoreBuild(validated, body);
           validated = sanitizeNarrativeAgainstFinalItems(validated, body, mechMap3);

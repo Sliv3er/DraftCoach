@@ -7,6 +7,11 @@ import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, cl
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
 const GAME_MODES: GameMode[] = ['sr', 'aram', 'aram-mayhem'];
+const GAME_MODE_META: Record<GameMode, { label: string; shortLabel: string; mapId: 11 | 12; badge?: string }> = {
+  sr: { label: "Summoner's Rift", shortLabel: 'SR', mapId: 11 },
+  aram: { label: 'ARAM', shortLabel: 'ARAM', mapId: 12 },
+  'aram-mayhem': { label: 'ARAM Mayhem', shortLabel: 'Mayhem', mapId: 12, badge: 'AUG' },
+};
 
 // ── Hotkey settings definitions ─────────────────────────────────────
 const HOTKEY_SETTINGS = [
@@ -153,7 +158,7 @@ export interface IconLookups {
 
 const SECTION_KEYS = [
   'ANALYSIS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
-  'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
+  'CORE BUILD', 'AUGMENTS', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
   'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES',
 ];
 
@@ -681,6 +686,12 @@ export function App() {
         if (teleportUrl) {
           spells.set('unleashed teleport', teleportUrl);
           spells.set('tp', teleportUrl);
+        }
+        const markUrl = spells.get('mark') || `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/SummonerSnowball.png`;
+        if (markUrl) {
+          for (const alias of ['snowball', 'mark', 'mark/dash', 'mark dash', 'snowball/mark', 'snowball + flash', 'mark + dash', 'dash']) {
+            spells.set(alias, markUrl);
+          }
         }
 
         // Build rune lookup
@@ -1424,6 +1435,10 @@ export function App() {
       : status === 'error' ? 'Needs retry'
       : 'Ready';
   const selectedModelMeta = MODEL_OPTIONS.find((m) => m.value === selectedModel) || MODEL_OPTIONS[0];
+  const modeIconVersion = ddragonVersion || (patchVersion && patchVersion !== '...' ? patchVersion : '16.10.1');
+  const getModeIconUrl = useCallback((mode: GameMode) => (
+    `https://ddragon.leagueoflegends.com/cdn/${modeIconVersion}/img/map/map${GAME_MODE_META[mode].mapId}.png`
+  ), [modeIconVersion]);
   const pipelineSteps = [
     {
       key: 'meta',
@@ -1600,20 +1615,27 @@ export function App() {
           <div className="field-group">
             <label>Mode</label>
             <div className="mode-picker">
-              {GAME_MODES.map((m) => (
-                <button
-                  key={m}
-                  className={`mode-btn ${gameMode === m ? 'mode-btn-active' : ''}`}
-                  onClick={() => {
-                    setGameMode(m);
-                    if (m !== 'sr') setRole('mid');
-                    metaPreviewKeyRef.current = '';
-                  }}
-                  title={m === 'sr' ? "Summoner's Rift" : m === 'aram' ? 'ARAM' : 'ARAM Mayhem'}
-                >
-                  {m === 'sr' ? 'SR' : m === 'aram' ? 'ARAM' : 'Mayhem'}
-                </button>
-              ))}
+              {GAME_MODES.map((m) => {
+                const meta = GAME_MODE_META[m];
+                return (
+                  <button
+                    key={m}
+                    className={`mode-btn ${gameMode === m ? 'mode-btn-active' : ''}`}
+                    onClick={() => {
+                      setGameMode(m);
+                      if (m !== 'sr') setRole('mid');
+                      metaPreviewKeyRef.current = '';
+                    }}
+                    title={meta.label}
+                  >
+                    <span className="mode-icon-wrap">
+                      <img src={getModeIconUrl(m)} alt="" className="mode-icon-img" />
+                      {meta.badge && <span className="mode-icon-badge">{meta.badge}</span>}
+                    </span>
+                    <span className="mode-label">{meta.shortLabel}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -1682,7 +1704,13 @@ export function App() {
               {myChampion && <img src={getChampIconUrl(myChampion)} alt={selectedChampionName} className="draft-command-champ" />}
               <div>
                 <div className="draft-command-kicker">Draft Plan</div>
-                <div className="draft-command-title">{selectedChampionName} <span>{gameMode === 'sr' ? role.toUpperCase() : gameMode === 'aram' ? 'ARAM' : 'MAYHEM'}</span></div>
+                <div className="draft-command-title">
+                  {selectedChampionName}
+                  <span className="draft-command-mode">
+                    <img src={getModeIconUrl(gameMode)} alt="" className="draft-command-mode-icon" />
+                    {gameMode === 'sr' ? role.toUpperCase() : GAME_MODE_META[gameMode].shortLabel.toUpperCase()}
+                  </span>
+                </div>
               </div>
             </div>
             <div className="draft-pipeline" aria-label="Generation pipeline">

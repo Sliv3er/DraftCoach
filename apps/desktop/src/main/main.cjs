@@ -1456,7 +1456,7 @@ function buildInstantMetaText(body, patchDisplay) {
   const maxOrder = [...maxOrderBase, 'R'].filter((v, i, arr) => arr.indexOf(v) === i).join(' > ');
   const sums = base.summonerSpells || ['Flash', engineRole === 'JUNGLE' ? 'Smite' : 'Teleport'];
   const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : gameMode === 'aram' ? 'ARAM' : engineRole;
-  const augmentSection = gameMode === 'aram-mayhem' ? buildInstantAugmentsSection(body.myChampion) : [];
+  const augmentSection = gameMode === 'aram-mayhem' ? buildInstantAugmentsSection(body.myChampion, body) : [];
   const enemyLine = (body.enemies || []).filter(Boolean).length
     ? `Enemy draft detected: ${(body.enemies || []).filter(Boolean).join(', ')}. AI is checking whether the meta base needs defensive swaps, anti-heal, boots changes, or rune adjustments.`
     : 'No full enemy draft yet. AI will refine once more matchup context is available.';
@@ -3002,13 +3002,88 @@ function loadKBAugmentsMaster() {
 function formatAugmentLine(augment, index) {
   const name = augment?.name || `Augment ${augment?.id || index + 1}`;
   const tier = augment?.tier && augment.tier !== 'Unknown' ? `${augment.tier} ` : '';
-  const rate = Number.isFinite(augment?.bestPickRate) && augment.bestPickRate > 0
-    ? `, ${augment.bestPickRate.toFixed(1)}% pick priority`
-    : Number.isFinite(augment?.pickRate) && augment.pickRate > 0
-      ? `, ${augment.pickRate.toFixed(1)}% pick priority`
-      : '';
-  const effect = augment?.effect ? ` - ${augment.effect}` : '';
-  return `${index + 1}. ${name} (${tier}Mobalytics recommended${rate})${effect}`;
+  const effect = augment?.effect ? ` - ${cleanAugmentEffect(augment.effect)}` : '';
+  return `${index + 1}. ${name} (${tier}Mayhem candidate)${effect}`;
+}
+
+function cleanAugmentEffect(effect) {
+  return String(effect || '')
+    .replace(/\{\{[^}]+\}\}/g, '')
+    .replace(/@\w+(?:\*\d+)?@/g, '')
+    .replace(/%i:[^%\s]+%/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 220);
+}
+
+function augmentTierScore(tier) {
+  if (/prismatic/i.test(tier || '')) return 18;
+  if (/gold/i.test(tier || '')) return 12;
+  return 7;
+}
+
+function scoreAugmentForDraft(augment, champion, body = {}, mechanicsMap = null) {
+  const name = String(augment?.name || '');
+  const effect = cleanAugmentEffect(augment?.effect || '');
+  const text = `${name} ${effect}`.toLowerCase();
+  const tags = getChampionTags(champion);
+  const dmg = inferDamageFromTagsAndInfo(champion, mechanicsMap);
+  const mech = mechanicsMap?.get(champion);
+  const enemies = body?.enemies || [];
+  const enemyDraft = analyzeEnemyDraft(enemies, mechanicsMap);
+
+  let score = augmentTierScore(augment?.tier);
+  const add = (regex, amount) => { if (regex.test(text)) score += amount; };
+
+  if (tags.includes('Marksman')) {
+    add(/attack speed|basic attack|critical|crit|on-hit|range|move speed|dash|kite|lifesteal/, 8);
+    add(/ability power|mana|heal and shield/, -5);
+  }
+  if (tags.includes('Mage') || dmg === 'AP') {
+    add(/ability|spell|magic|ability power|haste|cooldown|mana|ultimate|burn/, 8);
+    add(/attack speed|basic attack|critical strike|crit chance/, -3);
+  }
+  if (tags.includes('Fighter')) {
+    add(/health|heal|omnivamp|lifesteal|shield|haste|damage|movement|dash|armor|magic resist|tenacity/, 7);
+  }
+  if (tags.includes('Tank')) {
+    add(/health|armor|magic resist|shield|slow|immobil|tenacity|nearby|crowd control|resist/, 8);
+    add(/critical|crit|attack speed/, -3);
+  }
+  if (tags.includes('Assassin')) {
+    add(/dash|blink|execute|invisible|stealth|damage|ability haste|movement|lethality|burst/, 8);
+  }
+  if (tags.includes('Support')) {
+    add(/heal|shield|ally|haste|slow|root|immobil|protect|movement speed/, 8);
+  }
+
+  if (mech?.dashes >= 2) add(/dash|movement|blink|ability haste|cooldown/, 5);
+  if (mech?.resource === 'MANA') add(/mana|spell|ability haste/, 3);
+  if (mech?.healThreat) add(/heal|shield|omnivamp|lifesteal/, 4);
+
+  if (enemyDraft.hardCc >= 3 || enemyDraft.suppression > 0) add(/tenacity|unstoppable|cleanse|crowd control|slow resist|movement/, 7);
+  if (enemyDraft.ap >= 3) add(/magic resist|spell shield|shield|health/, 5);
+  if (enemyDraft.ad >= 3) add(/armor|basic attack|attack speed|shield|health/, 5);
+  if (enemyDraft.tanks >= 2) add(/max health|true damage|burn|penetration|shred|damage/, 5);
+  if (enemyDraft.enchanterHealing + enemyDraft.selfHealingFrontliners >= 2) add(/wound|anti-heal|damage|execute/, 3);
+
+  if (/404 augment not found|how did you find this|tahm kench|sacrificed to tahm/i.test(`${name} ${effect}`)) score -= 40;
+  if (!effect || /\{\{|summary|current conversion/i.test(effect)) score -= 10;
+  return score;
+}
+
+function getDraftAugmentCandidates(champion, body = {}, mechanicsMap = null, limit = 48) {
+  const data = loadKBAugmentsMaster();
+  const augments = Array.isArray(data.augments) ? data.augments : [];
+  return augments
+    .map(augment => ({
+      ...augment,
+      effect: cleanAugmentEffect(augment.effect),
+      draftScore: scoreAugmentForDraft(augment, champion, body, mechanicsMap),
+    }))
+    .filter(augment => augment.name && augment.effect && augment.draftScore > 0)
+    .sort((a, b) => (b.draftScore - a.draftScore) || (augmentTierScore(b.tier) - augmentTierScore(a.tier)) || a.name.localeCompare(b.name))
+    .slice(0, limit);
 }
 
 function extractAugmentsSection(text) {
@@ -3016,11 +3091,12 @@ function extractAugmentsSection(text) {
   return match ? match[0].trim() : '';
 }
 
-function ensureMayhemAugmentsSection(text, champion) {
+function ensureMayhemAugmentsSection(text, body = {}, mechanicsMap = null) {
   if (!text) return text;
+  const champion = body?.myChampion || body?.champion || body;
   const existing = extractAugmentsSection(text);
-  if (existing) return normalizeMayhemAugmentsSection(text, champion);
-  const fallback = buildInstantAugmentsSection(champion);
+  if (existing) return normalizeMayhemAugmentsSection(text, body, mechanicsMap);
+  const fallback = buildInstantAugmentsSection(champion, body, mechanicsMap);
   if (fallback.length <= 2) return text;
 
   const augmentText = fallback.join('\n').trim();
@@ -3033,14 +3109,16 @@ function ensureMayhemAugmentsSection(text, champion) {
   return `${text.trim()}\n\n${augmentText}`;
 }
 
-function normalizeMayhemAugmentsSection(text, champion) {
+function normalizeMayhemAugmentsSection(text, body = {}, mechanicsMap = null) {
   const section = extractAugmentsSection(text);
   if (!section) return text;
 
-  const master = loadKBAugmentsMaster().augments || [];
-  const championTemplate = loadKBAugmentTemplates().data?.[champion];
+  const master = (loadKBAugmentsMaster().augments || [])
+    .filter(aug => !/404 augment not found|how did you find this|tahm kench|sacrificed to tahm/i.test(`${aug?.name || ''} ${aug?.effect || ''}`));
+  const champion = body?.myChampion || body?.champion || body;
+  const draftCandidates = getDraftAugmentCandidates(champion, body, mechanicsMap, 24);
   const validNames = new Map(master.map(aug => [String(aug.name || '').toLowerCase(), aug]));
-  const preferred = new Map((championTemplate?.recommended || []).map(aug => [String(aug.name || '').toLowerCase(), aug]));
+  const preferred = new Map(draftCandidates.map(aug => [String(aug.name || '').toLowerCase(), aug]));
   const allNames = master.map(aug => aug.name).filter(Boolean);
 
   function nearest(name) {
@@ -3064,8 +3142,10 @@ function normalizeMayhemAugmentsSection(text, champion) {
   for (const [idx, raw] of rawLines.entries()) {
     const withoutNumber = raw.replace(/^\d+[.)]\s*/, '').trim();
     const namePart = withoutNumber.split(/\s+-\s+|:/)[0].replace(/\([^)]*\)/g, '').trim();
-    const exact = validNames.get(namePart.toLowerCase())?.name || preferred.get(namePart.toLowerCase())?.name || nearest(namePart) || namePart;
-    const source = validNames.get(exact.toLowerCase()) || preferred.get(exact.toLowerCase()) || {};
+    const corrected = validNames.get(namePart.toLowerCase())?.name || preferred.get(namePart.toLowerCase())?.name || nearest(namePart);
+    const source = corrected ? (validNames.get(corrected.toLowerCase()) || preferred.get(corrected.toLowerCase())) : null;
+    const exact = source?.name || corrected;
+    if (!source || !exact) continue;
     if (!exact || seen.has(exact.toLowerCase())) continue;
     seen.add(exact.toLowerCase());
     const tierText = source.tier && !new RegExp(`\\b${source.tier}\\b`, 'i').test(withoutNumber) ? `${source.tier} augment` : '';
@@ -3078,7 +3158,7 @@ function normalizeMayhemAugmentsSection(text, champion) {
   }
 
   if (normalized.length < 4) {
-    const pool = championTemplate?.recommended?.length ? championTemplate.recommended : master;
+    const pool = draftCandidates.length ? draftCandidates : master;
     for (const aug of pool) {
       if (normalized.length >= 4) break;
       const key = String(aug.name || '').toLowerCase();
@@ -3092,13 +3172,13 @@ function normalizeMayhemAugmentsSection(text, champion) {
   return text.replace(section, ['AUGMENTS', ...normalized].join('\n'));
 }
 
-function buildInstantAugmentsSection(champion) {
-  const template = loadKBAugmentTemplates().data?.[champion];
-  if (!template?.recommended?.length) return [];
+function buildInstantAugmentsSection(champion, body = {}, mechanicsMap = null) {
+  const candidates = getDraftAugmentCandidates(champion, body, mechanicsMap, 4);
+  if (!candidates.length) return [];
   return [
     '',
     'AUGMENTS',
-    ...template.recommended.slice(0, 4).map(formatAugmentLine),
+    ...candidates.map(formatAugmentLine),
   ];
 }
 
@@ -3106,26 +3186,22 @@ function buildInstantAugmentsSection(champion) {
  * Load the augments master list and format as prompt reference.
  * Returns empty string if no augment data is cached.
  */
-function getAugmentsReference(champion = '') {
+function getAugmentsReference(champion = '', body = {}, mechanicsMap = null) {
   try {
-    const championTemplate = champion ? loadKBAugmentTemplates().data?.[champion] : null;
     const data = loadKBAugmentsMaster();
     if (!data.augments || !Array.isArray(data.augments) || data.augments.length === 0) return '';
 
-    let ref = `\n\nVALID ARAM MAYHEM AUGMENTS (Patch ${data.patch || '?'}):\n`;
-    ref += `Use ONLY augments from this list. NEVER invent augment names.\n`;
-    ref += `Total: ${data.augments.length} augments\n\n`;
+    const candidates = getDraftAugmentCandidates(champion, body, mechanicsMap, 48);
+    let ref = `\n\nARAM MAYHEM AUGMENT KNOWLEDGE (CommunityDragon Patch ${data.patch || '?'}):\n`;
+    ref += `Mobalytics does not provide reliable ARAM Mayhem augment meta. Treat CommunityDragon effect text and tier as the source of truth.\n`;
+    ref += `Use ONLY exact augment names from this catalog. NEVER invent augment names.\n`;
+    ref += `Total valid augments: ${data.augments.length}\n\n`;
 
-    if (championTemplate?.recommended?.length) {
-      ref += `MOBALYTICS CHAMPION AUGMENT POOL FOR ${champion}:\n`;
-      ref += `These are the high-sample augments Mobalytics sees for this champion. Treat them like item/rune reference data, then choose the best 4 for the actual enemy draft.\n`;
-      for (const aug of championTemplate.recommended.slice(0, 12)) {
-        ref += `  - ${aug.name} (${aug.tier || 'Unknown'}): priority ${Number(aug.bestPickRate || aug.pickRate || 0).toFixed(1)}%, sample ${aug.wins || 0}/${aug.matches || 0}. Effect: ${aug.effect || ''}\n`;
-      }
-      const rounds = Array.isArray(championTemplate.rounds) ? championTemplate.rounds : [];
-      for (const round of rounds.slice(0, 4)) {
-        const choices = (round.recommended || []).slice(0, 8).map(aug => `${aug.name} (${aug.tier || 'Unknown'}: ${aug.effect || 'no effect text'})`);
-        if (choices.length) ref += `  Pick ${round.pick} possible choices: ${choices.join(' | ')}\n`;
+    if (candidates.length) {
+      ref += `DRAFT-SCORED AUGMENT CANDIDATES FOR ${champion || 'THIS CHAMPION'}:\n`;
+      ref += `These candidates are pre-ranked from champion class, known kit mechanics, enemy draft pressure, tier, and effect text. Prefer this list unless a full-catalog augment is clearly better.\n`;
+      for (const aug of candidates) {
+        ref += `  - ${aug.name} (${aug.tier || 'Unknown'}, score ${aug.draftScore}): ${aug.effect}\n`;
       }
       ref += `\n`;
     }
@@ -3133,14 +3209,18 @@ function getAugmentsReference(champion = '') {
     // Group by tier
     const byTier = { Prismatic: [], Gold: [], Silver: [] };
     for (const aug of data.augments) {
+      const name = String(aug.name || '');
+      const effect = cleanAugmentEffect(aug.effect);
+      if (!name || !effect || /404 augment not found|how did you find this/i.test(`${name} ${effect}`)) continue;
       const tier = aug.tier || 'Silver';
-      if (byTier[tier]) byTier[tier].push(aug);
-      else byTier.Silver.push(aug);
+      const cleaned = { ...aug, effect };
+      if (byTier[tier]) byTier[tier].push(cleaned);
+      else byTier.Silver.push(cleaned);
     }
 
     for (const [tier, augs] of Object.entries(byTier)) {
       if (augs.length === 0) continue;
-      ref += `${tier.toUpperCase()} TIER:\n`;
+      ref += `FULL CATALOG - ${tier.toUpperCase()} TIER:\n`;
       for (const aug of augs) {
         ref += `  - ${aug.name}${aug.set ? ` [Set: ${aug.set}]` : ''}: ${aug.effect || ''}\n`;
       }
@@ -3625,7 +3705,7 @@ COMMON MISTAKES Ã¢â‚¬â€ NEVER DO THESE:
           items: {
             type: "object",
             properties: {
-              name: { type: "string", description: "ARAM Mayhem augment name exactly from VALID ARAM MAYHEM AUGMENTS" },
+              name: { type: "string", description: "ARAM Mayhem augment name exactly from the ARAM MAYHEM AUGMENT KNOWLEDGE catalog" },
               tier: { type: "string", description: "Silver, Gold, or Prismatic" },
               pickAt: { type: "string", description: "Pick 1, Pick 2, Pick 3, Pick 4, or level timing" },
               reason: { type: "string", description: "Why this augment is best for the champion and enemy matchup" }
@@ -4596,6 +4676,9 @@ ${userMessage.slice(0, 2000)}`;
         const allChamps3 = [body.myChampion, ...(body.enemies || [])];
         const mechMap3 = await _prompts.fetchMultipleChampionMechanics(allChamps3);
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
+        if (gameMode === 'aram-mayhem') {
+          await ensureDdragonChampCache().catch(() => null);
+        }
         const refinementBaseline = buildAiRefinementBaseline(instantMetaText);
         const kbContext = refinementBaseline ? '' : getKBBuildContext(body.myChampion, body.role);
 
@@ -4603,10 +4686,10 @@ ${userMessage.slice(0, 2000)}`;
         let fullUserMessage;
         if (isARAM) {
           const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
-          const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference(body.myChampion) : '';
+          const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference(body.myChampion, body, mechMap3) : '';
           const modeKbContext = getKBBuildContext(body.myChampion, body.role, gameMode);
           const mayhemAugmentTask = gameMode === 'aram-mayhem'
-            ? `\n\nARAM MAYHEM AUGMENT TASK:\n- You MUST output an AUGMENTS section with exactly 4 augment recommendations.\n- Choose from MOBALYTICS CHAMPION AUGMENT POOL first; only use the full VALID ARAM MAYHEM AUGMENTS list when the matchup makes another augment clearly better.\n- Each line must include: augment name, tier, pick timing/priority, and a matchup-specific reason.\n- Rank Prismatic/Gold/Silver by actual power, champion synergy, enemy threats, and whether the effect solves this draft. Do not blindly choose highest tier if it does not fit.\n- Never invent augment names. Never omit AUGMENTS in ARAM: Mayhem.`
+            ? `\n\nARAM MAYHEM AUGMENT TASK:\n- You MUST output an AUGMENTS section with exactly 4 augment recommendations.\n- Choose from DRAFT-SCORED AUGMENT CANDIDATES first; use the FULL CATALOG only when a matchup-specific reason clearly beats a candidate.\n- Each line must include: augment name, tier, pick timing/priority, and a matchup-specific reason.\n- Rank Prismatic/Gold/Silver by actual power, champion synergy, enemy threats, damage profile, and whether the effect solves this draft. Do not blindly choose highest tier if it does not fit.\n- Never invent augment names. Never omit AUGMENTS in ARAM: Mayhem.`
             : '';
           fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the Mobalytics ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${mayhemAugmentTask}\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
         } else {
@@ -4657,7 +4740,7 @@ ${userMessage.slice(0, 2000)}`;
           }
           validated = enforceDraftCounterLogic(validated, body, mechMap3);
           if (gameMode === 'aram-mayhem') {
-            validated = ensureMayhemAugmentsSection(validated, body.myChampion);
+            validated = ensureMayhemAugmentsSection(validated, body, mechMap3);
           }
           validated = enforceRoleSafeItems(validated, body);
           validated = dedupeAndPadCoreBuild(validated, body);
@@ -4667,7 +4750,10 @@ ${userMessage.slice(0, 2000)}`;
           if (judged.issues.length) {
             log('WARN', `[judge] ${getModelDisplayName(aiModel)} ${body.myChampion} ${body.role}: ${judged.score}/100 - ${judged.issues.join('; ')}`);
           }
-          const visibleValidated = stripDecisionTrace(validated);
+          let visibleValidated = stripDecisionTrace(validated);
+          if (gameMode === 'aram-mayhem') {
+            visibleValidated = ensureMayhemAugmentsSection(visibleValidated, body, mechMap3);
+          }
           if (!isUsableBuildText(validated, body.role)) {
             if (instantMetaText) {
               const fallbackText = fallbackToMetaBuild(instantMetaText, body, mechMap3);

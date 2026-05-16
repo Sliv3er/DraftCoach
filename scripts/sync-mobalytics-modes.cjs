@@ -5,8 +5,9 @@
  * Fetches non-SR Mobalytics data:
  * - ARAM builds from Mobalytics `gameMode: ARAM`
  * - ARAM Mayhem builds from the ARAM build baseline
- * - ARAM Mayhem augment recommendations from Mobalytics `gameMode: ARENA`
- *   augmented with CommunityDragon augment names/effects.
+ * - ARAM Mayhem augment names/effects from CommunityDragon's official Arena
+ *   catalog. Mobalytics does not expose reliable ARAM Mayhem augment meta,
+ *   so runtime recommendations rank this official catalog against the draft.
  *
  * Usage:
  *   node scripts/sync-mobalytics-modes.cjs [--dry-run] [--champion aatrox]
@@ -143,20 +144,11 @@ const BUILD_FIELDS = `
   skillOrder
 `;
 
-const ARENA_FIELDS = `
-  id role type name
-  stats { wins }
-  augmentOptions { augments { id pickRate wins matches } }
-`;
-
 async function fetchChampionModes(slug) {
   const query = `{
     lol {
       aram: champion(filters: { slug: "${slug}", gameMode: ARAM }) {
         buildsOptions { options { ${BUILD_FIELDS} } }
-      }
-      arena: champion(filters: { slug: "${slug}", gameMode: ARENA }) {
-        buildsOptions { options { ${ARENA_FIELDS} } }
       }
     }
   }`;
@@ -240,61 +232,6 @@ function selectBuilds(options) {
   return kept;
 }
 
-function resolveAugment(augment, augmentMap) {
-  const base = augmentMap.get(Number(augment.id));
-  return {
-    id: Number(augment.id),
-    name: base?.name || `Augment ${augment.id}`,
-    tier: base?.tier || 'Unknown',
-    effect: base?.effect || '',
-    pickRate: Number(augment.pickRate || 0),
-    wins: Number(augment.wins || 0),
-    matches: Number(augment.matches || 0),
-    iconSmall: base?.iconSmall || '',
-    iconLarge: base?.iconLarge || '',
-  };
-}
-
-function buildAugmentTemplate(arenaOptions, augmentMap) {
-  const source = (arenaOptions || []).find(o => o.type === 'MOST_POPULAR')
-    || (arenaOptions || []).find(o => o.type === 'RECOMMENDED')
-    || (arenaOptions || [])[0];
-  if (!source?.augmentOptions?.length) return null;
-
-  const byId = new Map();
-  const rounds = source.augmentOptions.map((option, index) => {
-    const resolved = (option.augments || [])
-      .map(aug => resolveAugment(aug, augmentMap))
-      .sort((a, b) => (b.pickRate - a.pickRate) || (b.matches - a.matches))
-      .slice(0, 12);
-    for (const aug of resolved) {
-      const existing = byId.get(aug.id) || { ...aug, appearances: 0, bestPickRate: 0, totalMatches: 0, totalWins: 0 };
-      existing.appearances++;
-      existing.bestPickRate = Math.max(existing.bestPickRate, aug.pickRate);
-      existing.totalMatches += aug.matches;
-      existing.totalWins += aug.wins;
-      byId.set(aug.id, existing);
-    }
-    return {
-      pick: index + 1,
-      recommended: resolved,
-    };
-  });
-
-  const recommended = [...byId.values()]
-    .sort((a, b) => (b.appearances - a.appearances) || (b.bestPickRate - a.bestPickRate) || (b.totalMatches - a.totalMatches))
-    .slice(0, 16)
-    .map(({ appearances, bestPickRate, totalMatches, totalWins, ...rest }) => ({
-      ...rest,
-      appearances,
-      bestPickRate,
-      matches: totalMatches,
-      wins: totalWins,
-    }));
-
-  return { sourceBuildType: source.type, rounds, recommended };
-}
-
 async function main() {
   console.log('\n========================================');
   console.log('  DraftCoach Mobalytics Mode Sync');
@@ -329,7 +266,6 @@ async function main() {
     try {
       const modes = await fetchChampionModes(champ.slug);
       const aramOptions = selectBuilds(modes.aram?.buildsOptions?.options || []);
-      const arenaOptions = modes.arena?.buildsOptions?.options || [];
 
       if (aramOptions.length) {
         const variants = {};
@@ -351,17 +287,7 @@ async function main() {
         }
       }
 
-      const augments = buildAugmentTemplate(arenaOptions, augmentMap);
-      if (augments) {
-        augmentTemplates.data[champ.id] = {
-          championId: champ.id,
-          mode: 'aram-mayhem',
-          ...augments,
-        };
-        augmentCount++;
-      }
-
-      console.log(`ARAM=${aramOptions.length ? 'yes' : 'no'} augments=${augments ? 'yes' : 'no'}`);
+      console.log(`ARAM=${aramOptions.length ? 'yes' : 'no'} augments=official-catalog`);
     } catch (err) {
       failed.push(champ.slug);
       console.log(`failed: ${err.message}`);
@@ -398,7 +324,7 @@ async function main() {
     console.log('\n[DRY RUN] Would write:');
     console.log(`  build-templates-aram.json: ${Object.keys(aramBuilds.data).length}`);
     console.log(`  build-templates-aram-mayhem.json: ${Object.keys(mayhemBuilds.data).length}`);
-    console.log(`  augment-templates.json: ${Object.keys(augmentTemplates.data).length}`);
+    console.log(`  augment-templates.json: ${Object.keys(augmentTemplates.data).length} (unused; Mayhem ranks official catalog at runtime)`);
     console.log(JSON.stringify({
       aramSample: Object.entries(aramBuilds.data)[0],
       augmentSample: Object.entries(augmentTemplates.data)[0],

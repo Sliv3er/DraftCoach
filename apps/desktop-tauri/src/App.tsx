@@ -7,11 +7,31 @@ import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, cl
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
 const GAME_MODES: GameMode[] = ['sr', 'aram', 'aram-mayhem'];
-const GAME_MODE_META: Record<GameMode, { label: string; shortLabel: string; mapId: 11 | 12; badge?: string }> = {
-  sr: { label: "Summoner's Rift", shortLabel: 'SR', mapId: 11 },
-  aram: { label: 'ARAM', shortLabel: 'ARAM', mapId: 12 },
-  'aram-mayhem': { label: 'ARAM Mayhem', shortLabel: 'Mayhem', mapId: 12, badge: 'AUG' },
+const GAME_MODE_META: Record<GameMode, { label: string; shortLabel: string; badge?: string }> = {
+  sr: { label: "Summoner's Rift", shortLabel: 'SR' },
+  aram: { label: 'ARAM', shortLabel: 'ARAM' },
+  'aram-mayhem': { label: 'ARAM Mayhem', shortLabel: 'Mayhem', badge: 'AUG' },
 };
+
+function ModeIcon({ mode, compact = false }: { mode: GameMode; compact?: boolean }) {
+  return (
+    <span className={`mode-glyph mode-glyph-${mode} ${compact ? 'mode-glyph-compact' : ''}`} aria-hidden="true">
+      <span className="mode-glyph-stack mode-glyph-stack-back" />
+      <span className="mode-glyph-stack mode-glyph-stack-mid" />
+      <span className="mode-glyph-core">
+        {mode === 'sr' ? (
+          <>
+            <span className="mode-glyph-rift mode-glyph-rift-a" />
+            <span className="mode-glyph-rift mode-glyph-rift-b" />
+          </>
+        ) : (
+          <span className="mode-glyph-bridge" />
+        )}
+      </span>
+      {mode === 'aram-mayhem' && <span className="mode-glyph-augment" />}
+    </span>
+  );
+}
 
 // ── Hotkey settings definitions ─────────────────────────────────────
 const HOTKEY_SETTINGS = [
@@ -1435,10 +1455,6 @@ export function App() {
       : status === 'error' ? 'Needs retry'
       : 'Ready';
   const selectedModelMeta = MODEL_OPTIONS.find((m) => m.value === selectedModel) || MODEL_OPTIONS[0];
-  const modeIconVersion = ddragonVersion || (patchVersion && patchVersion !== '...' ? patchVersion : '16.10.1');
-  const getModeIconUrl = useCallback((mode: GameMode) => (
-    `https://ddragon.leagueoflegends.com/cdn/${modeIconVersion}/img/map/map${GAME_MODE_META[mode].mapId}.png`
-  ), [modeIconVersion]);
   const pipelineSteps = [
     {
       key: 'meta',
@@ -1629,7 +1645,7 @@ export function App() {
                     title={meta.label}
                   >
                     <span className="mode-icon-wrap">
-                      <img src={getModeIconUrl(m)} alt="" className="mode-icon-img" />
+                      <ModeIcon mode={m} />
                       {meta.badge && <span className="mode-icon-badge">{meta.badge}</span>}
                     </span>
                     <span className="mode-label">{meta.shortLabel}</span>
@@ -1707,7 +1723,7 @@ export function App() {
                 <div className="draft-command-title">
                   {selectedChampionName}
                   <span className="draft-command-mode">
-                    <img src={getModeIconUrl(gameMode)} alt="" className="draft-command-mode-icon" />
+                    <ModeIcon mode={gameMode} compact />
                     {gameMode === 'sr' ? role.toUpperCase() : GAME_MODE_META[gameMode].shortLabel.toUpperCase()}
                   </span>
                 </div>

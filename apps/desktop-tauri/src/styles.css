@@ -635,18 +635,119 @@ body {
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 1px solid rgba(200, 170, 110, 0.28);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  overflow: visible;
 }
 
-.mode-icon-img {
+.mode-glyph {
+  position: relative;
+  display: inline-block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transform: scale(1.25);
-  filter: saturate(0.95) contrast(1.08);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.9));
+}
+
+.mode-glyph-stack,
+.mode-glyph-core {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #8e7a4a;
+  background: #07111d;
+  box-shadow: inset 0 0 0 1px rgba(214, 190, 124, 0.2);
+}
+
+.mode-glyph-sr .mode-glyph-stack,
+.mode-glyph-sr .mode-glyph-core {
+  border-radius: 7px 2px 7px 2px;
+}
+
+.mode-glyph-sr .mode-glyph-stack-back {
+  transform: translate(-4px, -4px);
+  opacity: 0.75;
+}
+
+.mode-glyph-sr .mode-glyph-stack-mid {
+  transform: translate(-2px, -2px);
+  opacity: 0.9;
+}
+
+.mode-glyph-sr .mode-glyph-core {
+  overflow: hidden;
+  background: linear-gradient(135deg, #08203a 0%, #0b2d4d 48%, #06111f 49%, #06111f 100%);
+}
+
+.mode-glyph-rift {
+  position: absolute;
+  border: 1px solid rgba(111, 214, 255, 0.55);
+  background: linear-gradient(135deg, #14659a, #42c4ec);
+  transform: skew(-18deg);
+}
+
+.mode-glyph-rift-a {
+  left: 3px;
+  top: 3px;
+  width: 8px;
+  height: 13px;
+}
+
+.mode-glyph-rift-b {
+  right: 3px;
+  bottom: 3px;
+  width: 9px;
+  height: 13px;
+}
+
+.mode-glyph-aram .mode-glyph-stack,
+.mode-glyph-aram .mode-glyph-core,
+.mode-glyph-aram-mayhem .mode-glyph-stack,
+.mode-glyph-aram-mayhem .mode-glyph-core {
+  border-radius: 2px;
+  transform: skew(-18deg);
+}
+
+.mode-glyph-aram .mode-glyph-stack-back,
+.mode-glyph-aram-mayhem .mode-glyph-stack-back {
+  transform: translate(-4px, -4px) skew(-18deg);
+  opacity: 0.72;
+}
+
+.mode-glyph-aram .mode-glyph-stack-mid,
+.mode-glyph-aram-mayhem .mode-glyph-stack-mid {
+  transform: translate(-2px, -2px) skew(-18deg);
+  opacity: 0.88;
+}
+
+.mode-glyph-aram .mode-glyph-core,
+.mode-glyph-aram-mayhem .mode-glyph-core {
+  background: linear-gradient(135deg, #071224, #0b1730 58%, #11101b);
+  overflow: hidden;
+}
+
+.mode-glyph-bridge {
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 11px;
+  height: 20px;
+  border-left: 2px solid rgba(13, 32, 61, 0.95);
+  border-right: 2px solid rgba(13, 32, 61, 0.95);
+  background: linear-gradient(180deg, rgba(28, 52, 88, 0.95), rgba(4, 12, 26, 0.95));
+}
+
+.mode-glyph-augment {
+  position: absolute;
+  right: -3px;
+  bottom: -2px;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  border: 1px solid rgba(0, 209, 156, 0.95);
+  background: linear-gradient(135deg, #00d19c, #245dff);
+  box-shadow: 0 0 8px rgba(0, 209, 156, 0.55);
+}
+
+.mode-glyph-compact {
+  width: 18px;
+  height: 18px;
 }
 
 .mode-icon-badge {

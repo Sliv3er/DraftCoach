@@ -6,22 +6,27 @@ export interface DraftState {
 }
 
 export type Role = 'top' | 'jungle' | 'mid' | 'adc' | 'support';
+export type GameMode = 'sr' | 'aram' | 'aram-mayhem';
 
 export interface BuildRequest {
   patch: string;
   myChampion: string;
   role: Role;
+  gameMode?: GameMode;
   allies: string[];
   enemies: string[];
+  enemyRoles?: Record<string, Role>;
   model?: string;
   userId?: string;  // For usage tracking
 }
 
 export interface BuildSuccessResponse {
   ok: true;
-  source: 'grounded' | 'cache' | 'stale-cache';
+  source: 'grounded' | 'cache' | 'stale-cache' | 'meta' | 'meta-preview' | 'meta-fallback';
   patchDetected: string;
   text: string;
+  metaStatus?: 'exact' | 'missing-role' | 'missing-champion';
+  metaMessage?: string;
 }
 
 export interface BuildErrorResponse {
@@ -43,7 +48,7 @@ export interface CacheEntry {
 
 export interface AppConfig {
   aiProvider: 'openrouter';
-  aiModel: 'deepseek/deepseek-v4-flash';
+  aiModel: 'deepseek/deepseek-v4-flash' | 'qwen/qwen3.6-flash' | 'google/gemini-3-flash-preview';
   backendPort: number;
 }
 

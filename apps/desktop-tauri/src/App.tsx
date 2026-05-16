@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { BuildResponse, Role, AiModel } from './types';
+import { BuildResponse, Role, AiModel, GameMode } from './types';
 import { ChampionPicker } from './components/ChampionPicker';
 import { BuildOutput } from './components/BuildOutput';
 import { ipcInvoke, ipcSend, ipcOn, ipcRemoveListener, minimizeCurrentWindow, closeCurrentWindow, hideCurrentWindow, toggleMaximizeCurrentWindow, backendReady, registerGlobalHotkey, unregisterAllHotkeys } from './bridge';
 
 const API_BASE = 'http://127.0.0.1:3210';
 const ROLES: Role[] = ['top', 'jungle', 'mid', 'adc', 'support'];
+const GAME_MODES: GameMode[] = ['sr', 'aram', 'aram-mayhem'];
 
 // ── Hotkey settings definitions ─────────────────────────────────────
 const HOTKEY_SETTINGS = [
@@ -113,8 +114,10 @@ const ROLE_ICON_URLS: Record<Role, string> = {
   support: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png',
 };
 
-const MODEL_OPTIONS: { value: AiModel; label: string }[] = [
-  { value: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash' },
+const MODEL_OPTIONS: { value: AiModel; label: string; tone: string }[] = [
+  { value: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash', tone: 'Best' },
+  { value: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash', tone: 'Balanced' },
+  { value: 'qwen/qwen3.6-flash', label: 'Qwen3.6 Flash', tone: 'Fast' },
 ];
 
 // Map LCU position strings to our Role type
@@ -126,7 +129,7 @@ const LCU_POSITION_MAP: Record<string, Role> = {
   utility: 'support',
 };
 
-type Status = 'idle' | 'fetching' | 'grounded' | 'cache' | 'stale-cache' | 'error';
+type Status = 'idle' | 'fetching' | 'grounded' | 'cache' | 'stale-cache' | 'meta' | 'meta-fallback' | 'error';
 
 interface ChampionData {
   id: string;
@@ -180,6 +183,68 @@ function parseSectionsFromText(text: string): { title: string; content: string }
 
 // ── Component Item Path Algorithm ───────────────────────────────────
 
+function sectionContent(text: string, title: string): string {
+  return parseSectionsFromText(text).find(s => s.title === title)?.content || '';
+}
+
+function normalizeLineList(content: string): string[] {
+  return content
+    .split('\n')
+    .map(line => line.trim()
+      .replace(/\*\*/g, '')
+      .replace(/^\d+[.)\s]+\s*/, '')
+      .replace(/^[-*]\s*/, '')
+      .replace(/\s*\([^)]*\)\s*$/, '')
+      .trim())
+    .filter(Boolean);
+}
+
+function diffList(before: string[], after: string[]) {
+  const norm = (value: string) => value.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+  const beforeSet = new Set(before.map(norm));
+  const afterSet = new Set(after.map(norm));
+  return {
+    added: after.filter(item => !beforeSet.has(norm(item))),
+    removed: before.filter(item => !afterSet.has(norm(item))),
+  };
+}
+
+function buildRefinementSummary(metaText: string, finalText: string): string[] {
+  if (!metaText || !finalText) return [];
+  const changes: string[] = [];
+
+  const metaCore = normalizeLineList(sectionContent(metaText, 'CORE BUILD'));
+  const finalCore = normalizeLineList(sectionContent(finalText, 'CORE BUILD'));
+  const coreDiff = diffList(metaCore, finalCore);
+  if (coreDiff.added.length || coreDiff.removed.length) {
+    const added = coreDiff.added.slice(0, 3).join(', ');
+    const removed = coreDiff.removed.slice(0, 2).join(', ');
+    changes.push(`Core adjusted${added ? `: added ${added}` : ''}${removed ? `; removed ${removed}` : ''}`);
+  } else if (metaCore.join('|').toLowerCase() !== finalCore.join('|').toLowerCase()) {
+    changes.push('Core order refined for this draft');
+  }
+
+  const metaStarting = normalizeLineList(sectionContent(metaText, 'STARTING ITEMS'));
+  const finalStarting = normalizeLineList(sectionContent(finalText, 'STARTING ITEMS'));
+  const startingDiff = diffList(metaStarting, finalStarting);
+  if (startingDiff.added.length || startingDiff.removed.length) {
+    changes.push(`Start changed to ${finalStarting.slice(0, 2).join(' + ')}`);
+  }
+
+  const metaRunes = normalizeLineList(sectionContent(metaText, 'RUNES'));
+  const finalRunes = normalizeLineList(sectionContent(finalText, 'RUNES'));
+  const runeDiff = diffList(metaRunes, finalRunes);
+  if (runeDiff.added.length || runeDiff.removed.length) {
+    changes.push('Runes refined for matchup pressure');
+  }
+
+  const finalSituational = normalizeLineList(sectionContent(finalText, 'SITUATIONAL ITEMS'));
+  if (finalSituational.length) {
+    changes.push(`Situational plan added: ${finalSituational.slice(0, 2).join(', ')}`);
+  }
+
+  return changes.length ? changes.slice(0, 5) : ['AI validated the meta baseline with no major structural changes'];
+}
 function resolveComponentPath(
   itemName: string,
   iconLookups: IconLookups | null,
@@ -372,11 +437,15 @@ export function App() {
   const [ddragonVersion, setDdragonVersion] = useState('');
   const [champions, setChampions] = useState<ChampionData[]>([]);
   const [role, setRole] = useState<Role>('mid');
+  const [gameMode, setGameMode] = useState<GameMode>('sr');
   const [myChampion, setMyChampion] = useState('');
   const [allies, setAllies] = useState<string[]>([]);
   const [enemies, setEnemies] = useState<string[]>([]);
+  const [enemyRoles, setEnemyRoles] = useState<Record<string, Role>>({});
   const [status, setStatus] = useState<Status>('idle');
   const [buildResult, setBuildResult] = useState<BuildResponse | null>(null);
+  const [refinementSummary, setRefinementSummary] = useState<string[]>([]);
+  const [metaStatus, setMetaStatus] = useState<{ status: 'exact' | 'missing-role' | 'missing-champion'; message: string } | null>(null);
   const [iconLookups, setIconLookups] = useState<IconLookups | null>(null);
   const [selectedModel, setSelectedModel] = useState<AiModel>('deepseek/deepseek-v4-flash');
   const [autoDetect, setAutoDetect] = useState(true);
@@ -384,10 +453,13 @@ export function App() {
   const autoDetectRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const champKeyMapRef = useRef<Map<string, { id: string; name: string }>>(new Map());
   const autoGenKeyRef = useRef<string>(''); // track last auto-generated combo to avoid repeated calls
+  const metaPreviewKeyRef = useRef<string>(''); // track last champion/role meta preview
   const buildGeneratedRef = useRef<boolean>(false); // once a build is generated, lock champion detection
   const lastSessionIdRef = useRef<string>(''); // track champ select session to avoid resetting lock every poll tick
   const overlayShownRef = useRef<boolean>(false); // track if overlay is currently shown by polling
   const overlayHasDataRef = useRef<boolean>(false); // ref mirror for use in pollLCU callback
+  const statusRef = useRef<Status>('idle');
+  const draftCompleteRef = useRef<boolean>(false);
 
   // ── New UI state: RAG, overlay, settings ───────────────────────
   const [ragStatus, setRagStatus] = useState<RagStatus>({ isUpdating: false, patch: null, updatedAt: null });
@@ -398,6 +470,7 @@ export function App() {
   const [openrouterKeySaveStatus, setOpenrouterKeySaveStatus] = useState<string>('');
   const [runesModel, setRunesModel] = useState('');
   const [buildModel, setBuildModel] = useState('');
+  const [metaPreviewLoading, setMetaPreviewLoading] = useState(false);
 
   // ── Live Advisor state ─────────────────────────────────────────
   const [liveAdvice, setLiveAdvice] = useState<any>(null);
@@ -415,6 +488,9 @@ export function App() {
 
   // ── Ping Monitor state ─────────────────────────────────────────
   const [pingData, setPingData] = useState<any>({ ping: null, jitter: null, packetLoss: 0, status: 'disconnected', history: [] });
+
+  statusRef.current = status;
+  draftCompleteRef.current = Boolean(myChampion && allies.length >= 4 && enemies.length >= 5);
 
   useEffect(() => {
     const handler = (_event: any, advice: any) => { setLiveAdvice(advice); };
@@ -458,6 +534,9 @@ export function App() {
     const settingsUpdateHandler = (_event: any, newSettings: any) => {
       if (newSettings && typeof newSettings === 'object') {
         setSettings(newSettings);
+        if (MODEL_OPTIONS.some((m) => m.value === newSettings.aiModel)) {
+          setSelectedModel(newSettings.aiModel);
+        }
       }
     };
     ipcOn('settings-update', settingsUpdateHandler);
@@ -475,9 +554,12 @@ export function App() {
       setMyChampion('');
       setAllies([]);
       setEnemies([]);
+      setEnemyRoles({});
+      setGameMode('sr');
       setStatus('idle');
       // Clear the auto-generate key so the next draft triggers a fresh build
       autoGenKeyRef.current = '';
+      metaPreviewKeyRef.current = '';
       lastSessionIdRef.current = '';
       // Clear live-updated items so next game starts fresh
       setLiveUpdatedItems(null);
@@ -665,6 +747,9 @@ export function App() {
         try {
           const s = await ipcInvoke('get-settings');
           setSettings(s);
+          if (MODEL_OPTIONS.some((m) => m.value === s?.aiModel)) {
+            setSelectedModel(s.aiModel);
+          }
         } catch { /* ignore */ }
       };
 
@@ -731,6 +816,75 @@ export function App() {
   // Track when overlay data is sent
   const origOverlayHasData = useRef(false);
 
+  const fetchMetaPreview = useCallback(async (championId: string, champRole: Role) => {
+    if (!championId || !patchVersion || patchVersion === '...') return;
+    const requestBody = {
+      patch: patchVersion,
+      myChampion: championId,
+      role: champRole,
+      gameMode,
+      allies: [],
+      enemies: [],
+      model: selectedModel,
+      generationMode: 'meta-preview',
+    };
+
+    setMetaPreviewLoading(true);
+    setBuildResult(null);
+    setRefinementSummary([]);
+    setMetaStatus(null);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/build-dual`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+      const reader = response.body?.getReader();
+      if (!reader) return;
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data: ')) continue;
+          const payload = JSON.parse(line.slice(6));
+          if (payload.phase === 'meta' && payload.fullText) {
+            if (draftCompleteRef.current || statusRef.current === 'fetching') return;
+            setMetaStatus({ status: 'exact', message: 'Exact Mobalytics role baseline loaded.' });
+            setStatus('meta');
+            setBuildResult({
+              ok: true,
+              source: 'meta-preview',
+              patchDetected: payload.patchUsed || patchVersion,
+              text: payload.fullText,
+              metaStatus: 'exact',
+              metaMessage: 'Exact Mobalytics role baseline loaded.',
+            } as BuildResponse);
+            return;
+          }
+          if (payload.phase === 'meta-status') {
+            if (draftCompleteRef.current || statusRef.current === 'fetching') return;
+            const statusValue = payload.source === 'meta-missing-role' ? 'missing-role' : 'missing-champion';
+            const missingMessage = statusValue === 'missing-role'
+              ? `No exact Mobalytics ${champRole} meta is available for ${championId}.`
+              : `No Mobalytics meta is available for ${championId}.`;
+            setMetaStatus({ status: statusValue, message: missingMessage });
+            setStatus('meta-fallback');
+            setBuildResult(null);
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[App] Meta preview failed:', err);
+    } finally {
+      setMetaPreviewLoading(false);
+    }
+  }, [patchVersion, selectedModel, gameMode]);
+
   const handleGenerate = useCallback(async () => {
     if (!myChampion) return;
     // Don't generate if DDragon hasn't loaded yet
@@ -740,11 +894,13 @@ export function App() {
     }
     setStatus('fetching');
     setBuildResult(null);
+    setRefinementSummary([]);
+    setMetaStatus(null);
     setRunesModel('');
     setBuildModel('');
     // Don't reset buildGeneratedRef here — auto-detect will unlock on new champ select session
 
-    const requestBody = { patch: patchVersion, myChampion, role, allies, enemies, model: selectedModel, generationMode: settings.generationMode || 'flash' };
+    const requestBody = { patch: patchVersion, myChampion, role, gameMode, allies, enemies, enemyRoles, model: selectedModel, generationMode: settings.generationMode || 'flash' };
     console.log('[App] Generate request:', JSON.stringify({ ...requestBody, allies: requestBody.allies?.length, enemies: requestBody.enemies?.length }));
 
     try {
@@ -773,6 +929,8 @@ export function App() {
       let patchUsed = '';
       let source = 'grounded';
       let fullFinalText = '';
+      let metaBaselineText = '';
+      let currentMetaStatus: { status: 'exact' | 'missing-role' | 'missing-champion'; message: string } | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -789,6 +947,21 @@ export function App() {
             if (payload.patchUsed) patchUsed = payload.patchUsed;
             if (payload.source) source = payload.source;
 
+            if (payload.phase === 'meta-status') {
+              const statusValue = payload.source === 'meta-missing-role' ? 'missing-role' : 'missing-champion';
+              currentMetaStatus = { status: statusValue, message: payload.message || 'No exact meta baseline is available for this role.' };
+              setMetaStatus(currentMetaStatus);
+              continue;
+            }
+
+            if (payload.phase === 'meta' && payload.fullText) {
+              metaBaselineText = payload.fullText;
+              currentMetaStatus = { status: 'exact', message: 'Exact Mobalytics role baseline loaded.' };
+              setMetaStatus(currentMetaStatus);
+              if (payload.model) setBuildModel(payload.model);
+              continue;
+            }
+
             // ── Full build phase (single generation) ──
             if (payload.phase === 'full') {
               if (payload.error && payload.done) {
@@ -802,23 +975,34 @@ export function App() {
               }
               if (payload.chunk) {
                 fullStreamedText += payload.chunk;
-                if (fullStreamedText.includes('CORE BUILD') || fullStreamedText.length > 500) {
-                  setBuildResult({ ok: true, source, patchDetected: patchUsed, text: fullStreamedText } as BuildResponse);
-                }
               }
               if (payload.corrected) fullFinalText = payload.corrected;
               if (payload.done) {
                 fullFinalText = payload.fullText || fullFinalText || fullStreamedText;
                 source = payload.source || source;
+                if (!fullFinalText.trim() && metaBaselineText) {
+                  console.warn('[App] Ignoring empty AI final result; keeping meta baseline visible.');
+                  fullFinalText = metaBaselineText;
+                  source = 'meta-fallback';
+                }
                 if (payload.model) setBuildModel(payload.model);
-                setBuildResult({ ok: true, source: source as any, patchDetected: patchUsed, text: fullFinalText } as BuildResponse);
+                if (metaBaselineText && fullFinalText && source === 'grounded') {
+                  setRefinementSummary(buildRefinementSummary(metaBaselineText, fullFinalText));
+                }
+                setBuildResult({
+                  ok: true,
+                  source: source as any,
+                  patchDetected: patchUsed,
+                  text: fullFinalText,
+                  metaStatus: currentMetaStatus?.status,
+                  metaMessage: currentMetaStatus?.message,
+                } as BuildResponse);
               }
             }
 
             // Handle non-phased events (cache hit etc)
             if (!payload.phase && payload.chunk) {
               fullStreamedText += payload.chunk;
-              setBuildResult({ ok: true, source, patchDetected: patchUsed, text: fullStreamedText } as BuildResponse);
             }
             if (!payload.phase && payload.done) {
               fullFinalText = payload.fullText || fullStreamedText;
@@ -835,12 +1019,38 @@ export function App() {
       }
 
       // Final result
-      const text = fullFinalText || fullStreamedText;
-      const data: BuildResponse = { ok: true, source: source as any, patchDetected: patchUsed, text };
+      let text = fullFinalText || fullStreamedText;
+      if (!text.trim() && metaBaselineText) {
+        console.warn('[App] Empty final build after stream; keeping meta baseline.');
+        text = metaBaselineText;
+        source = 'meta-fallback';
+      }
+      if (!text.trim()) {
+        setBuildResult({ ok: false, source: 'error', text: '', message: 'AI returned an empty build. Please retry.', canRetry: true } as any);
+        setStatus('error');
+        return;
+      }
+      const data: BuildResponse = {
+        ok: true,
+        source: source as any,
+        patchDetected: patchUsed,
+        text,
+        metaStatus: currentMetaStatus?.status,
+        metaMessage: currentMetaStatus?.message,
+      };
+      if (metaBaselineText && text && source === 'grounded') {
+        setRefinementSummary(buildRefinementSummary(metaBaselineText, text));
+      }
       setBuildResult(data);
 
       if (data.ok) {
-        setStatus(data.source === 'grounded' ? 'grounded' : data.source === 'cache' ? 'cache' : 'stale-cache');
+        setStatus(
+          data.source === 'grounded' ? 'grounded'
+            : data.source === 'cache' ? 'cache'
+            : data.source === 'meta' ? 'meta'
+            : data.source === 'meta-fallback' ? 'meta-fallback'
+            : 'stale-cache'
+        );
         buildGeneratedRef.current = true;
 
         if (data.text) {
@@ -887,7 +1097,7 @@ export function App() {
       setBuildResult({ ok: false, source: 'error', message: err.message, canRetry: true });
       setStatus('error');
     }
-  }, [myChampion, role, allies, enemies, selectedModel, iconLookups, patchVersion, settings]);
+  }, [myChampion, role, gameMode, allies, enemies, enemyRoles, selectedModel, iconLookups, patchVersion, settings]);
 
   // ── Auto-generate when all 10 champions are locked in ──
   useEffect(() => {
@@ -898,12 +1108,31 @@ export function App() {
     // Don't auto-generate until DDragon data is loaded
     if (!patchVersion || patchVersion === '...') return;
     // Build a key so we don't re-trigger for the same exact draft
-    const comboKey = `${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}`;
+    const comboKey = `${gameMode}|${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}`;
     if (autoGenKeyRef.current === comboKey) return;
     autoGenKeyRef.current = comboKey;
     console.log('[App] All 10 champions detected — auto-generating build');
     handleGenerate();
-  }, [autoDetect, myChampion, role, allies, enemies, status, handleGenerate, patchVersion]);
+  }, [autoDetect, myChampion, role, gameMode, allies, enemies, status, handleGenerate, patchVersion]);
+
+  useEffect(() => {
+    if (!myChampion) {
+      if (buildResult?.ok && buildResult.source === 'meta-preview') setBuildResult(null);
+      setMetaStatus(null);
+      if (status === 'meta' || status === 'meta-fallback') setStatus('idle');
+      metaPreviewKeyRef.current = '';
+      return;
+    }
+    if (status === 'fetching' || status === 'grounded' || status === 'cache' || status === 'stale-cache') return;
+    if (allies.length >= 4 && enemies.length >= 5) return;
+    const previewKey = `${gameMode}|${myChampion}|${role}|${patchVersion}`;
+    if (metaPreviewKeyRef.current === previewKey) return;
+    const timer = setTimeout(() => {
+      metaPreviewKeyRef.current = previewKey;
+      fetchMetaPreview(myChampion, role);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [myChampion, role, allies.length, enemies.length, status, fetchMetaPreview, buildResult, patchVersion]);
 
   // Listen for force-regenerate from main process (CTRL+SHIFT+G)
   useEffect(() => {
@@ -921,8 +1150,12 @@ export function App() {
     setMyChampion('');
     setAllies([]);
     setEnemies([]);
+    setEnemyRoles({});
     setBuildResult(null);
+    setRefinementSummary([]);
+    setMetaStatus(null);
     setStatus('idle');
+    metaPreviewKeyRef.current = '';
   }, []);
 
   // Auto-detect: poll LCU for champ select session, with in-game fallback
@@ -934,16 +1167,26 @@ export function App() {
       console.log('[Auto-detect] lcu-champ-select result:', JSON.stringify(result)?.substring(0, 300));
       if (result?.ok) {
         setAutoDetectStatus('connected');
+        try {
+          const modeResult = await ipcInvoke('lcu-game-mode');
+          if (modeResult?.ok && GAME_MODES.includes(modeResult.mode as GameMode)) {
+            const detectedMode = modeResult.mode as GameMode;
+            setGameMode(detectedMode);
+            if (detectedMode !== 'sr') setRole('mid');
+          }
+        } catch {}
         const session = result.session;
         const sessionId = `${session.localPlayerCellId}-${session.gameId || session.counter || 'x'}`;
         if (lastSessionIdRef.current !== sessionId) {
           lastSessionIdRef.current = sessionId;
           buildGeneratedRef.current = false;
           autoGenKeyRef.current = '';
+          metaPreviewKeyRef.current = '';
           // Clear stale data from previous session
           setMyChampion('');
           setAllies([]);
           setEnemies([]);
+          setEnemyRoles({});
           console.log('[App] New champ select session detected — unlocking auto-generate');
         }
         const localCellId = session.localPlayerCellId;
@@ -993,14 +1236,20 @@ export function App() {
 
         // Enemies — only confirmed picks from their team
         const enemyIds: string[] = [];
+        const detectedEnemyRoles: Record<string, Role> = {};
         for (const p of session.theirTeam || []) {
           const pickedId = pickedChampByCellId.get(p.cellId);
           if (pickedId) {
             const champ = keyMap.get(String(pickedId));
-            if (champ) enemyIds.push(champ.id);
+            if (champ) {
+              enemyIds.push(champ.id);
+              const mappedEnemyRole = LCU_POSITION_MAP[String(p.assignedPosition || '').toLowerCase()];
+              if (mappedEnemyRole) detectedEnemyRoles[champ.id] = mappedEnemyRole;
+            }
           }
         }
         setEnemies(enemyIds);
+        setEnemyRoles(detectedEnemyRoles);
         return; // champ select worked, no fallback needed
       }
 
@@ -1033,6 +1282,14 @@ export function App() {
       console.log('[Auto-detect] lcu-live-game result:', liveResult?.ok ? 'connected' : 'not in game');
       if (liveResult?.ok) {
         setAutoDetectStatus('connected');
+        try {
+          const modeResult = await ipcInvoke('lcu-game-mode');
+          if (modeResult?.ok && GAME_MODES.includes(modeResult.mode as GameMode)) {
+            const detectedMode = modeResult.mode as GameMode;
+            setGameMode(detectedMode);
+            if (detectedMode !== 'sr') setRole('mid');
+          }
+        } catch {}
         const keyMap = champKeyMapRef.current;
 
         // Resolve champion name → DDragon ID (keyMap is keyed by champion key,
@@ -1083,12 +1340,18 @@ export function App() {
 
         // Set enemies
         const liveEnemies: string[] = [];
+        const liveEnemyRoles: Record<string, Role> = {};
         for (const name of liveResult.enemies || []) {
           const id = resolveChamp(name);
-          if (id) liveEnemies.push(id);
+          if (id) {
+            liveEnemies.push(id);
+            const liveRole = liveResult.enemyRoles?.[name] || liveResult.enemyRoles?.[id];
+            if (liveRole && ROLES.includes(liveRole)) liveEnemyRoles[id] = liveRole;
+          }
         }
         if (liveEnemies.length > 0) {
           setEnemies(prev => liveEnemies.length >= prev.length ? liveEnemies : prev);
+          if (Object.keys(liveEnemyRoles).length > 0) setEnemyRoles(liveEnemyRoles);
         }
 
         // Show overlay when in-game (reliable fallback for SSE)
@@ -1151,13 +1414,80 @@ export function App() {
     ddragonVersion ? `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/champion/${champId}.png` : ''
   , [ddragonVersion]);
 
+  const selectedChampionName = champions.find(c => c.id === myChampion)?.name || myChampion || 'No champion';
+  const generationStage =
+    status === 'fetching' && buildResult?.ok ? 'AI refining'
+      : status === 'fetching' ? 'AI generating'
+      : status === 'grounded' ? 'AI validated'
+      : status === 'meta' || status === 'meta-fallback' ? 'Meta baseline'
+      : status === 'cache' ? 'Saved build'
+      : status === 'error' ? 'Needs retry'
+      : 'Ready';
+  const selectedModelMeta = MODEL_OPTIONS.find((m) => m.value === selectedModel) || MODEL_OPTIONS[0];
+  const pipelineSteps = [
+    {
+      key: 'meta',
+      label: 'Meta',
+      state: status === 'idle' || status === 'error' ? 'pending' : 'done',
+    },
+    {
+      key: 'draft',
+      label: 'Draft',
+      state: status === 'fetching' && !buildResult?.ok ? 'active' : status === 'idle' || status === 'error' ? 'pending' : 'done',
+    },
+    {
+      key: 'ai',
+      label: 'AI',
+      state: status === 'fetching' && buildResult?.ok ? 'active' : status === 'grounded' ? 'done' : 'pending',
+    },
+  ];
+  const advisorGameTime = liveAdvice
+    ? `${Math.floor((liveAdvice.gameTime || 0) / 60)}:${String(Math.floor((liveAdvice.gameTime || 0) % 60)).padStart(2, '0')}`
+    : '0:00';
+  const advisorGetIcon = useCallback((name: string) => {
+    if (!iconLookups || !name) return '';
+    const norm = name.toLowerCase().trim();
+    let url = iconLookups.items.get(norm);
+    if (!url) {
+      for (const [key, val] of iconLookups.items.entries()) {
+        if (key === norm || key.startsWith(norm + ' ') || norm.startsWith(key + ' ')) {
+          url = val;
+          break;
+        }
+      }
+    }
+    return url || '';
+  }, [iconLookups]);
+  const advisorNextItems = useMemo(() => {
+    const raw = liveAdvice?.rawText || '';
+    const nextSection = raw.match(/NEXT ITEMS?\n([\s\S]*?)(?=\nTHREAT|\nSELL|\n\n|$)/);
+    if (!nextSection) return [];
+    return nextSection[1]
+      .trim()
+      .split('\n')
+      .map((line: string) => line.trim())
+      .filter(Boolean)
+      .map((line: string) => {
+        const cleaned = line.replace(/^\d+[.)]\s*/, '').trim();
+        const colonIdx = cleaned.indexOf(':');
+        const name = colonIdx > 0 ? cleaned.substring(0, colonIdx).trim() : cleaned;
+        const reason = colonIdx > 0 ? cleaned.substring(colonIdx + 1).trim() : '';
+        return { name, reason, icon: advisorGetIcon(name) };
+      })
+      .slice(0, 2);
+  }, [liveAdvice, advisorGetIcon]);
+  const advisorThreatText = useMemo(() => {
+    const raw = liveAdvice?.rawText || '';
+    return raw.match(/THREAT\n(.+?)(?:\n\n|$)/s)?.[1]?.trim() || '';
+  }, [liveAdvice]);
+
   const handleSettingChange = useCallback(async (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     await ipcInvoke('set-setting', key, value);
   }, []);
 
   return (
-    <div className="app">
+    <div className={`app app-state-${status} ${status === 'fetching' ? 'app-generating' : ''}`}>
       <header className="header">
         <div className="header-brand">
           <img src="/logo.png" alt="DraftCoach" className="header-logo" />
@@ -1192,7 +1522,6 @@ export function App() {
                 const model = e.target.value as AiModel;
                 setSelectedModel(model);
                 await handleSettingChange('aiModel', model);
-                await handleSettingChange('generationMode', 'flash');
               }}
             >
               {MODEL_OPTIONS.map((m) => (
@@ -1269,13 +1598,34 @@ export function App() {
           )}
 
           <div className="field-group">
+            <label>Mode</label>
+            <div className="mode-picker">
+              {GAME_MODES.map((m) => (
+                <button
+                  key={m}
+                  className={`mode-btn ${gameMode === m ? 'mode-btn-active' : ''}`}
+                  onClick={() => {
+                    setGameMode(m);
+                    if (m !== 'sr') setRole('mid');
+                    metaPreviewKeyRef.current = '';
+                  }}
+                  title={m === 'sr' ? "Summoner's Rift" : m === 'aram' ? 'ARAM' : 'ARAM Mayhem'}
+                >
+                  {m === 'sr' ? 'SR' : m === 'aram' ? 'ARAM' : 'Mayhem'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="field-group">
             <label>Role</label>
             <div className="role-picker">
               {ROLES.map((r) => (
                 <button
                   key={r}
-                  className={`role-btn ${role === r ? 'role-btn-active' : ''}`}
-                  onClick={() => setRole(r)}
+                  className={`role-btn ${role === r ? 'role-btn-active' : ''} ${gameMode !== 'sr' ? 'role-btn-disabled' : ''}`}
+                  onClick={() => gameMode === 'sr' && setRole(r)}
+                  disabled={gameMode !== 'sr'}
                   title={r.charAt(0).toUpperCase() + r.slice(1)}
                 >
                   <img src={ROLE_ICON_URLS[r]} alt={r} className="role-icon-img" />
@@ -1327,15 +1677,54 @@ export function App() {
         </div>
 
         <div className="right-panel">
-          <BuildOutput result={buildResult} iconLookups={iconLookups} loading={status === 'fetching'} championId={myChampion} role={role} liveUpdatedItems={liveUpdatedItems} enemies={enemies} />
+          <div className="draft-command-bar">
+            <div className="draft-command-primary">
+              {myChampion && <img src={getChampIconUrl(myChampion)} alt={selectedChampionName} className="draft-command-champ" />}
+              <div>
+                <div className="draft-command-kicker">Draft Plan</div>
+                <div className="draft-command-title">{selectedChampionName} <span>{gameMode === 'sr' ? role.toUpperCase() : gameMode === 'aram' ? 'ARAM' : 'MAYHEM'}</span></div>
+              </div>
+            </div>
+            <div className="draft-pipeline" aria-label="Generation pipeline">
+              {pipelineSteps.map((step) => (
+                <div key={step.key} className={`draft-pipeline-step draft-pipeline-${step.state}`}>
+                  <span className="draft-pipeline-node" />
+                  <span>{step.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="draft-command-metrics">
+              <div className="draft-command-metric"><span>Allies</span><strong>{allies.length}/4</strong></div>
+              <div className="draft-command-metric"><span>Enemies</span><strong>{enemies.length}/5</strong></div>
+              <div className="draft-command-metric"><span>State</span><strong>{generationStage}</strong></div>
+              <div className="draft-command-metric draft-command-model"><span>Model</span><strong>{selectedModelMeta.tone}</strong></div>
+            </div>
+          </div>
+          <BuildOutput
+            result={buildResult}
+            iconLookups={iconLookups}
+            loading={status === 'fetching' || metaPreviewLoading}
+            loadingMode={status === 'fetching' ? 'ai' : 'meta'}
+            championId={myChampion}
+            role={role}
+            liveUpdatedItems={liveUpdatedItems}
+            enemies={enemies}
+            refinementSummary={refinementSummary}
+            metaStatus={metaStatus}
+          />
 
           {/* ── Live Advisor Panel ── */}
           <div className="live-advisor-section">
             <div className="live-advisor-header">
-              <span className="live-advisor-title">
-                <span className={`live-advisor-dot ${liveAdvisorActive ? 'active' : ''}`} />
-                Live Advisor
-              </span>
+              <div className="live-advisor-title-wrap">
+                <span className="live-advisor-title">
+                  <span className={`live-advisor-dot ${liveAdvisorActive ? 'active' : ''}`} />
+                  Live Advisor
+                </span>
+                <span className="live-advisor-subtitle">
+                  {liveAdvisorActive ? `Watching game state with ${selectedModelMeta.label}` : 'Ready when the match starts'}
+                </span>
+              </div>
               <button
                 className={`live-advisor-toggle ${liveAdvisorActive ? 'active' : ''}`}
                 onClick={async () => {
@@ -1355,44 +1744,44 @@ export function App() {
 
             {liveAdvisorActive && !liveAdvice && (
               <div className="live-advisor-waiting">
-                Monitoring game... Advice will appear when triggered.
+                <div className="advisor-wait-orbit">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div>
+                  <strong>Monitoring live game</strong>
+                  <span>Advice appears when gold, items, threats, or objective state changes enough to matter.</span>
+                </div>
               </div>
             )}
 
             {liveAdvice && (
               <div className="live-advisor-card">
-                <div className="live-advisor-trigger">
-                  {liveAdvice.triggerReason}
-                  <span className="live-advisor-time">
-                    {Math.floor((liveAdvice.gameTime || 0) / 60)}:{String(Math.floor((liveAdvice.gameTime || 0) % 60)).padStart(2, '0')}
-                  </span>
+                <div className="advisor-hero">
+                  <div className="advisor-hero-main">
+                    <span className="advisor-hero-kicker">{liveAdvice.triggerReason || 'Live recommendation'}</span>
+                    <strong>{liveAdvice.summary || 'Build path updated from current game state.'}</strong>
+                  </div>
+                  <div className="advisor-hero-stats">
+                    <div><span>Time</span><strong>{advisorGameTime}</strong></div>
+                    <div><span>Model</span><strong>{selectedModelMeta.tone}</strong></div>
+                  </div>
                 </div>
-                <div className="live-advisor-summary">{liveAdvice.summary}</div>
 
                 {liveAdvice.changes && liveAdvice.changes.length > 0 && (
-                  <div className="live-advisor-changes">
+                  <div className="advisor-panel advisor-panel-priority">
                     <div className="live-advisor-changes-title">Item Changes</div>
                     {liveAdvice.changes.map((c: any, i: number) => {
-                      const getIcon = (name: string) => {
-                        if (!iconLookups) return '';
-                        const norm = name.toLowerCase().trim();
-                        let url = iconLookups.items.get(norm);
-                        if (!url) {
-                          for (const [key, val] of iconLookups.items.entries()) {
-                            if (key === norm || key.startsWith(norm + ' ') || norm.startsWith(key + ' ')) { url = val; break; }
-                          }
-                        }
-                        return url || '';
-                      };
-                      const oldIcon = getIcon(c.currentItem);
-                      const newIcon = getIcon(c.recommendedItem);
+                      const oldIcon = advisorGetIcon(c.currentItem);
+                      const newIcon = advisorGetIcon(c.recommendedItem);
                       return (
                         <div key={i} className="advisor-change-row">
                           <div className="advisor-item-slot">
                             {oldIcon ? <img src={oldIcon} className="advisor-item-icon" alt={c.currentItem} title={c.currentItem} /> : <div className="advisor-item-placeholder" />}
                             <span className="advisor-item-name old">{c.currentItem}</span>
                           </div>
-                          <span className="advisor-arrow">→</span>
+                          <span className="advisor-flow-arrow">&gt;</span>
                           <div className="advisor-item-slot">
                             {newIcon ? <img src={newIcon} className="advisor-item-icon new" alt={c.recommendedItem} title={c.recommendedItem} /> : <div className="advisor-item-placeholder" />}
                             <span className="advisor-item-name new">{c.recommendedItem}</span>
@@ -1404,72 +1793,43 @@ export function App() {
                   </div>
                 )}
 
-                {/* Next Items visual */}
-                {(() => {
-                  const raw = liveAdvice.rawText || '';
-                  const nextSection = raw.match(/NEXT ITEMS?\n([\s\S]*?)(?=\nTHREAT|\n\n|$)/);
-                  if (!nextSection) return null;
-                  const itemLines = nextSection[1].trim().split('\n').filter((l: string) => l.trim());
-                  if (itemLines.length === 0) return null;
-                  const getIcon = (name: string) => {
-                    if (!iconLookups) return '';
-                    const norm = name.toLowerCase().trim();
-                    let url = iconLookups.items.get(norm);
-                    if (!url) {
-                      for (const [key, val] of iconLookups.items.entries()) {
-                        if (key === norm || key.startsWith(norm + ' ') || norm.startsWith(key + ' ')) { url = val; break; }
-                      }
-                    }
-                    return url || '';
-                  };
-                  const parsed = itemLines.map((line: string) => {
-                    const cleaned = line.replace(/^\d+\.\s*/, '').trim();
-                    const colonIdx = cleaned.indexOf(':');
-                    const name = colonIdx > 0 ? cleaned.substring(0, colonIdx).trim() : cleaned;
-                    const reason = colonIdx > 0 ? cleaned.substring(colonIdx + 1).trim() : '';
-                    return { name, reason, icon: getIcon(name) };
-                  });
-                  return (
-                    <div className="advisor-next-item">
-                      <div className="live-advisor-changes-title">Next Items</div>
-                      {parsed.map((item: any, i: number) => (
-                        <div key={i} className="advisor-next-row" style={{ marginBottom: i < parsed.length - 1 ? '6px' : 0 }}>
-                          {item.icon ? <img src={item.icon} className="advisor-item-icon next" alt={item.name} title={item.name} /> : <div className="advisor-item-placeholder" />}
-                          <div className="advisor-next-info">
-                            <span className="advisor-item-name new">{i + 1}. {item.name}</span>
-                            {item.reason && <span className="advisor-next-reason">{item.reason}</span>}
+                {(advisorNextItems.length > 0 || advisorThreatText) && (
+                  <div className="advisor-grid">
+                    {advisorNextItems.length > 0 && (
+                      <div className="advisor-panel">
+                        <div className="live-advisor-changes-title">Next Buy</div>
+                        {advisorNextItems.map((item: any, i: number) => (
+                          <div key={i} className="advisor-next-row">
+                            <span className="advisor-next-index">{i + 1}</span>
+                            {item.icon ? <img src={item.icon} className="advisor-item-icon next" alt={item.name} title={item.name} /> : <div className="advisor-item-placeholder" />}
+                            <div className="advisor-next-info">
+                              <span className="advisor-next-name">{item.name}</span>
+                              {item.reason && <span className="advisor-next-reason">{item.reason}</span>}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-
-                {/* Threat visual */}
-                {(() => {
-                  const raw = liveAdvice.rawText || '';
-                  const threatMatch = raw.match(/THREAT\n(.+?)(?:\n\n|$)/s);
-                  if (!threatMatch) return null;
-                  const threatLine = threatMatch[1].trim();
-                  return (
-                    <div className="advisor-threat">
-                      <div className="live-advisor-changes-title">
-                        <svg className="warn-icon" viewBox="0 0 10 10" style={{width:11,height:11,verticalAlign:'middle',marginRight:3}}><path d="M5 1 L9 9 L1 9 Z" fill="none" stroke="#c8aa6e" strokeWidth="1.2"/><line x1="5" y1="4" x2="5" y2="6" stroke="#c8aa6e" strokeWidth="1.2"/><circle cx="5" cy="7.5" r="0.6" fill="#c8aa6e"/></svg>
-                        Threat
+                        ))}
                       </div>
-                      <div className="advisor-threat-text">{threatLine}</div>
-                    </div>
-                  );
-                })()}
+                    )}
+
+                    {advisorThreatText && (
+                      <div className="advisor-panel advisor-threat">
+                        <div className="live-advisor-changes-title">Threat</div>
+                        <div className="advisor-threat-text">{advisorThreatText}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {liveAdvice.rawText && (
                   <details className="live-advisor-raw">
-                    <summary>Full AI Response</summary>
+                    <summary>Full response</summary>
                     <pre>{liveAdvice.rawText}</pre>
                   </details>
                 )}
 
-                <button className="live-advisor-dismiss" onClick={() => setLiveAdvice(null)}>Dismiss</button>
+                <div className="advisor-card-actions">
+                  <button className="live-advisor-dismiss" onClick={() => setLiveAdvice(null)}>Dismiss</button>
+                </div>
               </div>
             )}
 
@@ -1601,19 +1961,24 @@ export function App() {
               </div>
             </div>
             <label className="settings-toggle-row" style={{ marginTop: 10 }}>
-              <span>Generation Mode</span>
+              <span>AI Model</span>
               <select
                 className="game-mode-select"
-                style={{ width: '150px' }}
-                value={settings.generationMode || 'flash'}
-                onChange={e => handleSettingChange('generationMode', e.target.value)}
+                style={{ width: '170px' }}
+                value={selectedModel}
+                onChange={async (e) => {
+                  const model = e.target.value as AiModel;
+                  setSelectedModel(model);
+                  await handleSettingChange('aiModel', model);
+                }}
               >
-                <option value="hybrid">Hybrid (Flash & Pro)</option>
-                <option value="flash">Speed (Flash Only)</option>
+                {MODEL_OPTIONS.map((m) => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
               </select>
             </label>
             <div className="settings-desc">
-              Hybrid uses Pro for deeper analysis (~22s). Speed uses Flash for instant results (~7s).
+              This model is used for builds, live advisor, scouting, stats, and background data grounding.
             </div>
           </div>
 

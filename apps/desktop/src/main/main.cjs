@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, globalShortcut, screen } = require('electron');
+﻿const { app, BrowserWindow, ipcMain, Menu, globalShortcut, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -6,7 +6,7 @@ const http = require('http');
 const { spawn, exec } = require('child_process');
 const { setupCrashHandlers, log } = require('./crash-logger.cjs');
 const { loadSettings, getSetting, setSetting, SETTINGS_FILE, SENSITIVE_KEYS } = require('./settings.cjs');
-// â”€â”€ Intelligence upgrade: centralised prompt builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Intelligence upgrade: centralised prompt builder Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const _prompts = require('./prompt-builder.cjs');
 
 // Load .env from multiple possible locations
@@ -36,17 +36,72 @@ const CACHE_DIR = path.join(app.getPath('userData'), 'icon-cache');
 const _distIndexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
 const isDev = !app.isPackaged && !require('fs').existsSync(_distIndexPath);
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  OPENROUTER / DEEPSEEK V4 FLASH â€” Universal LLM wrapper
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+//  OPENROUTER / DEEPSEEK V4 FLASH Ã¢â‚¬â€ Universal LLM wrapper
 //  Uses OpenRouter API (OpenAI-compatible) for DeepSeek generation.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_MODEL = 'deepseek/deepseek-v4-flash';
+const OPENROUTER_MODELS = new Set([
+  'deepseek/deepseek-v4-flash',
+  'deepseek/deepseek-v4-pro',
+  'qwen/qwen3.6-flash',
+  'qwen/qwen3.6-max-preview',
+  'openai/gpt-5.4',
+  'openai/gpt-5.5',
+  'anthropic/claude-sonnet-4.6',
+  'anthropic/claude-opus-4.6',
+  'google/gemini-3-flash-preview',
+  'google/gemini-3.1-flash-lite',
+  'google/gemini-3.1-flash-lite-preview',
+  'google/gemini-3.1-pro-preview',
+  'google/gemini-3.1-pro-preview-customtools',
+  'moonshotai/kimi-k2.6',
+  'x-ai/grok-4.3',
+  'mistralai/mistral-large-2512',
+]);
+const MODEL_DISPLAY_NAMES = {
+  'deepseek/deepseek-v4-flash': 'DeepSeek V4 Flash',
+  'deepseek/deepseek-v4-pro': 'DeepSeek V4 Pro',
+  'qwen/qwen3.6-flash': 'Qwen3.6 Flash',
+  'qwen/qwen3.6-max-preview': 'Qwen3.6 Max',
+  'openai/gpt-5.4': 'GPT-5.4',
+  'openai/gpt-5.5': 'GPT-5.5',
+  'anthropic/claude-sonnet-4.6': 'Claude Sonnet 4.6',
+  'anthropic/claude-opus-4.6': 'Claude Opus 4.6',
+  'google/gemini-3-flash-preview': 'Gemini 3 Flash',
+  'google/gemini-3.1-flash-lite': 'Gemini 3.1 Flash Lite',
+  'google/gemini-3.1-flash-lite-preview': 'Gemini 3.1 Flash Lite Preview',
+  'google/gemini-3.1-pro-preview': 'Gemini 3.1 Pro',
+  'google/gemini-3.1-pro-preview-customtools': 'Gemini 3.1 Pro Custom Tools',
+  'moonshotai/kimi-k2.6': 'Kimi K2.6',
+  'x-ai/grok-4.3': 'Grok 4.3',
+  'mistralai/mistral-large-2512': 'Mistral Large 3',
+};
 
 function getOpenRouterKey() {
   return getSetting('openrouterApiKey')
     || process.env.OPENROUTER_API_KEY
     || '';
+}
+
+function getOpenRouterModel(requestedModel) {
+  const configured = requestedModel || getSetting('aiModel') || process.env.OPENROUTER_MODEL || OPENROUTER_MODEL;
+  return OPENROUTER_MODELS.has(configured) ? configured : OPENROUTER_MODEL;
+}
+
+function getModelDisplayName(model) {
+  return MODEL_DISPLAY_NAMES[model] || MODEL_DISPLAY_NAMES[OPENROUTER_MODEL];
+}
+
+function applyOpenRouterReasoningControls(body, opts = {}) {
+  let defaultReasoning = { effort: 'none', exclude: true };
+  if (/^google\/gemini-3/i.test(body.model || '')) {
+    defaultReasoning = { effort: /pro/i.test(body.model) ? 'medium' : 'low', exclude: true };
+  }
+  const reasoning = opts.reasoning === undefined ? defaultReasoning : opts.reasoning;
+  if (reasoning) body.reasoning = reasoning;
+  return body;
 }
 
 /**
@@ -57,19 +112,21 @@ function getOpenRouterKey() {
  * @returns {Promise<string>} Generated text
  */
 async function llmGenerate(systemPrompt, userMessage, opts = {}) {
-  const { temperature = 0.2, maxTokens = 8192, jsonMode = false } = opts;
+  const { temperature = 0.2, maxTokens = 8192, jsonMode = false, topP = 0.85, seed } = opts;
   const apiKey = getOpenRouterKey();
+  const model = getOpenRouterModel(opts.model);
 
-  const body = {
-    model: OPENROUTER_MODEL,
+  const body = applyOpenRouterReasoningControls({
+    model,
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage },
     ],
     temperature,
     max_tokens: maxTokens,
-    top_p: 0.85,
-  };
+    top_p: topP,
+  }, opts);
+  if (Number.isInteger(seed)) body.seed = seed;
 
   // If JSON mode requested, ask the model to output JSON
   if (jsonMode) {
@@ -103,13 +160,42 @@ async function llmGenerate(systemPrompt, userMessage, opts = {}) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) {
+            const message = parsed.error.message || JSON.stringify(parsed.error);
+            if (/provider returned error|upstream|temporarily|rate limit|overloaded/i.test(message) && !opts.__retriedProviderError) {
+              log('WARN', `[openrouter] ${getModelDisplayName(model)} provider error; retrying once without seed/reasoning controls`);
+              const retryOpts = {
+                ...opts,
+                __retriedProviderError: true,
+                reasoning: { effort: 'none', exclude: true },
+              };
+              delete retryOpts.seed;
+              llmGenerate(systemPrompt, userMessage, retryOpts).then(resolve, reject);
+              return;
+            }
             reject(new Error(`OpenRouter error: ${parsed.error.message || JSON.stringify(parsed.error)}`));
             return;
           }
           const content = parsed.choices?.[0]?.message?.content || '';
+          const reasoningTokens = parsed.usage?.completion_tokens_details?.reasoning_tokens || 0;
+          if (!content && Number.isInteger(opts.seed) && !opts.__retriedNoSeed) {
+            log('WARN', `[openrouter] ${getModelDisplayName(model)} returned no content; retrying without seed`);
+            const retryOpts = { ...opts, __retriedNoSeed: true };
+            delete retryOpts.seed;
+            llmGenerate(systemPrompt, userMessage, retryOpts).then(resolve, reject);
+            return;
+          }
+          if (!content && reasoningTokens > 0 && !opts.__retriedNoContent) {
+            log('WARN', `[openrouter] ${getModelDisplayName(model)} returned reasoning tokens but no content; retrying with reasoning budget disabled`);
+            llmGenerate(systemPrompt, userMessage, {
+              ...opts,
+              __retriedNoContent: true,
+              reasoning: model.startsWith('deepseek/') ? { max_tokens: 0, exclude: true } : { effort: 'none', exclude: true },
+            }).then(resolve, reject);
+            return;
+          }
           resolve(content);
         } catch (e) {
-          reject(new Error(`OpenRouter parse error: ${e.message} â€” raw: ${data.slice(0, 200)}`));
+          reject(new Error(`OpenRouter parse error: ${e.message} Ã¢â‚¬â€ raw: ${data.slice(0, 200)}`));
         }
       });
     });
@@ -126,20 +212,22 @@ async function llmGenerate(systemPrompt, userMessage, opts = {}) {
  * Calls onChunk(text) for each SSE chunk, resolves with full text.
  */
 async function llmGenerateStream(systemPrompt, userMessage, opts = {}, onChunk = null) {
-  const { temperature = 0.2, maxTokens = 8192 } = opts;
+  const { temperature = 0.2, maxTokens = 8192, topP = 0.85, seed } = opts;
   const apiKey = getOpenRouterKey();
+  const model = getOpenRouterModel(opts.model);
 
-  const body = {
-    model: OPENROUTER_MODEL,
+  const body = applyOpenRouterReasoningControls({
+    model,
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage },
     ],
     temperature,
     max_tokens: maxTokens,
-    top_p: 0.85,
+    top_p: topP,
     stream: true,
-  };
+  }, opts);
+  if (Number.isInteger(seed)) body.seed = seed;
 
   const payload = JSON.stringify(body);
 
@@ -180,7 +268,25 @@ async function llmGenerateStream(systemPrompt, userMessage, opts = {}, onChunk =
           } catch {}
         }
       });
-      res.on('end', () => resolve(fullText));
+      res.on('end', () => {
+        if (!fullText && Number.isInteger(opts.seed) && !opts.__retriedNoSeed) {
+          log('WARN', `[openrouter] ${getModelDisplayName(model)} stream returned no content; retrying without seed`);
+          const retryOpts = { ...opts, __retriedNoSeed: true };
+          delete retryOpts.seed;
+          llmGenerateStream(systemPrompt, userMessage, retryOpts, onChunk).then(resolve, reject);
+          return;
+        }
+        if (!fullText && !opts.__retriedNoContent) {
+          log('WARN', `[openrouter] ${getModelDisplayName(model)} stream returned no content; retrying with reasoning budget disabled`);
+          llmGenerateStream(systemPrompt, userMessage, {
+            ...opts,
+            __retriedNoContent: true,
+            reasoning: model.startsWith('deepseek/') ? { max_tokens: 0, exclude: true } : { effort: 'none', exclude: true },
+          }, onChunk).then(resolve, reject);
+          return;
+        }
+        resolve(fullText);
+      });
     });
 
     req.on('error', (e) => reject(new Error(`OpenRouter stream error: ${e.message}`)));
@@ -201,7 +307,7 @@ let scoreboardWindow = null;
 let trackerWindow = null;
 let cachedScoutReport = null;  // Cache for scout window
 let overlayData = null;
-let overlayGeneration = 0; // Increments on every overlay update â€” prevents stale renders
+let overlayGeneration = 0; // Increments on every overlay update Ã¢â‚¬â€ prevents stale renders
 let ddragonItemCache = null; // { version, items: Map<normalizedName, {id, name, iconUrl, gold}>, byId: Map<id, {name, from, gold, iconUrl}> }
 let ddragonItemCachePromise = null; // Lock to prevent duplicate fetches
 let ddragonRuneCache = null; // { version, trees: [{name, keystones, slots}], shardOptions, reference }
@@ -217,9 +323,9 @@ async function fetchDdragonRunes() {
     const runesRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${ver}/data/en_US/runesReforged.json`);
     const runesData = await runesRes.json();
     
-    // Build dynamic nameâ†’ID lookup map (replaces hardcoded PERK_IDS)
-    const perkMap = {}; // UPPER_NAME â†’ perkId
-    const styleMap = {}; // UPPER_TREE_NAME â†’ styleId
+    // Build dynamic nameÃ¢â€ â€™ID lookup map (replaces hardcoded PERK_IDS)
+    const perkMap = {}; // UPPER_NAME Ã¢â€ â€™ perkId
+    const styleMap = {}; // UPPER_TREE_NAME Ã¢â€ â€™ styleId
 
     const trees = runesData.map(tree => {
       styleMap[tree.name.toUpperCase()] = tree.id;
@@ -241,7 +347,7 @@ async function fetchDdragonRunes() {
       };
     });
 
-    // Add stat shard IDs (Season 2026 â€” Armor and Magic Resist REMOVED from shards)
+    // Add stat shard IDs (Season 2026 Ã¢â‚¬â€ Armor and Magic Resist REMOVED from shards)
     // Row1: [Adaptive Force, Attack Speed, Ability Haste]
     // Row2: [Adaptive Force, Move Speed, Health Scaling]
     // Row3: [Health, Tenacity and Slow Resist, Health Scaling]
@@ -249,7 +355,7 @@ async function fetchDdragonRunes() {
       'ADAPTIVE FORCE': 5008, 'ATTACK SPEED': 5005, 'ABILITY HASTE': 5007,
       'HEALTH': 5011, 'HEALTH SCALING': 5001,
       'TENACITY AND SLOW RESIST': 5013, 'MOVEMENT SPEED': 5010,
-      // Old shard names that no longer exist â€” map to closest valid defense shard
+      // Old shard names that no longer exist Ã¢â‚¬â€ map to closest valid defense shard
       'ARMOR': 5011, 'MAGIC RESIST': 5011,
     };
     Object.assign(perkMap, shardIds);
@@ -322,13 +428,13 @@ function getValidItemsReference(mapId = 11) {
   return ref;
 }
 
-// Get valid starting items from DDragon cache (items â‰¤500g, no recipe, base items)
+// Get valid starting items from DDragon cache (items Ã¢â€°Â¤500g, no recipe, base items)
 function getValidStartingItemsReference(role, mapId = 11) {
   if (!ddragonItemCache || !ddragonItemCache.byId) return '';
 
   // ARAM has no starting items in the traditional sense (you start with gold and buy on first death)
   if (mapId === 12) {
-    return 'ARAM STARTING RULES: Players start with 1400g. Buy components or full items immediately. No Doran\'s items. No startingItems needed â€” put everything in coreBuild.\n';
+    return 'ARAM STARTING RULES: Players start with 1400g. Buy components or full items immediately. No Doran\'s items. No startingItems needed Ã¢â‚¬â€ put everything in coreBuild.\n';
   }
 
   const EXCLUDED_IDS = new Set([
@@ -372,7 +478,7 @@ function getValidStartingItemsReference(role, mapId = 11) {
   ref += `  Jungle: ${dedupe(jungleItems).join(', ')}\n`;
   ref += `  Support: ${dedupe(supportItems).join(', ')}\n`;
   ref += `  Potions: ${dedupe(potions).join(', ')}\n`;
-  ref += `  RULE: Buy exactly 1 starting item + 1 potion (Health Potion or Refillable Potion). Total must be â‰¤500g.\n`;
+  ref += `  RULE: Buy exactly 1 starting item + 1 potion (Health Potion or Refillable Potion). Total must be Ã¢â€°Â¤500g.\n`;
   ref += `  Jungle: Buy 1 companion + 1 Health Potion.\n`;
   ref += `  Support: Buy World Atlas + 1 Health Potion.\n`;
   ref += `  NEVER put starting items (Doran's, companions, potions) in coreBuild.\n`;
@@ -396,32 +502,32 @@ async function computeEnemyProfile(enemies) {
 
   // Fix #5: Champion-specific counter-item hints for common champions
   const CHAMPION_COUNTER_HINTS = {
-    'Zed': 'Zed [AD Burst] â†’ Zhonya\'s negates R',
-    'Talon': 'Talon [AD Burst] â†’ Early armor + Sterak\'s/Zhonya\'s',
-    'Fizz': 'Fizz [AP Burst] â†’ Banshee\'s blocks R, MR rush',
-    'Katarina': 'Katarina [AP/AD Hybrid] â†’ CC interrupts R, anti-heal',
-    'Malzahar': 'Malzahar [AP Suppress] â†’ QSS removes R',
-    'Mordekaiser': 'Mordekaiser [AP Bruiser] â†’ QSS cleanses R',
-    'Vayne': 'Vayne [True Dmg] â†’ HP stacking > armor, burst < 3 autos',
-    'Fiora': 'Fiora [True Dmg] â†’ Thornmail + Frozen Heart',
-    'Veigar': 'Veigar [AP Scaling] â†’ Banshee\'s blocks E cage, MR',
-    'Sylas': 'Sylas [AP Bruiser] â†’ Anti-heal CRITICAL, MR',
-    'Vladimir': 'Vladimir [AP Sustain] â†’ Anti-heal MANDATORY',
-    'Aatrox': 'Aatrox [AD Drain] â†’ Anti-heal MANDATORY',
-    'DrMundo': 'Dr. Mundo [HP Tank] â†’ Anti-heal + % HP damage',
-    'Warwick': 'Warwick [Healing Fighter] â†’ Anti-heal, CC interrupts R',
-    'Yasuo': 'Yasuo [AD Crit] â†’ Randuin\'s (anti-crit)',
-    'Yone': 'Yone [AD/AP Hybrid] â†’ Needs armor AND MR, Randuin\'s',
-    'Irelia': 'Irelia [AD Sustained] â†’ Thornmail + Frozen Heart',
-    'Tryndamere': 'Tryndamere [AD Crit] â†’ Randuin\'s, disengage during R',
-    'Kassadin': 'Kassadin [AP Scaling] â†’ Punish early (weak pre-6)',
-    'Nasus': 'Nasus [AD Scaling] â†’ Kite, % armor pen late',
-    'Akali': 'Akali [AP Assassin] â†’ MR + HP, sweeper for shroud',
-    'LeBlanc': 'LeBlanc [AP Burst] â†’ Banshee\'s, MR rush',
-    'Rengar': 'Rengar [AD Burst] â†’ Zhonya\'s/GA, group up',
-    'KhaZix': 'Kha\'Zix [AD Assassin] â†’ Stay grouped (isolation = death)',
-    'Samira': 'Samira [AD Melee ADC] â†’ CC interrupts R',
-    'Kayn': 'Kayn [Shadow/Rhaast] â†’ Red: anti-heal + armor. Blue: MR + burst',
+    'Zed': 'Zed [AD Burst] Ã¢â€ â€™ armor, Guardian Angel, Sterak\'s, or Death\'s Dance',
+    'Talon': 'Talon [AD Burst] Ã¢â€ â€™ early armor + Sterak\'s/Guardian Angel',
+    'Fizz': 'Fizz [AP Burst] Ã¢â€ â€™ Banshee\'s blocks R, MR rush',
+    'Katarina': 'Katarina [AP/AD Hybrid] Ã¢â€ â€™ CC interrupts R, anti-heal',
+    'Malzahar': 'Malzahar [AP Suppress] Ã¢â€ â€™ QSS removes R',
+    'Mordekaiser': 'Mordekaiser [AP Bruiser] Ã¢â€ â€™ QSS cleanses R',
+    'Vayne': 'Vayne [True Dmg] Ã¢â€ â€™ HP stacking > armor, burst < 3 autos',
+    'Fiora': 'Fiora [True Dmg] Ã¢â€ â€™ Thornmail + Frozen Heart',
+    'Veigar': 'Veigar [AP Scaling] Ã¢â€ â€™ Banshee\'s blocks E cage, MR',
+    'Sylas': 'Sylas [AP Bruiser] Ã¢â€ â€™ Anti-heal CRITICAL, MR',
+    'Vladimir': 'Vladimir [AP Sustain] Ã¢â€ â€™ Anti-heal MANDATORY',
+    'Aatrox': 'Aatrox [AD Drain] Ã¢â€ â€™ Anti-heal MANDATORY',
+    'DrMundo': 'Dr. Mundo [HP Tank] Ã¢â€ â€™ Anti-heal + % HP damage',
+    'Warwick': 'Warwick [Healing Fighter] Ã¢â€ â€™ Anti-heal, CC interrupts R',
+    'Yasuo': 'Yasuo [AD Crit] Ã¢â€ â€™ Randuin\'s (anti-crit)',
+    'Yone': 'Yone [AD/AP Hybrid] Ã¢â€ â€™ Needs armor AND MR, Randuin\'s',
+    'Irelia': 'Irelia [AD Sustained] Ã¢â€ â€™ Thornmail + Frozen Heart',
+    'Tryndamere': 'Tryndamere [AD Crit] Ã¢â€ â€™ Randuin\'s, disengage during R',
+    'Kassadin': 'Kassadin [AP Scaling] Ã¢â€ â€™ Punish early (weak pre-6)',
+    'Nasus': 'Nasus [AD Scaling] Ã¢â€ â€™ Kite, % armor pen late',
+    'Akali': 'Akali [AP Assassin] Ã¢â€ â€™ MR + HP, sweeper for shroud',
+    'LeBlanc': 'LeBlanc [AP Burst] Ã¢â€ â€™ Banshee\'s, MR rush',
+    'Rengar': 'Rengar [AD Burst] Ã¢â€ â€™ Guardian Angel/Sterak\'s, group up',
+    'KhaZix': 'Kha\'Zix [AD Assassin] Ã¢â€ â€™ Stay grouped (isolation = death)',
+    'Samira': 'Samira [AD Melee ADC] Ã¢â€ â€™ CC interrupts R',
+    'Kayn': 'Kayn [Shadow/Rhaast] Ã¢â€ â€™ Red: anti-heal + armor. Blue: MR + burst',
   };
 
   let apCount = 0, adCount = 0, tankCount = 0, assassinCount = 0, hasHealing = false;
@@ -447,16 +553,16 @@ async function computeEnemyProfile(enemies) {
   let analysis = '\nENEMY TEAM PROFILE:\n';
   analysis += `Champions: ${details.join(', ')}\n`;
   analysis += `Damage Split: ${apCount} AP / ${adCount} AD / ${tankCount} Tanks / ${assassinCount} Assassins\n`;
-  if (apCount >= 3) analysis += 'âš ï¸ HEAVY AP TEAM â€” Prioritize MR items (Wit\'s End, Maw of Malmortius, Kaenic Rookern, Spirit Visage, Mercury\'s Treads)\n';
-  if (adCount >= 3) analysis += 'âš ï¸ HEAVY AD TEAM â€” Prioritize Armor items (Plated Steelcaps, Randuin\'s Omen, Frozen Heart, Dead Man\'s Plate)\n';
-  if (tankCount >= 2) analysis += 'âš ï¸ TANKY TEAM â€” Prioritize penetration/% HP items (Lord Dominik\'s Regards, Void Staff, Liandry\'s Torment, Black Cleaver)\n';
-  if (assassinCount >= 2) analysis += 'âš ï¸ ASSASSIN-HEAVY â€” Consider defensive items early (Zhonya\'s Hourglass, Guardian Angel, Sterak\'s Gage)\n';
-  if (hasHealing) analysis += 'âš ï¸ ENEMY HAS HEALING â€” Consider anti-heal (Mortal Reminder, Morellonomicon, Thornmail)\n';
+  if (apCount >= 3) analysis += 'Ã¢Å¡Â Ã¯Â¸Â HEAVY AP TEAM Ã¢â‚¬â€ Prioritize MR items (Wit\'s End, Maw of Malmortius, Kaenic Rookern, Spirit Visage, Mercury\'s Treads)\n';
+  if (adCount >= 3) analysis += 'Ã¢Å¡Â Ã¯Â¸Â HEAVY AD TEAM Ã¢â‚¬â€ Prioritize Armor items (Plated Steelcaps, Randuin\'s Omen, Frozen Heart, Dead Man\'s Plate)\n';
+  if (tankCount >= 2) analysis += 'Ã¢Å¡Â Ã¯Â¸Â TANKY TEAM Ã¢â‚¬â€ Prioritize penetration/% HP items (Lord Dominik\'s Regards, Void Staff, Liandry\'s Torment, Black Cleaver)\n';
+  if (assassinCount >= 2) analysis += 'Ã¢Å¡Â Ã¯Â¸Â ASSASSIN-HEAVY Ã¢â‚¬â€ Consider class-appropriate defensive items early (Guardian Angel, Sterak\'s Gage, Death\'s Dance, Maw; stasis only for AP champions)\n';
+  if (hasHealing) analysis += 'Ã¢Å¡Â Ã¯Â¸Â ENEMY HAS HEALING Ã¢â‚¬â€ Consider anti-heal (Mortal Reminder, Morellonomicon, Thornmail)\n';
   if (counterHints.length > 0) analysis += '\nCHAMPION-SPECIFIC COUNTER TIPS:\n' + counterHints.join('\n') + '\n';
   return analysis;
 }
 
-// â”€â”€ DDragon Summoner Spells Cache â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ DDragon Summoner Spells Cache Ã¢â€â‚¬Ã¢â€â‚¬
 let ddragonSummonerCache = null; // { version, spells: Set<string>, spellNames: string[] }
 
 async function fetchDdragonSummoners() {
@@ -485,7 +591,7 @@ async function fetchDdragonSummoners() {
   }
 }
 
-// â”€â”€ Cooldown Tracker State â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Cooldown Tracker State Ã¢â€â‚¬Ã¢â€â‚¬
 const cooldownData = require('./cooldowns/cooldown-data.cjs');
 let cooldownTimers = []; // Array of { id, championName, ability, totalDuration, endTime, startedAt }
 let cooldownTickInterval = null;
@@ -494,16 +600,16 @@ let lastLiveGameData = null; // Cache for latest /allgamedata response
 let champUltCooldowns = {}; // { championName: [rank1cd, rank2cd, rank3cd] }
 let ddragonVersion = null; // e.g. '15.1.1'
 
-// â”€â”€ Ping Monitor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Ping Monitor Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // Hybrid approach:
 // PRE-GAME: TCP connect to Riot regional endpoints (the only endpoints that
-// respond â€” game server IPs block both ICMP and TCP). The regional API
+// respond Ã¢â‚¬â€ game server IPs block both ICMP and TCP). The regional API
 // endpoints route through Cloudflare's anycast, hitting the nearest edge node.
-// IN-GAME:  Read the real ping from /liveclientdata/allgamedata â€” 100% accurate.
+// IN-GAME:  Read the real ping from /liveclientdata/allgamedata Ã¢â‚¬â€ 100% accurate.
 
 const net = require('net');
 
-// Riot regional endpoints â€” these respond to TCP on port 443
+// Riot regional endpoints Ã¢â‚¬â€ these respond to TCP on port 443
 // (Game server IPs like 104.160.x.x block ALL external connections)
 const RIOT_SERVER_ENDPOINTS = {
   'EUW1':  'euw1.api.riotgames.com',
@@ -534,7 +640,7 @@ let pingGeneration = 0;       // Incremented on restart to discard stale in-flig
 let pingUsingLiveClient = false; // True when in-game (using real ping from Live Client API)
 
 /**
- * TCP connect ping â€” measures time to establish a TCP connection.
+ * TCP connect ping Ã¢â‚¬â€ measures time to establish a TCP connection.
  * Returns RTT in ms or null on failure/timeout.
  */
 function tcpPing(host, port, timeout) {
@@ -623,7 +729,7 @@ function startPingMonitor() {
   const region = settings.serverRegion || 'EUW1';
   const serverHost = RIOT_SERVER_ENDPOINTS[region] || RIOT_SERVER_ENDPOINTS['EUW1'];
   const gen = ++pingGeneration;
-  log('INFO', `[ping] Starting ping monitor â†’ ${region} (${serverHost}:${PING_PORT}) [gen=${gen}]`);
+  log('INFO', `[ping] Starting ping monitor Ã¢â€ â€™ ${region} (${serverHost}:${PING_PORT}) [gen=${gen}]`);
   pingHistory = [];
   pingUsingLiveClient = false;
 
@@ -681,7 +787,7 @@ function restartPingMonitor() {
   setTimeout(() => startPingMonitor(), 200);
 }
 
-// IPC: renderer can request region change â†’ restart ping with new target
+// IPC: renderer can request region change Ã¢â€ â€™ restart ping with new target
 ipcMain.on('set-ping-region', (_event, region) => {
   log('INFO', `[ping] Region changed to: ${region}`);
   try {
@@ -731,9 +837,9 @@ async function resolveDdragonItem(itemName) {
       await ddragonItemCachePromise;
     }
     const norm = itemName.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
-    // Exact match (primary â€” fastest)
+    // Exact match (primary Ã¢â‚¬â€ fastest)
     if (ddragonItemCache.items.has(norm)) return ddragonItemCache.items.get(norm);
-    // Strict prefix match only â€” no loose substring matching
+    // Strict prefix match only Ã¢â‚¬â€ no loose substring matching
     // This prevents removed items (e.g. "Divine Sunderer") from matching existing items (e.g. "Sundered Sky")
     for (const [key, val] of ddragonItemCache.items) {
       // Only match if one is a strict prefix of the other WITH a word boundary (space)
@@ -759,10 +865,10 @@ let overlayManuallyHidden = false;
 let liveClientInterval = null;
 let liveAdvisorInterval = null;  // separate from liveClientInterval!
 
-// â”€â”€ LCU Lockfile Reader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ LCU Lockfile Reader Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // Duplicate getLcuCredentials declaration removed (already defined at line 3003)
 
-// â”€â”€ RAG Pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ RAG Pipeline Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const RAG_DIR = path.join(app.getPath('userData'), 'rag');
 const RAG_META_FILE = path.join(RAG_DIR, 'meta.json');
 const RAG_DATASET_FILE = path.join(RAG_DIR, 'dataset.json');
@@ -879,7 +985,7 @@ Rules:
 - If ANY new items were added or existing items were reworked, mention them by name
 - If any champion was reworked, mention it
 - Include item cost changes if significant
-- Do NOT list every individual change â€” summarize the overall meta impact
+- Do NOT list every individual change Ã¢â‚¬â€ summarize the overall meta impact
 - Do NOT hallucinate changes not in the official notes`;
 
     let newDataset;
@@ -894,7 +1000,7 @@ Rules:
       };
     } catch (apiError) {
       log('ERROR', '[RAG] DeepSeek/OpenRouter grounding failed, using fallback:', apiError.message);
-      newDataset = { metaContext: `Patch ${liveMajorMinor} is live. Grounding failed â€” adapt to global changes.`, championMeta: {}, patch: liveMajorMinor };
+      newDataset = { metaContext: `Patch ${liveMajorMinor} is live. Grounding failed Ã¢â‚¬â€ adapt to global changes.`, championMeta: {}, patch: liveMajorMinor };
     }
 
     ensureRagDir();
@@ -929,34 +1035,38 @@ function seedRagFromBundle() {
   } catch { }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 //  META BUILD REFERENCE SYSTEM
 //  Fetches per-champion popular builds from reference sites via DeepSeek/OpenRouter.
 //  Pre-fetched for ALL champions on patch
 //  change, cached to disk, injected as guidance into the AI prompt.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 const META_BUILDS_DIR = path.join(RAG_DIR, 'meta-builds');
 const META_BUILDS_SR_DIR = path.join(META_BUILDS_DIR, 'sr');
 const AUGMENTS_DIR = path.join(RAG_DIR, 'augments');
+const KB_DATA_DIR = path.join(RAG_DIR, 'kb-data');
 let isMetaSyncing = false;
 
 function ensureMetaBuildDirs() {
-  for (const dir of [META_BUILDS_DIR, META_BUILDS_SR_DIR, AUGMENTS_DIR]) {
+  for (const dir of [META_BUILDS_DIR, META_BUILDS_SR_DIR, AUGMENTS_DIR, KB_DATA_DIR]) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-// â”€â”€ Centralized RAG: Fetch from GitHub data branch â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Centralized RAG: Fetch from GitHub data branch Ã¢â€â‚¬Ã¢â€â‚¬
 const CDN_BASE = 'https://raw.githubusercontent.com/Sliv3er/DraftCoach/data';
 
 async function syncMetaFromCDN() {
   ensureMetaBuildDirs();
   log('INFO', '[cdn] Checking centralized meta data from GitHub...');
   try {
-    // 1. Fetch manifest to check patch version
-    const manifestUrl = `${CDN_BASE}/data/meta-builds/manifest.json`;
-    const manifestRes = await fetch(manifestUrl, { signal: AbortSignal.timeout(10000) });
+    // 1. Fetch manifest to check patch version. Prefer the unified KB
+    // manifest, but keep the legacy meta-builds manifest as fallback.
+    let manifestRes = await fetch(`${CDN_BASE}/data/kb/manifest.json`, { signal: AbortSignal.timeout(10000) });
+    if (!manifestRes.ok) {
+      manifestRes = await fetch(`${CDN_BASE}/data/meta-builds/manifest.json`, { signal: AbortSignal.timeout(10000) });
+    }
     if (!manifestRes.ok) {
       log('WARN', `[cdn] Manifest not available (${manifestRes.status}), skipping CDN sync`);
       return false;
@@ -965,7 +1075,16 @@ async function syncMetaFromCDN() {
 
     // Check if local data is already up-to-date
     const localMeta = getMetaBuildMeta();
-    if (localMeta && localMeta.patch === manifest.patch && localMeta.champCount >= manifest.champCount) {
+    const localKbManifestPath = path.join(KB_DATA_DIR, 'manifest.json');
+    let localKbManifest = null;
+    try {
+      if (fs.existsSync(localKbManifestPath)) localKbManifest = JSON.parse(fs.readFileSync(localKbManifestPath, 'utf-8'));
+    } catch {}
+    const needsKbManifest = Boolean(manifest.modes);
+    if (
+      localMeta && localMeta.patch === manifest.patch && localMeta.champCount >= manifest.champCount &&
+      (!needsKbManifest || (localKbManifest && localKbManifest.patch === manifest.patch))
+    ) {
       log('INFO', `[cdn] Local meta data already up-to-date (patch ${manifest.patch}, ${localMeta.champCount} champs)`);
       return true;
     }
@@ -985,6 +1104,7 @@ async function syncMetaFromCDN() {
     const tree = await treeRes.json();
     const metaFiles = tree.tree.filter(f => f.path.startsWith('data/meta-builds/sr/') && f.path.endsWith('.json'));
     const augmentFiles = tree.tree.filter(f => f.path.startsWith('data/augments/') && f.path.endsWith('.json'));
+    const kbFiles = tree.tree.filter(f => f.path.startsWith('data/kb/') && f.path.endsWith('.json'));
 
     // 3. Download meta build files (in parallel batches of 15)
     let downloaded = 0;
@@ -1017,15 +1137,32 @@ async function syncMetaFromCDN() {
       } catch {}
     }
 
-    // 5. Update local meta
+    // 5. Download unified KB files used by instant Mobalytics preview,
+    // ARAM baselines, ARAM Mayhem baselines, and augment recommendations.
+    let kbDownloaded = 0;
+    for (const file of kbFiles) {
+      try {
+        const url = `${CDN_BASE}/${file.path}`;
+        const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+        if (res.ok) {
+          const data = await res.text();
+          const fileName = path.basename(file.path);
+          fs.writeFileSync(path.join(KB_DATA_DIR, fileName), data, 'utf-8');
+          kbDownloaded++;
+        }
+      } catch {}
+    }
+
+    // 6. Update local meta
     const metaData = {
       patch: manifest.patch,
       updatedAt: new Date().toISOString(),
-      champCount: downloaded,
+      champCount: Math.max(downloaded, manifest.champCount || 0),
+      modes: manifest.modes || null,
       source: 'cdn',
     };
     fs.writeFileSync(path.join(META_BUILDS_DIR, 'meta.json'), JSON.stringify(metaData, null, 2), 'utf-8');
-    log('INFO', `[cdn] Downloaded ${downloaded} meta builds + augments from CDN (patch ${manifest.patch})`);
+    log('INFO', `[cdn] Downloaded ${downloaded} legacy meta builds, ${kbDownloaded} KB files + augments from CDN (patch ${manifest.patch})`);
     return true;
   } catch (err) {
     log('WARN', `[cdn] CDN sync failed: ${err.message}. Will use local DeepSeek/OpenRouter grounding as fallback.`);
@@ -1072,51 +1209,75 @@ function formatMetaReference(data, isOffRole = false) {
   if (!data || !data.metaBuild) return '';
   const mb = data.metaBuild;
   const offRoleNote = isOffRole
-    ? `\n  âš ï¸ NOTE: No meta data for this exact role. Showing ${data.champion} ${data.role || 'main role'} as reference. Adapt heavily for the actual role.`
+    ? `\n  Ã¢Å¡Â Ã¯Â¸Â NOTE: No meta data for this exact role. Showing ${data.champion} ${data.role || 'main role'} as reference. Adapt heavily for the actual role.`
     : '';
-  let ref = `META REFERENCE (Patch ${data.patch || '?'} popular build â€” use as baseline, adapt to enemy comp):${offRoleNote}\n`;
+  let ref = `META REFERENCE (Patch ${data.patch || '?'} popular build Ã¢â‚¬â€ use as baseline, adapt to enemy comp):${offRoleNote}\n`;
   if (mb.winRate) ref += `  Win Rate: ${mb.winRate}% | `;
   if (mb.pickRate) ref += `Pick Rate: ${mb.pickRate}%\n`;
   if (mb.keystone) ref += `  Popular Keystone: ${mb.keystone}${mb.primaryTree ? ` (${mb.primaryTree})` : ''}\n`;
   if (mb.startingItems && mb.startingItems.length > 0) ref += `  Popular Starting: ${mb.startingItems.join(' + ')}\n`;
-  if (mb.coreItems && mb.coreItems.length > 0) ref += `  Popular Core: ${mb.coreItems.join(' â†’ ')}\n`;
+  if (mb.coreItems && mb.coreItems.length > 0) ref += `  Popular Core: ${mb.coreItems.join(' Ã¢â€ â€™ ')}\n`;
   if (mb.boots) ref += `  Popular Boots: ${mb.boots}\n`;
   if (mb.skillOrder) ref += `  Skill Order: ${mb.skillOrder}\n`;
   ref += `\n  INSTRUCTION: Start from this meta build as your baseline. You MUST strictly adhere to these CORE ITEMS. You may change their build order, but you should ONLY swap out a core item in extreme counter-matchup scenarios. Otherwise, keep the core items exactly as they appear. Adapt RUNES and BOOTS as needed to counter the enemy team.\n`;
   return ref;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 //  MOBALYTICS KB BUILD REFERENCE SYSTEM
 //  Reads build-templates.json from shared/kb/data (dev) or
 //  kb-data/ (production). Injects all 3 variants as AI baseline.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
-let _kbBuildTemplatesCache = null;
+const _kbBuildTemplatesCache = new Map();
 
-function loadKBBuildTemplates() {
-  if (_kbBuildTemplatesCache) return _kbBuildTemplatesCache;
+function kbBuildTemplateFileForMode(gameMode = 'sr') {
+  const mode = String(gameMode || 'sr').toLowerCase();
+  if (mode === 'aram-mayhem') return 'build-templates-aram-mayhem.json';
+  if (mode === 'aram') return 'build-templates-aram.json';
+  return 'build-templates.json';
+}
+
+function kbDataPaths(fileName) {
   const kbPaths = isDev
     ? [
-        path.resolve(__dirname, '../../../../shared/kb/data/build-templates.json'),
+        path.join(KB_DATA_DIR, fileName),
+        path.resolve(__dirname, '../../../../shared/kb/data', fileName),
       ]
     : [
-        path.join(process.resourcesPath, 'kb-data', 'build-templates.json'),
-        path.join(__dirname, '..', 'kb-data', 'build-templates.json'),
+        path.join(KB_DATA_DIR, fileName),
+        path.join(process.resourcesPath, 'kb-data', fileName),
+        path.join(__dirname, '..', 'kb-data', fileName),
+        path.resolve(__dirname, '../../../../shared/kb/data', fileName),
+        path.resolve(process.resourcesPath || '', '..', 'shared/kb/data', fileName),
       ];
+  return kbPaths;
+}
+
+function loadKBBuildTemplates(gameMode = 'sr') {
+  const fileName = kbBuildTemplateFileForMode(gameMode);
+  if (_kbBuildTemplatesCache.has(fileName)) return _kbBuildTemplatesCache.get(fileName);
+  const kbPaths = kbDataPaths(fileName);
   for (const p of kbPaths) {
     if (fs.existsSync(p)) {
       try {
         const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
-        _kbBuildTemplatesCache = raw.data || {};
-        log('INFO', `[KB] Loaded build-templates.json from: ${p} (${Object.keys(_kbBuildTemplatesCache).length} entries)`);
-        return _kbBuildTemplatesCache;
+        const data = raw.data || {};
+        _kbBuildTemplatesCache.set(fileName, data);
+        log('INFO', `[KB] Loaded ${fileName} from: ${p} (${Object.keys(data).length} entries)`);
+        return data;
       } catch (e) {
         log('WARN', `[KB] Failed to parse ${p}: ${e.message}`);
       }
     }
   }
-  log('WARN', '[KB] build-templates.json not found in any search path');
+  if (fileName !== 'build-templates.json') {
+    log('WARN', `[KB] ${fileName} not found; falling back to SR build-templates.json`);
+    const fallback = loadKBBuildTemplates('sr');
+    _kbBuildTemplatesCache.set(fileName, fallback);
+    return fallback;
+  }
+  log('WARN', `[KB] ${fileName} not found in any search path`);
   return {};
 }
 
@@ -1125,21 +1286,25 @@ function loadKBBuildTemplates() {
  * Returns a formatted prompt string with all 3 variants (DAMAGE/SAFETY/UTILITY)
  * that the AI uses as its baseline reference.
  */
-function getKBBuildContext(champion, role) {
+function getKBBuildContext(champion, role, gameMode = 'sr') {
   const roleMap = {
     top: 'TOP', jungle: 'JUNGLE', mid: 'MID',
     adc: 'ADC', bot: 'ADC', bottom: 'ADC', support: 'SUPPORT',
   };
-  const engineRole = roleMap[role.toLowerCase()] || role.toUpperCase();
-  const data = loadKBBuildTemplates();
+  const mode = String(gameMode || 'sr').toLowerCase();
+  const isARAMMode = mode === 'aram' || mode === 'aram-mayhem';
+  const engineRole = isARAMMode
+    ? (mode === 'aram-mayhem' ? 'ARAM_MAYHEM' : 'ARAM')
+    : (roleMap[String(role || '').toLowerCase()] || String(role || '').toUpperCase());
+  const data = loadKBBuildTemplates(mode);
 
   // Priority 1: exact role-suffixed key (e.g. "Aatrox_JUNGLE")
   // Priority 2: bare champion key ONLY if its stored role matches the requested role
   // Priority 3: fuzzy match by championId + role
-  let template = data[`${champion}_${engineRole}`];
+  let template = isARAMMode ? (data[champion] || data[`${champion}_${engineRole}`]) : data[`${champion}_${engineRole}`];
   if (!template) {
     const bareEntry = data[champion];
-    if (bareEntry && bareEntry.role === engineRole) {
+    if (bareEntry && (bareEntry.role === engineRole || isARAMMode)) {
       template = bareEntry;
     }
   }
@@ -1150,19 +1315,20 @@ function getKBBuildContext(champion, role) {
   }
 
   if (!template || !template.variants) {
-    log('WARN', `[KB] No build data for ${champion} ${engineRole} â€” falling back to legacy meta`);
-    return getMetaBuildReference(champion, role);
+    log('WARN', `[KB] No build data for ${champion} ${engineRole} (${mode}) Ã¢â‚¬â€ falling back to legacy meta`);
+    return isARAMMode ? '' : getMetaBuildReference(champion, role);
   }
 
   const variantKeys = Object.keys(template.variants);
-  log('INFO', `[KB] Injecting ${champion} ${engineRole}: ${variantKeys.length} variants (${variantKeys.join(', ')})`);
+  log('INFO', `[KB] Injecting ${champion} ${engineRole} ${mode}: ${variantKeys.length} variants (${variantKeys.join(', ')})`);
 
-  const lines = [`\nâ•â•â• REFERENCE BUILDS for ${champion} ${engineRole} (Mobalytics Patch ${loadKBBuildTemplatesMeta()}) â•â•â•`];
+  const modeLabel = mode === 'aram-mayhem' ? 'ARAM: Mayhem' : mode === 'aram' ? 'ARAM' : engineRole;
+  const lines = [`\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â REFERENCE BUILDS for ${champion} ${modeLabel} (Mobalytics Patch ${loadKBBuildTemplatesMeta(mode)}) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â`];
   lines.push(`You MUST use one of these as your base build. State which one you chose in your ANALYSIS.`);
   const variantLabels = {
-    DAMAGE: 'BUILD 1 â€” Most Popular (highest pick rate)',
-    SAFETY: 'BUILD 2 â€” Secondary (alternative popular build)',
-    UTILITY: 'BUILD 3 â€” Alternative (situational build)',
+    DAMAGE: 'BUILD 1 Ã¢â‚¬â€ Most Popular (highest pick rate)',
+    SAFETY: 'BUILD 2 Ã¢â‚¬â€ Secondary (alternative popular build)',
+    UTILITY: 'BUILD 3 Ã¢â‚¬â€ Alternative (situational build)',
   };
 
   for (const [vKey, vLabel] of Object.entries(variantLabels)) {
@@ -1180,34 +1346,1609 @@ function getKBBuildContext(champion, role) {
     if (v.summonerSpells) lines.push(`  Summoner Spells: ${v.summonerSpells.join(' + ')}`);
     if (v.skillOrder) {
       const maxOrder = v.skillOrder.maxOrder ? v.skillOrder.maxOrder.join(' > ') : 'N/A';
-      const first3 = v.skillOrder.first3 ? v.skillOrder.first3.join(' â†’ ') : 'N/A';
+      const first3 = v.skillOrder.first3 ? v.skillOrder.first3.join(' Ã¢â€ â€™ ') : 'N/A';
       lines.push(`  Skill Max Order: ${maxOrder} (first 3 levels: ${first3})`);
     }
     if (v.startingItems) lines.push(`  Starting Items: ${v.startingItems.map(i => typeof i === 'string' ? i : i.name).join(' + ')}`);
     if (v.bootChoice) lines.push(`  Boots: ${typeof v.bootChoice === 'string' ? v.bootChoice : v.bootChoice.name}`);
-    if (v.coreItems) lines.push(`  Core Items (in order): ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' â†’ ')}`);
+    if (v.coreItems) lines.push(`  Core Items (in order): ${v.coreItems.map(i => typeof i === 'string' ? i : i.name).join(' Ã¢â€ â€™ ')}`);
   }
 
-  lines.push(`\nâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•`);
+  lines.push(`\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â`);
   lines.push(`\nCRITICAL RULES FOR USING REFERENCE BUILDS:`);
   lines.push(`1. You MUST use BUILD 1 (Most Popular) as your default base build.`);
   lines.push(`2. Only switch to BUILD 2 or BUILD 3 if the enemy composition STRONGLY demands it (e.g., BUILD 1 is pure offense but enemy has 4+ assassins).`);
   lines.push(`3. Your CORE BUILD output MUST contain the same core items from your chosen base build.`);
-  lines.push(`4. You may reorder items based on the matchup (e.g., rush MR item vs AP lane).`);
-  lines.push(`5. You may ONLY swap a core item in an extreme scenario (e.g., 4+ AP enemies demands MR stacking). If you swap, you MUST explain why in ANALYSIS.`);
-  lines.push(`6. Adapt RUNES, BOOTS, SUMMONER SPELLS, and SITUATIONAL ITEMS freely based on the enemy team.`);
+  lines.push(`4. You may reorder items based on the matchup or mode pressure.`);
+  lines.push(`5. You may ONLY swap a core item in an extreme scenario. If you swap, you MUST explain why in ANALYSIS.`);
+  lines.push(`6. Adapt RUNES, BOOTS, SUMMONER SPELLS, AUGMENTS, and SITUATIONAL ITEMS freely based on the mode and enemy team.`);
   lines.push(`7. In ANALYSIS, state: "Base Build: BUILD X" and explain any adaptations.`);
   return lines.join('\n');
 }
 
-/** Helper to get the patch from KB meta */
-function loadKBBuildTemplatesMeta() {
+function findKBBuildTemplate(champion, role, gameMode = 'sr') {
+  const roleMap = {
+    top: 'TOP', jungle: 'JUNGLE', mid: 'MID',
+    adc: 'ADC', bot: 'ADC', bottom: 'ADC', support: 'SUPPORT',
+  };
+  const mode = String(gameMode || 'sr').toLowerCase();
+  const isARAMMode = mode === 'aram' || mode === 'aram-mayhem';
+  const engineRole = isARAMMode
+    ? (mode === 'aram-mayhem' ? 'ARAM_MAYHEM' : 'ARAM')
+    : (roleMap[String(role || '').toLowerCase()] || String(role || '').toUpperCase());
+  const data = loadKBBuildTemplates(mode);
+
+  let template = isARAMMode ? (data[champion] || data[`${champion}_${engineRole}`]) : data[`${champion}_${engineRole}`];
+  if (!template) {
+    const bareEntry = data[champion];
+    if (bareEntry && (bareEntry.role === engineRole || isARAMMode)) template = bareEntry;
+  }
+  if (!template) {
+    template = Object.values(data).find(
+      e => e.championId && e.championId.toLowerCase() === String(champion || '').toLowerCase() && e.role === engineRole
+    );
+  }
+  return { template, engineRole };
+}
+
+function findAnyKBBuildTemplateForChampion(champion, gameMode = 'sr') {
+  const data = loadKBBuildTemplates(gameMode);
+  const champ = String(champion || '').toLowerCase();
+  const bareEntry = data[champion];
+  if (bareEntry && bareEntry.variants) return bareEntry;
+  return Object.values(data).find(
+    e => e && e.variants && e.championId && e.championId.toLowerCase() === champ
+  ) || null;
+}
+
+function names(list) {
+  return (list || []).map(i => typeof i === 'string' ? i : i.name).filter(Boolean);
+}
+
+function normalizeMetaStartingItems(items, engineRole) {
+  const entries = items || [];
+  const byId = (id) => entries.find(i => i && typeof i !== 'string' && i.id === id);
+  const byName = (name) => entries.find(i => (typeof i === 'string' ? i : i?.name || '').toLowerCase().includes(name));
+
+  if (engineRole === 'JUNGLE') {
+    const jungleStarter = entries.find(i => {
+      const id = typeof i === 'string' ? '' : i?.id || '';
+      const name = (typeof i === 'string' ? i : i?.name || '').toLowerCase();
+      return /^110[123567]$/.test(id) || name.includes('hatchling') || name.includes('seedling') || name.includes('pup');
+    });
+    return names([jungleStarter, byId('2003') || byName('health potion') || { name: 'Health Potion' }]).slice(0, 2);
+  }
+
+  if (engineRole === 'SUPPORT') {
+    const supportStarter = entries.find(i => {
+      const id = typeof i === 'string' ? '' : i?.id || '';
+      const name = (typeof i === 'string' ? i : i?.name || '').toLowerCase();
+      return /^38\d\d$/.test(id) || /^486\d$/.test(id) || name.includes('world atlas');
+    });
+    return names([supportStarter || { name: 'World Atlas' }, byId('2003') || byName('health potion') || { name: 'Health Potion' }]).slice(0, 2);
+  }
+
+  return names(entries.filter(i => {
+    const id = typeof i === 'string' ? '' : i?.id || '';
+    return id !== '3340';
+  })).slice(0, 2);
+}
+
+function buildInstantMetaText(body, patchDisplay) {
+  const gameMode = body.gameMode || 'sr';
+  const { template, engineRole } = findKBBuildTemplate(body.myChampion, body.role, gameMode);
+  if (!template || !template.variants) return '';
+
+  const base = template.variants.DAMAGE || Object.values(template.variants)[0];
+  if (!base) return '';
+
+  const starting = normalizeMetaStartingItems(base.startingItems, engineRole);
+  const core = names(base.coreItems);
+  const boots = typeof base.bootChoice === 'string' ? base.bootChoice : base.bootChoice?.name;
+  const runes = base.runes || {};
+  const maxOrderBase = base.skillOrder?.maxOrder || ['Q', 'E', 'W'];
+  const maxOrder = [...maxOrderBase, 'R'].filter((v, i, arr) => arr.indexOf(v) === i).join(' > ');
+  const sums = base.summonerSpells || ['Flash', engineRole === 'JUNGLE' ? 'Smite' : 'Teleport'];
+  const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : gameMode === 'aram' ? 'ARAM' : engineRole;
+  const augmentSection = gameMode === 'aram-mayhem' ? buildInstantAugmentsSection(body.myChampion) : [];
+  const enemyLine = (body.enemies || []).filter(Boolean).length
+    ? `Enemy draft detected: ${(body.enemies || []).filter(Boolean).join(', ')}. AI is checking whether the meta base needs defensive swaps, anti-heal, boots changes, or rune adjustments.`
+    : 'No full enemy draft yet. AI will refine once more matchup context is available.';
+
+  return [
+    'ANALYSIS',
+    `Base Build: BUILD 1 from Mobalytics reference data, shown instantly while AI refines in the background.`,
+    `Champion: ${body.myChampion} ${modeLabel}. Patch reference: ${loadKBBuildTemplatesMeta(gameMode)}; live patch: ${patchDisplay}.`,
+    enemyLine,
+    '',
+    'RUNES',
+    `Primary: ${runes.primaryTree || 'Primary'}`,
+    runes.primaryKeystone ? `Keystone: ${runes.primaryKeystone}` : '',
+    ...(runes.primarySlots || []),
+    `Secondary: ${runes.secondaryTree || 'Secondary'}`,
+    ...(runes.secondarySlots || []),
+    runes.statShards?.length ? `Shards: ${runes.statShards.join(', ')}` : '',
+    '',
+    'SUMMONERS',
+    ...sums,
+    '',
+    'SKILL ORDER',
+    maxOrder,
+    '',
+    'STARTING ITEMS',
+    ...(starting.length ? starting : ['Meta starting items pending']),
+    '',
+    'CORE BUILD',
+    ...[boots, ...core].filter(Boolean).map((item, index) => `${index + 1}. ${item}`),
+    ...augmentSection,
+    '',
+    'WIN CONDITION',
+    'Use the Mobalytics core as the stable baseline. Treat this as the instant meta view; final AI output may reorder or adjust only when the draft strongly demands it.',
+  ].filter(Boolean).join('\n');
+}
+
+function buildAiRefinementBaseline(metaText) {
+  if (!metaText) return '';
+  return [
+    '\nMETA BASELINE ALREADY SHOWN TO THE USER:',
+    metaText,
+    '\nREFINEMENT TASK:',
+    '- Start from the meta baseline above; it is the trusted Mobalytics plan already visible to the user.',
+    '- Write DECISION TRACE first. It is backend-only and must include enemy damage priority, primary threats, win condition, Mobalytics variant, item swap budget, boots decision, rune decision, and anti-heal/QSS decision.',
+    '- This is a refinement pass, not a fresh build generation. Keep the visible baseline as the answer unless a listed enemy threat creates a concrete need.',
+    '- You may switch to another listed Mobalytics reference build when its runes/items are a better matchup fit. If you switch, state the chosen BUILD number and the exact trigger.',
+    '- Keep summoners, starting items, and skill order exactly as baseline unless there is a critical role/legality issue.',
+    '- Runes may change only when the enemy draft creates a real lane/teamfight need, such as extreme poke, unavoidable hard CC, oppressive burst, or a different Mobalytics build variant already supports that rune page.',
+    '- Do not write "keep baseline", "preserved", or similar shorthand inside build sections. Repeat the exact rune, summoner, skill, and item names so the UI can render icons correctly.',
+    '- Keep the core build unless the enemy draft strongly demands a change. Prefer choosing another Mobalytics variant, reordering, or 1 targeted swap. Use 2 swaps only for extreme cases such as 4+ one damage type, mandatory QSS/suppression, or overwhelming healing.',
+    '- Do not change an item merely because another item is also good. If the baseline item is playable, preserve it.',
+    '- If changing a baseline choice, state the concrete trigger in ANALYSIS: damage split, fed threat, suppression, heavy healing, or impossible lane survival.',
+    '- Never swap to off-class items. Respect champion role, gold economy, and normal item users.',
+    '- Output the full final build in the normal DraftCoach section format.',
+    '- Do not explain unchanged meta choices unless they matter for the matchup.',
+  ].join('\n');
+}
+
+function normalizeDraftRole(role) {
+  const key = String(role || '').toLowerCase();
+  const map = {
+    top: 'top',
+    jungle: 'jungle',
+    jg: 'jungle',
+    middle: 'mid',
+    mid: 'mid',
+    bottom: 'adc',
+    bot: 'adc',
+    adc: 'adc',
+    utility: 'support',
+    support: 'support',
+  };
+  return map[key] || '';
+}
+
+function roleLabel(role) {
+  return ({ top: 'Top', jungle: 'Jungle', mid: 'Mid', adc: 'ADC', support: 'Support' })[normalizeDraftRole(role)] || 'Unknown';
+}
+
+function getConfirmedEnemyRole(body, champion) {
+  const roles = body?.enemyRoles || {};
+  const direct = roles[champion];
+  if (direct) return normalizeDraftRole(direct);
+  const matchKey = Object.keys(roles).find(key => key.toLowerCase() === String(champion || '').toLowerCase());
+  return matchKey ? normalizeDraftRole(roles[matchKey]) : '';
+}
+
+function buildEnemyRoleContext(body) {
+  const enemies = body?.enemies || [];
+  const confirmed = enemies
+    .map(champ => ({ champ, role: getConfirmedEnemyRole(body, champ) }))
+    .filter(entry => entry.role);
+  const myRole = normalizeDraftRole(body?.role);
+  const laneEnemy = confirmed.find(entry => entry.role === myRole);
+
+  if (!confirmed.length) {
+    return {
+      context: [
+        'ENEMY ROLE ASSIGNMENTS: unknown.',
+        'Do not infer lane assignments from champion names, pick order, list order, or meta assumptions.',
+        `Do not write "${body?.myChampion} vs <enemy> ${roleLabel(myRole)}" unless a confirmed enemy role is provided.`,
+        'Use enemy champions as teamfight/threat profiles only until roles are confirmed.',
+      ].join('\n'),
+      matchupLine: '',
+    };
+  }
+
+  const roleLines = confirmed.map(entry => `- ${entry.champ}: ${roleLabel(entry.role)}`).join('\n');
+  return {
+    context: [
+      'CONFIRMED ENEMY ROLES from League client assignedPosition:',
+      roleLines,
+      'Use these roles exactly. Never override them with champion-name guesses or list order.',
+      laneEnemy
+        ? `CONFIRMED LANE MATCHUP: ${body.myChampion} (${roleLabel(myRole)}) vs ${laneEnemy.champ} (${roleLabel(laneEnemy.role)}).`
+        : `No confirmed enemy ${roleLabel(myRole)} opponent yet; do not claim a specific lane matchup.`,
+    ].join('\n'),
+    matchupLine: laneEnemy
+      ? `\nLANE MATCHUP: ${body.myChampion} (${roleLabel(myRole)}) vs ${laneEnemy.champ} (${roleLabel(laneEnemy.role)}) — confirmed by League client assignedPosition.\n`
+      : '',
+  };
+}
+
+function sanitizeEnemyRoleClaims(finalText, body) {
+  if (!finalText || !body?.enemyRoles) return finalText;
+  let safe = String(finalText);
+  for (const enemy of body.enemies || []) {
+    const confirmedRole = getConfirmedEnemyRole(body, enemy);
+    if (!confirmedRole) continue;
+    const roleWords = ['Top', 'Jungle', 'Mid', 'Middle', 'Bot', 'Bottom', 'ADC', 'Support'];
+    for (const word of roleWords) {
+      if (normalizeDraftRole(word) === confirmedRole) continue;
+      const pattern = new RegExp(`\\b${enemy.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+${word}\\b`, 'gi');
+      safe = safe.replace(pattern, `${enemy} (${roleLabel(confirmedRole)})`);
+    }
+  }
+  return safe;
+}
+
+function stableHashSeed(value) {
+  const text = String(value || '');
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function normalizeBuildLine(line) {
+  return String(line || '')
+    .replace(/\*\*/g, '')
+    .replace(/^\s*\d+[.)]\s*/, '')
+    .replace(/^[-*]\s*/, '')
+    .replace(/\s*\([^)]*\)\s*$/, '')
+    .replace(/\s*:\s*.*$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractBuildSection(text, title) {
+  const headers = [
+    'DECISION TRACE', 'ANALYSIS', 'CONSTRAINTS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
+    'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'ENEMY POWER SPIKES',
+    'WIN CONDITION', 'YOUR POWER SPIKES',
+  ];
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const otherHeaders = headers.filter(h => h !== title).map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const match = String(text || '').match(new RegExp(`(^|\\n)${escaped}\\s*\\n([\\s\\S]*?)(?=\\n(?:${otherHeaders})\\s*\\n|$)`, 'i'));
+  return match ? match[2].trim() : '';
+}
+
+function replaceBuildSection(text, title, content) {
+  if (!text || !content) return text;
+  const headers = [
+    'DECISION TRACE', 'ANALYSIS', 'CONSTRAINTS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
+    'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'ENEMY POWER SPIKES',
+    'WIN CONDITION', 'YOUR POWER SPIKES',
+  ];
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const otherHeaders = headers.filter(h => h !== title).map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const pattern = new RegExp(`(^|\\n)${escaped}\\s*\\n[\\s\\S]*?(?=\\n(?:${otherHeaders})\\s*\\n|$)`, 'i');
+  if (!pattern.test(text)) return text;
+  return text.replace(pattern, `$1${title}\n${content.trim()}\n`);
+}
+
+function sectionItems(text, title) {
+  const section = extractBuildSection(text, title);
+  return section
+    .split('\n')
+    .map(normalizeBuildLine)
+    .filter(Boolean);
+}
+
+function stripDecisionTrace(text) {
+  if (!text) return text;
+  const headers = [
+    'ANALYSIS', 'CONSTRAINTS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
+    'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'ENEMY POWER SPIKES',
+    'WIN CONDITION', 'YOUR POWER SPIKES',
+  ];
+  const otherHeaders = headers.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  return String(text)
+    .replace(new RegExp(`(^|\\n)DECISION TRACE\\s*\\n[\\s\\S]*?(?=\\n(?:${otherHeaders})\\s*\\n|$)`, 'i'), '$1')
+    .trim();
+}
+
+function hasAnyText(text, terms) {
+  const haystack = String(text || '').toLowerCase();
+  return terms.some(term => haystack.includes(String(term).toLowerCase()));
+}
+
+function judgeReasoningQuality(finalText, body, mechanicsMap = null) {
+  const draft = analyzeEnemyDraft(body?.enemies || [], mechanicsMap);
+  const trace = extractBuildSection(finalText, 'DECISION TRACE');
+  const analysis = extractBuildSection(finalText, 'ANALYSIS');
+  const situational = extractBuildSection(finalText, 'SITUATIONAL ITEMS');
+  const coreItems = sectionItems(finalText, 'CORE BUILD');
+  const coreText = coreItems.join(' | ');
+  const reasoningText = `${trace}\n${analysis}\n${situational}`;
+  const issues = [];
+
+  const requiredTraceLabels = [
+    'Enemy Damage Priority',
+    'Primary Threats',
+    'Win Condition',
+    'Mobalytics Variant',
+    'Item Swap Budget',
+    'Boots Decision',
+    'Rune Decision',
+    'Anti-Heal/QSS Decision',
+  ];
+  if (!trace) {
+    issues.push('missing backend decision trace');
+  } else {
+    for (const label of requiredTraceLabels) {
+      if (!new RegExp(`${label}\\s*:`, 'i').test(trace)) issues.push(`decision trace missing ${label}`);
+    }
+  }
+
+  const fullAdPressure = draft.heavyAd && draft.effectiveAp < 1.5;
+  if (draft.heavyAp) {
+    if (!hasAnyText(reasoningText, ['AP', 'magic', 'MR', 'Mercury', 'Kaenic', 'Force of Nature', 'Banshee'])) {
+      issues.push('heavy AP draft not acknowledged in reasoning');
+    }
+    if (!hasAnyText(coreText, ["Mercury's Treads", 'Kaenic Rookern', 'Force of Nature', 'Maw of Malmortius', "Banshee's Veil", 'Spirit Visage'])) {
+      issues.push('heavy AP draft lacks MR answer in core');
+    }
+  }
+  if (fullAdPressure) {
+    if (!hasAnyText(reasoningText, ['AD', 'armor', 'Steelcaps', 'physical'])) {
+      issues.push('full AD draft not acknowledged in reasoning');
+    }
+    if (!hasAnyText(coreText, ['Plated Steelcaps', "Zhonya's Hourglass", "Randuin's Omen", 'Frozen Heart', "Dead Man's Plate", 'Guardian Angel'])) {
+      issues.push('full AD draft lacks armor/physical answer in core');
+    }
+  }
+  if (draft.suppression > 0) {
+    if (!hasAnyText(reasoningText, ['suppression', 'QSS', 'Mercurial', 'cleanse'])) {
+      issues.push('suppression not acknowledged in reasoning');
+    }
+    if (!hasAnyText(`${coreText}\n${situational}`, ['Mercurial Scimitar', 'QSS', 'Quicksilver'])) {
+      issues.push('suppression draft lacks QSS/Mercurial option');
+    }
+  }
+  if (draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0) {
+    if (!hasAnyText(reasoningText, ['heal', 'healing', 'Grievous', 'anti-heal'])) {
+      issues.push('healing not acknowledged in reasoning');
+    }
+  }
+  if (hasAnyText(coreText, ["Mercury's Treads"]) && /plated steelcaps (?:are|is|provide|reduces|preferred)/i.test(reasoningText)) {
+    issues.push('reasoning contradicts Mercury boots');
+  }
+  if (hasAnyText(coreText, ['Plated Steelcaps']) && /mercury'?s treads (?:are|is|provide|preferred|required)/i.test(reasoningText) && !draft.heavyAp) {
+    issues.push('reasoning contradicts Steelcaps boots');
+  }
+
+  const score = Math.max(0, 100 - issues.length * 12);
+  return { score, issues, trace };
+}
+
+function isUsableBuildText(text, role) {
+  if (!text || String(text).trim().length < 200) return false;
+  const required = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS'];
+  if (!required.every(title => extractBuildSection(text, title))) return false;
+  const expectedCore = /^(adc|bot|bottom)$/i.test(String(role || '')) ? 7 : 6;
+  return sectionItems(text, 'CORE BUILD').length === expectedCore;
+}
+
+function fallbackToMetaBuild(instantMetaText, body, mechanicsMap = null) {
+  if (!instantMetaText) return '';
+  let safe = instantMetaText;
+  safe = enforceRoleSafeItems(safe, body);
+  safe = repairStartingItems(safe, body);
+  safe = dedupeAndPadCoreBuild(safe, body);
+  safe = enforceDraftCounterLogic(safe, body, mechanicsMap);
+  safe = enforceRoleSafeItems(safe, body);
+  safe = dedupeAndPadCoreBuild(safe, body);
+  safe = sanitizeNarrativeAgainstFinalItems(safe, body, mechanicsMap);
+  safe = sanitizeEnemyRoleClaims(safe, body);
+  return safe;
+}
+
+function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
+  const role = String(body?.role || '').toLowerCase();
+  const tags = getChampionTags(body?.myChampion);
+  const draft = analyzeEnemyDraft(body?.enemies || [], mechanicsMap);
+  const isSupport = /support/.test(role);
+  const isJungle = /jungle/.test(role);
+  const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+  const champ = body?.myChampion || 'Champion';
+  const supportUpgrade = supportQuestUpgradeForChampion(champ, tags, mechanicsMap);
+  const boots = draft.heavyAd && draft.effectiveAp < 1.5
+    ? 'Plated Steelcaps'
+    : (draft.heavyAp || draft.highCc ? "Mercury's Treads" : (isMarksman ? "Berserker's Greaves" : 'Boots of Swiftness'));
+  const antiHeal = antiHealItemForChampion(champ, role, mechanicsMap);
+  const needsAntiHeal = draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0;
+
+  const core = [];
+  const push = (item) => {
+    if (item && !core.some(x => x.toLowerCase() === item.toLowerCase())) core.push(item);
+  };
+  if (isSupport) push(supportUpgrade);
+  push(boots);
+  if (tags.includes('Mage')) {
+    push('Malignance'); push("Zhonya's Hourglass"); push("Rabadon's Deathcap");
+  } else if (isMarksman) {
+    push('Infinity Edge'); push('Lord Dominik\'s Regards'); push('Guardian Angel');
+  } else {
+    push('Stridebreaker'); push('Black Cleaver'); push("Sterak's Gage");
+  }
+  if (needsAntiHeal) push(antiHeal);
+  if (draft.heavyAp) { push('Kaenic Rookern'); push('Force of Nature'); }
+  if (draft.heavyAd) { push("Randuin's Omen"); push('Frozen Heart'); }
+  if (isSupport) { push('Trailblazer'); push("Knight's Vow"); }
+  push('Guardian Angel');
+
+  const expected = isMarksman ? 7 : 6;
+  const finalCore = core.slice(0, expected);
+  const starting = isSupport
+    ? ['World Atlas', 'Health Potion']
+    : isJungle
+      ? ['Gustwalker Hatchling', 'Health Potion']
+      : ["Doran's Blade", 'Health Potion'];
+
+  const text = [
+    'ANALYSIS',
+    `Matchup Type: Fallback validated plan for ${champ} ${body?.role || role}.`,
+    `Enemy Damage Split: ${draft.ap} AP / ${draft.ad} AD / ${draft.hybrid} mixed. ${draft.heavyAp ? 'MR is the first defensive priority.' : draft.heavyAd ? 'Armor is the first defensive priority.' : 'Balanced defenses are acceptable.'}`,
+    `Key Threats: ${(body?.enemies || []).slice(0, 2).join(', ') || 'enemy draft'}.`,
+    `Survivability Requirement: ${boots} plus ${draft.heavyAp ? 'magic resist' : draft.heavyAd ? 'armor' : 'health and role-safe defenses'}.`,
+    `Item Priorities: Base Build: fallback from validated patch data because no exact Mobalytics role page was usable. ${isSupport ? `${supportUpgrade} is required for support economy.` : ''} ${needsAntiHeal ? `${antiHeal} covers enemy healing.` : ''}`,
+    '',
+    'RUNES',
+    tags.includes('Mage') ? 'Primary: Domination' : 'Primary: Precision',
+    tags.includes('Mage') ? 'Keystone: Electrocute' : 'Keystone: Conqueror',
+    tags.includes('Mage') ? 'Cheap Shot' : 'Absorb Life',
+    tags.includes('Mage') ? 'Eyeball Collection' : 'Triumph',
+    tags.includes('Mage') ? 'Ultimate Hunter' : 'Legend: Alacrity',
+    'Secondary: Resolve',
+    'Conditioning',
+    'Overgrowth',
+    'Shards: Adaptive Force, Adaptive Force, Health Scaling',
+    '',
+    'SUMMONERS',
+    'Flash',
+    isJungle ? 'Smite' : isSupport ? 'Ignite' : 'Teleport',
+    '',
+    'SKILL ORDER',
+    'Q > E > W > R',
+    '',
+    'STARTING ITEMS',
+    ...starting,
+    '',
+    'CORE BUILD',
+    ...finalCore.map((item, index) => `${index + 1}. ${item} (${index === 0 && item === supportUpgrade ? 'support quest upgrade' : 'role-safe validated item'})`),
+    '',
+    'SITUATIONAL ITEMS',
+    'Locket of the Iron Solari: buy when teamwide burst mitigation matters.',
+    "Knight's Vow: buy when your carry needs peel.",
+    'Trailblazer: buy when engage movement and support utility matter.',
+    'Guardian Angel: buy if you are a key engage target and need a second life.',
+    '',
+    'WIN CONDITION',
+    `${champ} ${body?.role || role} should play around controlled engages and protect the carry economy. Do not turn the support slot into a greedy solo-lane build; keep support utility while covering the enemy damage profile.`,
+  ].join('\n');
+
+  let safe = enforceRoleSafeItems(text, body);
+  safe = repairStartingItems(safe, body);
+  safe = dedupeAndPadCoreBuild(safe, body);
+  safe = enforceDraftCounterLogic(safe, body, mechanicsMap);
+  safe = enforceRoleSafeItems(safe, body);
+  safe = dedupeAndPadCoreBuild(safe, body);
+  safe = sanitizeNarrativeAgainstFinalItems(safe, body, mechanicsMap);
+  safe = sanitizeEnemyRoleClaims(safe, body);
+  return stripDecisionTrace(safe);
+}
+
+function countChangedItems(baseItems, finalItems) {
+  const norm = (value) => String(value || '').toLowerCase().replace(/['']/g, "'").trim();
+  const baseSet = new Set(baseItems.map(norm));
+  const finalSet = new Set(finalItems.map(norm));
+  let added = 0;
+  let removed = 0;
+  for (const item of finalSet) if (!baseSet.has(item)) added++;
+  for (const item of baseSet) if (!finalSet.has(item)) removed++;
+  return { added, removed, total: Math.max(added, removed) };
+}
+
+const CHAMPION_DAMAGE_CLASS_OVERRIDES = {
+  Ahri: 'AP',
+  Akali: 'AP',
+  Anivia: 'AP',
+  Annie: 'AP',
+  AurelionSol: 'AP',
+  Azir: 'AP',
+  Brand: 'AP',
+  Cassiopeia: 'AP',
+  Diana: 'AP',
+  Ekko: 'AP',
+  Elise: 'AP',
+  Evelynn: 'AP',
+  Fiddlesticks: 'AP',
+  Fizz: 'AP',
+  Galio: 'AP',
+  Gragas: 'AP',
+  Gwen: 'AP',
+  Heimerdinger: 'AP',
+  Hwei: 'AP',
+  Ivern: 'AP',
+  Karthus: 'AP',
+  Kassadin: 'AP',
+  Katarina: 'AP',
+  Kennen: 'AP',
+  Leblanc: 'AP',
+  LeBlanc: 'AP',
+  Lillia: 'AP',
+  Lissandra: 'AP',
+  Malzahar: 'AP',
+  Mordekaiser: 'AP',
+  Morgana: 'AP',
+  Neeko: 'AP',
+  Nidalee: 'AP',
+  Orianna: 'AP',
+  Rumble: 'AP',
+  Ryze: 'AP',
+  Seraphine: 'AP',
+  Singed: 'AP',
+  Swain: 'AP',
+  Sylas: 'AP',
+  Syndra: 'AP',
+  Taliyah: 'AP',
+  Teemo: 'AP',
+  TwistedFate: 'AP',
+  Veigar: 'AP',
+  Velkoz: 'AP',
+  Vex: 'AP',
+  Viktor: 'AP',
+  Vladimir: 'AP',
+  Xerath: 'AP',
+  Ziggs: 'AP',
+  Zoe: 'AP',
+  Zyra: 'AP',
+  Zed: 'AD',
+  Talon: 'AD',
+  Naafiri: 'AD',
+  Qiyana: 'AD',
+  Rengar: 'AD',
+  Khazix: 'AD',
+  KhaZix: 'AD',
+  Pyke: 'AD',
+  Yasuo: 'AD',
+  Yone: 'AD',
+  Tryndamere: 'AD',
+  Kayn: 'AD',
+};
+
+function championDamageOverride(champion) {
+  const compact = String(champion || '').replace(/[\s.'-]/g, '');
+  return CHAMPION_DAMAGE_CLASS_OVERRIDES[compact] || CHAMPION_DAMAGE_CLASS_OVERRIDES[String(champion || '')] || '';
+}
+
+function inferDamageFromTagsAndInfo(champion, mechanicsMap = null) {
+  const override = championDamageOverride(champion);
+  if (override) return override;
+  const mech = mechanicsMap?.get(champion);
+  if (mech?.dmg) return mech.dmg;
+  const cache = ddragonChampCache || null;
+  const data = cache?.get(champion);
+  const tags = data?.tags || [];
+  const info = data?.info || {};
+
+  if (tags.includes('Mage')) return 'AP';
+  if (tags.includes('Marksman')) return 'AD';
+  if (tags.includes('Assassin') && info.magic > info.attack + 1) return 'AP';
+  if (tags.includes('Support') && !tags.includes('Fighter') && !tags.includes('Marksman')) return 'AP';
+  if (info.magic > info.attack + 2) return 'AP';
+  if (info.attack > info.magic + 2) return 'AD';
+  if (info.magic > 4 && info.attack > 4) return 'HYBRID';
+  return 'UNKNOWN';
+}
+
+const KNOWN_SUPPRESSION_CHAMPIONS = new Set([
+  'Ambessa',
+  'Malzahar',
+  'Skarner',
+  'Urgot',
+  'Warwick',
+  'Sett',
+]);
+
+function analyzeEnemyDraft(enemies, mechanicsMap = null) {
+  const result = {
+    ap: 0,
+    ad: 0,
+    hybrid: 0,
+    tanks: 0,
+    hardCc: 0,
+    suppression: 0,
+    enchanterHealing: 0,
+    selfHealingFrontliners: 0,
+  };
+  for (const raw of enemies || []) {
+    const dmg = inferDamageFromTagsAndInfo(raw, mechanicsMap);
+    if (dmg === 'AP') result.ap++;
+    else if (dmg === 'AD') result.ad++;
+    else if (dmg === 'HYBRID') result.hybrid++;
+    const tags = getChampionTags(raw);
+    const mech = mechanicsMap?.get(raw);
+    const ccList = mech?.cc || [];
+    const hasSuppression = ccList.some(c => c.type === 'SUPPRESSION')
+      || mech?.ult?.type === 'SUPPRESSION'
+      || KNOWN_SUPPRESSION_CHAMPIONS.has(String(raw || '').replace(/\s+/g, ''));
+    if (tags.includes('Tank')) result.tanks++;
+    if (ccList.some(c => c.type === 'HARD_CC' || c.type === 'SUPPRESSION' || c.type === 'DISPLACEMENT') || hasSuppression) result.hardCc++;
+    if (hasSuppression) result.suppression++;
+    if (mech?.healThreat && tags.includes('Support')) result.enchanterHealing++;
+    if (mech?.healThreat && !tags.includes('Support')) result.selfHealingFrontliners++;
+  }
+  result.effectiveAp = result.ap + result.hybrid * 0.5;
+  result.effectiveAd = result.ad + result.hybrid * 0.5;
+  result.heavyAp = result.ap >= 3 || result.effectiveAp >= result.effectiveAd + 1.5;
+  result.heavyAd = result.ad >= 4 && !result.heavyAp;
+  result.highCc = result.hardCc >= 3;
+  return result;
+}
+
+function stabilizeAgainstMetaBaseline(finalText, metaText) {
+  if (!finalText || !metaText) return finalText;
+  let stabilized = finalText;
+
+  for (const title of ['SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS']) {
+    const baselineContent = extractBuildSection(metaText, title);
+    if (baselineContent) stabilized = replaceBuildSection(stabilized, title, baselineContent);
+  }
+
+  const baseCore = sectionItems(metaText, 'CORE BUILD');
+  const finalCore = sectionItems(stabilized, 'CORE BUILD');
+  const changeCount = countChangedItems(baseCore, finalCore);
+  if (baseCore.length && finalCore.length && changeCount.total > 2) {
+    stabilized = replaceBuildSection(stabilized, 'CORE BUILD', extractBuildSection(metaText, 'CORE BUILD'));
+    const analysis = extractBuildSection(stabilized, 'ANALYSIS');
+    if (analysis && !/item stability/i.test(analysis)) {
+      stabilized = replaceBuildSection(
+        stabilized,
+        'ANALYSIS',
+        `${analysis}\nItem Stability: Preserved the Mobalytics core because the draft did not justify more than two baseline swaps.`
+      );
+    }
+  }
+
+  return stabilized;
+}
+
+function getChampionTags(champion) {
   try {
-    const kbPaths = isDev
-      ? [path.resolve(__dirname, '../../../../shared/kb/data/build-templates.json')]
-      : [path.join(process.resourcesPath, 'kb-data', 'build-templates.json'),
-         path.join(__dirname, '..', 'kb-data', 'build-templates.json')];
-    for (const p of kbPaths) {
+    const cache = ddragonChampCache || null;
+    const found = cache?.get(champion);
+    return found?.tags || [];
+  } catch {
+    return [];
+  }
+}
+
+const SUPPORT_QUEST_UPGRADES = ['Bloodsong', 'Celestial Opposition', 'Dream Maker', 'Solstice Sleigh', "Zaz'Zak's Realmspike"];
+
+function supportQuestUpgradeForChampion(champion, tags, mechanicsMap = null) {
+  const dmg = inferDamageFromTagsAndInfo(champion, mechanicsMap);
+  if (dmg === 'AP' || tags.includes('Mage')) return "Zaz'Zak's Realmspike";
+  if (tags.includes('Fighter') || tags.includes('Assassin') || tags.includes('Marksman')) return 'Bloodsong';
+  if (tags.includes('Tank')) return 'Celestial Opposition';
+  if (tags.includes('Support')) return 'Dream Maker';
+  return 'Celestial Opposition';
+}
+
+const OFF_CLASS_AP_ITEMS = [
+  "Zhonya's Hourglass",
+  "Rabadon's Deathcap",
+  'Shadowflame',
+  'Malignance',
+  "Luden's Echo",
+  'Void Staff',
+  'Morellonomicon',
+];
+
+function replaceFirstCoreMatch(text, matchNames, replacementName, reason) {
+  const core = extractBuildSection(text, 'CORE BUILD');
+  if (!core) return text;
+  const normKey = (value) => String(value || '').toLowerCase().replace(/[â€™']/g, "'").trim();
+  const matchSet = new Set(matchNames.map(normKey));
+  const existing = sectionItems(text, 'CORE BUILD').map(item => item.toLowerCase());
+  if (existing.includes(replacementName.toLowerCase())) return text;
+
+  let changed = false;
+  const next = core.split('\n').map(line => {
+    const item = normalizeBuildLine(line);
+    if (!changed && matchSet.has(normKey(item))) {
+      changed = true;
+      const prefix = line.match(/^(\s*\d+[.)]\s*)/)?.[1] || '';
+      return `${prefix}${replacementName} (${reason})`;
+    }
+    return line;
+  });
+  return changed ? replaceBuildSection(text, 'CORE BUILD', next.join('\n')) : text;
+}
+
+function replaceFirstCoreMatchWithCandidates(text, matchNames, replacementNames, reason) {
+  const existing = sectionItems(text, 'CORE BUILD').map(item => item.toLowerCase());
+  const replacement = replacementNames.find(name => !existing.includes(name.toLowerCase()));
+  if (!replacement) return text;
+  return replaceFirstCoreMatch(text, matchNames, replacement, reason);
+}
+
+function replaceAllCoreMatchesWithCandidates(text, matchNames, replacementNames, reason) {
+  const core = extractBuildSection(text, 'CORE BUILD');
+  if (!core) return text;
+  const normKey = (value) => String(value || '').toLowerCase().replace(/[Ã¢â‚¬â„¢']/g, "'").trim();
+  const matchSet = new Set(matchNames.map(normKey));
+  const used = new Set(sectionItems(text, 'CORE BUILD').map(normKey));
+  let changed = false;
+
+  const next = core.split('\n').map(line => {
+    const item = normalizeBuildLine(line);
+    if (!matchSet.has(normKey(item))) return line;
+    const replacement = replacementNames.find(name => !used.has(normKey(name)));
+    if (!replacement) return '';
+    changed = true;
+    used.add(normKey(replacement));
+    const prefix = line.match(/^(\s*\d+[.)]\s*)/)?.[1] || '';
+    return `${prefix}${replacement} (${reason})`;
+  }).filter(line => line.trim());
+
+  return changed ? replaceBuildSection(text, 'CORE BUILD', next.join('\n')) : text;
+}
+
+function ensureSupportQuestUpgrade(finalText, body, tags) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  if (!/support/.test(role)) return finalText;
+  const desired = supportQuestUpgradeForChampion(body.myChampion, tags);
+  const coreItems = sectionItems(finalText, 'CORE BUILD');
+  if (coreItems.some(item => SUPPORT_QUEST_UPGRADES.some(upgrade => upgrade.toLowerCase() === item.toLowerCase()))) {
+    return finalText;
+  }
+
+  const replacePriority = [
+    "Zhonya's Hourglass", "Rabadon's Deathcap", 'Shadowflame', 'Malignance', "Luden's Echo", 'Void Staff',
+    'Banshee\'s Veil', 'Guardian Angel', 'Force of Nature', 'Kaenic Rookern',
+  ];
+  let safe = replaceFirstCoreMatch(
+    finalText,
+    replacePriority,
+    desired,
+    'support quest upgrade for support economy'
+  );
+  if (safe !== finalText) return safe;
+
+  const core = extractBuildSection(finalText, 'CORE BUILD');
+  if (!core) return finalText;
+  const lines = core.split('\n').filter(line => line.trim());
+  lines.unshift(`1. ${desired} (support quest upgrade for support economy)`);
+  const renumbered = lines.slice(0, 6).map((line, index) => {
+    const clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
+    return `${index + 1}. ${clean}`;
+  }).join('\n');
+  return replaceBuildSection(finalText, 'CORE BUILD', renumbered);
+}
+
+function enforceRoleSafeItems(finalText, body) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  const tags = getChampionTags(body.myChampion);
+  const isMarksmanRole = /^(adc|bot|bottom)$/.test(role);
+  const isSupportRole = /support/.test(role);
+  const isMarksman = isMarksmanRole || tags.includes('Marksman');
+  const champDmg = inferDamageFromTagsAndInfo(body.myChampion);
+  const isApChampion = champDmg === 'AP' || tags.includes('Mage');
+  const utilitySupports = new Set([
+    'Alistar', 'Bard', 'Blitzcrank', 'Braum', 'Janna', 'Leona', 'Lulu', 'Milio',
+    'Nami', 'Nautilus', 'Rakan', 'Rell', 'Renata', 'RenataGlasc', 'Senna',
+    'Sona', 'Soraka', 'TahmKench', 'Taric', 'Thresh', 'Yuumi', 'Zilean',
+  ]);
+  const isUtilitySupport = isSupportRole && (tags.includes('Support') || utilitySupports.has(body.myChampion));
+  let safe = finalText;
+
+  if (!isApChampion) {
+    const nonApReplacements = isSupportRole
+      ? [supportQuestUpgradeForChampion(body.myChampion, tags), 'Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Redemption']
+      : tags.includes('Tank') && !tags.includes('Fighter')
+        ? ["Jak'Sho, The Protean", "Randuin's Omen", 'Force of Nature', 'Frozen Heart', "Dead Man's Plate", 'Guardian Angel']
+        : tags.includes('Marksman') || isMarksmanRole
+          ? ['Guardian Angel', 'Mercurial Scimitar', 'Maw of Malmortius', 'Bloodthirster', 'Rapid Firecannon']
+          : ["Death's Dance", "Sterak's Gage", 'Guardian Angel', 'Maw of Malmortius', "Randuin's Omen", 'Force of Nature'];
+    safe = replaceAllCoreMatchesWithCandidates(
+      safe,
+      OFF_CLASS_AP_ITEMS,
+      nonApReplacements,
+      isSupportRole ? 'support quest upgrade; off-class AP stasis/carry item removed' : 'role-safe defensive item; off-class AP item removed'
+    );
+  }
+
+  if (isSupportRole) {
+    safe = ensureSupportQuestUpgrade(safe, body, tags);
+    safe = replaceFirstCoreMatchWithCandidates(
+      safe,
+      OFF_CLASS_AP_ITEMS,
+      ['Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Celestial Opposition', 'Redemption'],
+      'support-role economy item; off-class AP carry item removed'
+    );
+  }
+
+  if (isMarksman) {
+    const coreItems = sectionItems(safe, 'CORE BUILD');
+    const illegalForMarksman = new Set(["Zhonya's Hourglass"]);
+    if (coreItems.some(item => illegalForMarksman.has(item))) {
+      const rewritten = extractBuildSection(safe, 'CORE BUILD')
+        .split('\n')
+        .map(line => illegalForMarksman.has(normalizeBuildLine(line))
+          ? line.replace(/Zhonya's Hourglass/i, coreItems.some(item => item === 'Guardian Angel') ? 'Mercurial Scimitar' : 'Guardian Angel')
+          : line)
+        .join('\n');
+      safe = replaceBuildSection(safe, 'CORE BUILD', rewritten);
+    }
+  }
+
+  if (isUtilitySupport) {
+    const expensiveCarryItems = ["Infinity Edge", "Lord Dominik's Regards", "Bloodthirster", "Mortal Reminder", "Thornmail", "Morellonomicon", "Rabadon's Deathcap", "Youmuu's Ghostblade"];
+    const core = extractBuildSection(safe, 'CORE BUILD');
+    if (core && expensiveCarryItems.some(item => new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(core))) {
+      const supportFallbacks = ['Redemption', "Mikael's Blessing", 'Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Dawncore'];
+      const used = new Set(sectionItems(safe, 'CORE BUILD').map(item => item.toLowerCase()));
+      const filtered = core.split('\n').map(line => {
+        const item = normalizeBuildLine(line);
+        if (!expensiveCarryItems.some(bad => item.toLowerCase() === bad.toLowerCase())) return line;
+        const replacement = supportFallbacks.find(candidate => !used.has(candidate.toLowerCase())) || 'Redemption';
+        used.add(replacement.toLowerCase());
+        return line.replace(item, replacement);
+      }).join('\n');
+      safe = replaceBuildSection(safe, 'CORE BUILD', filtered);
+    }
+  }
+
+  return safe;
+}
+
+function dedupeAndPadCoreBuild(finalText, body) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  const coreContent = extractBuildSection(finalText, 'CORE BUILD');
+  if (!coreContent) return finalText;
+
+  const isSupportBuild = /support|utility/.test(role)
+    || sectionItems(finalText, 'STARTING ITEMS').some(item => /World Atlas/i.test(item));
+  const tags = getChampionTags(body.myChampion);
+  const champDmg = inferDamageFromTagsAndInfo(body.myChampion);
+  const isApChampion = champDmg === 'AP' || tags.includes('Mage');
+  const expected = /^(adc|bot|bottom)$/.test(role) ? 7 : 6;
+  const fillByRole = isSupportBuild
+    ? ['Redemption', "Mikael's Blessing", 'Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Dawncore']
+    : /^(adc|bot|bottom)$/.test(role)
+      ? ['Guardian Angel', 'Bloodthirster', 'Mercurial Scimitar', 'Maw of Malmortius', "Runaan's Hurricane", 'Rapid Firecannon']
+      : /jungle|top/.test(role)
+        ? ['Death\'s Dance', 'Sterak\'s Gage', 'Guardian Angel', 'Force of Nature', 'Randuin\'s Omen', 'Frozen Heart']
+        : isApChampion
+          ? ['Guardian Angel', 'Zhonya\'s Hourglass', 'Banshee\'s Veil', 'Void Staff', 'Rabadon\'s Deathcap']
+          : ['Guardian Angel', 'Death\'s Dance', 'Sterak\'s Gage', 'Maw of Malmortius', 'Randuin\'s Omen', 'Force of Nature'];
+
+  let kept = [];
+  const used = new Set();
+  for (const line of coreContent.split('\n')) {
+    const item = normalizeBuildLine(line);
+    if (!item) continue;
+    const key = item.toLowerCase();
+    if (used.has(key)) continue;
+    used.add(key);
+    kept.push(line);
+  }
+
+  if (isSupportBuild) {
+    const supportUpgrade = supportQuestUpgradeForChampion(body.myChampion, tags);
+    const illegalSupportCore = isApChampion
+      ? new Set()
+      : new Set(["zhonya's hourglass", "rabadon's deathcap", 'shadowflame', 'malignance', "luden's echo", 'void staff', 'morellonomicon']);
+
+    kept = kept.filter(line => {
+      const item = normalizeBuildLine(line).toLowerCase().replace(/[â€™']/g, "'");
+      return !illegalSupportCore.has(item) && !SUPPORT_QUEST_UPGRADES.some(upgrade => upgrade.toLowerCase() === item);
+    });
+    used.clear();
+    for (const line of kept) used.add(normalizeBuildLine(line).toLowerCase());
+
+    kept.unshift(`1. ${supportUpgrade} (support quest upgrade from World Atlas)`);
+    used.add(supportUpgrade.toLowerCase());
+  }
+
+  if (!isApChampion) {
+    const illegalNonAp = new Set(OFF_CLASS_AP_ITEMS.map(item => item.toLowerCase()));
+    kept = kept.filter(line => {
+      const item = normalizeBuildLine(line).toLowerCase().replace(/[Ã¢â‚¬â„¢']/g, "'");
+      return !illegalNonAp.has(item);
+    });
+    used.clear();
+    for (const line of kept) used.add(normalizeBuildLine(line).toLowerCase());
+  }
+
+  for (const filler of fillByRole) {
+    if (kept.length >= expected) break;
+    const key = filler.toLowerCase();
+    if (used.has(key)) continue;
+    used.add(key);
+    kept.push(`${kept.length + 1}. ${filler} (role-safe completion item)`);
+  }
+
+  const renumbered = kept.slice(0, expected).map((line, index) => {
+    let clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
+    if (/\b(wait|let'?s|we have|need \d|core is \d|reference has)\b/i.test(clean)) {
+      clean = `${clean.split('(')[0].trim()} (role-safe validated item)`;
+    }
+    clean = clean.replace(
+      /Sundered Sky\s*\([^)]*(?:anti-heal|grievous|damage reduction|true damage|%HP|shield)[^)]*\)/i,
+      'Sundered Sky (dueling sustain and health for extended fights)'
+    );
+    clean = clean.replace(/Serylda's Grudge\s*\([^)]*%HP[^)]*\)/i, "Serylda's Grudge (armor penetration and slow utility)");
+    return `${index + 1}. ${clean}`;
+  }).join('\n');
+
+  return replaceBuildSection(finalText, 'CORE BUILD', renumbered);
+}
+
+function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  const tags = getChampionTags(body.myChampion);
+  const champDmg = inferDamageFromTagsAndInfo(body.myChampion, mechanicsMap);
+  const isSupport = /support/.test(role) || sectionItems(finalText, 'STARTING ITEMS').some(item => /World Atlas/i.test(item));
+  const isApChampion = champDmg === 'AP' || tags.includes('Mage');
+  const allItems = [
+    ...sectionItems(finalText, 'CORE BUILD'),
+    ...sectionItems(finalText, 'SITUATIONAL ITEMS'),
+  ].map(item => item.toLowerCase().replace(/[â€™']/g, "'"));
+  const hasItem = (name) => allItems.some(item => item === String(name || '').toLowerCase().replace(/[â€™']/g, "'"));
+  const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
+  const supportUpgrade = supportQuestUpgradeForChampion(body.myChampion, tags, mechanicsMap);
+  const fallbackDefense = hasItem('Mercurial Scimitar')
+    ? 'Mercurial Scimitar'
+    : hasItem('Guardian Angel')
+    ? 'Guardian Angel'
+    : hasItem("Sterak's Gage")
+      ? "Sterak's Gage"
+      : 'role-safe defensive itemization';
+
+  const itemRewrites = [
+    { item: "Zhonya's Hourglass", aliases: ["Zhonya's Hourglass", "Zhonya's"], force: !isApChampion, replacement: !isApChampion ? fallbackDefense : null },
+    { item: "Rabadon's Deathcap", aliases: ["Rabadon's Deathcap", "Rabadon's"], force: !isApChampion, replacement: !isApChampion ? (isSupport ? supportUpgrade : fallbackDefense) : null },
+    { item: 'Shadowflame', aliases: ['Shadowflame'], force: !isApChampion, replacement: !isApChampion ? (isSupport ? supportUpgrade : fallbackDefense) : null },
+    { item: 'Malignance', aliases: ['Malignance'], force: !isApChampion, replacement: !isApChampion ? (isSupport ? supportUpgrade : fallbackDefense) : null },
+    { item: "Luden's Echo", aliases: ["Luden's Echo", "Luden's"], force: !isApChampion, replacement: !isApChampion ? (isSupport ? supportUpgrade : fallbackDefense) : null },
+    { item: 'Void Staff', aliases: ['Void Staff'], force: !isApChampion, replacement: !isApChampion ? (isSupport ? supportUpgrade : fallbackDefense) : null },
+    { item: 'Thornmail', aliases: ['Thornmail'], force: isSupport, replacement: hasItem('Thornmail') && !isSupport ? null : (hasItem(preferredAntiHeal) ? preferredAntiHeal : 'class-appropriate anti-heal') },
+    { item: 'Mortal Reminder', aliases: ['Mortal Reminder'], force: isSupport, replacement: hasItem('Mortal Reminder') && !isSupport ? null : (hasItem(preferredAntiHeal) ? preferredAntiHeal : 'class-appropriate anti-heal') },
+    { item: 'Morellonomicon', aliases: ['Morellonomicon'], force: isSupport, replacement: hasItem('Morellonomicon') && !isSupport ? null : (hasItem(preferredAntiHeal) ? preferredAntiHeal : 'class-appropriate anti-heal') },
+  ];
+
+  let safe = finalText;
+  for (const section of ['ANALYSIS', 'SITUATIONAL ITEMS', 'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES']) {
+    let content = extractBuildSection(safe, section);
+    if (!content) continue;
+    for (const { item, aliases, replacement, force } of itemRewrites) {
+      if (!replacement || (!force && hasItem(item))) continue;
+      const escaped = item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/'/g, "[â€™']");
+      content = content.replace(new RegExp(escaped, 'gi'), replacement);
+      for (const alias of aliases || []) {
+        if (alias === item) continue;
+        const aliasEscaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/'/g, "[Ã¢â‚¬â„¢']");
+        content = content.replace(new RegExp(aliasEscaped, 'gi'), replacement);
+      }
+    }
+    content = content
+      .replace(/Mercurial Scimitar\s+and\s+Mercurial Scimitar/gi, 'Mercurial Scimitar')
+      .replace(/Sundered Sky\s+and\s+Serylda's Grudge while kiting with Serylda's slow/gi, "Sundered Sky and Serylda's Grudge for sustain, armor penetration, and slow utility");
+    if (isSupport && !/support economy|World Atlas|quest upgrade/i.test(content) && section === 'WIN CONDITION') {
+      content += ` Keep the ${supportUpgrade} support upgrade as the automatic World Atlas completion, not as a delayed luxury slot.`;
+    }
+    safe = replaceBuildSection(safe, section, content);
+  }
+
+  const coreSet = new Set(sectionItems(safe, 'CORE BUILD').map(item => item.toLowerCase().replace(/[Ã¢â‚¬â„¢']/g, "'")));
+  const situational = extractBuildSection(safe, 'SITUATIONAL ITEMS');
+  if (situational) {
+    const filtered = situational
+      .split('\n')
+      .filter(line => {
+        const item = normalizeBuildLine(line).toLowerCase().replace(/[Ã¢â‚¬â„¢']/g, "'");
+        return item && !coreSet.has(item);
+      })
+      .join('\n');
+    if (filtered.trim()) safe = replaceBuildSection(safe, 'SITUATIONAL ITEMS', filtered);
+  }
+  return sanitizeItemFactClaims(safe);
+}
+
+function repairStartingItems(finalText, body) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  if (/support/.test(role)) {
+    return replaceBuildSection(finalText, 'STARTING ITEMS', 'World Atlas\nHealth Potion');
+  }
+  if (/jungle/.test(role)) {
+    const starting = sectionItems(finalText, 'STARTING ITEMS');
+    if (!starting.some(item => /hatchling|seedling|pup/i.test(item))) {
+      return replaceBuildSection(finalText, 'STARTING ITEMS', 'Gustwalker Hatchling\nHealth Potion');
+    }
+  }
+  return finalText;
+}
+
+function replaceCoreItemByName(text, fromNames, toName, reason) {
+  const core = extractBuildSection(text, 'CORE BUILD');
+  if (!core) return text;
+  const fromSet = new Set(fromNames.map(name => name.toLowerCase()));
+  const lines = core.split('\n');
+  const existing = sectionItems(text, 'CORE BUILD').map(item => item.toLowerCase());
+  if (existing.includes(toName.toLowerCase())) return text;
+
+  let changed = false;
+  const next = lines.map(line => {
+    const item = normalizeBuildLine(line).toLowerCase();
+    if (!changed && fromSet.has(item)) {
+      changed = true;
+      const prefix = line.match(/^(\s*\d+[.)]\s*)/)?.[1] || '';
+      return `${prefix}${toName} (${reason})`;
+    }
+    return line;
+  });
+  return changed ? replaceBuildSection(text, 'CORE BUILD', next.join('\n')) : text;
+}
+
+const BOOT_ITEMS = [
+  'Plated Steelcaps',
+  "Mercury's Treads",
+  'Boots of Swiftness',
+  "Berserker's Greaves",
+  'Ionian Boots of Lucidity',
+  "Sorcerer's Shoes",
+];
+
+function ensureCoreItem(text, itemName, reason, insertIndex = 0) {
+  const core = extractBuildSection(text, 'CORE BUILD');
+  if (!core || !itemName) return text;
+  const existing = sectionItems(text, 'CORE BUILD').map(item => item.toLowerCase());
+  if (existing.includes(itemName.toLowerCase())) return text;
+  const lines = core.split('\n').filter(line => line.trim());
+  const safeIndex = Math.max(0, Math.min(insertIndex, lines.length));
+  lines.splice(safeIndex, 0, `${itemName} (${reason})`);
+  return replaceBuildSection(text, 'CORE BUILD', lines.join('\n'));
+}
+
+function replaceSituationalItemByName(text, fromNames, toName, reason) {
+  const section = extractBuildSection(text, 'SITUATIONAL ITEMS');
+  if (!section) return text;
+  const fromSet = new Set(fromNames.map(name => name.toLowerCase()));
+  const existing = [
+    ...sectionItems(text, 'CORE BUILD'),
+    ...sectionItems(text, 'SITUATIONAL ITEMS'),
+  ].map(item => item.toLowerCase());
+  const lines = section.split('\n');
+
+  let changed = false;
+  const next = lines.map(line => {
+    const item = normalizeBuildLine(line).toLowerCase();
+    if (!changed && fromSet.has(item) && !existing.includes(toName.toLowerCase())) {
+      changed = true;
+      const prefix = line.match(/^(\s*\d+[.)]\s*)/)?.[1] || '';
+      return `${prefix}${toName} (${reason})`;
+    }
+    if (!changed && fromSet.has(item)) {
+      changed = true;
+      return '';
+    }
+    return line;
+  }).filter(line => line.trim());
+
+  const renumbered = next.map((line, index) => {
+    const clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
+    return `${index + 1}. ${clean}`;
+  }).join('\n');
+  return changed ? replaceBuildSection(text, 'SITUATIONAL ITEMS', renumbered) : text;
+}
+
+function ensureSituationalItem(text, itemName, reason) {
+  if (!text || !itemName) return text;
+  const allItems = [
+    ...sectionItems(text, 'CORE BUILD'),
+    ...sectionItems(text, 'SITUATIONAL ITEMS'),
+  ].map(item => item.toLowerCase());
+  if (allItems.includes(itemName.toLowerCase())) return text;
+
+  const section = extractBuildSection(text, 'SITUATIONAL ITEMS');
+  if (!section) return text;
+  const lines = section.split('\n').filter(line => line.trim());
+  lines.push(`${lines.length + 1}. ${itemName} (${reason})`);
+  return replaceBuildSection(text, 'SITUATIONAL ITEMS', lines.join('\n'));
+}
+
+function antiHealItemForChampion(champion, role, mechanicsMap = null) {
+  const tags = getChampionTags(champion);
+  const dmg = inferDamageFromTagsAndInfo(champion, mechanicsMap);
+  const roleLower = String(role || '').toLowerCase();
+  if (/^(adc|bot|bottom)$/.test(roleLower) || tags.includes('Marksman')) return 'Mortal Reminder';
+  if (dmg === 'AP' || tags.includes('Mage')) return 'Morellonomicon';
+  if (tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman')) return 'Thornmail';
+  return 'Chempunk Chainsword';
+}
+
+function hasGrievousItem(items) {
+  return items.some(item => /Thornmail|Mortal Reminder|Morellonomicon|Chempunk Chainsword/i.test(item));
+}
+
+const GRIEVOUS_ITEMS = ['Thornmail', 'Mortal Reminder', 'Morellonomicon', 'Chempunk Chainsword'];
+const ARMOR_PEN_EXCLUSIVE_ITEMS = ['Black Cleaver', "Lord Dominik's Regards", 'Mortal Reminder', "Serylda's Grudge", 'Terminus'];
+
+function itemKey(name) {
+  return String(name || '').toLowerCase().replace(/[â€™']/g, "'").trim();
+}
+
+function exactItemMatch(name, candidates) {
+  const key = itemKey(name);
+  return candidates.some(candidate => itemKey(candidate) === key);
+}
+
+function draftNeedsAntiHeal(draft) {
+  return Boolean(draft && (draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0));
+}
+
+function replacementCandidatesForBuild(body, draft, mechanicsMap = null) {
+  const role = String(body?.role || '').toLowerCase();
+  const tags = getChampionTags(body?.myChampion);
+  const champDmg = inferDamageFromTagsAndInfo(body?.myChampion, mechanicsMap);
+  const isSupport = /support|utility/.test(role);
+  const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+  const isApChampion = champDmg === 'AP' || tags.includes('Mage');
+  if (isSupport) {
+    return ['Redemption', "Mikael's Blessing", 'Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Dawncore'];
+  }
+  if (isMarksman) {
+    return draft?.heavyAp
+      ? ['Maw of Malmortius', 'Mercurial Scimitar', 'Guardian Angel', 'Bloodthirster', 'Rapid Firecannon', "Runaan's Hurricane"]
+      : ['Guardian Angel', 'Bloodthirster', 'Mercurial Scimitar', 'Maw of Malmortius', 'Rapid Firecannon', "Runaan's Hurricane"];
+  }
+  if (isApChampion) {
+    return draft?.heavyAp
+      ? ["Banshee's Veil", "Zhonya's Hourglass", "Rabadon's Deathcap", 'Void Staff', 'Cosmic Drive']
+      : ["Zhonya's Hourglass", "Banshee's Veil", "Rabadon's Deathcap", 'Void Staff', 'Cosmic Drive'];
+  }
+  return draft?.heavyAp
+    ? ['Maw of Malmortius', 'Kaenic Rookern', 'Force of Nature', "Sterak's Gage", "Death's Dance", 'Guardian Angel', "Randuin's Omen", 'Frozen Heart']
+    : ["Death's Dance", "Sterak's Gage", 'Guardian Angel', "Randuin's Omen", 'Frozen Heart', 'Force of Nature', 'Maw of Malmortius'];
+}
+
+function firstAvailableItem(candidates, used, blocked = []) {
+  const blockedKeys = new Set(blocked.map(itemKey));
+  return candidates.find(candidate => !used.has(itemKey(candidate)) && !blockedKeys.has(itemKey(candidate)));
+}
+
+function rewriteItemsInSection(text, title, replacer) {
+  const section = extractBuildSection(text, title);
+  if (!section) return text;
+  const used = new Set([
+    ...sectionItems(text, 'CORE BUILD'),
+    ...sectionItems(text, 'SITUATIONAL ITEMS'),
+  ].map(itemKey));
+  let changed = false;
+  const next = [];
+
+  for (const line of section.split('\n')) {
+    const item = normalizeBuildLine(line);
+    if (!item) continue;
+    const result = replacer(item, line, used);
+    if (result === null) {
+      changed = true;
+      used.delete(itemKey(item));
+      continue;
+    }
+    if (typeof result === 'string' && result !== line) {
+      changed = true;
+      const replacement = normalizeBuildLine(result);
+      if (replacement) used.add(itemKey(replacement));
+      next.push(result);
+      continue;
+    }
+    next.push(line);
+  }
+
+  if (!changed) return text;
+  const renumbered = next
+    .filter(line => line.trim())
+    .map((line, index) => {
+      const clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
+      return `${index + 1}. ${clean}`;
+    })
+    .join('\n');
+  return renumbered ? replaceBuildSection(text, title, renumbered) : text;
+}
+
+function lineWithReplacement(line, replacement, reason) {
+  const prefix = line.match(/^(\s*\d+[.)]\s*)/)?.[1] || '';
+  return `${prefix}${replacement} (${reason})`;
+}
+
+function itemIntentReason(item, body, draft) {
+  const name = itemKey(item);
+  if (name === itemKey('Mortal Reminder')) return 'Grievous Wounds and armor penetration vs healing frontline';
+  if (name === itemKey("Lord Dominik's Regards")) return 'armor penetration vs high-health frontline';
+  if (name === itemKey("Serylda's Grudge")) return 'armor penetration and slow utility for chasing targets';
+  if (name === itemKey('Black Cleaver')) return 'armor shred and haste for extended fights';
+  if (name === itemKey('Terminus')) return 'on-hit penetration for extended DPS fights';
+  if (name === itemKey('Guardian Angel')) return 'revive safety vs burst and late fights';
+  if (name === itemKey('Bloodthirster')) return 'lifesteal shield for safer DPS';
+  if (name === itemKey('Mercurial Scimitar')) return 'QSS active vs suppression or dangerous lockdown';
+  if (name === itemKey('Maw of Malmortius')) return 'magic shield vs AP burst';
+  if (name === itemKey("Randuin's Omen")) return 'armor and crit reduction vs AD carries';
+  if (name === itemKey('Frozen Heart')) return 'armor and attack-speed slow vs auto attackers';
+  if (name === itemKey("Death's Dance")) return 'physical burst delay for extended fights';
+  if (name === itemKey("Sterak's Gage")) return 'burst shield for all-ins';
+  if (name === itemKey('Force of Nature')) return 'magic resist and movement vs sustained AP';
+  if (name === itemKey('Kaenic Rookern')) return 'large magic shield vs AP poke and burst';
+  if (name === itemKey('Rapid Firecannon')) return 'safer range to hit first in fights';
+  if (name === itemKey("Runaan's Hurricane")) return 'multi-target DPS in front-to-back fights';
+  if (/support/.test(String(body?.role || '').toLowerCase())) return 'support-economy utility for teamfights';
+  return draft?.heavyAp ? 'role-safe magic-resist adaptation' : draft?.heavyAd ? 'role-safe armor adaptation' : 'role-safe completion item';
+}
+
+function scrubUnneededAntiHealNarrative(text) {
+  if (!text) return text;
+  return String(text)
+    .replace(/(?:mandatory|must-buy|required|non-negotiable)\s+(?:anti-heal|grievous wounds)[^.]*\./gi, '')
+    .replace(/(?:anti-heal|grievous wounds)\s+(?:is|are|becomes|remains)\s+(?:mandatory|required|non-negotiable)[^.]*\./gi, '')
+    .replace(/Need\s+(?:anti-heal|grievous wounds)[^.]*\./gi, '')
+    .replace(/requires\s+(?:anti-heal|grievous wounds)[^.]*\./gi, 'requires sustained-fight discipline.')
+    .replace(/[ \t]+\n/g, '\n');
+}
+
+function enforceAntiHealClassFit(finalText, body, draft, mechanicsMap = null) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  const desired = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
+  const desiredReason = desired === 'Morellonomicon'
+    ? 'AP Grievous Wounds for enemy healing'
+    : desired === 'Mortal Reminder'
+      ? 'crit-compatible Grievous Wounds and armor penetration for enemy healing'
+      : desired === 'Thornmail'
+        ? 'tank Grievous Wounds when enemies hit you'
+        : 'fighter Grievous Wounds for enemy healing';
+  let safe = finalText;
+  const coreItems = sectionItems(safe, 'CORE BUILD');
+  const needsAntiHeal = draftNeedsAntiHeal(draft);
+
+  if (!needsAntiHeal) {
+    const candidates = replacementCandidatesForBuild(body, draft, mechanicsMap);
+    safe = rewriteItemsInSection(safe, 'CORE BUILD', (item, line, used) => {
+      if (!exactItemMatch(item, GRIEVOUS_ITEMS)) return line;
+      const replacement = firstAvailableItem(candidates, used, GRIEVOUS_ITEMS);
+      return replacement
+        ? lineWithReplacement(line, replacement, 'no major healing threat; role-safe completion item')
+        : null;
+    });
+    safe = rewriteItemsInSection(safe, 'SITUATIONAL ITEMS', (item, line, used) => {
+      if (!exactItemMatch(item, GRIEVOUS_ITEMS)) return line;
+      const replacement = firstAvailableItem(candidates, used, GRIEVOUS_ITEMS);
+      return replacement
+        ? lineWithReplacement(line, replacement, 'situational defense; anti-heal is not forced in this draft')
+        : null;
+    });
+    return scrubUnneededAntiHealNarrative(safe);
+  }
+
+  if (coreItems.some(item => /Thornmail|Mortal Reminder|Morellonomicon|Chempunk Chainsword/i.test(item) && item !== desired)) {
+    safe = replaceCoreItemByName(
+      safe,
+      ['Thornmail', 'Mortal Reminder', 'Morellonomicon', 'Chempunk Chainsword'],
+      desired,
+      desiredReason
+    );
+  }
+
+  if (needsAntiHeal && !hasGrievousItem(sectionItems(safe, 'CORE BUILD'))) {
+    const replaceCandidates = draft.heavyAp
+      ? ['Maw of Malmortius', 'Guardian Angel', 'Death\'s Dance', 'Dead Man\'s Plate', 'Randuin\'s Omen', 'Frozen Heart']
+      : ['Guardian Angel', 'Death\'s Dance', 'Dead Man\'s Plate', 'Force of Nature'];
+    safe = replaceCoreItemByName(
+      safe,
+      replaceCandidates,
+      desired,
+      desiredReason
+    );
+  }
+
+  const wrongGrievous = ['Thornmail', 'Mortal Reminder', 'Morellonomicon', 'Chempunk Chainsword'].filter(item => item !== desired);
+  if (sectionItems(safe, 'SITUATIONAL ITEMS').some(item => wrongGrievous.some(bad => bad.toLowerCase() === item.toLowerCase()))) {
+    const allItems = [
+      ...sectionItems(safe, 'CORE BUILD'),
+      ...sectionItems(safe, 'SITUATIONAL ITEMS'),
+    ].map(item => item.toLowerCase());
+    const situationalFallbacks = draft.heavyAp
+      ? ['Spirit Visage', 'Force of Nature', 'Banshee\'s Veil', 'Guardian Angel']
+      : draft.heavyAd
+        ? ['Randuin\'s Omen', 'Frozen Heart', 'Dead Man\'s Plate', 'Guardian Angel']
+        : ['Guardian Angel', 'Spirit Visage', 'Randuin\'s Omen', 'Banshee\'s Veil'];
+    const replacement = allItems.includes(desired.toLowerCase())
+      ? situationalFallbacks.find(item => !allItems.includes(item.toLowerCase())) || desired
+      : desired;
+    safe = replaceSituationalItemByName(
+      safe,
+      wrongGrievous,
+      replacement,
+      replacement === desired ? desiredReason : 'situational defensive alternative; Grievous Wounds is already covered'
+    );
+  }
+
+  return safe;
+}
+
+function chooseArmorPenKeep(groupItems, body, draft, mechanicsMap = null) {
+  const needsAntiHeal = draftNeedsAntiHeal(draft);
+  const desiredAntiHeal = antiHealItemForChampion(body?.myChampion, body?.role, mechanicsMap);
+  if (needsAntiHeal && exactItemMatch(desiredAntiHeal, ARMOR_PEN_EXCLUSIVE_ITEMS) && exactItemMatch(desiredAntiHeal, groupItems)) {
+    return groupItems.find(item => itemKey(item) === itemKey(desiredAntiHeal));
+  }
+
+  const role = String(body?.role || '').toLowerCase();
+  const tags = getChampionTags(body?.myChampion);
+  const champDmg = inferDamageFromTagsAndInfo(body?.myChampion, mechanicsMap);
+  const preference = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman')
+    ? ["Lord Dominik's Regards", 'Terminus', 'Mortal Reminder', "Serylda's Grudge", 'Black Cleaver']
+    : tags.includes('Assassin')
+      ? ["Serylda's Grudge", 'Black Cleaver', "Lord Dominik's Regards", 'Mortal Reminder', 'Terminus']
+      : champDmg === 'AP' || tags.includes('Mage')
+        ? []
+        : ['Black Cleaver', "Serylda's Grudge", "Lord Dominik's Regards", 'Terminus', 'Mortal Reminder'];
+
+  for (const candidate of preference) {
+    const found = groupItems.find(item => itemKey(item) === itemKey(candidate));
+    if (found) return found;
+  }
+  return groupItems[0];
+}
+
+function scrubExclusiveItemNarrative(text, keepItem) {
+  if (!text) return text;
+  const names = ARMOR_PEN_EXCLUSIVE_ITEMS
+    .map(name => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|');
+  const multiPenSentence = new RegExp(`[^.\\n]*(?:${names})[^.\\n]*(?:${names})[^.\\n]*\\.`, 'gi');
+  return String(text).replace(multiPenSentence, (sentence) => {
+    const mentioned = ARMOR_PEN_EXCLUSIVE_ITEMS.filter(item => new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(sentence));
+    const unique = [...new Set(mentioned.map(itemKey))];
+    if (unique.length <= 1) return sentence;
+    return `${keepItem} is the armor-penetration slot here; spend the remaining gold on damage or survivability.`;
+  });
+}
+
+function enforceExclusiveItemGroups(finalText, body, draft, mechanicsMap = null) {
+  if (!finalText || !body) return finalText;
+  let safe = finalText;
+  const allItems = [
+    ...sectionItems(safe, 'CORE BUILD'),
+    ...sectionItems(safe, 'SITUATIONAL ITEMS'),
+  ];
+  const armorPenItems = allItems.filter(item => exactItemMatch(item, ARMOR_PEN_EXCLUSIVE_ITEMS));
+  const uniqueArmorPen = [...new Map(armorPenItems.map(item => [itemKey(item), item])).values()];
+  if (uniqueArmorPen.length <= 1) {
+    return scrubExclusiveItemNarrative(safe, uniqueArmorPen[0] || 'the chosen armor-penetration item');
+  }
+
+  const keep = chooseArmorPenKeep(uniqueArmorPen, body, draft, mechanicsMap);
+  const candidates = replacementCandidatesForBuild(body, draft, mechanicsMap);
+  const blocked = ARMOR_PEN_EXCLUSIVE_ITEMS;
+  let promotedKeepInCore = false;
+
+  const core = extractBuildSection(safe, 'CORE BUILD');
+  if (core) {
+    const lines = core.split('\n').filter(line => line.trim());
+    const keepIndex = lines.findIndex(line => itemKey(normalizeBuildLine(line)) === itemKey(keep));
+    const used = new Set([
+      ...sectionItems(safe, 'CORE BUILD'),
+      ...sectionItems(safe, 'SITUATIONAL ITEMS'),
+    ].map(itemKey));
+    let changed = false;
+
+    for (let index = 0; index < lines.length; index++) {
+      const item = normalizeBuildLine(lines[index]);
+      if (!exactItemMatch(item, ARMOR_PEN_EXCLUSIVE_ITEMS) || itemKey(item) === itemKey(keep)) continue;
+
+      if (!promotedKeepInCore && keepIndex > index) {
+        const replacement = firstAvailableItem(candidates, used, blocked);
+        lines[index] = lineWithReplacement(lines[index], keep, itemIntentReason(keep, body, draft));
+        if (replacement) {
+          lines[keepIndex] = lineWithReplacement(lines[keepIndex], replacement, itemIntentReason(replacement, body, draft));
+          used.add(itemKey(replacement));
+        } else {
+          lines[keepIndex] = '';
+        }
+        promotedKeepInCore = true;
+        changed = true;
+        continue;
+      }
+
+      const replacement = firstAvailableItem(candidates, used, blocked);
+      lines[index] = replacement ? lineWithReplacement(lines[index], replacement, itemIntentReason(replacement, body, draft)) : '';
+      if (replacement) used.add(itemKey(replacement));
+      changed = true;
+    }
+
+    if (changed) {
+      const renumbered = lines
+        .filter(line => line.trim())
+        .map((line, index) => `${index + 1}. ${line.replace(/^\s*\d+[.)]\s*/, '').trim()}`)
+        .join('\n');
+      safe = replaceBuildSection(safe, 'CORE BUILD', renumbered);
+    }
+  }
+  safe = rewriteItemsInSection(safe, 'SITUATIONAL ITEMS', (item, line, used) => {
+    if (!exactItemMatch(item, ARMOR_PEN_EXCLUSIVE_ITEMS) || itemKey(item) === itemKey(keep)) return line;
+    const replacement = firstAvailableItem(candidates, used, blocked);
+    return replacement ? lineWithReplacement(line, replacement, itemIntentReason(replacement, body, draft)) : null;
+  });
+  return scrubExclusiveItemNarrative(safe, keep);
+}
+
+function normalizeKnownItemTypos(text) {
+  if (!text) return text;
+  return String(text)
+    .replace(/Maw of Malmort\w*/gi, 'Maw of Malmortius')
+    .replace(/Guardian'?s Angel/gi, 'Guardian Angel')
+    .replace(/Quicksilver Sash/gi, 'Mercurial Scimitar')
+    .replace(/Serpant'?s Fangs?/gi, "Serpent's Fang")
+    .replace(/Serpent'?s Fangs/gi, "Serpent's Fang");
+}
+
+function sanitizeItemFactClaims(text) {
+  if (!text) return text;
+  return normalizeKnownItemTypos(text)
+    .replace(/Eclipse\s*\([^)]*(?:armor|wave clear|sustain)[^)]*\)/gi, 'Eclipse (early burst, dueling, and shield proc)')
+    .replace(/^(\s*(?:\d+[.)]\s*)?Eclipse:\s*).*$/gmi, '$1Buy for early burst trades and dueling tempo.')
+    .replace(/Plated Steelcaps\s*\([^)]*(?:AD damage|\d+%|15-20|Pantheon Q)[^)]*\)/gi, 'Plated Steelcaps (reduces incoming basic attack damage into heavy AD pressure)')
+    .replace(/^(\s*(?:\d+[.)]\s*)?Plated Steelcaps:\s*).*$/gmi, '$1Reduces incoming basic attack damage and is preferred into heavy AD auto-attack pressure.')
+    .replace(/Sterak's Gage\s*\([^)]*Tenacity[^)]*\)/gi, "Sterak's Gage (burst shield and survivability for all-ins)")
+    .replace(/^(\s*(?:\d+[.)]\s*)?Sterak's Gage:\s*).*Tenacity.*$/gmi, "$1Buy for burst shield and survivability in all-ins.")
+    .replace(/Death's Dance\s*\([^)]*true damage[^)]*\)/gi, "Death's Dance (physical burst delay and extended-fight survivability)")
+    .replace(/^(\s*(?:\d+[.)]\s*)?Death's Dance:\s*).*true damage.*$/gmi, "$1Buy for physical burst delay and extended-fight survivability.")
+    .replace(/true damage from Ahri/gi, 'burst from Ahri')
+    .replace(/Sundered Sky\s*\([^)]*(?:anti-heal|grievous|damage reduction|true damage|%HP|shield)[^)]*\)/gi, 'Sundered Sky (dueling sustain and health for extended fights)')
+    .replace(/Serylda's Grudge\s*\([^)]*%HP[^)]*\)/gi, "Serylda's Grudge (armor penetration and slow utility)")
+    .replace(/^(\s*(?:\d+[.)]\s*)?Mercurial Scimitar:\s*).*stasis.*$/gmi, '$1Buy when QSS/cleanse is needed against suppression or dangerous lockdown.')
+    .replace(/Chempunk Chainsword is added as situational/gi, 'Chempunk Chainsword covers healing')
+    .replace(/Survivability Requirement:\s*High Armor\s*\([^.\n]*Class-appropriate Grievous Wounds is required for enemy healing\./gi, 'Survivability Requirement: High armor and class-appropriate anti-heal are required against this draft.');
+}
+
+function enforceDraftCounterLogic(finalText, body, mechanicsMap = null) {
+  if (!finalText || !body) return finalText;
+  const role = String(body.role || '').toLowerCase();
+  const draft = analyzeEnemyDraft(body.enemies || [], mechanicsMap);
+  let safe = normalizeKnownItemTypos(finalText);
+  const before = finalText;
+  let desiredBoots = null;
+  let desiredBootsReason = '';
+
+  const fullAdPressure = draft.heavyAd && draft.effectiveAp < 1.5;
+  if (fullAdPressure) {
+    desiredBoots = 'Plated Steelcaps';
+    desiredBootsReason = 'armor vs AD-heavy enemy team';
+    safe = replaceCoreItemByName(
+      safe,
+      BOOT_ITEMS.filter(item => item !== desiredBoots),
+      'Plated Steelcaps',
+      'armor vs AD-heavy enemy team'
+    );
+  } else if (draft.heavyAp || draft.highCc) {
+    desiredBoots = "Mercury's Treads";
+    desiredBootsReason = draft.highCc ? 'tenacity vs heavy crowd control' : 'magic resist vs AP-heavy enemy team';
+    safe = replaceCoreItemByName(
+      safe,
+      BOOT_ITEMS.filter(item => item !== desiredBoots),
+      "Mercury's Treads",
+      draft.highCc ? 'tenacity vs heavy crowd control' : 'magic resist vs AP-heavy enemy team'
+    );
+  } else if (draft.heavyAd) {
+    desiredBoots = 'Plated Steelcaps';
+    desiredBootsReason = 'armor vs AD-heavy enemy team';
+    safe = replaceCoreItemByName(
+      safe,
+      BOOT_ITEMS.filter(item => item !== desiredBoots),
+      'Plated Steelcaps',
+      'armor vs AD-heavy enemy team'
+    );
+  }
+  if (desiredBoots) {
+    safe = ensureCoreItem(safe, desiredBoots, desiredBootsReason, /support/.test(role) ? 1 : 0);
+  }
+
+  if (draft.suppression > 0) {
+    safe = ensureSituationalItem(
+      safe,
+      'Mercurial Scimitar',
+      'QSS active vs suppression/lockdown when cleanse is required'
+    );
+  }
+
+  if (draft.heavyAp) {
+    safe = replaceCoreItemByName(
+      safe,
+      ['Thornmail', 'Randuin\'s Omen', 'Frozen Heart', 'Dead Man\'s Plate'],
+      role.includes('adc') || role.includes('bot') ? 'Maw of Malmortius' : 'Kaenic Rookern',
+      'high magic resist vs AP-heavy enemy team'
+    );
+  }
+
+  safe = enforceAntiHealClassFit(safe, body, draft, mechanicsMap);
+  safe = enforceExclusiveItemGroups(safe, body, draft, mechanicsMap);
+
+  if (safe !== before) {
+    let analysis = extractBuildSection(safe, 'ANALYSIS');
+    if (draft.enchanterHealing > 0 && draft.selfHealingFrontliners === 0) {
+      const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
+      analysis = analysis
+        .replace(/adding Thornmail[^.]*\./i, `using ${preferredAntiHeal} because it applies Grievous Wounds through this champion's normal damage pattern.`)
+        .replace(/add Mortal Reminder[^.]*\./i, `use ${preferredAntiHeal} because it fits this champion's damage profile better than crit anti-heal.`)
+        .replace(/Mortal Reminder for Nami's healing/gi, `${preferredAntiHeal} for Nami's healing`)
+        .replace(/Thornmail for Nami's healing/gi, `${preferredAntiHeal} for Nami's healing`);
+    }
+    analysis = analysis.replace(/Thornmail[^.]*Grievous Wounds[^.]*\./gi, `${antiHealItemForChampion(body.myChampion, role, mechanicsMap)} is the correct Grievous Wounds item if enemy healing must be answered directly.`);
+    if (fullAdPressure) {
+      analysis = analysis
+        .replace(/Mercury's Treads are required[^.]*\./gi, 'Plated Steelcaps are preferred because the enemy damage profile is overwhelmingly AD.')
+        .replace(/Mercury's Treads provide[^.]*\./gi, 'Plated Steelcaps reduce the repeated AD auto-attack and dive damage.');
+    } else if (draft.heavyAp || draft.highCc) {
+      analysis = analysis
+        .replace(/Plated Steelcaps are retained[^.]*\./gi, "Mercury's Treads are required because AP damage and crowd control are the main threats.")
+        .replace(/Steelcaps provide better[^.]*\./gi, "Mercury's Treads provide the needed tenacity and magic resist.");
+    }
+    const note = [
+      fullAdPressure ? 'overwhelming AD pressure' : '',
+      draft.heavyAp ? 'heavy AP draft' : '',
+      draft.highCc && !fullAdPressure ? 'high crowd control' : '',
+      draft.suppression > 0 ? 'suppression answer' : '',
+      draft.enchanterHealing > 0 && draft.selfHealingFrontliners === 0 ? 'ranged/enchanter healing' : '',
+    ].filter(Boolean).join(', ');
+    if (analysis && !/Counter Logic:/i.test(analysis)) {
+      safe = replaceBuildSection(safe, 'ANALYSIS', `${analysis}\nCounter Logic: Deterministic validation adjusted boots/defense for ${note}.`);
+    }
+  }
+
+  return safe;
+}
+
+function getCompactRefinementReference(role) {
+  const isJungle = /jungle/i.test(role || '');
+  const isSupport = /support|utility/i.test(role || '');
+  const roleGuardrail = isSupport
+    ? 'Support economy: prefer baseline support items. For anti-heal, use Ignite timing or Oblivion Orb only for AP supports; otherwise mention ally anti-heal only in ANALYSIS or WIN CONDITION. Do not list Mortal Reminder, Thornmail, Morellonomicon, or expensive carry items in CORE BUILD or SITUATIONAL ITEMS for utility supports unless already present in the baseline.'
+    : isJungle
+      ? 'Jungle identity: keep Smite and a jungle companion start. Adapt boots/defense only when enemy damage split or CC clearly demands it.'
+      : 'Lane identity: keep the champion class intact. Do not turn mages into tanks, marksmen into tanks, or fighters into AP carries unless the baseline already does it.';
+  return [
+    'COMPACT VALIDATION REFERENCE:',
+    'Baseline preservation: keep runes, summoners, starting items, and skill order unless the matchup creates a critical need. Do not change them just because an alternative is also viable. Always repeat exact baseline names; never output "keep baseline" shorthand.',
+    `Starting items: ${isJungle ? 'jungle companion + Health Potion' : isSupport ? 'support starter + Health Potion' : 'one lane starter + Health Potion'}.`,
+    roleGuardrail,
+    'Anti-heal by role: Thornmail for tanks/fighters being hit, Mortal Reminder for ADC/crit users, Morellonomicon for AP/mages, Ignite/Oblivion Orb/ally-callout for supports.',
+    'Common defensive/counter items: Plated Steelcaps, Mercury\'s Treads, Ionian Boots of Lucidity, Boots of Swiftness, Thornmail, Mortal Reminder, Morellonomicon, Serpent\'s Fang, Randuin\'s Omen, Frozen Heart, Force of Nature, Spirit Visage, Kaenic Rookern, Maw of Malmortius, Death\'s Dance, Guardian Angel, Zhonya\'s Hourglass, Banshee\'s Veil, Mercurial Scimitar.',
+    'If you name an item, use its exact current in-game name. Backend validation will reject invented items.',
+  ].join('\n');
+}
+
+/** Helper to get the patch from KB meta */
+function loadKBBuildTemplatesMeta(gameMode = 'sr') {
+  try {
+    for (const p of kbDataPaths(kbBuildTemplateFileForMode(gameMode))) {
       if (fs.existsSync(p)) {
         const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
         return raw.meta?.patch || '?';
@@ -1217,20 +2958,84 @@ function loadKBBuildTemplatesMeta() {
   return '?';
 }
 
+let _kbAugmentTemplatesCache = null;
+let _kbAugmentsMasterCache = null;
+
+function loadKBAugmentTemplates() {
+  if (_kbAugmentTemplatesCache) return _kbAugmentTemplatesCache;
+  for (const p of kbDataPaths('augment-templates.json')) {
+    if (!fs.existsSync(p)) continue;
+    try {
+      const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
+      _kbAugmentTemplatesCache = raw;
+      return raw;
+    } catch (err) {
+      log('WARN', `[augments] Failed to parse ${p}: ${err.message}`);
+    }
+  }
+  _kbAugmentTemplatesCache = { data: {} };
+  return _kbAugmentTemplatesCache;
+}
+
+function loadKBAugmentsMaster() {
+  if (_kbAugmentsMasterCache) return _kbAugmentsMasterCache;
+  for (const p of [...kbDataPaths('augments-master.json'), path.join(AUGMENTS_DIR, 'augments-master.json')]) {
+    if (!fs.existsSync(p)) continue;
+    try {
+      const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
+      _kbAugmentsMasterCache = raw;
+      return raw;
+    } catch (err) {
+      log('WARN', `[augments] Failed to parse ${p}: ${err.message}`);
+    }
+  }
+  _kbAugmentsMasterCache = { augments: [] };
+  return _kbAugmentsMasterCache;
+}
+
+function formatAugmentLine(augment, index) {
+  const name = augment?.name || `Augment ${augment?.id || index + 1}`;
+  const tier = augment?.tier && augment.tier !== 'Unknown' ? `${augment.tier} ` : '';
+  const rate = Number.isFinite(augment?.bestPickRate) && augment.bestPickRate > 0
+    ? `, ${augment.bestPickRate.toFixed(1)}% pick priority`
+    : Number.isFinite(augment?.pickRate) && augment.pickRate > 0
+      ? `, ${augment.pickRate.toFixed(1)}% pick priority`
+      : '';
+  const effect = augment?.effect ? ` - ${augment.effect}` : '';
+  return `${index + 1}. ${name} (${tier}Mobalytics recommended${rate})${effect}`;
+}
+
+function buildInstantAugmentsSection(champion) {
+  const template = loadKBAugmentTemplates().data?.[champion];
+  if (!template?.recommended?.length) return [];
+  return [
+    '',
+    'AUGMENTS',
+    ...template.recommended.slice(0, 4).map(formatAugmentLine),
+  ];
+}
+
 /**
  * Load the augments master list and format as prompt reference.
  * Returns empty string if no augment data is cached.
  */
-function getAugmentsReference() {
+function getAugmentsReference(champion = '') {
   try {
-    const augFile = path.join(AUGMENTS_DIR, 'augments-master.json');
-    if (!fs.existsSync(augFile)) return '';
-    const data = JSON.parse(fs.readFileSync(augFile, 'utf-8'));
+    const championTemplate = champion ? loadKBAugmentTemplates().data?.[champion] : null;
+    const data = loadKBAugmentsMaster();
     if (!data.augments || !Array.isArray(data.augments) || data.augments.length === 0) return '';
 
     let ref = `\n\nVALID ARAM MAYHEM AUGMENTS (Patch ${data.patch || '?'}):\n`;
     ref += `Use ONLY augments from this list. NEVER invent augment names.\n`;
     ref += `Total: ${data.augments.length} augments\n\n`;
+
+    if (championTemplate?.recommended?.length) {
+      ref += `MOBALYTICS RECOMMENDED AUGMENTS FOR ${champion}:\n`;
+      for (const aug of championTemplate.recommended.slice(0, 12)) {
+        ref += `  - ${aug.name} (${aug.tier || 'Unknown'}): pick priority ${Number(aug.bestPickRate || aug.pickRate || 0).toFixed(1)}%, ${aug.wins || 0}/${aug.matches || 0} wins/matches. ${aug.effect || ''}\n`;
+      }
+      ref += `\n`;
+    }
 
     // Group by tier
     const byTier = { Prismatic: [], Gold: [], Silver: [] };
@@ -1458,7 +3263,7 @@ function startEmbeddedBackend() {
     const backendApp = express();
     const PORT = parseInt(process.env.BACKEND_PORT || '3210', 10);
 
-    // SECURITY: Restrict CORS to local apps â€” prevents cross-site attacks
+    // SECURITY: Restrict CORS to local apps Ã¢â‚¬â€ prevents cross-site attacks
     backendApp.use(cors({ origin: /^https?:\/\/(localhost|127\.0\.0\.1|tauri\.localhost)(:\d+)?$/ }));
     backendApp.use(express.json());
 
@@ -1529,8 +3334,8 @@ You will receive RAG context containing verified patch data, a VALID ITEMS list,
 FIRST, output this analysis section to reason about the matchup before building:
 
 ANALYSIS
-Matchup Type: <poke/all-in/sustain/scaling â€” describe the lane dynamic>
-Enemy Damage Split: <AP-heavy / AD-heavy / mixed â€” reference the ENEMY TEAM PROFILE provided>
+Matchup Type: <poke/all-in/sustain/scaling Ã¢â‚¬â€ describe the lane dynamic>
+Enemy Damage Split: <AP-heavy / AD-heavy / mixed Ã¢â‚¬â€ reference the ENEMY TEAM PROFILE provided>
 Key Threats: <1-2 enemy champions that are most dangerous and why>
 Build Priority: <What stats/passives does my champion need MOST vs THIS specific enemy team?>
 
@@ -1574,26 +3379,26 @@ SITUATIONAL ITEMS
 <ItemName>: <when to buy and why>
 
 JUNGLE PATH (ONLY include this section if the role is Jungle)
-Include the full jungle first clear route â€” list every camp you take in order, from start to first action. Use âž” between camps. Minimum 6 camps.
-Example (RED SIDE): Red âž” Krugs âž” Raptors âž” Wolves âž” Blue âž” Gromp âž” Scuttle
-Example (BLUE SIDE): Blue âž” Gromp âž” Wolves âž” Raptors âž” Red âž” Krugs âž” Scuttle
+Include the full jungle first clear route Ã¢â‚¬â€ list every camp you take in order, from start to first action. Use Ã¢Å¾â€ between camps. Minimum 6 camps.
+Example (RED SIDE): Red Ã¢Å¾â€ Krugs Ã¢Å¾â€ Raptors Ã¢Å¾â€ Wolves Ã¢Å¾â€ Blue Ã¢Å¾â€ Gromp Ã¢Å¾â€ Scuttle
+Example (BLUE SIDE): Blue Ã¢Å¾â€ Gromp Ã¢Å¾â€ Wolves Ã¢Å¾â€ Raptors Ã¢Å¾â€ Red Ã¢Å¾â€ Krugs Ã¢Å¾â€ Scuttle
 Adapt the route to your selected champion and matchup. Do NOT output only 1 or 2 camps.
 
 ENEMY POWER SPIKES
-<EnemyChampion>: <Level/Item spike â€” what to watch for>
-<EnemyChampion>: <Level/Item spike â€” what to watch for>
+<EnemyChampion>: <Level/Item spike Ã¢â‚¬â€ what to watch for>
+<EnemyChampion>: <Level/Item spike Ã¢â‚¬â€ what to watch for>
 
 WIN CONDITION
 <One or two sentences describing how to win this specific draft/matchup>
 
 YOUR POWER SPIKES
-1-item spike: <ItemName> â€” <why this is a power spike and how to play around it>
-2-item spike: <Item1> + <Item2> â€” <why this combination is strong and what to do>
+1-item spike: <ItemName> Ã¢â‚¬â€ <why this is a power spike and how to play around it>
+2-item spike: <Item1> + <Item2> Ã¢â‚¬â€ <why this combination is strong and what to do>
 
-EXAMPLE (showing the expected reasoning depth â€” adapt to the actual request):
+EXAMPLE (showing the expected reasoning depth Ã¢â‚¬â€ adapt to the actual request):
 ANALYSIS
-Matchup Type: Poke lane â€” Caitlyn outranges Jinx, expect harass with Q and headshots
-Enemy Damage Split: 3 AP / 1 AD / 1 Tank â€” heavy magic damage from mid, jungle, and support
+Matchup Type: Poke lane Ã¢â‚¬â€ Caitlyn outranges Jinx, expect harass with Q and headshots
+Enemy Damage Split: 3 AP / 1 AD / 1 Tank Ã¢â‚¬â€ heavy magic damage from mid, jungle, and support
 Key Threats: Syndra (burst mage, can one-shot at 6), Amumu (engage tank, R locks entire team)
 Build Priority: Need MR to survive AP threats, but also need core crit scaling for Jinx's identity
 
@@ -1610,13 +3415,13 @@ Shards: Attack Speed, Adaptive Force, Health
 
 CORE BUILD
 1. Berserker's Greaves (Essential AS boots for auto-attack ADC)
-2. Infinity Edge (Core crit multiplier â€” Jinx rockets scale with AD+crit multiplicatively)
-3. Rapid Firecannon (Extended range helps vs Caitlyn's 650 range â€” safer kiting in lane)
-4. Runaan's Hurricane (AOE rockets in teamfights â€” Jinx's identity item for multi-target DPS)
-5. Wit's End (ADAPTED: 3 AP enemies â€” on-hit MR + damage solves survivability AND DPS simultaneously)
+2. Infinity Edge (Core crit multiplier Ã¢â‚¬â€ Jinx rockets scale with AD+crit multiplicatively)
+3. Rapid Firecannon (Extended range helps vs Caitlyn's 650 range Ã¢â‚¬â€ safer kiting in lane)
+4. Runaan's Hurricane (AOE rockets in teamfights Ã¢â‚¬â€ Jinx's identity item for multi-target DPS)
+5. Wit's End (ADAPTED: 3 AP enemies Ã¢â‚¬â€ on-hit MR + damage solves survivability AND DPS simultaneously)
 6. Guardian Angel (Late game insurance vs AP burst flanks from Syndra)
 7. Bloodthirster (Lifesteal sustain for extended teamfights + overheal shield)
-(END OF EXAMPLE â€” do not copy this example, generate a unique build for the actual request)
+(END OF EXAMPLE Ã¢â‚¬â€ do not copy this example, generate a unique build for the actual request)
 
 Rules:
 - THINK THEN BUILD: Your ANALYSIS section must directly influence your item choices. If you identify "3 AP threats" in the analysis, at least 1-2 items in CORE BUILD must address that.
@@ -1624,14 +3429,14 @@ Rules:
 - ADAPTIVE KEYSTONES: Choose Keystones based on the lane. e.g. Fleet Footwork to survive heavy poke, Conqueror for extended melee trades, Grasp for short trades.
 - ADAPTIVE ITEMS: Build defensive items earlier if the enemy comp dictates it. Reference the ENEMY TEAM PROFILE data provided.
 - RUNE-ITEM COHERENCE: Your Keystone and items must form a coherent identity:
-  Conqueror â†’ sustained trade items (Blade of the Ruined King, Death's Dance, Black Cleaver)
-  Lethal Tempo â†’ attack speed items (Nashor's Tooth, Wit's End, Runaan's Hurricane)
-  Electrocute â†’ burst items (Luden's, Shadowflame, Stormsurge)
-  Fleet Footwork â†’ sustain/kiting items (Bloodthirster, Rapid Firecannon) 
-  Grasp â†’ bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
-  Dark Harvest â†’ snowball items (Mejai's Soulstealer, Shadowflame)
+  Conqueror Ã¢â€ â€™ sustained trade items (Blade of the Ruined King, Death's Dance, Black Cleaver)
+  Lethal Tempo Ã¢â€ â€™ attack speed items (Nashor's Tooth, Wit's End, Runaan's Hurricane)
+  Electrocute Ã¢â€ â€™ burst items (Luden's, Shadowflame, Stormsurge)
+  Fleet Footwork Ã¢â€ â€™ sustain/kiting items (Bloodthirster, Rapid Firecannon)
+  Grasp Ã¢â€ â€™ bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
+  Dark Harvest Ã¢â€ â€™ snowball items (Mejai's Soulstealer, Shadowflame)
 - ITEMS: Use ONLY items from the VALID COMPLETED ITEMS list provided. NEVER invent item names or use removed items.
-- COUNTER-ITEMS: Use the CHAMPION-SPECIFIC COUNTER TIPS from the ENEMY TEAM PROFILE. If a tip says "Zhonya's negates R," include Zhonya's as a core or situational item.
+- COUNTER-ITEMS: Use the CHAMPION-SPECIFIC COUNTER TIPS from the ENEMY TEAM PROFILE, but keep every item class-legal. Stasis/AP items are only legal for AP/mage champions; AD fighters use Guardian Angel, Sterak's Gage, Death's Dance, Maw, Randuin's, or Mercurial when appropriate.
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).
 - SITUATIONAL ITEMS must ALWAYS have at least 4 items with clear conditions (e.g. "vs heavy AP", "if behind", "vs tanks").
 - BOOTS: ONE pair of upgraded boots MUST be in CORE BUILD for all roles. ALWAYS place the upgraded boots as the FIRST or SECOND item in CORE BUILD. If you pick the "Magical Footwear" rune, include the UPGRADED boots. For Bottom/ADC: list 7 items total, placing boots 1st or 2nd.
@@ -1639,34 +3444,34 @@ Rules:
 - SHARDS: Pick 1 from each row. Use ONLY from the VALID STAT SHARDS list.
 - For jungle, include jungle companion start.
 - Do NOT add explanations or extra text outside the sections.
-- If role is Jungle, include JUNGLE PATH with a complete first clear: every camp in order, 6+ camps with âž” arrows.
+- If role is Jungle, include JUNGLE PATH with a complete first clear: every camp in order, 6+ camps with Ã¢Å¾â€ arrows.
 - ALWAYS include ENEMY POWER SPIKES, YOUR POWER SPIKES, and WIN CONDITION.
 - Only output NEED_RETRY if the champion name or role is completely invalid/nonsensical.
 
-COMMON MISTAKES â€” NEVER DO THESE:
-âŒ Do NOT put boots as item 5 or 6 â€” boots MUST be item 1 or 2 in CORE BUILD
-âŒ Do NOT suggest the same item twice in CORE BUILD
-âŒ Do NOT put starting items (Doran's, potions) in CORE BUILD
-âŒ Do NOT pick secondary runes from the SAME tree as primary
-âŒ Do NOT suggest 2 pairs of boots
-âŒ Do NOT suggest items that only exist in ARAM/Arena
-âŒ Do NOT output a generic cookie-cutter build â€” you MUST adapt to the enemy team profile
-âœ… ALWAYS adapt at least 1-2 items specifically to the enemy team composition
-âœ… ALWAYS explain HOW an item counters a specific enemy in the reason`;
+COMMON MISTAKES Ã¢â‚¬â€ NEVER DO THESE:
+Ã¢ÂÅ’ Do NOT put boots as item 5 or 6 Ã¢â‚¬â€ boots MUST be item 1 or 2 in CORE BUILD
+Ã¢ÂÅ’ Do NOT suggest the same item twice in CORE BUILD
+Ã¢ÂÅ’ Do NOT put starting items (Doran's, potions) in CORE BUILD
+Ã¢ÂÅ’ Do NOT pick secondary runes from the SAME tree as primary
+Ã¢ÂÅ’ Do NOT suggest 2 pairs of boots
+Ã¢ÂÅ’ Do NOT suggest items that only exist in ARAM/Arena
+Ã¢ÂÅ’ Do NOT output a generic cookie-cutter build Ã¢â‚¬â€ you MUST adapt to the enemy team profile
+Ã¢Å“â€¦ ALWAYS adapt at least 1-2 items specifically to the enemy team composition
+Ã¢Å“â€¦ ALWAYS explain HOW an item counters a specific enemy in the reason`;
     }
 
     function buildShortPrompt(patch) {
       return _prompts.buildShortPrompt(patch);
     }
 
-    // â”€â”€ JSON Structured Output Schema â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ JSON Structured Output Schema Ã¢â€â‚¬Ã¢â€â‚¬
     // Keeps DeepSeek/OpenRouter output aligned with the expected response shape.
     const BUILD_RESPONSE_SCHEMA = {
       type: "object",
       properties: {
         analysis: {
           type: "object",
-          description: "Matchup analysis â€” threats, damage types, build priorities",
+          description: "Matchup analysis Ã¢â‚¬â€ threats, damage types, build priorities",
           properties: {
             matchupType: { type: "string", description: "poke, all-in, sustain, or scaling" },
             enemyDamageSplit: { type: "string", description: "e.g. AD-heavy (3 AD: Zed, Yasuo, Caitlyn; 1 AP: Brand)" },
@@ -1683,7 +3488,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
             primaryTree: { type: "string", description: "Precision, Domination, Sorcery, Resolve, or Inspiration" },
             keystone: { type: "string", description: "Keystone rune name" },
             primaryRunes: { type: "array", items: { type: "string" }, description: "Exactly 3 primary runes" },
-            secondaryTree: { type: "string", description: "Secondary tree â€” DIFFERENT from primary" },
+            secondaryTree: { type: "string", description: "Secondary tree Ã¢â‚¬â€ DIFFERENT from primary" },
             secondaryRunes: { type: "array", items: { type: "string" }, description: "Exactly 2 secondary runes" },
             shards: { type: "array", items: { type: "string" }, description: "Exactly 3 stat shards" }
           },
@@ -1696,7 +3501,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
         skillOrder: { type: "string", description: "Max priority e.g. Q > W > E > R" },
         startingItems: {
           type: "array", items: { type: "string" },
-          description: "Exactly 2 items: 1 starting item + 1 potion. Total cost must be â‰¤500g. Use ONLY items from the VALID STARTING ITEMS list. Example: ['Doran\\'s Blade', 'Health Potion']. Jungle: ['Scorchclaw Pup', 'Health Potion']. Support: ['World Atlas', 'Health Potion']."
+          description: "Exactly 2 items: 1 starting item + 1 potion. Total cost must be Ã¢â€°Â¤500g. Use ONLY items from the VALID STARTING ITEMS list. Example: ['Doran\\'s Blade', 'Health Potion']. Jungle: ['Scorchclaw Pup', 'Health Potion']. Support: ['World Atlas', 'Health Potion']."
         },
         coreBuild: {
           type: "array",
@@ -1819,7 +3624,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
       return lines.join('\n');
     }
 
-    // â”€â”€ Build Validation & Correction Pass â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Build Validation & Correction Pass Ã¢â€â‚¬Ã¢â€â‚¬
     // Levenshtein distance for fuzzy matching
     function levenshtein(a, b) {
       const m = a.length, n = b.length;
@@ -1853,28 +3658,28 @@ COMMON MISTAKES â€” NEVER DO THESE:
     /**
      * Normalize messy AI output into the clean format the UI parser expects.
      * Handles all known AI format deviations:
-     * - "Primary Tree: X" â†’ "Primary: X"
-     * - "Row N: RuneName" â†’ "RuneName"
-     * - "Stat Shards:" + "Row N: X" â†’ "Shards: X, Y, Z"
-     * - "1. Smite (reason)" â†’ "Smite"
-     * - Verbose skill order â†’ "Q > W > E > R"
-     * - "STEP N â€”" sections stripped
+     * - "Primary Tree: X" Ã¢â€ â€™ "Primary: X"
+     * - "Row N: RuneName" Ã¢â€ â€™ "RuneName"
+     * - "Stat Shards:" + "Row N: X" Ã¢â€ â€™ "Shards: X, Y, Z"
+     * - "1. Smite (reason)" Ã¢â€ â€™ "Smite"
+     * - Verbose skill order Ã¢â€ â€™ "Q > W > E > R"
+     * - "STEP N Ã¢â‚¬â€" sections stripped
      * - "CONSTRAINT:" prefix noise stripped from core build items
      */
     function normalizeAIOutput(text) {
       if (!text) return text;
       let out = text;
 
-      // â”€â”€ Fix RUNES section â”€â”€
-      // "Primary Tree: X" â†’ "Primary: X"
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Fix RUNES section Ã¢â€â‚¬Ã¢â€â‚¬
+      // "Primary Tree: X" Ã¢â€ â€™ "Primary: X"
       out = out.replace(/Primary\s+Tree:\s*/gi, 'Primary: ');
       out = out.replace(/Secondary\s+Tree:\s*/gi, 'Secondary: ');
 
-      // "Keystone: X (reason)" â†’ "Keystone: X"
+      // "Keystone: X (reason)" Ã¢â€ â€™ "Keystone: X"
       out = out.replace(/(Keystone:\s*[A-Za-z\s']+?)\s*\(.*?\)/gi, '$1');
 
-      // "Row N: RuneName" â†’ "RuneName" (but NOT inside Shards)
-      // This handles lines like "Row 1: Triumph" â†’ "Triumph"
+      // "Row N: RuneName" Ã¢â€ â€™ "RuneName" (but NOT inside Shards)
+      // This handles lines like "Row 1: Triumph" Ã¢â€ â€™ "Triumph"
       // We need to be careful not to strip "Row" from shard lines yet
       const runesMatch = out.match(/RUNES\n([\s\S]*?)(?=\n(?:SUMMONERS|SKILL ORDER|STARTING|CORE BUILD|\n\n))/i);
       if (runesMatch) {
@@ -1896,7 +3701,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
           // Check if the header line itself has inline shards: "Shards: X, Y, Z"
           const inlineMatch = blockLines[shardsStartIdx].match(/Shards?:\s*(.+)/i);
           if (inlineMatch && inlineMatch[1].trim().length > 0 && inlineMatch[1].includes(',')) {
-            // Already inline format â€” leave it
+            // Already inline format Ã¢â‚¬â€ leave it
           } else {
             // Collect subsequent lines as individual shard entries
             for (let i = shardsStartIdx + 1; i < blockLines.length; i++) {
@@ -1920,9 +3725,9 @@ COMMON MISTAKES â€” NEVER DO THESE:
         out = out.replace(runesMatch[1], runesBlock);
       }
 
-      // â”€â”€ Fix SUMMONERS section â”€â”€
-      // "1. Smite (Required for Jungle)" â†’ "Smite"
-      // "2. Ghost (Essential for sticking)" â†’ "Ghost"
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Fix SUMMONERS section Ã¢â€â‚¬Ã¢â€â‚¬
+      // "1. Smite (Required for Jungle)" Ã¢â€ â€™ "Smite"
+      // "2. Ghost (Essential for sticking)" Ã¢â€ â€™ "Ghost"
       const summonersMatch = out.match(/SUMMONERS\n([\s\S]*?)(?=\n(?:SKILL ORDER|STARTING|CORE BUILD|\n\n))/i);
       if (summonersMatch) {
         let sumBlock = summonersMatch[1];
@@ -1944,7 +3749,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
         }
       }
 
-      // â”€â”€ Fix SKILL ORDER section â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Fix SKILL ORDER section Ã¢â€â‚¬Ã¢â€â‚¬
       // Various formats: "Level 1: Q\nLevel 2: E\nMax: Q > W > E > R" 
       // or "Q > E > W > R" (already correct)
       // or "Maximum Skill Order: Q > W > E > R\nLevel 1: Q\nLevel 2: W"
@@ -1979,18 +3784,18 @@ COMMON MISTAKES â€” NEVER DO THESE:
         }
       }
 
-      // â”€â”€ Strip "STEP N â€”" section headers (AI sometimes outputs these) â”€â”€
-      out = out.replace(/^STEP\s+\d+\s*[-â€”:].+$/gm, '');
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Strip "STEP N Ã¢â‚¬â€" section headers (AI sometimes outputs these) Ã¢â€â‚¬Ã¢â€â‚¬
+      out = out.replace(/^STEP\s+\d+\s*[-Ã¢â‚¬â€:].+$/gm, '');
 
-      // â”€â”€ Strip "(CONSTRAINT: ...)" from CORE BUILD but keep the reason â”€â”€
-      // "1. Heartsteel (CONSTRAINT: THREAT_1 â€” rush HP)" â†’ "1. Heartsteel (rush HP)"
-      out = out.replace(/\(CONSTRAINT:\s*(?:THREAT_\d+|ANTI_HEAL|BOOTS_CHOICE|KEY_POWERSPIKE)\s*[-â€”]\s*/gi, '(');
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Strip "(CONSTRAINT: ...)" from CORE BUILD but keep the reason Ã¢â€â‚¬Ã¢â€â‚¬
+      // "1. Heartsteel (CONSTRAINT: THREAT_1 Ã¢â‚¬â€ rush HP)" Ã¢â€ â€™ "1. Heartsteel (rush HP)"
+      out = out.replace(/\(CONSTRAINT:\s*(?:THREAT_\d+|ANTI_HEAL|BOOTS_CHOICE|KEY_POWERSPIKE)\s*[-Ã¢â‚¬â€]\s*/gi, '(');
 
-      // â”€â”€ Strip "(PRIORITY N)" from item names â”€â”€
-      // "2. LICH BANE (PRIORITY 1)" â†’ "2. Lich Bane"
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Strip "(PRIORITY N)" from item names Ã¢â€â‚¬Ã¢â€â‚¬
+      // "2. LICH BANE (PRIORITY 1)" Ã¢â€ â€™ "2. Lich Bane"
       out = out.replace(/\s*\(PRIORITY\s*\d+\)/gi, '');
 
-      // â”€â”€ Remove empty lines that pile up after stripping â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Remove empty lines that pile up after stripping Ã¢â€â‚¬Ã¢â€â‚¬
       out = out.replace(/\n{4,}/g, '\n\n\n');
 
       return out;
@@ -2037,7 +3842,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
       let corrected = text;
       const corrections = [];
 
-      // â”€â”€ Validate RUNES section â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Validate RUNES section Ã¢â€â‚¬Ã¢â€â‚¬
       const runesMatch = text.match(/RUNES\n([\s\S]*?)(?=\n(?:SUMMONERS|SKILL ORDER|\n\n))/);
       if (runesMatch && allValidRunes.length > 0) {
         const runesBlock = runesMatch[1];
@@ -2052,7 +3857,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
               if (!treeSet.has(treeName)) {
                 const closest = findClosestMatch(treeName, validTreeNames, 4);
                 if (closest) {
-                  corrections.push(`Tree: "${treeName}" â†’ "${closest}"`);
+                  corrections.push(`Tree: "${treeName}" Ã¢â€ â€™ "${closest}"`);
                   corrected = corrected.replace(treeName, closest);
                 }
               }
@@ -2065,7 +3870,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
               if (!allKeystones.includes(ks)) {
                 const closest = findClosestMatch(ks, allKeystones, 5);
                 if (closest) {
-                  corrections.push(`Keystone: "${ks}" â†’ "${closest}"`);
+                  corrections.push(`Keystone: "${ks}" Ã¢â€ â€™ "${closest}"`);
                   corrected = corrected.replace(ks, closest);
                 }
               }
@@ -2078,7 +3883,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
                 if (shard && !shardSet.has(shard)) {
                   const closest = findClosestMatch(shard, uniqueShards, 4);
                   if (closest) {
-                    corrections.push(`Shard: "${shard}" â†’ "${closest}"`);
+                    corrections.push(`Shard: "${shard}" Ã¢â€ â€™ "${closest}"`);
                     corrected = corrected.replace(shard, closest);
                   }
                 }
@@ -2090,14 +3895,14 @@ COMMON MISTAKES â€” NEVER DO THESE:
           if (trimmed && !runeSet.has(trimmed)) {
             const closest = findClosestMatch(trimmed, allValidRunes, 5);
             if (closest) {
-              corrections.push(`Rune: "${trimmed}" â†’ "${closest}"`);
+              corrections.push(`Rune: "${trimmed}" Ã¢â€ â€™ "${closest}"`);
               corrected = corrected.replace(trimmed, closest);
             }
           }
         }
       }
 
-      // â”€â”€ Validate items in CORE BUILD, STARTING ITEMS, SITUATIONAL ITEMS â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Validate items in CORE BUILD, STARTING ITEMS, SITUATIONAL ITEMS Ã¢â€â‚¬Ã¢â€â‚¬
       if (validItemNames.length > 0) {
         // CORE BUILD: lines like "1. ItemName (reason)" or "1. ItemName"
         const coreMatch = corrected.match(/CORE BUILD\n([\s\S]*?)(?=\n(?:SITUATIONAL|JUNGLE PATH|ENEMY POWER|WIN CONDITION|\n\n))/);
@@ -2112,7 +3917,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
               if (!exists) {
                 const closest = findClosestMatch(itemName, validItemNames, 5);
                 if (closest && closest.toLowerCase() !== itemName.toLowerCase()) {
-                  corrections.push(`Item: "${itemName}" â†’ "${closest}"`);
+                  corrections.push(`Item: "${itemName}" Ã¢â€ â€™ "${closest}"`);
                   corrected = corrected.replace(itemName, closest);
                 }
               }
@@ -2121,7 +3926,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
         }
       }
 
-      // â”€â”€ Validate SUMMONERS section â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Validate SUMMONERS section Ã¢â€â‚¬Ã¢â€â‚¬
       const summonerData = await fetchDdragonSummoners();
       if (summonerData && summonerData.spells) {
         const summonerMatch = corrected.match(/SUMMONERS\n([\s\S]*?)(?=\n(?:SKILL ORDER|\n\n))/);
@@ -2133,7 +3938,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
             if (!summonerData.spells.has(trimmed)) {
               const closest = findClosestMatch(trimmed, summonerData.spellNames, 5);
               if (closest) {
-                corrections.push(`Summoner: "${trimmed}" â†’ "${closest}"`);
+                corrections.push(`Summoner: "${trimmed}" Ã¢â€ â€™ "${closest}"`);
                 corrected = corrected.replace(trimmed, closest);
               }
             }
@@ -2141,7 +3946,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
         }
       }
 
-      // â”€â”€ Fix #7: Duplicate item dedup in CORE BUILD â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Fix #7: Duplicate item dedup in CORE BUILD Ã¢â€â‚¬Ã¢â€â‚¬
       const coreDedupMatch = corrected.match(/CORE BUILD\n([\s\S]*?)(?=\n(?:SITUATIONAL|JUNGLE PATH|ENEMY POWER|WIN CONDITION|YOUR POWER|\n\n))/);
       if (coreDedupMatch) {
         const coreBlock = coreDedupMatch[1];
@@ -2170,7 +3975,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
         }
       }
 
-      // â”€â”€ Fix #8: Secondary tree must differ from primary tree â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Fix #8: Secondary tree must differ from primary tree Ã¢â€â‚¬Ã¢â€â‚¬
       const primaryTreeMatch = corrected.match(/Primary:\s*(\w+)/);
       const secondaryTreeMatch = corrected.match(/Secondary:\s*(\w+)/);
       if (primaryTreeMatch && secondaryTreeMatch) {
@@ -2187,7 +3992,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
               'resolve': 'Precision', 'inspiration': 'Sorcery',
             };
             const replacement = pairings[primaryTree] || alternatives[0];
-            corrections.push(`Secondary tree "${secondaryTreeMatch[1]}" same as primary "${primaryTreeMatch[1]}" â†’ changed to "${replacement}"`);
+            corrections.push(`Secondary tree "${secondaryTreeMatch[1]}" same as primary "${primaryTreeMatch[1]}" Ã¢â€ â€™ changed to "${replacement}"`);
             corrected = corrected.replace(/Secondary:\s*\w+/, `Secondary: ${replacement}`);
           }
         }
@@ -2201,7 +4006,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
       return corrected;
     }
 
-    // â”€â”€ Completeness checker: detect missing required sections â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Completeness checker: detect missing required sections Ã¢â€â‚¬Ã¢â€â‚¬
     const REQUIRED_SECTIONS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'WIN CONDITION'];
     const OPTIONAL_SECTIONS = ['SUMMONERS', 'STARTING ITEMS', 'SITUATIONAL ITEMS', 'ENEMY POWER SPIKES', 'YOUR POWER SPIKES'];
 
@@ -2224,7 +4029,7 @@ COMMON MISTAKES â€” NEVER DO THESE:
       const { complete, missing } = checkBuildCompleteness(partialText);
       if (complete) return partialText;
 
-      log('WARN', `[completeness] Output missing ${missing.length} sections: ${missing.join(', ')} â€” running completion call`);
+      log('WARN', `[completeness] Output missing ${missing.length} sections: ${missing.join(', ')} Ã¢â‚¬â€ running completion call`);
       if (sendSSE) sendSSE({ phase: 'full', chunk: '\n\n' }); // Visual separator
 
       try {
@@ -2245,7 +4050,7 @@ ${userMessage.slice(0, 2000)}`;
 
         if (completionText.length > 50) {
           const combined = partialText + '\n\n' + completionText;
-          log('INFO', `[completeness] Completion call added ${completionText.length} chars â€” now has ${checkBuildCompleteness(combined).missing.length} missing sections`);
+          log('INFO', `[completeness] Completion call added ${completionText.length} chars Ã¢â‚¬â€ now has ${checkBuildCompleteness(combined).missing.length} missing sections`);
           return combined;
         }
       } catch (err) {
@@ -2288,14 +4093,18 @@ ${userMessage.slice(0, 2000)}`;
       }
     }
 
-    async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false) {
-      // â”€â”€ DeepSeek V4 Flash via OpenRouter â€” plain text, no JSON schema needed â”€â”€
-      log('INFO', `[build-fetch] Generating via DeepSeek V4 Flash (OpenRouter)...`);
+    async function fetchRobustJsonBuild(genAI, primaryModelName, systemPrompt, userMessage, isStreaming = false, requestedModel = null) {
+      const modelUsed = getOpenRouterModel(requestedModel);
+      // Ã¢â€â‚¬Ã¢â€â‚¬ DeepSeek V4 Flash via OpenRouter Ã¢â‚¬â€ plain text, no JSON schema needed Ã¢â€â‚¬Ã¢â€â‚¬
+      log('INFO', `[build-fetch] Generating via ${getModelDisplayName(modelUsed)} (OpenRouter)...`);
       const startTime = Date.now();
       try {
         const rawText = await llmGenerate(systemPrompt, userMessage, {
-          temperature: 0.2,
+          temperature: 0.12,
+          topP: 0.55,
+          seed: stableHashSeed(`${modelUsed}|${userMessage}`),
           maxTokens: 8192,
+          model: modelUsed,
         });
         const elapsedS = Math.round((Date.now() - startTime) / 1000);
 
@@ -2306,18 +4115,18 @@ ${userMessage.slice(0, 2000)}`;
           const buildJson = JSON.parse(stripped);
           if (buildJson.coreBuild && buildJson.coreBuild.length >= 5) {
             cleanText = jsonBuildToText(buildJson);
-            log('INFO', `[build-fetch] DeepSeek JSON parsed (${cleanText.length} chars, ${elapsedS}s)`);
-            return { text: cleanText, modelUsed: 'deepseek-v4-flash', rawText };
+            log('INFO', `[build-fetch] ${getModelDisplayName(modelUsed)} JSON parsed (${cleanText.length} chars, ${elapsedS}s)`);
+            return { text: cleanText, modelUsed, rawText };
           }
         } catch {
-          // Not JSON â€” use as plain text (expected)
+          // Not JSON Ã¢â‚¬â€ use as plain text (expected)
         }
 
-        log('INFO', `[build-fetch] DeepSeek succeeded (${cleanText.length} chars, ${elapsedS}s)`);
-        return { text: cleanText, modelUsed: 'deepseek-v4-flash', rawText };
+        log('INFO', `[build-fetch] ${getModelDisplayName(modelUsed)} succeeded (${cleanText.length} chars, ${elapsedS}s)`);
+        return { text: cleanText, modelUsed, rawText };
       } catch (e) {
         const elapsedS = Math.round((Date.now() - startTime) / 1000);
-        log('ERROR', `[build-fetch] DeepSeek failed after ${elapsedS}s: ${e.message}`);
+        log('ERROR', `[build-fetch] ${getModelDisplayName(modelUsed)} failed after ${elapsedS}s: ${e.message}`);
         return { text: '', modelUsed: 'failed', rawText: '' };
       }
     }
@@ -2332,7 +4141,7 @@ ${userMessage.slice(0, 2000)}`;
       }
       const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
 
-      log('INFO', `[backend] Using model: DeepSeek V4 Flash (OpenRouter), patch: ${patchDisplay}`);
+      log('INFO', `[backend] Using model: ${getModelDisplayName(getOpenRouterModel(body.model))} (OpenRouter), patch: ${patchDisplay}`);
 
       const systemPrompt = shortPrompt ? buildShortPrompt(patchDisplay) : buildSystemPrompt(patchDisplay);
 
@@ -2354,17 +4163,16 @@ ${userMessage.slice(0, 2000)}`;
       const isBot = /^(bottom|adc|bot)$/i.test(body.role);
       const itemSlots = isBot ? 7 : 6;
 
-      const matchupLine = body.enemies && body.enemies.length > 0
-        ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} â€” Analyze this matchup's dynamics and adapt the build accordingly.\n`
-        : '';
+      const enemyRoleContext = buildEnemyRoleContext(body);
+      const matchupLine = enemyRoleContext.matchupLine;
 
       const allChamps = [body.myChampion, ...(body.enemies || [])];
       const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
       const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
       const kbContext = getKBBuildContext(body.myChampion, body.role);
-      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots â€” CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
+      const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${enemyRoleContext.context}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots Ã¢â‚¬â€ CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
 
-      const { text: cleanText } = await fetchRobustJsonBuild(null, null, systemPrompt, userMessage, false);
+      const { text: cleanText } = await fetchRobustJsonBuild(null, null, systemPrompt, userMessage, false, body.model);
 
       return { text: cleanText, patchUsed: patchDisplay };
     }
@@ -2372,8 +4180,9 @@ ${userMessage.slice(0, 2000)}`;
     function buildCacheKey(body, patchKey) {
       const allies = [...(body.allies || [])].sort().join(',');
       const enemies = [...(body.enemies || [])].sort().join(',');
+      const enemyRoles = Object.entries(body.enemyRoles || {}).sort().map(([champ, role]) => `${champ}:${role}`).join(',');
       const modelKey = body.model || process.env.OPENROUTER_MODEL || OPENROUTER_MODEL;
-      return `${patchKey}|${modelKey}|${body.myChampion}|${body.role}|${allies}|${enemies}`;
+      return `${patchKey}|${modelKey}|${body.myChampion}|${body.role}|${allies}|${enemies}|roles=${enemyRoles}`;
     }
 
     backendApp.post('/api/build', async (req, res) => {
@@ -2405,8 +4214,8 @@ ${userMessage.slice(0, 2000)}`;
             console.log(`[backend] Attempt ${attempt + 1} for ${body.myChampion} ${body.role}`);
             const result = await generateBuild(body, false);
 
-            // â”€â”€ Build Validation & Correction Pass â”€â”€
-            result.text = await validateAndCorrectBuild(result.text);
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Build Validation & Correction Pass Ã¢â€â‚¬Ã¢â€â‚¬
+            result.text = sanitizeEnemyRoleClaims(await validateAndCorrectBuild(result.text), body);
 
             if (result.text.trim() === 'NEED_RETRY') {
               console.log('[backend] Got NEED_RETRY, trying short prompt...');
@@ -2415,7 +4224,7 @@ ${userMessage.slice(0, 2000)}`;
                 lastError = 'AI returned NEED_RETRY on all attempts';
                 break;
               }
-              retry.text = await validateAndCorrectBuild(retry.text);
+              retry.text = sanitizeEnemyRoleClaims(await validateAndCorrectBuild(retry.text), body);
               setCache(cacheKey, retry.text, retry.patchUsed);
               return res.json({ ok: true, source: 'grounded', patchDetected: retry.patchUsed, text: retry.text });
             }
@@ -2443,7 +4252,7 @@ ${userMessage.slice(0, 2000)}`;
       }
     });
 
-    // â”€â”€ Streaming Build Endpoint (SSE) â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Streaming Build Endpoint (SSE) Ã¢â€â‚¬Ã¢â€â‚¬
     backendApp.post('/api/build-stream', async (req, res) => {
       try {
         const body = req.body;
@@ -2495,20 +4304,25 @@ ${userMessage.slice(0, 2000)}`;
         const itemSlots = isBot ? 7 : 6;
 
         // Matchup context injection
-        const matchupLine = body.enemies && body.enemies.length > 0
-          ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} â€” Analyze this matchup's dynamics and adapt the build accordingly.\n`
-          : '';
+        const enemyRoleContext = buildEnemyRoleContext(body);
+        const matchupLine = enemyRoleContext.matchupLine;
 
-        // â”€â”€ Ability mechanics context (dynamically fetched from DDragon) â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Ability mechanics context (dynamically fetched from DDragon) Ã¢â€â‚¬Ã¢â€â‚¬
         const allChamps2 = [body.myChampion, ...(body.enemies || [])];
         const mechMap2 = await _prompts.fetchMultipleChampionMechanics(allChamps2);
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap2);
-        const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots â€” CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output the ANALYSIS section first, then all other sections.\n\nâš ï¸ FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch â€” pick the closest valid alternative. NEVER invent item names.`;
+        const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${sumSpellsRef}${enemyProfile}\n${enemyRoleContext.context}\n${mechContext}\n${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots Ã¢â‚¬â€ CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY runes and shards from the VALID RUNES list above. Use ONLY items from the VALID COMPLETED ITEMS list above. Generate optimized build. Output DECISION TRACE first, then ANALYSIS and all visible sections.\n\nÃ¢Å¡Â Ã¯Â¸Â FINAL REMINDER: Every item in CORE BUILD and SITUATIONAL ITEMS MUST appear in the VALID COMPLETED ITEMS list above. If you cannot find an item in that list, it does NOT exist in the current patch Ã¢â‚¬â€ pick the closest valid alternative. NEVER invent item names.`;
 
         sendSSE({ patchUsed: patchDisplay });
 
         try {
-          const fullStreamText = await llmGenerateStream(buildSystemPrompt(patchDisplay), userMessage, { temperature: 0.2, maxTokens: 8192 }, (chunk) => { sendSSE({ chunk }); });
+          const fullStreamText = await llmGenerateStream(buildSystemPrompt(patchDisplay), userMessage, {
+            temperature: 0.12,
+            topP: 0.55,
+            seed: stableHashSeed(`${patchDisplay}|${body.myChampion}|${body.role}|${(body.enemies || []).join(',')}|${body.model || ''}`),
+            maxTokens: 8192,
+            model: body.model,
+          }, (chunk) => { sendSSE({ chunk }); });
           let fullText = fullStreamText;
 
           // Validate & correct
@@ -2523,17 +4337,23 @@ ${userMessage.slice(0, 2000)}`;
           }
 
           if (corrected.trim() === 'NEED_RETRY') {
-            sendSSE({ error: 'NEED_RETRY â€” build generation failed' });
+            sendSSE({ error: 'NEED_RETRY Ã¢â‚¬â€ build generation failed' });
             return res.end();
           }
 
+          const judged = judgeReasoningQuality(corrected, body, mechMap2);
+          if (judged.issues.length) {
+            log('WARN', `[judge] ${body.myChampion} ${body.role}: ${judged.score}/100 - ${judged.issues.join('; ')}`);
+          }
+          const visibleCorrected = stripDecisionTrace(sanitizeEnemyRoleClaims(corrected, body));
+
           // If corrections were made, send the corrected version
-          if (corrected !== fullText) {
-            sendSSE({ corrected: corrected });
+          if (visibleCorrected !== fullText) {
+            sendSSE({ corrected: visibleCorrected });
           }
 
-          setCache(cacheKey, corrected, patchDisplay);
-          sendSSE({ done: true, source: 'grounded', patchUsed: patchDisplay, fullText: corrected });
+          setCache(cacheKey, visibleCorrected, patchDisplay);
+          sendSSE({ done: true, source: 'grounded', patchUsed: patchDisplay, fullText: visibleCorrected });
         } catch (err) {
           console.error('[stream] Generation error:', err.message);
           // Fallback to stale cache
@@ -2555,7 +4375,7 @@ ${userMessage.slice(0, 2000)}`;
       }
     });
 
-    // â”€â”€ Dual-Model Build Endpoint (SSE) â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Dual-Model Build Endpoint (SSE) Ã¢â€â‚¬Ã¢â€â‚¬
     // Now uses DeepSeek V4 Flash via OpenRouter for ALL generation
     backendApp.post('/api/build-dual', async (req, res) => {
       try {
@@ -2576,21 +4396,59 @@ ${userMessage.slice(0, 2000)}`;
         let livePatch;
         try { livePatch = await fetchDDragonVersion(); } catch { livePatch = body.patch || 'unknown'; }
         const patchDisplay = livePatch.split('.').slice(0, 2).join('.');
-        const patchKey = patchDisplay;
-        const cacheKey = buildCacheKey(body, patchKey);
-        const cached = getCache(cacheKey);
+        const cached = null; // Generation path intentionally runs fresh; no build caching for now.
+        let instantMetaText = '';
 
         if (cached && Date.now() - cached.timestamp < 24 * 60 * 60 * 1000) {
           sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'cache', patchUsed: cached.patchDetected, model: 'cache' });
           return res.end();
         }
 
-        // â”€â”€ Game Mode Detection â”€â”€
+        const requestedGameMode = body.gameMode || 'sr';
+        if (['sr', 'aram', 'aram-mayhem'].includes(requestedGameMode)) {
+          instantMetaText = buildInstantMetaText(body, patchDisplay);
+          if (instantMetaText) {
+            sendSSE({
+              phase: 'meta',
+              done: true,
+              source: 'meta',
+              patchUsed: patchDisplay,
+              fullText: instantMetaText,
+              model: 'mobalytics-kb',
+            });
+            if (body.generationMode === 'meta-preview') {
+              sendSSE({ allDone: true });
+              return res.end();
+            }
+          } else {
+            const anyRoleTemplate = findAnyKBBuildTemplateForChampion(body.myChampion, requestedGameMode);
+            const isModeMeta = requestedGameMode === 'aram' || requestedGameMode === 'aram-mayhem';
+            sendSSE({
+              phase: 'meta-status',
+              source: isModeMeta ? 'meta-missing-champion' : 'meta-missing-role',
+              patchUsed: patchDisplay,
+              champion: body.myChampion,
+              requestedRole: body.role,
+              availableRole: anyRoleTemplate?.role || null,
+              message: isModeMeta
+                ? `No Mobalytics ${requestedGameMode === 'aram-mayhem' ? 'ARAM Mayhem' : 'ARAM'} meta is available for ${body.myChampion}; AI is building from validated patch data instead.`
+                : anyRoleTemplate?.role
+                ? `No exact Mobalytics ${body.role} page is available for ${body.myChampion}; AI is adapting from validated patch data instead.`
+                : `No Mobalytics page is available for ${body.myChampion}; AI is building from validated patch data instead.`,
+            });
+            if (body.generationMode === 'meta-preview') {
+              sendSSE({ allDone: true });
+              return res.end();
+            }
+          }
+        }
+
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Game Mode Detection Ã¢â€â‚¬Ã¢â€â‚¬
         const gameMode = body.gameMode || 'sr';
         const mapId = gameMode === 'sr' ? 11 : 12;
         const isARAM = gameMode !== 'sr';
 
-        // â”€â”€ Mode-specific system prompt â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Mode-specific system prompt Ã¢â€â‚¬Ã¢â€â‚¬
         const systemPrompt = gameMode === 'aram-mayhem'
           ? _prompts.buildAramMayhemSystemPrompt(patchDisplay)
           : gameMode === 'aram'
@@ -2599,59 +4457,124 @@ ${userMessage.slice(0, 2000)}`;
 
         // Shared context
         const ragContext = getLocalRagContext(body.myChampion, body.role, body.enemies);
+        const hasMetaBaseline = Boolean(instantMetaText) && !isARAM;
         let runesRef = '';
-        try { const rd = await fetchDdragonRunes(); if (rd) runesRef = rd.reference; } catch {}
-        const bootsRef = getValidBootsReference(mapId);
-        const itemsRef = getValidItemsReference(mapId);
-        const startingItemsRef = getValidStartingItemsReference(body.role, mapId);
-        const metaRef = getMetaBuildReference(body.myChampion, body.role);
+        try {
+          const rd = await fetchDdragonRunes();
+          if (rd) runesRef = hasMetaBaseline ? 'RUNES: use exact current rune names; prefer the meta baseline page unless matchup pressure clearly demands a change.\n' : rd.reference;
+        } catch {}
+        const compactRef = hasMetaBaseline ? getCompactRefinementReference(body.role) + '\n' : '';
+        const bootsRef = hasMetaBaseline ? '' : getValidBootsReference(mapId);
+        const itemsRef = hasMetaBaseline ? compactRef : getValidItemsReference(mapId);
+        const startingItemsRef = hasMetaBaseline ? '' : getValidStartingItemsReference(body.role, mapId);
+        const metaRef = isARAM ? '' : getMetaBuildReference(body.myChampion, body.role);
         const sumSpellsRef = await getSummonerSpellsReference();
         const enemyProfile = isARAM ? '' : await computeEnemyProfile(body.enemies);
         const isBot = !isARAM && /^(bottom|adc|bot)$/i.test(body.role);
         const itemSlots = isBot ? 7 : 6;
-        const matchupLine = !isARAM && body.enemies && body.enemies.length > 0
-          ? `\nLANE MATCHUP: ${body.myChampion} (${body.role}) vs ${body.enemies[0]} â€” Analyze this matchup's dynamics and adapt the build accordingly.\n`
-          : '';
+        const enemyRoleContext = !isARAM ? buildEnemyRoleContext(body) : { context: '', matchupLine: '' };
+        const matchupLine = enemyRoleContext.matchupLine;
 
         // Ability mechanics context
         const allChamps3 = [body.myChampion, ...(body.enemies || [])];
         const mechMap3 = await _prompts.fetchMultipleChampionMechanics(allChamps3);
         const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap3);
-        const kbContext = getKBBuildContext(body.myChampion, body.role);
+        const refinementBaseline = buildAiRefinementBaseline(instantMetaText);
+        const kbContext = refinementBaseline ? '' : getKBBuildContext(body.myChampion, body.role);
 
         // Build user message
         let fullUserMessage;
         if (isARAM) {
           const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
-          const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference() : '';
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems: []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.\n\nNEVER invent item names. This is ${modeLabel} mode â€” no Doran's items, no jungle, no lane matchup.`;
+          const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference(body.myChampion) : '';
+          const modeKbContext = getKBBuildContext(body.myChampion, body.role, gameMode);
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the Mobalytics ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
         } else {
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots â€” CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
+          const variantContext = hasMetaBaseline ? getKBBuildContext(body.myChampion, body.role) : kbContext;
+          const metaGuidance = refinementBaseline
+            ? `${refinementBaseline}\n${variantContext ? '\n' + variantContext + '\n' : ''}`
+            : (kbContext ? '\n' + kbContext + '\n' : '');
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${enemyRoleContext.context}\n${mechContext}\n${metaGuidance}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots Ã¢â‚¬â€ CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
         }
 
         sendSSE({ patchUsed: patchDisplay, dualMode: false, gameMode });
-        log('INFO', `[dual] Starting DeepSeek generation: gameMode=${gameMode} for ${body.myChampion} ${body.role || 'ARAM'}`);
+        const aiModel = getOpenRouterModel(body.model);
+        const draftSeed = stableHashSeed([
+          patchDisplay,
+          gameMode,
+          body.myChampion,
+          body.role,
+          (body.allies || []).join(','),
+          (body.enemies || []).join(','),
+          aiModel,
+        ].join('|'));
+        log('INFO', `[dual] Starting ${getModelDisplayName(aiModel)} generation: gameMode=${gameMode} for ${body.myChampion} ${body.role || 'ARAM'}`);
 
-        // â”€â”€ Single DeepSeek call with streaming â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Single DeepSeek call with streaming Ã¢â€â‚¬Ã¢â€â‚¬
         try {
           const fullText = await llmGenerateStream(systemPrompt, fullUserMessage, {
-            temperature: 0.2,
+            temperature: hasMetaBaseline ? 0.05 : 0.12,
+            topP: hasMetaBaseline ? 0.35 : 0.55,
+            seed: draftSeed,
             maxTokens: 8192,
+            model: aiModel,
           }, (chunk) => {
             sendSSE({ phase: 'full', chunk });
           });
 
           let validated = await validateAndCorrectBuild(fullText);
-          if (validated !== fullText) {
-            sendSSE({ phase: 'full', corrected: validated });
+          if (hasMetaBaseline) {
+            validated = stabilizeAgainstMetaBaseline(validated, instantMetaText);
           }
-          setCache(cacheKey, validated, patchDisplay);
-          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: validated, model: 'deepseek-v4-flash' });
-          log('INFO', `[dual] DeepSeek build complete (${fullText.length} chars)`);
+          validated = enforceRoleSafeItems(validated, body);
+          validated = repairStartingItems(validated, body);
+          validated = dedupeAndPadCoreBuild(validated, body);
+          if (hasMetaBaseline) {
+            validated = stabilizeAgainstMetaBaseline(validated, instantMetaText);
+            validated = enforceRoleSafeItems(validated, body);
+            validated = repairStartingItems(validated, body);
+            validated = dedupeAndPadCoreBuild(validated, body);
+          }
+          validated = enforceDraftCounterLogic(validated, body, mechMap3);
+          validated = enforceRoleSafeItems(validated, body);
+          validated = dedupeAndPadCoreBuild(validated, body);
+          validated = sanitizeNarrativeAgainstFinalItems(validated, body, mechMap3);
+          validated = sanitizeEnemyRoleClaims(validated, body);
+          const judged = judgeReasoningQuality(validated, body, mechMap3);
+          if (judged.issues.length) {
+            log('WARN', `[judge] ${getModelDisplayName(aiModel)} ${body.myChampion} ${body.role}: ${judged.score}/100 - ${judged.issues.join('; ')}`);
+          }
+          const visibleValidated = stripDecisionTrace(validated);
+          if (!isUsableBuildText(validated, body.role)) {
+            if (instantMetaText) {
+              const fallbackText = fallbackToMetaBuild(instantMetaText, body, mechMap3);
+              log('WARN', `[dual] ${getModelDisplayName(aiModel)} returned an unusable build; falling back to validated Mobalytics baseline`);
+              sendSSE({ phase: 'full', done: true, source: 'meta-fallback', patchUsed: patchDisplay, fullText: stripDecisionTrace(fallbackText), model: 'mobalytics-kb' });
+              sendSSE({ allDone: true });
+              return res.end();
+            }
+            const fallbackText = buildEmergencyFallbackText(body, patchDisplay, mechMap3);
+            if (isUsableBuildText(fallbackText, body.role)) {
+              log('WARN', `[dual] ${getModelDisplayName(aiModel)} returned an unusable build; using validated role fallback`);
+              sendSSE({ phase: 'full', done: true, source: 'validated-fallback', patchUsed: patchDisplay, fullText: fallbackText, model: 'validated-fallback' });
+              sendSSE({ allDone: true });
+              return res.end();
+            }
+            sendSSE({ phase: 'full', done: true, error: 'AI returned an unusable build. Please retry.' });
+            sendSSE({ allDone: true });
+            return res.end();
+          }
+          if (visibleValidated !== fullText) {
+            sendSSE({ phase: 'full', corrected: visibleValidated });
+          }
+          sendSSE({ phase: 'full', done: true, source: 'grounded', patchUsed: patchDisplay, fullText: visibleValidated, model: aiModel });
+          log('INFO', `[dual] ${getModelDisplayName(aiModel)} build complete (${fullText.length} chars)`);
         } catch (err) {
-          log('ERROR', `[dual] DeepSeek generation failed: ${err.message}`);
+          log('ERROR', `[dual] ${getModelDisplayName(aiModel)} generation failed: ${err.message}`);
           if (cached) {
             sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
+          } else if (instantMetaText) {
+            sendSSE({ phase: 'full', done: true, source: 'meta-fallback', patchUsed: patchDisplay, fullText: stripDecisionTrace(instantMetaText), model: 'mobalytics-kb' });
           } else {
             sendSSE({ error: err.message });
           }
@@ -2735,7 +4658,7 @@ ${userMessage.slice(0, 2000)}`;
   });
 }
 
-// â”€â”€ Window Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Window Management Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 function createWindow() {
   Menu.setApplicationMenu(null);
@@ -2784,7 +4707,7 @@ function createWindow() {
 function createOverlayWindow() {
   if (overlayWindow && !overlayWindow.isDestroyed()) return;
 
-  // Fullscreen transparent overlay â€” elements position themselves at screen edges
+  // Fullscreen transparent overlay Ã¢â‚¬â€ elements position themselves at screen edges
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenW, height: screenH } = primaryDisplay.bounds;
 
@@ -2808,7 +4731,7 @@ function createOverlayWindow() {
     show: false,
   });
 
-  // Highest always-on-top level â€” sits above fullscreen/borderless games
+  // Highest always-on-top level Ã¢â‚¬â€ sits above fullscreen/borderless games
   overlayWindow.setAlwaysOnTop(true, 'screen-saver');
   // Click-through: mouse events pass to the game underneath
   overlayWindow.setIgnoreMouseEvents(true, { forward: true });
@@ -2832,7 +4755,7 @@ function createOverlayWindow() {
     overlayWindow = null;
   });
 
-  // â”€â”€ Crash Recovery (#16) â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Crash Recovery (#16) Ã¢â€â‚¬Ã¢â€â‚¬
   overlayWindow.webContents.on('crashed', () => {
     console.error('[overlay] Renderer process crashed! Recreating...');
     overlayWindow = null;
@@ -2935,9 +4858,9 @@ function createStatsWindow() {
   console.log('[main] Stats window created');
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// â”€â”€ SCOREBOARD WINDOW + COOLDOWN TRACKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// Ã¢â€â‚¬Ã¢â€â‚¬ SCOREBOARD WINDOW + COOLDOWN TRACKER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 let _scoreboardCreating = false; // Lock to prevent duplicate window creation
 
@@ -2989,7 +4912,7 @@ function createScoreboardWindow() {
   console.log('[main] Scoreboard window created');
 }
 
-// â”€â”€ Tracker Window (dedicated clickable panel, right edge) â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Tracker Window (dedicated clickable panel, right edge) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 let _trackerCreating = false;
 
 function createTrackerWindow() {
@@ -3026,7 +4949,7 @@ function createTrackerWindow() {
   });
 
   trackerWindow.setAlwaysOnTop(true, 'screen-saver');
-  // NO setIgnoreMouseEvents â€” clicks go through normally!
+  // NO setIgnoreMouseEvents Ã¢â‚¬â€ clicks go through normally!
 
   if (isDev) {
     trackerWindow.loadURL('http://localhost:9000/#/tracker');
@@ -3047,7 +4970,7 @@ function createTrackerWindow() {
   });
 }
 
-// â”€â”€ Scoreboard Data Polling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Scoreboard Data Polling Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 function startScoreboardPolling() {
   if (scoreboardDataInterval) return;
   console.log('[main] Starting scoreboard data polling');
@@ -3118,7 +5041,7 @@ function fetchAllGameData() {
 }
 
 function processAndSendScoreboardData(data) {
-  // Can run even if scoreboard is closed â€” overlay also needs this data
+  // Can run even if scoreboard is closed Ã¢â‚¬â€ overlay also needs this data
 
   const activePlayer = data.activePlayer;
   const players = data.allPlayers || [];
@@ -3212,7 +5135,7 @@ function processAndSendScoreboardData(data) {
   }
 }
 
-// â”€â”€ Cooldown Timer Logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Cooldown Timer Logic Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 async function startCooldownTimer(championName, ability) {
   if (!lastLiveGameData) {
@@ -3289,7 +5212,7 @@ async function startCooldownTimer(championName, ability) {
   };
 
   cooldownTimers.push(timer);
-  console.log(`[cooldown] Timer started: ${timerId} â†’ ${totalDuration}s`);
+  console.log(`[cooldown] Timer started: ${timerId} Ã¢â€ â€™ ${totalDuration}s`);
 
   // Immediate tick to show the timer right away
   tickCooldowns();
@@ -3333,7 +5256,7 @@ async function getChampionUltCooldowns(championName) {
   try {
     const ver = await ensureDdragonVersion();
     const fetch = require('node-fetch');
-    // DDragon champion data â€” use proper name mapping
+    // DDragon champion data Ã¢â‚¬â€ use proper name mapping
     const champKey = cooldownData.champToDdragonKey(championName);
     const url = `https://ddragon.leagueoflegends.com/cdn/${ver}/data/en_US/champion/${champKey}.json`;
     const res = await fetch(url);
@@ -3394,7 +5317,7 @@ async function autoRefreshStats() {
   }
 }
 
-// â”€â”€ Live Client Data API â€” Item Purchase Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Live Client Data API Ã¢â‚¬â€ Item Purchase Detection Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 // Stats window control buttons (frameless)
 ipcMain.on('stats-win-minimize', () => { if (statsWindow && !statsWindow.isDestroyed()) statsWindow.minimize(); });
@@ -3406,7 +5329,7 @@ function startLiveClientPolling() {
 
   // ADC quest slot fix: Once boots are detected, NEVER revert.
   // When the ADC quest completes, boots move from inventory to a hidden quest
-  // slot and disappear from the Live Client API items[] â€” this flag persists.
+  // slot and disappear from the Live Client API items[] Ã¢â‚¬â€ this flag persists.
   global.__bootsEverDetected = false;
 
   // Pre-warm DDragon cache so component data is available immediately
@@ -3434,7 +5357,7 @@ function startLiveClientPolling() {
       });
     });
     req.on('error', () => {
-      // Game not in an active match or API not available â€” that's fine
+      // Game not in an active match or API not available Ã¢â‚¬â€ that's fine
     });
   }, 3000);
 }
@@ -3459,7 +5382,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
           const purchasedItemIds = me.items.map((item) => String(item.itemID));
           const purchasedItemNames = me.items.map((item) => (item.displayName || '').toLowerCase().trim()).filter(Boolean);
 
-          // â”€â”€ Boots detection (handles quest slots + renamed boot variants) â”€â”€
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Boots detection (handles quest slots + renamed boot variants) Ã¢â€â‚¬Ã¢â€â‚¬
           // Check if player owns ANY upgraded boots by DDragon 'Boots' tag OR name pattern
           const BOOT_NAME_PATTERNS = ['boots', 'greaves', 'treads', 'steelcaps', 'plated', 'mercury', 'berserker', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'mobility', 'symbiotic', 'slightly magical', 'upgraded boots'];
           const isBootsId = (id) => {
@@ -3478,7 +5401,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
             return BOOT_NAME_PATTERNS.some(p => lower.includes(p));
           };
           const playerHasBootsFromInventory = purchasedItemIds.some(id => isBootsId(id)) || purchasedItemNames.some(n => isBootName(n));
-          // ADC quest slot fix: sticky flag â€” once boots are seen, they stay "seen"
+          // ADC quest slot fix: sticky flag Ã¢â‚¬â€ once boots are seen, they stay "seen"
           // (quest slot boots disappear from items[] but player still has them)
           if (playerHasBootsFromInventory) {
             global.__bootsEverDetected = true;
@@ -3491,7 +5414,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
               if (bi.id && isBootsId(bi.id)) buildBootIds.add(bi.id);
             }
           }
-          // â”€â”€ Compute next component to buy and remaining gold â”€â”€
+          // Ã¢â€â‚¬Ã¢â€â‚¬ Compute next component to buy and remaining gold Ã¢â€â‚¬Ã¢â€â‚¬
           let nextComponent = null; // { name, iconUrl, gold } or null
           let remainingGold = 0; // actual gold needed to finish the next item
 
@@ -3504,7 +5427,7 @@ function fetchPlayerItems(summonerName, currentGold = 0, gameTime = 0) {
           // Compute savings from owned sub-items in a recipe tree
           // Returns total gold value of owned items found (and consumes them from counts)
           const computeSavings = (itemId, counts) => {
-            // If player owns this completed item, consume it â€” savings = its full value
+            // If player owns this completed item, consume it Ã¢â‚¬â€ savings = its full value
             if ((counts.get(itemId) || 0) > 0) {
               counts.set(itemId, counts.get(itemId) - 1);
               const d = ddragonItemCache.byId.get(itemId);
@@ -3606,7 +5529,7 @@ function stopLiveClientPolling() {
   }
 }
 
-// â”€â”€ Game Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Game Detection Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 function checkGameState() {
   // Step 1: check if League of Legends game process is running
@@ -3614,7 +5537,7 @@ function checkGameState() {
     const gameProcessRunning = !err && stdout.toLowerCase().includes('league of legends');
 
     if (!gameProcessRunning) {
-      // Game not running â€” always hide overlay
+      // Game not running Ã¢â‚¬â€ always hide overlay
       if (isGameRunning) {
         console.log('[main] League of Legends game ended');
         isGameRunning = false;
@@ -3622,7 +5545,7 @@ function checkGameState() {
         // Auto-stop live advisor when game ends
         if (liveAdvisorState.isPolling) {
           stopLiveAdvisor();
-          sendAdvisorDebug('[stop] Game process ended â€” live advisor auto-stopped');
+          sendAdvisorDebug('[stop] Game process ended Ã¢â‚¬â€ live advisor auto-stopped');
           if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.webContents.send('live-advisor-stopped');
           }
@@ -3680,7 +5603,7 @@ function checkGameState() {
       // Auto-start live advisor for this game
       if (!liveAdvisorState.isPolling) {
         startLiveAdvisor();
-        sendAdvisorDebug('[start] Game detected â€” live advisor auto-started');
+        sendAdvisorDebug('[start] Game detected Ã¢â‚¬â€ live advisor auto-started');
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('live-advisor-started');
         }
@@ -3785,7 +5708,7 @@ function hideOverlay() {
   }
 }
 
-// â”€â”€ Global Keyboard Shortcuts (Configurable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Global Keyboard Shortcuts (Configurable) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 // Shortcut action handlers
 const SHORTCUT_ACTIONS = {
@@ -3823,7 +5746,7 @@ const SHORTCUT_ACTIONS = {
   },
 };
 
-// Map of setting keys â†’ action keys
+// Map of setting keys Ã¢â€ â€™ action keys
 const HOTKEY_MAP = {
   hotkeyToggleOverlay: { action: 'toggleOverlay', label: 'Toggle Overlay' },
   hotkeyHideOverlay: { action: 'hideOverlay', label: 'Hide Overlay' },
@@ -3849,13 +5772,13 @@ function registerShortcuts() {
     try {
       const ok = globalShortcut.register(accelerator, SHORTCUT_ACTIONS[meta.action]);
       if (ok) {
-        log('INFO', `[shortcuts] âœ“ Registered: ${accelerator} â†’ ${meta.label}`);
+        log('INFO', `[shortcuts] Ã¢Å“â€œ Registered: ${accelerator} Ã¢â€ â€™ ${meta.label}`);
       } else {
-        log('WARN', `[shortcuts] âœ— FAILED: ${accelerator} â†’ ${meta.label} â€” taken by another app`);
+        log('WARN', `[shortcuts] Ã¢Å“â€” FAILED: ${accelerator} Ã¢â€ â€™ ${meta.label} Ã¢â‚¬â€ taken by another app`);
       }
       results[settingKey] = { key: accelerator, ok, label: meta.label };
     } catch (err) {
-      log('WARN', `[shortcuts] âœ— ERROR: ${accelerator} â†’ ${meta.label}: ${err.message}`);
+      log('WARN', `[shortcuts] Ã¢Å“â€” ERROR: ${accelerator} Ã¢â€ â€™ ${meta.label}: ${err.message}`);
       results[settingKey] = { key: accelerator, ok: false, label: meta.label };
     }
   }
@@ -3868,7 +5791,7 @@ function registerShortcuts() {
   return results;
 }
 
-// â”€â”€ LoL Config Parser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ LoL Config Parser Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 function parseLolConfig() {
   const settings = loadSettings();
@@ -3914,10 +5837,10 @@ function parseLolConfig() {
 
     // Corrected minimap size formula:
     // At 1080p with default MinimapScale=1.0, the League minimap is ~243px.
-    // MinimapScale 0.0â†’1.0 maps to roughly 70%â†’100% of base size.
+    // MinimapScale 0.0Ã¢â€ â€™1.0 maps to roughly 70%Ã¢â€ â€™100% of base size.
     // Scale linearly with screen height for other resolutions.
     const baseSize = 243;
-    const scaleFactor = 0.7 + 0.3 * minimapScale; // 0.0â†’0.7x, 1.0â†’1.0x
+    const scaleFactor = 0.7 + 0.3 * minimapScale; // 0.0Ã¢â€ â€™0.7x, 1.0Ã¢â€ â€™1.0x
     const size = baseSize * (height / 1080) * scaleFactor;
 
     console.log(`[main] Detected Minimap: ${Math.round(size)}px at ${width}x${height} (Scale: ${minimapScale})`);
@@ -3935,10 +5858,10 @@ function parseLolConfig() {
   }
 }
 
-// â”€â”€ IPC Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ IPC Handlers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 
-// Overlay data from renderer â†’ forward to overlay window
+// Overlay data from renderer Ã¢â€ â€™ forward to overlay window
 ipcMain.on('overlay-data', (_event, data) => {
   log('INFO', '[main] Received overlay data from renderer');
   overlayGeneration++;
@@ -3949,7 +5872,7 @@ ipcMain.on('overlay-data', (_event, data) => {
   }
 });
 
-// Partial item update â€” merges new items into existing overlay data
+// Partial item update Ã¢â‚¬â€ merges new items into existing overlay data
 ipcMain.on('update-overlay-items', (_event, newItems) => {
   log('INFO', `[main] Overlay items updated: ${newItems.length} items`);
   overlayGeneration++;
@@ -3962,7 +5885,7 @@ ipcMain.on('update-overlay-items', (_event, newItems) => {
   }
 });
 
-// â”€â”€ LCU Credentials & Communication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ LCU Credentials & Communication Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 function getLcuCredentials() {
   const settings = loadSettings();
@@ -4017,7 +5940,7 @@ async function lcuCall(method, pathStr, body) {
     if (!res.ok) {
       let errorBody = '';
       try { errorBody = await res.text(); } catch { }
-      console.error(`[main] LCU ${method} ${pathStr} failed: HTTP ${res.status} â€” ${errorBody}`);
+      console.error(`[main] LCU ${method} ${pathStr} failed: HTTP ${res.status} Ã¢â‚¬â€ ${errorBody}`);
       return { __lcuError: true, status: res.status, body: errorBody };
     }
 
@@ -4051,7 +5974,7 @@ ipcMain.handle('lcu-champ-select', async () => {
 
 // LCU auto-detect game mode from lobby/gameflow
 ipcMain.handle('lcu-game-mode', async () => {
-  // Queue ID â†’ game mode mapping
+  // Queue ID Ã¢â€ â€™ game mode mapping
   // SR queues: 400 (Draft), 420 (Ranked Solo), 430 (Blind), 440 (Flex), 490 (Quickplay)
   // ARAM queues: 450 (ARAM), 930 (Poro King on HA)
   // ARAM Mayhem: queue ID TBD by Riot (we'll detect via gameMode string)
@@ -4061,7 +5984,7 @@ ipcMain.handle('lcu-game-mode', async () => {
   };
 
   try {
-    // Try gameflow session first â€” more reliable during champ select
+    // Try gameflow session first Ã¢â‚¬â€ more reliable during champ select
     const gameflow = await lcuCall('GET', '/lol-gameflow/v1/session');
     if (gameflow && !gameflow.__lcuError && !gameflow.__lcuOk) {
       const queueId = gameflow.gameData?.queue?.id;
@@ -4139,6 +6062,7 @@ ipcMain.handle('lcu-live-game', async () => {
     const myPosition = posMap[(localPlayer.position || '').toUpperCase()] || '';
     const allies = [];
     const enemies = [];
+    const enemyRoles = {};
 
     for (const p of data.allPlayers) {
       if (p === localPlayer) continue;
@@ -4148,6 +6072,8 @@ ipcMain.handle('lcu-live-game', async () => {
         allies.push(champName);
       } else {
         enemies.push(champName);
+        const enemyPosition = posMap[(p.position || '').toUpperCase()] || '';
+        if (enemyPosition) enemyRoles[champName] = enemyPosition === 'bottom' ? 'adc' : enemyPosition;
       }
     }
 
@@ -4158,6 +6084,7 @@ ipcMain.handle('lcu-live-game', async () => {
       myPosition,
       allies,
       enemies,
+      enemyRoles,
       gameTime: data.gameData?.gameTime || 0,
     };
   } catch {
@@ -4165,7 +6092,7 @@ ipcMain.handle('lcu-live-game', async () => {
   }
 });
 
-// â”€â”€ Live Game AI Advisor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Live Game AI Advisor Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 let liveAdvisorState = {
   lastAdviceTime: 0,
   lastPhase: '',            // 'early', 'mid', 'late'
@@ -4173,15 +6100,15 @@ let liveAdvisorState = {
   advisorCooldown: 90000,   // minimum 90s between AI calls
   originalBuildText: '',    // stored from the pre-game generation
   isPolling: false,
-  // â”€â”€ Intelligence upgrades â”€â”€
-  previousAdvice: '',       // #6: memory â€” last AI response to prevent flip-flopping
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Intelligence upgrades Ã¢â€â‚¬Ã¢â€â‚¬
+  previousAdvice: '',       // #6: memory Ã¢â‚¬â€ last AI response to prevent flip-flopping
   previousAdviceTime: 0,    // timestamp of last advice
   lastDeaths: 0,            // #2: death trigger
   lastGold: 0,              // #2: gold spike trigger
   lastEnemyItemCounts: {},  // #2: enemy major item completion trigger
 };
 
-// â”€â”€ DDragon Champion Cache (for class-based item filtering) â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ DDragon Champion Cache (for class-based item filtering) Ã¢â€â‚¬Ã¢â€â‚¬
 let ddragonChampCache = null; // Map<champName, { tags: string[] }>
 let ddragonChampCachePromise = null;
 
@@ -4198,7 +6125,10 @@ async function ensureDdragonChampCache() {
         const champData = await champRes.json();
         const cache = new Map();
         for (const [key, c] of Object.entries(champData.data)) {
-          cache.set(c.name, { tags: c.tags || [], id: c.id });
+          const entry = { tags: c.tags || [], id: c.id, name: c.name, info: c.info || {}, stats: c.stats || {} };
+          cache.set(c.name, entry);
+          cache.set(c.id, entry);
+          cache.set(key, entry);
         }
         ddragonChampCache = cache;
         ddragonChampCachePromise = null;
@@ -4228,7 +6158,7 @@ async function fetchLiveClientData() {
     sendAdvisorDebug(`[fetch] Got game data: ${data.allPlayers?.length || 0} players, time=${Math.floor((data.gameData?.gameTime || 0) / 60)}min`);
     return data;
   } catch (err) {
-    // Game not running â€” this is normal, don't spam
+    // Game not running Ã¢â‚¬â€ this is normal, don't spam
     return null;
   }
 }
@@ -4290,19 +6220,19 @@ function checkLiveAdvisorTriggers(gameData) {
     return `Enemy threat detected: ${names}`;
   }
 
-  // Trigger 3: Player died â€” best time to rethink build (on fountain with gold)
+  // Trigger 3: Player died Ã¢â‚¬â€ best time to rethink build (on fountain with gold)
   const myDeaths = myPlayer.scores?.deaths || 0;
   if (myDeaths > liveAdvisorState.lastDeaths && liveAdvisorState.lastDeaths >= 0) {
     liveAdvisorState.lastDeaths = myDeaths;
-    return `Player died (${myDeaths} deaths) â€” reassess build on respawn`;
+    return `Player died (${myDeaths} deaths) Ã¢â‚¬â€ reassess build on respawn`;
   }
   if (liveAdvisorState.lastDeaths < 0) liveAdvisorState.lastDeaths = myDeaths;
 
-  // Trigger 4: Gold spike (>800g increase since last check â€” can buy a component)
+  // Trigger 4: Gold spike (>800g increase since last check Ã¢â‚¬â€ can buy a component)
   const currentGold = activePlayer.currentGold || 0;
   if (currentGold > (liveAdvisorState.lastGold || 0) + 800 && gameTime >= 120) {
     liveAdvisorState.lastGold = currentGold;
-    return `Gold spike: ${currentGold}g available â€” check for item purchases`;
+    return `Gold spike: ${currentGold}g available Ã¢â‚¬â€ check for item purchases`;
   }
   liveAdvisorState.lastGold = currentGold;
 
@@ -4336,7 +6266,7 @@ function checkLiveAdvisorTriggers(gameData) {
 async function pollLiveClient() {
   const gameData = await fetchLiveClientData();
   if (!gameData) {
-    // API not ready (loading screen) or game not active â€” just wait
+    // API not ready (loading screen) or game not active Ã¢â‚¬â€ just wait
     // Game-end stopping is handled by checkGameState() which detects the process ending
     return;
   }
@@ -4374,10 +6304,10 @@ async function pollLiveClient() {
     const formatP = (p) => {
       const items = (p.items || []).map(i => i.displayName).filter(Boolean).join(', ') || 'No items';
       const kda = p.scores || {};
-      return `  ${p.championName} (Lv${p.level || 1}) â€” ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0} â€” Gold: ${p.currentGold || 0} â€” Items: [${items}]`;
+      return `  ${p.championName} (Lv${p.level || 1}) Ã¢â‚¬â€ ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0} Ã¢â‚¬â€ Gold: ${p.currentGold || 0} Ã¢â‚¬â€ Items: [${items}]`;
     };
 
-    // â”€â”€ Boots detection helper for live advisor (same logic as fetchPlayerItems) â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Boots detection helper for live advisor (same logic as fetchPlayerItems) Ã¢â€â‚¬Ã¢â€â‚¬
     const advisorIsBootsId = (id) => {
       if (!ddragonItemCache || !ddragonItemCache.byId) return false;
       const d = ddragonItemCache.byId.get(String(id));
@@ -4426,22 +6356,25 @@ async function pollLiveClient() {
         remainingBuildQueue = remaining.map((bi, idx) => `${idx + 1}. ${bi.name}`).join('\n');
       }
     }
+    const validatedBuildPlan = overlayData?.buildItems?.length
+      ? overlayData.buildItems.map((bi, idx) => `${idx + 1}. ${bi.name}${bi.reason ? ` (${bi.reason})` : ''}`).join('\n')
+      : 'No validated build plan loaded yet.';
 
-    // â”€â”€ Game Phase Detection â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Game Phase Detection Ã¢â€â‚¬Ã¢â€â‚¬
     const gameTime = gameData.gameData?.gameTime || 0;
     const gameMinutes = Math.floor(gameTime / 60);
     const gameSecs = Math.floor(gameTime % 60);
     let gamePhase = 'LANING';
-    let phaseGuidance = 'Laning phase: prioritize lane-specific items, early combat stats, and components that build into core items.';
+    let phaseGuidance = 'Laning phase: prioritize the next completed item in the planned build order, with matchup-driven completed-item swaps only when needed.';
     if (gameTime >= 1500) { // 25+ min
       gamePhase = 'LATE GAME';
       phaseGuidance = 'Late game: prioritize final build optimization, defensive items vs fed enemies, and closing out the game.';
     } else if (gameTime >= 840) { // 14+ min
       gamePhase = 'MID GAME';
-      phaseGuidance = 'Mid game: prioritize teamfight items, objective control items, and countering the strongest enemy threats.';
+      phaseGuidance = 'Mid game: prioritize completed teamfight items, objective control items, and countering the strongest enemy threats.';
     }
 
-    // â”€â”€ Build Complete Detection â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Build Complete Detection Ã¢â€â‚¬Ã¢â€â‚¬
     // ADCs (Marksman) have 7-item builds: 6 regular slots + 1 quest boots slot
     // Quest boots can NEVER be sold, only swapped for other boots
     const myChampInfo = ddragonChampCache?.get(myPlayer?.championName);
@@ -4455,7 +6388,7 @@ async function pollLiveClient() {
     });
     const myItemCount = myCompletedItems.length;
     // ADC quest slot: if boots moved to quest slot, they're not in items[] anymore
-    // but the player still has them â€” count them toward completed items
+    // but the player still has them Ã¢â‚¬â€ count them toward completed items
     const hasBootsInInventory = myCompletedItems.some(i => {
       const d = ddragonItemCache?.byId?.get(String(i.itemID));
       return d && d.tags && d.tags.includes('Boots');
@@ -4480,15 +6413,15 @@ async function pollLiveClient() {
       let bootsAdvice;
       if (isADC) {
         // ADC quest boots can NEVER be sold, only swapped for other boots
-        bootsAdvice = `- BOOTS (ADC QUEST SLOT): This champion has a quest boots slot. Quest boots CANNOT be sold â€” they can only be swapped for a different pair of boots. NEVER suggest selling boots for a non-boots item on this champion.\n` +
-          `- If the current boots are suboptimal, suggest SWAPPING them for a different boots (e.g., Berserker's Greaves â†’ Mercury's Treads). Use the SELL format: CurrentBoots â†’ NewBoots.\n`;
+        bootsAdvice = `- BOOTS (ADC QUEST SLOT): This champion has a quest boots slot. Quest boots CANNOT be sold Ã¢â‚¬â€ they can only be swapped for a different pair of boots. NEVER suggest selling boots for a non-boots item on this champion.\n` +
+          `- If the current boots are suboptimal, suggest SWAPPING them for a different boots (e.g., Berserker's Greaves Ã¢â€ â€™ Mercury's Treads). Use the SELL format: CurrentBoots Ã¢â€ â€™ NewBoots.\n`;
       } else if (isFullBuild && isUltraLateGame) {
         bootsAdvice = `- BOOTS: Since ALL 6 slots are full and it's ultra-late game (${gameMinutes}min), boots CAN be sold for a 6th full item if the movement speed trade-off is worth it.\n`;
       } else {
         bootsAdvice = `- BOOTS: Do NOT suggest selling boots unless ALL 6 item slots are full AND it's 30+ minutes.\n`;
       }
-      buildCompleteContext = `\nBUILD STATUS: âœ… COMPLETE â€” All core items built. Current full build: [${currentBuild}]\n` +
-        `Champion type: ${isADC ? 'ADC/Marksman (has quest boots slot â€” 7 items total)' : 'Non-ADC (6 items total)'}\n` +
+      buildCompleteContext = `\nBUILD STATUS: Ã¢Å“â€¦ COMPLETE Ã¢â‚¬â€ All core items built. Current full build: [${currentBuild}]\n` +
+        `Champion type: ${isADC ? 'ADC/Marksman (has quest boots slot Ã¢â‚¬â€ 7 items total)' : 'Non-ADC (6 items total)'}\n` +
         `Evaluate if any item should be REPLACED based on the current game state.\n` +
         `Consider:\n` +
         `- Is an item underperforming against the current enemy composition?\n` +
@@ -4498,22 +6431,24 @@ async function pollLiveClient() {
         `Only suggest a replacement if it's genuinely impactful. "No replacement needed" is a valid answer.\n`;
     }
 
-    // â”€â”€ Enemy Items Breakdown (dedicated section) â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Enemy Items Breakdown (dedicated section) Ã¢â€â‚¬Ã¢â€â‚¬
     const enemyItemBreakdown = enemies.map(e => {
       const items = (e.items || []).map(i => i.displayName).filter(Boolean);
       const kda = e.scores || {};
       const isFed = (kda.kills || 0) >= 5 || ((kda.kills || 0) - (kda.deaths || 0)) >= 4;
       const goldEarned = (kda.kills || 0) * 300 + (kda.assists || 0) * 150;
-      return `  ${e.championName} (Lv${e.level || 1}, ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0})${isFed ? ' âš ï¸ FED' : ''}: [${items.join(', ') || 'No items'}]`;
+      return `  ${e.championName} (Lv${e.level || 1}, ${kda.kills || 0}/${kda.deaths || 0}/${kda.assists || 0})${isFed ? ' Ã¢Å¡Â Ã¯Â¸Â FED' : ''}: [${items.join(', ') || 'No items'}]`;
     }).join('\n');
 
-    // â”€â”€ My items summary â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ My items summary Ã¢â€â‚¬Ã¢â€â‚¬
     const myItems = (myPlayer?.items || []).map(i => i.displayName).filter(Boolean);
     // Use ID-based boots detection (catches quest slot boots that may not be in displayName list)
     const hasBoots = advisorHasBoots;
 
-    // â”€â”€ #3: Enemy Damage-Type Classification â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ #3: Enemy Damage-Type Classification Ã¢â€â‚¬Ã¢â€â‚¬
     const classifyDamageType = (enemy) => {
+      const inferred = inferDamageFromTagsAndInfo(enemy.championName);
+      if (inferred === 'AP' || inferred === 'AD' || inferred === 'HYBRID') return inferred;
       const champInfo = ddragonChampCache?.get(enemy.championName);
       const tags = champInfo?.tags || [];
       const enemyItems = (enemy.items || []).map(i => {
@@ -4535,27 +6470,29 @@ async function pollLiveClient() {
     const apCount = enemyDamageProfile.filter(d => d.type === 'AP').length;
     const mixedCount = enemyDamageProfile.filter(d => d.type === 'MIXED').length;
     let damageVerdict = 'balanced';
-    if (adCount >= 4) damageVerdict = 'heavily AD â€” prioritize armor';
-    else if (apCount >= 4) damageVerdict = 'heavily AP â€” prioritize MR';
-    else if (adCount >= 3) damageVerdict = 'AD-leaning â€” consider armor';
-    else if (apCount >= 3) damageVerdict = 'AP-leaning â€” consider MR';
+    if (adCount >= 4) damageVerdict = 'heavily AD Ã¢â‚¬â€ prioritize armor';
+    else if (apCount >= 4) damageVerdict = 'heavily AP Ã¢â‚¬â€ prioritize MR';
+    else if (adCount >= 3) damageVerdict = 'AD-leaning Ã¢â‚¬â€ consider armor';
+    else if (apCount >= 3) damageVerdict = 'AP-leaning Ã¢â‚¬â€ consider MR';
     const damageProfileStr = enemyDamageProfile.map(d => `${d.name}=${d.type}`).join(', ');
-    const damageSection = `ENEMY DAMAGE PROFILE: ${adCount} AD / ${apCount} AP / ${mixedCount} Mixed â€” ${damageVerdict}\n  [${damageProfileStr}]`;
+    const damageSection = `ENEMY DAMAGE PROFILE: ${adCount} AD / ${apCount} AP / ${mixedCount} Mixed Ã¢â‚¬â€ ${damageVerdict}\n  [${damageProfileStr}]`;
 
-    // â”€â”€ #4: Gold Efficiency Context â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ #4: Gold Efficiency Context Ã¢â€â‚¬Ã¢â€â‚¬
     const currentGold = activePlayer.currentGold || 0;
     let goldContext = '';
     if (currentGold < 800) {
-      goldContext = `GOLD CONTEXT: Very low gold (${currentGold}g) â€” can only afford basic components or wards.`;
+      goldContext = `GOLD CONTEXT: Very low gold (${currentGold}g) - continue toward the next completed item goal.`;
     } else if (currentGold < 1300) {
-      goldContext = `GOLD CONTEXT: Low gold (${currentGold}g) â€” suggest components, not completed items.`;
+      goldContext = `GOLD CONTEXT: Low gold (${currentGold}g) - keep the next completed item goal.`;
     } else if (currentGold < 3000) {
-      goldContext = `GOLD CONTEXT: Moderate gold (${currentGold}g) â€” can afford mid-tier components or cheaper completed items.`;
+      goldContext = `GOLD CONTEXT: Moderate gold (${currentGold}g) - recommend the next completed item goal.`;
     } else {
-      goldContext = `GOLD CONTEXT: High gold (${currentGold}g) â€” can buy a completed item directly.`;
+      goldContext = `GOLD CONTEXT: High gold (${currentGold}g) Ã¢â‚¬â€ can buy a completed item directly.`;
     }
 
-    // â”€â”€ #7: Objective Awareness â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ #7: Objective Awareness Ã¢â€â‚¬Ã¢â€â‚¬
+    goldContext = `GOLD CONTEXT: ${currentGold}g available. NEXT ITEMS must still be completed item goals only; never name components.`;
+
     let objectiveContext = '';
     try {
       const events = gameData.events?.Events || [];
@@ -4580,20 +6517,20 @@ async function pollLiveClient() {
       }
     } catch (e) { /* events may not exist in all API versions */ }
 
-    // â”€â”€ Two-Step Prompting â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Two-Step Prompting Ã¢â€â‚¬Ã¢â€â‚¬
     // Step 1: Quick threat analysis (cached for 60s to reduce latency)
     sendAdvisorDebug('[ai] Step 1: Threat analysis...');
     // Using DeepSeek V4 Flash via OpenRouter.
 
 
-    sendAdvisorDebug('[ai] Using model: DeepSeek V4 Flash (OpenRouter)');
+    sendAdvisorDebug(`[ai] Using model: ${getModelDisplayName(getOpenRouterModel())} (OpenRouter)`);
 
-    // Fix #6: Eliminate Step 1 AI call â€” use pre-computed threat analysis instead
+    // Fix #6: Eliminate Step 1 AI call Ã¢â‚¬â€ use pre-computed threat analysis instead
     // The damage profile (damageSection) + enemy item breakdown is already computed above.
     // No need to waste an AI call asking "what are the threats?" when we've already calculated it.
     const threatAnalysis = `${damageSection}\nKey threat: ${(() => {
       const fedEnemy = enemies.find(e => (e.scores?.kills || 0) >= 5 || ((e.scores?.kills || 0) - (e.scores?.deaths || 0)) >= 4);
-      if (fedEnemy) return `${fedEnemy.championName} is FED (${fedEnemy.scores?.kills}/${fedEnemy.scores?.deaths}/${fedEnemy.scores?.assists}) â€” prioritize countering their damage type`;
+      if (fedEnemy) return `${fedEnemy.championName} is FED (${fedEnemy.scores?.kills}/${fedEnemy.scores?.deaths}/${fedEnemy.scores?.assists}) Ã¢â‚¬â€ prioritize countering their damage type`;
       const strongestEnemy = enemies.reduce((a, b) => ((b.scores?.kills || 0) - (b.scores?.deaths || 0)) > ((a.scores?.kills || 0) - (a.scores?.deaths || 0)) ? b : a, enemies[0]);
       return strongestEnemy ? `${strongestEnemy.championName} is the primary threat (${strongestEnemy.scores?.kills || 0}/${strongestEnemy.scores?.deaths || 0}/${strongestEnemy.scores?.assists || 0})` : 'No clear primary threat';
     })()}`;
@@ -4602,12 +6539,12 @@ async function pollLiveClient() {
     // Build recommendations using pre-computed analysis
     sendAdvisorDebug('[ai] Generating build recommendations...');
 
-    // â”€â”€ #6: Advisor Memory â€” inject previous advice to prevent flip-flopping â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ #6: Advisor Memory Ã¢â‚¬â€ inject previous advice to prevent flip-flopping Ã¢â€â‚¬Ã¢â€â‚¬
     const prevAdviceSection = liveAdvisorState.previousAdvice
       ? `\nYOUR PREVIOUS ADVICE (${Math.round((Date.now() - liveAdvisorState.previousAdviceTime) / 60000)} min ago):\n${liveAdvisorState.previousAdvice}\nIMPORTANT: Do NOT flip-flop. Only change recommendations if the game state has SIGNIFICANTLY shifted since your last advice. If the same items are still correct, recommend them again.\n`
       : '';
 
-    // â”€â”€ #5: Class-Filtered Valid Items â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ #5: Class-Filtered Valid Items Ã¢â€â‚¬Ã¢â€â‚¬
     const getFilteredValidItems = () => {
       if (!ddragonItemCache || !ddragonItemCache.byId) return 'Loading...';
       const champInfo = ddragonChampCache?.get(myPlayer?.championName);
@@ -4618,7 +6555,7 @@ async function pollLiveClient() {
         // CRITICAL: Only include Summoner's Rift items
         if (!d.isSR) continue;
         if (d.gold < 2000 || !d.from || d.from.length === 0) continue;
-        // Exclude mid-tier components that build INTO other items (e.g., Kindlegem â†’ Spirit Visage)
+        // Exclude mid-tier components that build INTO other items (e.g., Kindlegem Ã¢â€ â€™ Spirit Visage)
         // Same logic as getValidItemsReference() for consistency
         if (d.into && d.into.length > 0) continue;
         // Check if item is relevant to champion class
@@ -4637,7 +6574,7 @@ async function pollLiveClient() {
         } else if (champTags.includes('Support')) {
           relevant = itemTags.some(t => ['SpellDamage', 'Health', 'Mana', 'ManaRegen', 'CooldownReduction', 'SpellBlock', 'Armor'].includes(t));
         } else {
-          relevant = true; // Unknown class â€” show everything
+          relevant = true; // Unknown class Ã¢â‚¬â€ show everything
         }
         // Always include defensive items
         if (!relevant && itemTags.some(t => alwaysIncludeTags.includes(t))) relevant = true;
@@ -4650,7 +6587,7 @@ async function pollLiveClient() {
       return validItems.sort().join(', ');
     };
 
-    const userMessage = `GAME TIME: ${gameMinutes}:${gameSecs.toString().padStart(2, '0')} â€” PHASE: ${gamePhase}
+    const userMessage = `GAME TIME: ${gameMinutes}:${gameSecs.toString().padStart(2, '0')} Ã¢â‚¬â€ PHASE: ${gamePhase}
 ${phaseGuidance}
 
 MY CHAMPION: ${myPlayer?.championName || '?'}
@@ -4658,7 +6595,11 @@ MY STATS: Level ${myPlayer?.level || '?'}, ${myPlayer?.scores?.kills || 0}/${myP
 MY ITEMS: [${myItems.join(', ') || 'None'}]
 HAS BOOTS: ${hasBoots ? 'Yes' : 'No'}
 ${goldContext}
-${currentlyBuilding ? `\nCURRENTLY BUILDING: ${currentlyBuilding} â€” I have components for this item. This MUST be NEXT ITEM 1.\n` : ''}
+LIVE ADVISOR ITEM-NAMING RULE: NEXT ITEMS are completed item goals for the overlay. Never output components such as Null-Magic Mantle, Kindlegem, Ruby Crystal, Long Sword, Amplifying Tome, Cloth Armor, or Chain Vest.
+${currentlyBuilding ? `\nCURRENTLY BUILDING: ${currentlyBuilding} Ã¢â‚¬â€ I have components for this item. This MUST be NEXT ITEM 1.\n` : ''}
+VALIDATED LIVE BUILD PLAN:
+${validatedBuildPlan}
+
 ${remainingBuildQueue ? `REMAINING BUILD QUEUE (in order):\n${remainingBuildQueue}\nFor NEXT ITEMS: Item 1 should be the first item in this queue (the one I'm building). Item 2 should be what comes after.\n` : ''}
 ${buildCompleteContext}
 ${damageSection}
@@ -4673,7 +6614,7 @@ ${allies.map(formatP).join('\n')}
 ORIGINAL RECOMMENDED BUILD (pre-game):
 ${liveAdvisorState.originalBuildText || 'No pre-game build available'}
 
-VALID ITEMS (current patch â€” ONLY suggest items from this list):
+VALID ITEMS (current patch Ã¢â‚¬â€ ONLY suggest items from this list):
 ${getFilteredValidItems()}
 
 Analyze the current game state and provide live build advice.`;
@@ -4685,7 +6626,7 @@ ASSESSMENT
 One-line summary of the game state and recommendation.
 
 CHANGES
-OldItem → NewItem: reason
+OldItem â†’ NewItem: reason
 (List item swaps from the current build. Write "None needed" if no swaps.)
 
 NEXT ITEMS
@@ -4694,7 +6635,7 @@ NEXT ITEMS
 (List the next 1-2 items to buy. Use exact item names from the VALID ITEMS list.)
 
 SELL
-OldItem → NewItem: reason
+OldItem â†’ NewItem: reason
 (Only if build is complete and an item should be replaced. Otherwise omit.)
 
 THREAT
@@ -4702,12 +6643,34 @@ One-line about the biggest enemy threat.
 
 RULES:
 - Use EXACT item names from the VALID ITEMS list provided
-- Use the → arrow character for item swaps
+- Use the â†’ arrow character for item swaps
 - Keep each section short (1-3 lines max)
-- NEXT ITEMS must be a numbered list
-- If CURRENTLY BUILDING is specified, that MUST be NEXT ITEM 1`;
+- NEXT ITEMS must be a numbered list of completed item goals only, never components
+- Treat VALIDATED LIVE BUILD PLAN as the source of truth.
+- Default action is CONTINUE: keep the build plan and list the next 1-2 unowned items from it.
+- Only change the build plan by writing an explicit CHANGES line. Do not sneak a new item into NEXT ITEMS unless it also appears as OldItem -> NewItem under CHANGES.
+- If CURRENTLY BUILDING is specified, it should remain NEXT ITEM 1 unless CHANGES explicitly swaps that exact item for an emergency counter.
+- Preserve the validated build queue unless the current game state creates a clear emergency.
+- Be stable across repeated checks. If gold, inventory, enemy threats, and objective state are materially unchanged from PREVIOUS ADVICE, keep the same NEXT ITEMS and write "None needed" under CHANGES.
+- Respect champion class and support economy. Do not recommend expensive off-class carry items to utility supports.
+- Anti-heal must fit the champion: tanks/fighters use Thornmail only if they are being hit, ADC/crit users use Mortal Reminder, AP/mages use Morellonomicon. Utility supports usually rely on Ignite/Oblivion Orb if AP or ask an ally to cover anti-heal; do not put off-class anti-heal items in CHANGES or NEXT ITEMS for a utility support.
+- Ignore current gold for item naming: the UI needs the next completed item goal, not the shop component to buy this recall.`;
 
-    const _rawText = await llmGenerate(advisorSystemPrompt, userMessage, { temperature: 0.2, maxTokens: 4096 });
+    const advisorSeed = stableHashSeed([
+      myPlayer?.championName || '?',
+      gamePhase,
+      myItems.join(','),
+      remainingBuildQueue || '',
+      currentlyBuilding || '',
+      damageSection || '',
+      threatAnalysis || '',
+    ].join('|'));
+    const _rawText = await llmGenerate(advisorSystemPrompt, userMessage, {
+      temperature: 0.08,
+      topP: 0.4,
+      seed: advisorSeed,
+      maxTokens: 4096,
+    });
     const text = _rawText;
     sendAdvisorDebug(`[ai] Response received (${text.length} chars)`);
 
@@ -4724,6 +6687,16 @@ RULES:
     let inChanges = false;
     let inNextItems = false;
     let inSell = false;
+    const parseSwapLine = (value) => {
+      const cleaned = String(value || '').replace(/^\d+[.)]\s*/, '').replace(/\*\*/g, '').trim();
+      const match = cleaned.match(/^(.*?)\s*(?:\u2192|->|=>|ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢)\s*([^:]+?)(?:\s*:\s*(.*))?$/);
+      if (!match) return null;
+      return {
+        current: match[1].trim(),
+        recommended: match[2].trim(),
+        reason: (match[3] || '').trim(),
+      };
+    };
     for (const line of lines) {
       const trimmed = line.trim();
       if (trimmed.startsWith('ASSESSMENT')) { inChanges = false; inNextItems = false; inSell = false; continue; }
@@ -4735,8 +6708,8 @@ RULES:
       if (!summary && !inChanges && !inNextItems && !inSell && trimmed && !trimmed.startsWith('CHANGES') && !trimmed.startsWith('NEXT ITEM') && !trimmed.startsWith('THREAT') && !trimmed.startsWith('SELL')) {
         summary = trimmed;
       }
-      if (inChanges && trimmed.includes('â†’')) {
-        const arrow = trimmed.indexOf('â†’');
+      if (inChanges && trimmed.includes('Ã¢â€ â€™')) {
+        const arrow = trimmed.indexOf('Ã¢â€ â€™');
         const colon = trimmed.indexOf(':', arrow);
         const cur = trimmed.substring(0, arrow).trim();
         const rec = colon > arrow ? trimmed.substring(arrow + 1, colon).trim() : trimmed.substring(arrow + 1).trim();
@@ -4745,15 +6718,26 @@ RULES:
           changes.push({ currentItem: cur, recommendedItem: rec, reason });
         }
       }
-      // Parse SELL section (same format as CHANGES: OldItem â†’ NewItem: reason)
-      if (inSell && trimmed.includes('â†’')) {
-        const arrow = trimmed.indexOf('â†’');
+      // Parse SELL section (same format as CHANGES: OldItem Ã¢â€ â€™ NewItem: reason)
+      if (inSell && trimmed.includes('Ã¢â€ â€™')) {
+        const arrow = trimmed.indexOf('Ã¢â€ â€™');
         const colon = trimmed.indexOf(':', arrow);
         const cur = trimmed.substring(0, arrow).trim();
         const rec = colon > arrow ? trimmed.substring(arrow + 1, colon).trim() : trimmed.substring(arrow + 1).trim();
         const reason = colon > arrow ? trimmed.substring(colon + 1).trim() : '';
         if (cur && rec && !rec.toLowerCase().includes('no replacement') && rec.toLowerCase() !== 'none') {
           sellReplacements.push({ sellItem: cur, buyItem: rec, reason });
+        }
+      }
+      const parsedSwap = parseSwapLine(trimmed);
+      if (inChanges && parsedSwap && !changes.some(c => c.currentItem === parsedSwap.current && c.recommendedItem === parsedSwap.recommended)) {
+        if (parsedSwap.current && parsedSwap.recommended && parsedSwap.recommended.toLowerCase() !== 'none needed') {
+          changes.push({ currentItem: parsedSwap.current, recommendedItem: parsedSwap.recommended, reason: parsedSwap.reason });
+        }
+      }
+      if (inSell && parsedSwap && !sellReplacements.some(s => s.sellItem === parsedSwap.current && s.buyItem === parsedSwap.recommended)) {
+        if (parsedSwap.current && parsedSwap.recommended && !parsedSwap.recommended.toLowerCase().includes('no replacement') && parsedSwap.recommended.toLowerCase() !== 'none') {
+          sellReplacements.push({ sellItem: parsedSwap.current, buyItem: parsedSwap.recommended, reason: parsedSwap.reason });
         }
       }
       if (inNextItems && trimmed) {
@@ -4774,11 +6758,22 @@ RULES:
       }
     }
 
-    // â”€â”€ Validate all AI-suggested items against DDragon â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Validate all AI-suggested items against DDragon Ã¢â€â‚¬Ã¢â€â‚¬
     const validateItem = async (name) => {
       const resolved = await resolveDdragonItem(name);
       if (!resolved) {
-        sendAdvisorDebug(`[validation] REJECTED invalid item: "${name}" â€” not found in DDragon`);
+        sendAdvisorDebug(`[validation] REJECTED invalid item: "${name}" Ã¢â‚¬â€ not found in DDragon`);
+        return false;
+      }
+      const data = ddragonItemCache?.byId?.get(String(resolved.id));
+      if (!data?.isSR) {
+        sendAdvisorDebug(`[validation] REJECTED non-SR item: "${resolved.name || name}"`);
+        return false;
+      }
+      const isBoots = advisorIsBootsId(resolved.id);
+      const isCompleted = isBoots || (data.gold >= 2000 && (!data.into || data.into.length === 0));
+      if (!isCompleted) {
+        sendAdvisorDebug(`[validation] REJECTED component in live advisor: "${resolved.name || name}"`);
         return false;
       }
       return true;
@@ -4792,33 +6787,49 @@ RULES:
       return BOOT_PATTERNS_ADV.some(p => lower.includes(p));
     };
 
-    // Validate CHANGES â€” remove invalid recommendations
+    // Validate CHANGES Ã¢â‚¬â€ remove invalid recommendations
     for (let i = changes.length - 1; i >= 0; i--) {
       if (!(await validateItem(changes[i].recommendedItem))) {
         changes.splice(i, 1);
       }
     }
 
-    // Validate NEXT ITEMS â€” remove invalid items
+    // Validate NEXT ITEMS Ã¢â‚¬â€ remove invalid items
     for (let i = nextItems.length - 1; i >= 0; i--) {
       if (!(await validateItem(nextItems[i]))) {
         nextItems.splice(i, 1);
       }
     }
 
-    // â”€â”€ Boots dedup: if player already has boots, strip any boots from suggestions â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Boots dedup: if player already has boots, strip any boots from suggestions Ã¢â€â‚¬Ã¢â€â‚¬
     if (advisorHasBoots) {
       for (let i = nextItems.length - 1; i >= 0; i--) {
         if (await isBootsItem(nextItems[i])) {
-          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${nextItems[i]}" from NEXT ITEMS â€” player already has boots`);
+          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${nextItems[i]}" from NEXT ITEMS Ã¢â‚¬â€ player already has boots`);
           nextItems.splice(i, 1);
         }
       }
       for (let i = changes.length - 1; i >= 0; i--) {
         if (await isBootsItem(changes[i].recommendedItem)) {
-          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${changes[i].recommendedItem}" from CHANGES â€” player already has boots`);
+          sendAdvisorDebug(`[validation] BOOTS DEDUP: Removed "${changes[i].recommendedItem}" from CHANGES Ã¢â‚¬â€ player already has boots`);
           changes.splice(i, 1);
         }
+      }
+    }
+
+    if (nextItems.length === 0) {
+      const queueFallback = [
+        currentlyBuilding,
+        ...String(remainingBuildQueue || '')
+          .split('\n')
+          .map(line => line.replace(/^\s*\d+[.)]\s*/, '').trim())
+          .filter(Boolean),
+      ].filter((item, index, arr) => item && arr.findIndex(v => v.toLowerCase() === item.toLowerCase()) === index);
+      for (const item of queueFallback.slice(0, 2)) {
+        if (await validateItem(item)) nextItems.push(item);
+      }
+      if (nextItems.length > 0) {
+        sendAdvisorDebug(`[validation] Filled NEXT ITEMS from completed build queue: [${nextItems.join(', ')}]`);
       }
     }
 
@@ -4846,16 +6857,12 @@ RULES:
     sendAdvisorDebug(`[advice] ${advice.summary}`);
     sendAdvisorDebug(`[advice] NEXT ITEMS parsed: [${nextItems.join(', ')}]`);
     if (sellReplacements.length > 0) {
-      sendAdvisorDebug(`[advice] SELL: ${sellReplacements.map(s => `${s.sellItem} â†’ ${s.buyItem}`).join(', ')}`);
+      sendAdvisorDebug(`[advice] SELL: ${sellReplacements.map(s => `${s.sellItem} Ã¢â€ â€™ ${s.buyItem}`).join(', ')}`);
     }
     if (isBuildComplete) {
-      sendAdvisorDebug(`[advice] Build is COMPLETE â€” evaluating replacements`);
+      sendAdvisorDebug(`[advice] Build is COMPLETE Ã¢â‚¬â€ evaluating replacements`);
     }
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('live-advice', advice);
-    }
-
-    // â”€â”€ Apply updates to overlay â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Apply updates to overlay Ã¢â€â‚¬Ã¢â€â‚¬
     if (overlayData && overlayData.buildItems && overlayData.buildItems.length > 0) {
       const updatedItems = [...overlayData.buildItems];
       let modified = false;
@@ -4877,18 +6884,8 @@ RULES:
       }
       sendAdvisorDebug(`[overlay] Lock index: ${lockIndex} (building: ${lockIndex < updatedItems.length ? updatedItems[lockIndex]?.name : 'end'})`);
 
-      // 1. Apply CHANGES (swap items) â€” skip lockIndex (currently building)
-      const safeChanges = changes.filter(c => {
-        const curName = c.currentItem.toLowerCase().trim();
-        if (lockIndex < updatedItems.length) {
-          const buildingName = updatedItems[lockIndex].name.toLowerCase().trim();
-          if (curName === buildingName || curName.includes(buildingName) || buildingName.includes(curName)) {
-            sendAdvisorDebug(`[overlay] Blocked swap of currently-building item: ${c.currentItem}`);
-            return false;
-          }
-        }
-        return true;
-      });
+      // 1. Apply CHANGES (swap items) Ã¢â‚¬â€ skip lockIndex (currently building)
+      const safeChanges = changes.filter(c => Boolean(c.currentItem && c.recommendedItem));
 
       for (const change of safeChanges) {
         const curName = change.currentItem.toLowerCase().trim();
@@ -4898,12 +6895,12 @@ RULES:
           sendAdvisorDebug(`[overlay] Skipped swap: ${change.recommendedItem} already in build (dedup)`);
           continue;
         }
-        for (let i = lockIndex + 1; i < updatedItems.length; i++) {
+        for (let i = lockIndex; i < updatedItems.length; i++) {
           if (updatedItems[i].name.toLowerCase().trim() === curName ||
               updatedItems[i].name.toLowerCase().includes(curName) ||
               curName.includes(updatedItems[i].name.toLowerCase())) {
             const resolved = recResolved || await resolveDdragonItem(change.recommendedItem);
-            sendAdvisorDebug(`[overlay] Swapping item ${i}: ${updatedItems[i].name} â†’ ${change.recommendedItem}${resolved ? ' (icon found)' : ' (no icon)'}`); 
+            sendAdvisorDebug(`[overlay] Swapping item ${i}: ${updatedItems[i].name} Ã¢â€ â€™ ${change.recommendedItem}${resolved ? ' (icon found)' : ' (no icon)'}`);
             updatedItems[i] = {
               name: resolved?.name || change.recommendedItem,
               iconUrl: resolved?.iconUrl || '',
@@ -4917,9 +6914,28 @@ RULES:
         }
       }
 
-      // 2. Apply NEXT ITEMS â€” update overlay starting at lockIndex
-      //    NEXT ITEM 1 â†’ lockIndex (the item to build now)
-      //    NEXT ITEM 2 â†’ lockIndex+1 (the item after that) - UNLESS there's a boots/non-boots mismatch
+      // 2. Apply NEXT ITEMS Ã¢â‚¬â€ update overlay starting at lockIndex
+      //    NEXT ITEM 1 Ã¢â€ â€™ lockIndex (the item to build now)
+      //    NEXT ITEM 2 Ã¢â€ â€™ lockIndex+1 (the item after that) - UNLESS there's a boots/non-boots mismatch
+      const derivePlanNextItems = () => updatedItems
+        .slice(lockIndex)
+        .filter((bi) => {
+          const buildName = bi.name.toLowerCase().trim();
+          const owned = ownedItemNames.some(owned => owned === buildName || owned.includes(buildName) || buildName.includes(owned));
+          const bootsSkip = advisorHasBoots && bi.id && advisorIsBootsId(bi.id);
+          return !owned && !bootsSkip;
+        })
+        .slice(0, 2)
+        .map(bi => bi.name);
+      const aiNextItems = [...nextItems];
+      const planNextItems = derivePlanNextItems();
+      if (planNextItems.length > 0) {
+        nextItems.length = 0;
+        nextItems.push(...planNextItems);
+        if (aiNextItems.length && aiNextItems.join('|').toLowerCase() !== planNextItems.join('|').toLowerCase()) {
+          sendAdvisorDebug(`[validation] Ignored NEXT ITEMS outside validated plan: [${aiNextItems.join(', ')}] -> [${planNextItems.join(', ')}]`);
+        }
+      }
       if (nextItems.length > 0) {
         let overlayIdx = lockIndex;
         for (let ni = 0; ni < nextItems.length && overlayIdx < updatedItems.length; ni++) {
@@ -4949,7 +6965,7 @@ RULES:
             if (resolved && resolved.id && updatedItems.some((ui, idx) => ui.id === resolved.id && idx !== targetIdx)) {
               sendAdvisorDebug(`[overlay] Skipped NEXT ITEM ${ni + 1}: ${suggestedName} already in build at another position (dedup)`);
             } else {
-              sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: replacing ${updatedItems[targetIdx].name} â†’ ${suggestedName}${resolved ? ' (icon found)' : ' (no icon)'}`);
+              sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: replacing ${updatedItems[targetIdx].name} Ã¢â€ â€™ ${suggestedName}${resolved ? ' (icon found)' : ' (no icon)'}`);
               updatedItems[targetIdx] = {
                 name: resolved?.name || suggestedName,
                 iconUrl: resolved?.iconUrl || '',
@@ -4960,7 +6976,7 @@ RULES:
               modified = true;
             }
           } else {
-            sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: ${suggestedName} matches queue â€” no change`);
+            sendAdvisorDebug(`[overlay] NEXT ITEM ${ni + 1}: ${suggestedName} matches queue Ã¢â‚¬â€ no change`);
           }
           
           overlayIdx++; // Advance to the next overlay slot for the next AI suggestion
@@ -4973,7 +6989,7 @@ RULES:
           const sellName = sell.sellItem.toLowerCase().trim();
           const resolved = await resolveDdragonItem(sell.buyItem);
           if (!resolved) {
-            sendAdvisorDebug(`[overlay] SELL: Could not resolve ${sell.buyItem} â€” skipping`);
+            sendAdvisorDebug(`[overlay] SELL: Could not resolve ${sell.buyItem} Ã¢â‚¬â€ skipping`);
             continue;
           }
 
@@ -4988,7 +7004,7 @@ RULES:
 
           // ADC quest boots: can NEVER be sold for a non-boots item
           if (isADC && isSellItemBoots && !isBuyItemBoots) {
-            sendAdvisorDebug(`[overlay] SELL: BLOCKED â€” ADC quest boots cannot be sold for non-boots item (${sell.sellItem} â†’ ${sell.buyItem})`);
+            sendAdvisorDebug(`[overlay] SELL: BLOCKED Ã¢â‚¬â€ ADC quest boots cannot be sold for non-boots item (${sell.sellItem} Ã¢â€ â€™ ${sell.buyItem})`);
             continue;
           }
 
@@ -5003,7 +7019,7 @@ RULES:
           for (let i = 0; i < updatedItems.length; i++) {
             const biName = updatedItems[i].name.toLowerCase().trim();
             if (biName === sellName || biName.includes(sellName) || sellName.includes(biName)) {
-              sendAdvisorDebug(`[overlay] SELL: Replacing ${updatedItems[i].name} â†’ ${sell.buyItem} (${sell.reason})`);
+              sendAdvisorDebug(`[overlay] SELL: Replacing ${updatedItems[i].name} Ã¢â€ â€™ ${sell.buyItem} (${sell.reason})`);
               updatedItems[i] = {
                 name: resolved.name || sell.buyItem,
                 iconUrl: resolved.iconUrl || '',
@@ -5023,7 +7039,7 @@ RULES:
       }
 
       if (modified) {
-        // Fix: Global safety net â€” deduplicate items by ID before pushing to overlay
+        // Fix: Global safety net Ã¢â‚¬â€ deduplicate items by ID before pushing to overlay
         const seenIds = new Set();
         for (let i = updatedItems.length - 1; i >= 0; i--) {
           if (updatedItems[i].id && seenIds.has(updatedItems[i].id)) {
@@ -5046,6 +7062,13 @@ RULES:
           sendAdvisorDebug(`[app-ui] Pushed ${updatedItems.length} updated items to App UI (gen=${overlayGeneration})`);
         }
       }
+    }
+    advice.nextItems = [...nextItems];
+    advice.changes = [...changes];
+    advice.sellReplacements = [...sellReplacements];
+    advice.planSynced = Boolean(overlayData?.buildItems?.length);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('live-advice', advice);
     }
   } catch (err) {
     sendAdvisorDebug(`[error] ${err.message}`);
@@ -5096,9 +7119,9 @@ ipcMain.handle('live-advisor-status', async () => {
   return { isPolling: liveAdvisorState.isPolling };
 });
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// â”€â”€ Loading Screen Scouting Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// Ã¢â€â‚¬Ã¢â€â‚¬ Loading Screen Scouting Report Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 let scoutingState = {
   hasRun: false,        // only run once per game
@@ -5383,7 +7406,7 @@ async function runScoutingReport(gameData) {
   // Build richer AI prompt
   const formatStats = (ps) => {
     const soloLine = ps.soloQ
-      ? `SoloQ: ${ps.soloQ.tier} ${ps.soloQ.rank} ${ps.soloQ.lp}LP | ${ps.soloQ.winRate}% WR (${ps.soloQ.wins}W/${ps.soloQ.losses}L)${ps.soloQ.hotStreak ? ' ðŸ”¥STREAK' : ''}`
+      ? `SoloQ: ${ps.soloQ.tier} ${ps.soloQ.rank} ${ps.soloQ.lp}LP | ${ps.soloQ.winRate}% WR (${ps.soloQ.wins}W/${ps.soloQ.losses}L)${ps.soloQ.hotStreak ? ' Ã°Å¸â€Â¥STREAK' : ''}`
       : 'SoloQ: Unranked';
     const flexLine = ps.flexQ
       ? `FlexQ: ${ps.flexQ.tier} ${ps.flexQ.rank} | ${ps.flexQ.winRate}% WR (${ps.flexQ.totalGames} games)`
@@ -5397,7 +7420,7 @@ async function runScoutingReport(gameData) {
       ? `Recent 5: ${ps.recentWinRate}% WR, ${ps.recentAvgKDA} KDA, ${ps.recentAvgCS} CS/min`
       : '';
     return [
-      `${ps.riotId} â€” PLAYING: ${ps.championName} â€” Level ${ps.level}`,
+      `${ps.riotId} Ã¢â‚¬â€ PLAYING: ${ps.championName} Ã¢â‚¬â€ Level ${ps.level}`,
       `  ${soloLine}`,
       flexLine ? `  ${flexLine}` : null,
       avgLine ? `  ${avgLine}` : null,
@@ -5427,7 +7450,7 @@ Return ONLY a valid JSON object with this EXACT structure (no markdown, no code 
       "playstyleTag": "<3-6 word playstyle, e.g. 'Aggressive all-in diver', 'KDA farmer avoids fights', 'Tilted inter', 'Smurf will 1v9', 'First time champion', 'Safe laner scales well'>",
       "laneNote": "<one-line laning tip if they lane against you, or general warning>",
       "smurfProbability": <0-100 integer>,
-      "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE â€” based on recent W/L pattern, death trends, game durations>"
+      "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE Ã¢â‚¬â€ based on recent W/L pattern, death trends, game durations>"
     }
   ],
   "strategy": {
@@ -5441,7 +7464,7 @@ Return ONLY a valid JSON object with this EXACT structure (no markdown, no code 
     "winCondition": "<12-word max win condition>",
     "dangerLevel": "<LOW / MEDIUM / HIGH / EXTREME>"
   },
-  "coachBriefing": "<3 sentences MAX. Write as a coach talking to the player. Explain THE most important thing about this game: who is the biggest threat, what's the win condition, and what to absolutely avoid. Use player names and champion names. Be direct and confident, like a real analyst. Example: 'Tough game â€” their Vayne is on a 7-game win streak with 73% WR, likely a smurf. Your best shot is snowballing top where their Garen has a 38% WR. Force early drakes and close before Vayne scales.'>",
+  "coachBriefing": "<3 sentences MAX. Write as a coach talking to the player. Explain THE most important thing about this game: who is the biggest threat, what's the win condition, and what to absolutely avoid. Use player names and champion names. Be direct and confident, like a real analyst. Example: 'Tough game Ã¢â‚¬â€ their Vayne is on a 7-game win streak with 73% WR, likely a smurf. Your best shot is snowballing top where their Garen has a 38% WR. Force early drakes and close before Vayne scales.'>",
   "winProbability": <0-100 integer, your honest estimated pre-game win probability based on all 10 players stats, ranks, winrates, hot streaks, and champion matchups. 50 = even, 20 = very hard, 80 = very easy>,
   "laneMatchup": {
     "myChamp": "${myPlayer?.championName || '?'}",
@@ -5619,7 +7642,7 @@ ipcMain.handle('open-scout-window', async () => {
   return { ok: true };
 });
 
-// â”€â”€ Scoreboard & Cooldown IPC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Scoreboard & Cooldown IPC Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 ipcMain.handle('open-scoreboard-window', async () => {
   createScoreboardWindow();
   startScoreboardPolling();
@@ -5665,11 +7688,11 @@ ipcMain.on('overlay-set-ignore-mouse', (_e, ignore) => {
   }
 });
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// â”€â”€ Stats/Profile Window Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// Ã¢â€â‚¬Ã¢â€â‚¬ Stats/Profile Window Data Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
-// Champion name â†’ DDragon filename normalization
+// Champion name Ã¢â€ â€™ DDragon filename normalization
 const CHAMP_NAME_MAP = {
   'Wukong': 'MonkeyKing',
   'FiddleSticks': 'Fiddlesticks',
@@ -5750,7 +7773,7 @@ async function fetchMyStats() {
   try {
     summoner = await riotApiGet(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`);
   } catch (e) {
-    log('WARN', `[stats] Summoner v4 failed (${e.message}) â€” some features unavailable`);
+    log('WARN', `[stats] Summoner v4 failed (${e.message}) Ã¢â‚¬â€ some features unavailable`);
   }
 
   // Get ranked data via PUUID (summoner.id is deprecated)
@@ -5760,7 +7783,7 @@ async function fetchMyStats() {
     soloQ = rankedData.find(r => r.queueType === 'RANKED_SOLO_5x5') || {};
     flexQ = rankedData.find(r => r.queueType === 'RANKED_FLEX_SR') || {};
   } catch (e) {
-    log('WARN', `[stats] League v4 failed (${e.message}) â€” rank data unavailable`);
+    log('WARN', `[stats] League v4 failed (${e.message}) Ã¢â‚¬â€ rank data unavailable`);
   }
 
   // Get match IDs (last 15)
@@ -6220,7 +8243,7 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
   "tip": "<one specific, actionable improvement tip, 15 words max>",
   "improvementAreas": ["<area1>", "<area2>"],
   "strengthAreas": ["<strength1>", "<strength2>"],
-  "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE â€” based on recent W/L pattern and death trends>",
+  "mentalState": "<MENTAL BOOM / TILTED / SHAKY / STABLE / LOCKED IN / ON FIRE Ã¢â‚¬â€ based on recent W/L pattern and death trends>",
   "champRatings": {
     "<championName>": { "grade": "<S+/S/A/B/C/D/F>", "note": "<4-8 word strength/weakness note>" }
   }
@@ -6382,9 +8405,9 @@ ipcMain.handle('open-stats-window', async () => {
   return { ok: true };
 });
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// â”€â”€ Riot API Key Health Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// Ã¢â€â‚¬Ã¢â€â‚¬ Riot API Key Health Check Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 let riotApiKeyState = {
   status: 'unknown',   // 'valid' | 'expired' | 'checking' | 'no-key' | 'unknown'
@@ -6496,7 +8519,7 @@ async function checkRiotApiKey() {
     }
   } catch (err) {
     console.log('[riot-api] Health check error:', err.message);
-    // Network error â€” keep previous status
+    // Network error Ã¢â‚¬â€ keep previous status
     if (riotApiKeyState.status === 'checking') {
       riotApiKeyState.status = riotApiKeyState.validatedAt ? 'valid' : 'unknown';
     }
@@ -6586,7 +8609,7 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
   }
 
   for (const rawLine of lines) {
-    const stripped = rawLine.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').replace(/^[-*â€¢]\s*/, '');
+    const stripped = rawLine.trim().replace(/\*\*/g, '').replace(/^#+\s*/, '').replace(/^[-*Ã¢â‚¬Â¢]\s*/, '');
     const upperStripped = stripped.toUpperCase().replace(/[^A-Z\s]/g, '').trim();
 
     const matchedSection = ALL_SECTIONS.find(s => upperStripped === s || upperStripped.startsWith(s));
@@ -6642,7 +8665,7 @@ ipcMain.handle('export-item-set', async (_event, { championId, title, rawText, i
     blocks,
   };
 
-  // â”€â”€ Find League install path (multi-strategy) â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Find League install path (multi-strategy) Ã¢â€â‚¬Ã¢â€â‚¬
   let targetDir = null;
 
   // Strategy 1: User's custom lolPath setting
@@ -6782,11 +8805,11 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
       'OVERHEAL': 9101, 'LEGEND: TENACITY': 9105, 'NULLIFYING ORB': 8224,
       'ZOMBIE WARD': 8137, 'GHOST PORO': 8141, 'EYEBALL COLLECTION': 8140,
       'INGENIOUS HUNTER': 8134,
-      // Shards (Season 2026 â€” Armor & Magic Resist REMOVED)
+      // Shards (Season 2026 Ã¢â‚¬â€ Armor & Magic Resist REMOVED)
       'ADAPTIVE FORCE': 5008, 'ATTACK SPEED': 5005, 'ABILITY HASTE': 5007,
       'HEALTH': 5011, 'HEALTH SCALING': 5001,
       'TENACITY AND SLOW RESIST': 5013, 'MOVEMENT SPEED': 5010,
-      // Old shard names â†’ map to Health (closest defensive substitute)
+      // Old shard names Ã¢â€ â€™ map to Health (closest defensive substitute)
       'ARMOR': 5011, 'MAGIC RESIST': 5011,
     };
 
@@ -6814,7 +8837,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
 
     for (let i = 0; i < lines.length; i++) {
       const rawLine = lines[i];
-      const line = rawLine.trim().replace(/\*\*/g, '').replace(/^[-*â€¢]\s*/, '').replace(/^#+\s*/, '');
+      const line = rawLine.trim().replace(/\*\*/g, '').replace(/^[-*Ã¢â‚¬Â¢]\s*/, '').replace(/^#+\s*/, '');
       const upper = line.toUpperCase().replace(/[^A-Z\s:,+]/g, '').trim();
 
       if (!line) continue;
@@ -6837,7 +8860,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
 
       if (!inRunesSection) continue;
 
-      // â”€â”€ Tree Detection â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Tree Detection Ã¢â€â‚¬Ã¢â€â‚¬
       // Handle: "Primary: Precision", "Primary Tree: Precision", "Primary (Precision)"
       const primaryMatch = line.match(/^(?:Primary|Primary Tree)\s*[:(]\s*(.+?)[\s)]*$/i);
       if (primaryMatch) {
@@ -6855,7 +8878,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         continue;
       }
 
-      // â”€â”€ Keystone Detection â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Keystone Detection Ã¢â€â‚¬Ã¢â€â‚¬
       const keystoneMatch = line.match(/^Keystone\s*:\s*(.+)$/i);
       if (keystoneMatch) {
         keystone = keystoneMatch[1].trim();
@@ -6863,7 +8886,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         continue;
       }
 
-      // â”€â”€ Shard Detection â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Shard Detection Ã¢â€â‚¬Ã¢â€â‚¬
       // Handle: "Shards: X, Y, Z" or "Stat Shards: X, Y, Z" or multi-line
       const shardsLineMatch = line.match(/^(?:Shards?|Stat Shards?|Offense|Flex|Defense)\s*:\s*(.+)$/i);
       if (shardsLineMatch || upper.includes('SHARDS')) {
@@ -6877,7 +8900,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         continue;
       }
 
-      // â”€â”€ Slot Filling â”€â”€
+      // Ã¢â€â‚¬Ã¢â€â‚¬ Slot Filling Ã¢â€â‚¬Ã¢â€â‚¬
       if (section === 'primary' && line && !primaryTree.toUpperCase().includes(upper)) {
         primarySlots.push(line);
         logFn(`[line ${i}] Primary slot: "${line}"`);
@@ -6918,7 +8941,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
     }
 
     const perkIds = [];
-    // Shard aliases â€” map common AI variants to the exact PERK_IDS keys
+    // Shard aliases Ã¢â‚¬â€ map common AI variants to the exact PERK_IDS keys
     const SHARD_ALIASES = {
       'MOVE SPEED': 'MOVEMENT SPEED',
       'MOVESPEED': 'MOVEMENT SPEED',
@@ -6947,26 +8970,26 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         .trim();
 
       // Direct match
-      if (PERK_IDS[n]) { logFn(`  âœ“ ${context}: "${name}" â†’ ${PERK_IDS[n]} (direct)`); return PERK_IDS[n]; }
+      if (PERK_IDS[n]) { logFn(`  Ã¢Å“â€œ ${context}: "${name}" Ã¢â€ â€™ ${PERK_IDS[n]} (direct)`); return PERK_IDS[n]; }
 
       // Legend prefix
-      if (PERK_IDS[`LEGEND: ${n}`]) { logFn(`  âœ“ ${context}: "${name}" â†’ ${PERK_IDS[`LEGEND: ${n}`]} (legend prefix)`); return PERK_IDS[`LEGEND: ${n}`]; }
+      if (PERK_IDS[`LEGEND: ${n}`]) { logFn(`  Ã¢Å“â€œ ${context}: "${name}" Ã¢â€ â€™ ${PERK_IDS[`LEGEND: ${n}`]} (legend prefix)`); return PERK_IDS[`LEGEND: ${n}`]; }
 
       // Shard alias
       if (SHARD_ALIASES[n] && PERK_IDS[SHARD_ALIASES[n]]) {
-        logFn(`  âœ“ ${context}: "${name}" â†’ ${PERK_IDS[SHARD_ALIASES[n]]} (alias: ${SHARD_ALIASES[n]})`);
+        logFn(`  Ã¢Å“â€œ ${context}: "${name}" Ã¢â€ â€™ ${PERK_IDS[SHARD_ALIASES[n]]} (alias: ${SHARD_ALIASES[n]})`);
         return PERK_IDS[SHARD_ALIASES[n]];
       }
 
-      // Fuzzy match â€” key contains name or name contains key
+      // Fuzzy match Ã¢â‚¬â€ key contains name or name contains key
       for (const [key, id] of Object.entries(PERK_IDS)) {
         if (key.includes(n) || n.includes(key)) {
-          logFn(`  âœ“ ${context}: "${name}" â†’ ${id} (fuzzy: ${key})`);
+          logFn(`  Ã¢Å“â€œ ${context}: "${name}" Ã¢â€ â€™ ${id} (fuzzy: ${key})`);
           return id;
         }
       }
 
-      logFn(`  âœ— ${context}: "${name}" â†’ FAILED TO RESOLVE`);
+      logFn(`  Ã¢Å“â€” ${context}: "${name}" Ã¢â€ â€™ FAILED TO RESOLVE`);
       return null;
     };
 
@@ -7006,7 +9029,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
     ];
     const DEFAULT_SHARDS = [5008, 5008, 5011]; // Safe defaults per row
     // Remapping for removed shards (Season 2026)
-    const REMOVED_SHARD_REMAP = { 5002: 5011, 5003: 5011 }; // Armorâ†’Health, MRâ†’Health
+    const REMOVED_SHARD_REMAP = { 5002: 5011, 5003: 5011 }; // ArmorÃ¢â€ â€™Health, MRÃ¢â€ â€™Health
 
     for (let i = 0; i < 3; i++) {
       const shard = statShards[i];
@@ -7014,12 +9037,12 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
         let id = resolve(shard, `Shard[${i}]`);
         // Remap removed shards (Armor 5002, MR 5003)
         if (id && REMOVED_SHARD_REMAP[id]) {
-          logFn(`  âš  Shard[${i}]: Remapped removed shard ${id} â†’ ${REMOVED_SHARD_REMAP[id]} (Season 2026)`);
+          logFn(`  Ã¢Å¡Â  Shard[${i}]: Remapped removed shard ${id} Ã¢â€ â€™ ${REMOVED_SHARD_REMAP[id]} (Season 2026)`);
           id = REMOVED_SHARD_REMAP[id];
         }
         // Validate shard belongs to this row
         if (id && !SHARD_ROWS[i].includes(id)) {
-          logFn(`  âš  Shard[${i}]: ID ${id} not valid for row ${i+1} (valid: [${SHARD_ROWS[i]}]), using default ${DEFAULT_SHARDS[i]}`);
+          logFn(`  Ã¢Å¡Â  Shard[${i}]: ID ${id} not valid for row ${i+1} (valid: [${SHARD_ROWS[i]}]), using default ${DEFAULT_SHARDS[i]}`);
           id = DEFAULT_SHARDS[i];
         }
         if (id) perkIds.push(id);
@@ -7035,27 +9058,27 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
 
     logFn(`Resolved ${perkIds.length}/9 perks: [${perkIds.join(', ')}]`);
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    // CRITICAL: 9/9 validation gate â€” NEVER send broken rune pages to LCU
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    // CRITICAL: 9/9 validation gate Ã¢â‚¬â€ NEVER send broken rune pages to LCU
     // A broken page = random runes in game = lost games
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
     if (perkIds.length !== 9) {
-      logFn(`BLOCKED: Only resolved ${perkIds.length}/9 perks â€” refusing to send broken rune page to LCU`);
+      logFn(`BLOCKED: Only resolved ${perkIds.length}/9 perks Ã¢â‚¬â€ refusing to send broken rune page to LCU`);
       logFn(`  Keystone: ${keystone ? 'OK' : 'MISSING'}`);
       logFn(`  Primary slots: ${primarySlots.length}/3`);
       logFn(`  Secondary slots: ${secondarySlots.length}/2`);
       logFn(`  Shards: ${statShards.length}/3`);
-      return { ok: false, error: `Only resolved ${perkIds.length}/9 perks â€” rune export aborted to prevent broken rune page` };
+      return { ok: false, error: `Only resolved ${perkIds.length}/9 perks Ã¢â‚¬â€ rune export aborted to prevent broken rune page` };
     }
 
     if (!primaryStyleId || !subStyleId) {
-      logFn(`BLOCKED: Missing tree IDs â€” Primary=${primaryStyleId}, Secondary=${subStyleId}`);
-      return { ok: false, error: `Missing rune tree â€” Primary: "${primaryTree}", Secondary: "${secondaryTree}"` };
+      logFn(`BLOCKED: Missing tree IDs Ã¢â‚¬â€ Primary=${primaryStyleId}, Secondary=${subStyleId}`);
+      return { ok: false, error: `Missing rune tree Ã¢â‚¬â€ Primary: "${primaryTree}", Secondary: "${secondaryTree}"` };
     }
 
     if (perkIds.some(id => !id || id === 0)) {
       logFn(`BLOCKED: Found null/zero perk ID in: [${perkIds.join(', ')}]`);
-      return { ok: false, error: 'Found null/zero perk ID â€” rune export aborted' };
+      return { ok: false, error: 'Found null/zero perk ID Ã¢â‚¬â€ rune export aborted' };
     }
 
     const payload = {
@@ -7065,7 +9088,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
       selectedPerkIds: perkIds,
     };
 
-    logFn(`VALIDATED âœ“ â€” Sending 9/9 perks to LCU`);
+    logFn(`VALIDATED Ã¢Å“â€œ Ã¢â‚¬â€ Sending 9/9 perks to LCU`);
 
     // 3. Send to LCU
     logFn(`Payload: ${JSON.stringify(payload)}`);
@@ -7073,7 +9096,7 @@ ipcMain.handle('export-runes', async (_event, { championName, rawText }) => {
     const pages = await lcuCall('GET', '/lol-perks/v1/pages');
     if (!pages || pages.__lcuError || !Array.isArray(pages)) {
       logFn(`Failed to fetch rune pages. Response: ${JSON.stringify(pages)}`);
-      throw new Error('Could not fetch rune pages from LCU â€” is the client running?');
+      throw new Error('Could not fetch rune pages from LCU Ã¢â‚¬â€ is the client running?');
     }
     logFn(`Found ${pages.length} existing rune pages`);
 
@@ -7213,7 +9236,7 @@ ipcMain.handle('get-icon', async (_event, url, cacheKey) => {
   }
 });
 
-// â”€â”€ App Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ App Lifecycle Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 app.whenReady().then(async () => {
   // Initialize crash handlers first
@@ -7236,7 +9259,7 @@ app.whenReady().then(async () => {
   // Start embedded backend
   await startEmbeddedBackend();
 
-  // â”€â”€ DDragon Cache Warming â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ DDragon Cache Warming Ã¢â€â‚¬Ã¢â€â‚¬
   // Pre-cache items, runes, and summoner spells so first build generation is instant
   (async () => {
     try {
@@ -7270,10 +9293,10 @@ app.whenReady().then(async () => {
     try {
       const lcuCreds = getLcuCredentials();
       if (lcuCreds) {
-        log('INFO', '[main] League client detected on startup â€” auto-opening stats');
+        log('INFO', '[main] League client detected on startup Ã¢â‚¬â€ auto-opening stats');
         autoRefreshStats();
       } else {
-        log('INFO', '[main] No League client on startup â€” stats will open manually');
+        log('INFO', '[main] No League client on startup Ã¢â‚¬â€ stats will open manually');
       }
     } catch (e) {
       log('WARN', '[main] Startup LCU check failed: ' + e.message);
@@ -7330,7 +9353,7 @@ app.on('will-quit', () => {
     if (fs.existsSync(scriptPath)) fs.unlinkSync(scriptPath);
   } catch { }
 
-  // Force exit after cleanup â€” backend server keeps event loop alive
+  // Force exit after cleanup Ã¢â‚¬â€ backend server keeps event loop alive
   setTimeout(() => process.exit(0), 500);
 });
 

@@ -1,0 +1,1987 @@
+{
+    "patch": "16.10",
+    "source": "communitydragon-arena",
+    "generatedAt": "2026-05-16T20:39:07.154Z",
+    "augments": [
+        {
+            "id": 404,
+            "name": "404 Augment Not Found",
+            "apiName": "Augment404",
+            "tier": "Silver",
+            "effect": "How did you find this?!?!? Gain hats.",
+            "iconSmall": "assets/ux/cherry/augments/icons/augment404_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/augment404_large.png"
+        },
+        {
+            "id": 366,
+            "name": "Abstain From Power",
+            "apiName": "GoHAbstainFromPower",
+            "tier": "Silver",
+            "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Gain Silver Stat Anvil.",
+            "iconSmall": "assets/ux/cherry/augments/icons/power_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/power_large.arena_2026_s2.png"
+        },
+        {
+            "id": 367,
+            "name": "Abstain From Risk",
+            "apiName": "GoHAbstainFromRisk",
+            "tier": "Silver",
+            "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Instantly gain a %i:Augment% Silver Augment.",
+            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.arena_2026_s2.png"
+        },
+        {
+            "id": 365,
+            "name": "Abstain From Wealth",
+            "apiName": "GoHAbstainFromWealth",
+            "tier": "Silver",
+            "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Gain +%i:goldCoins% gold.",
+            "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png"
+        },
+        {
+            "id": 1,
+            "name": "Accelerating Sorcery",
+            "apiName": "AcceleratingSorcery",
+            "tier": "Prismatic",
+            "effect": "Using an Ability grants Ability Haste, stacking infinitely, this resets each round.",
+            "iconSmall": "assets/ux/cherry/augments/icons/acceleratingsorcery_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/acceleratingsorcery_large.png"
+        },
+        {
+            "id": 205,
+            "name": "ADAPt",
+            "apiName": "ADAPt",
+            "tier": "Silver",
+            "effect": "Convert Bonus Attack Damage to Ability Power, and gain Ability Power. Current Conversion: Converts at a rate of Ability Power per point of Attack Damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/adapt_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/adapt_large.png"
+        },
+        {
+            "id": 336,
+            "name": "Aim for the Head",
+            "apiName": "AimForTheHead",
+            "tier": "Gold",
+            "effect": "{{Cherry_AimForTheHead_Summary}} Total Bonus Critical Strike Damage: %",
+            "iconSmall": "assets/ux/cherry/augments/icons/aim_for_the_head_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/aim_for_the_head_large.png"
+        },
+        {
+            "id": 141,
+            "name": "All For You",
+            "apiName": "AllForYou",
+            "tier": "Gold",
+            "effect": "Your Heals and Shields are % stronger when used on an ally.",
+            "iconSmall": "assets/ux/cherry/augments/icons/allforyou_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/allforyou_large.png"
+        },
+        {
+            "id": 309,
+            "name": "And My Axe!",
+            "apiName": "AndMyAxe",
+            "tier": "Gold",
+            "effect": "Autocast: Throws an axe at the nearest opponent every s, dealing physical damage, Slowing the target for % for s, and shredding % Armor and Magic Resist for seconds. Picking up this axes reduces its Cooldown (%i:cooldown%) to s.",
+            "iconSmall": "assets/ux/cherry/augments/icons/andmyaxe_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/andmyaxe_large.png"
+        },
+        {
+            "id": 2,
+            "name": "Apex Inventor",
+            "apiName": "ApexInventor",
+            "tier": "Gold",
+            "effect": "Gain Item Haste (equivalent to % Item CDR). Item Haste reduces the cooldown %i:cooldown% of all Item Abilities.",
+            "iconSmall": "assets/ux/cherry/augments/icons/apexinventor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/apexinventor_large.png"
+        },
+        {
+            "id": 405,
+            "name": "Augment 405",
+            "apiName": "Augment405",
+            "tier": "Prismatic",
+            "effect": "Gain % damage per hat you're wearing.",
+            "iconSmall": "assets/ux/cherry/augments/icons/augment405_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/augment405_large.png"
+        },
+        {
+            "id": 322,
+            "name": "Augmented Power",
+            "apiName": "AugmentedPower",
+            "tier": "Silver",
+            "effect": "{{ Cherry_AugmentedPower_Summary }} Damage increase this round: Total damage increased:",
+            "iconSmall": "assets/ux/cherry/augments/icons/augmented_power_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/augmented_power_large.png"
+        },
+        {
+            "id": 4,
+            "name": "Back To Basics",
+            "apiName": "BacktoBasics",
+            "tier": "Prismatic",
+            "effect": "Your Ultimate Ability is sealed. Gain % Ability Damage, Healing, Shielding, and Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/backtobasics_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/backtobasics_large.png"
+        },
+        {
+            "id": 5,
+            "name": "Banner of Command",
+            "apiName": "BannerofCommand",
+            "tier": "Gold",
+            "effect": "Your ally gains a bonus % Health, Attack Damage, Ability Power, Attack Speed and Size for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bannerofcommand_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bannerofcommand_large.png"
+        },
+        {
+            "id": 180,
+            "name": "Big Brain",
+            "apiName": "BigBrain",
+            "tier": "Gold",
+            "effect": "At the start of each round, gain a Shield.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bigbrain_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bigbrain_large.png"
+        },
+        {
+            "id": 6,
+            "name": "Blade Waltz",
+            "apiName": "BladeWaltz",
+            "tier": "Prismatic",
+            "effect": "Makes you untargetable while you dash at and deal damage to enemies times (deals 50% on-hit damage). Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/bladewaltz_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bladewaltz_large.png"
+        },
+        {
+            "id": 200,
+            "name": "Blood Brother",
+            "apiName": "BloodBrother",
+            "tier": "Gold",
+            "effect": "Gain Darius's Passive Hemorrhage. Attacks and damaging Abilities cause the target to Hemorrhage, dealing physical damage over seconds, stacking up to times. Draven gains Attack Damage at Hemorrhage stacks.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bloodbrother_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bloodbrother_large.png"
+        },
+        {
+            "id": 7,
+            "name": "Blunt Force",
+            "apiName": "BluntForce",
+            "tier": "Silver",
+            "effect": "Gain % () Attack Damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bluntforce_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bluntforce_large.png"
+        },
+        {
+            "id": 321,
+            "name": "Bodyguard",
+            "apiName": "Bodyguard",
+            "tier": "Gold",
+            "effect": "Using a dash, blink, or teleport grants yourself, and an allies you pass through, a shield for seconds. The strength of this shield depends on your abilities base cooldown at level 1. Shields reach their maximum on abilities with at least a second cooldown.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bodyguard_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bodyguard_large.png"
+        },
+        {
+            "id": 324,
+            "name": "Bravest of the Brave",
+            "apiName": "BravestoftheBrave",
+            "tier": "Silver",
+            "effect": "Increase future %i:Augment%Augment offerings by tier(s). If the Augment's tier was already Prismatic, gain +%i:goldCoins% gold.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bravestofthebrave_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bravestofthebrave_large.png"
+        },
+        {
+            "id": 103,
+            "name": "Bread And Butter",
+            "apiName": "BreadAndButter",
+            "tier": "Gold",
+            "effect": "Your gains Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/breadandbutter_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/breadandbutter_large.png"
+        },
+        {
+            "id": 151,
+            "name": "Bread And Cheese",
+            "apiName": "BreadAndCheese",
+            "tier": "Gold",
+            "effect": "Your gains Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/breadandcheese_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/breadandcheese_large.png"
+        },
+        {
+            "id": 150,
+            "name": "Bread And Jam",
+            "apiName": "BreadAndJam",
+            "tier": "Gold",
+            "effect": "Your gains Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/breadandjam_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/breadandjam_large.png"
+        },
+        {
+            "id": 346,
+            "name": "Bread Sandwich",
+            "apiName": "BreadSandwich",
+            "tier": "Prismatic",
+            "effect": "Gain Ability Haste. Casting an ability gants % Movement Speed for seconds. You have become all that is feared, you have become the ultimate in food science. Men cry out for more toppings, and you whisper \"No\".",
+            "iconSmall": "assets/ux/cherry/augments/icons/bread_sandwhich_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bread_sandwhich.png"
+        },
+        {
+            "id": 9,
+            "name": "Buff Buddies",
+            "apiName": "BuffBuddies",
+            "tier": "Silver",
+            "effect": "You gain Crest of Cinders and Crest of Insight. Crest of Cinders: Basic attacks Burn and Slow enemy champions. While out of combat heal a percentage of your maximum health. Crest of Insight: Gain Ability Haste, and restore Mana and Energy each second.",
+            "iconSmall": "assets/ux/cherry/augments/icons/buffbuddies_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/buffbuddies_large.png"
+        },
+        {
+            "id": 320,
+            "name": "Calculated Risk",
+            "apiName": "CalculatedRisk",
+            "tier": "Silver",
+            "effect": "{{ Cherry_CalculatedRisk_Summary }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/calculated_risk_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/calculated_risk_large.png"
+        },
+        {
+            "id": 11,
+            "name": "Can't Touch This",
+            "apiName": "CantTouchThis",
+            "tier": "Prismatic",
+            "effect": "Casting your Ultimate makes you Invulnerable for seconds (s Cooldown).",
+            "iconSmall": "assets/ux/cherry/augments/icons/canttouchthis_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/canttouchthis_large.png"
+        },
+        {
+            "id": 10,
+            "name": "Cannon Fodder",
+            "apiName": "CannonFodder",
+            "tier": "Silver",
+            "effect": "You enter combat launching from a cannon.",
+            "iconSmall": "assets/ux/cherry/augments/icons/cannonfodder_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/cannonfodder_large.png"
+        },
+        {
+            "id": 12,
+            "name": "Castle",
+            "apiName": "Castle",
+            "tier": "Silver",
+            "effect": "Gain the Castle Summoner Spell. Swap places with your ally, granting you both % Move Speed and a Shield for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/castle_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/castle_large.png"
+        },
+        {
+            "id": 13,
+            "name": "Celestial Body",
+            "apiName": "CelestialBody",
+            "tier": "Gold",
+            "effect": "Gain Health, but you deal % less damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/celestialbody_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/celestialbody_large.png"
+        },
+        {
+            "id": 193,
+            "name": "Center of the Universe",
+            "apiName": "CenterOfTheUniverse",
+            "tier": "Prismatic",
+            "effect": "Stars orbit you, dealing magic damage to enemies they pass through. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/centeroftheuniverse_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/centeroftheuniverse_large.png"
+        },
+        {
+            "id": 323,
+            "name": "Cerberus",
+            "apiName": "Cerberus",
+            "tier": "Prismatic",
+            "effect": "Gain the Hail of Blades and Press the Attack Keystone Runes. Hail of Blades - Your first 3 Attacks have massively increased Attack Speed. Press the Attack - Hitting 3 Attacks against the same enemy deals a burst of damage and increases your damage until you leave combat.",
+            "iconSmall": "assets/ux/cherry/augments/icons/cerberus_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/cerberus_large.png"
+        },
+        {
+            "id": 166,
+            "name": "Chain Lightning",
+            "apiName": "ChainLightning",
+            "tier": "Prismatic",
+            "effect": "{{Cherry_ChainLightning_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/chainlightning_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/chainlightning_large.png"
+        },
+        {
+            "id": 14,
+            "name": "Chauffeur",
+            "apiName": "Chauffeur",
+            "tier": "Prismatic",
+            "effect": "{{ Cherry_Chauffeur_Tooltip }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/chauffeur_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/chauffeur_large.png"
+        },
+        {
+            "id": 15,
+            "name": "Circle of Death",
+            "apiName": "CircleofDeath",
+            "tier": "Prismatic",
+            "effect": "Healing and Health Regen you do deals % of the value magic damage to the nearest enemy champion. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/circleofdeath_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/circleofdeath_large.png"
+        },
+        {
+            "id": 110,
+            "name": "Clothesline",
+            "apiName": "Clothesline",
+            "tier": "Silver",
+            "effect": "There is a tether connecting your team, deals constant magic damage per second to those it touches. Damage Dealt this Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/clothesline_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/clothesline_large.png"
+        },
+        {
+            "id": 310,
+            "name": "Clown College",
+            "apiName": "ClownCollege",
+            "tier": "Prismatic",
+            "effect": "Backstab: You deal bonus physical damage when striking from behind. Deceive: You teleport and become Invisible for seconds. Your next Attack while Invisible deals an additional physical damage. If striking from behind, this Attack critically strikes for damage. Hallucinate: Death: On death, deal % maximum Health true damage and fear for s around you.",
+            "iconSmall": "assets/ux/cherry/augments/icons/clowncollege_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/clowncollege_large.png"
+        },
+        {
+            "id": 16,
+            "name": "Combo Master",
+            "apiName": "ComboMaster",
+            "tier": "Gold",
+            "effect": "Gain the Electrocute and Phase Rush Keystone Runes. Electrocute - Hitting 3 separate Attacks or Abilities within 3 seconds deals a burst of damage. Phase Rush - Hitting 3 separate Attacks or Abilities within 4 seconds grants you Move Speed and Slow Resist for a few seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/combomaster_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/combomaster_large.png"
+        },
+        {
+            "id": 372,
+            "name": "Compulsion For Power",
+            "apiName": "GoHCompulsionForPower",
+            "tier": "Silver",
+            "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain Prismatic Stat Anvils.",
+            "iconSmall": "assets/ux/cherry/augments/icons/power_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/power_large.arena_2026_s2.png"
+        },
+        {
+            "id": 373,
+            "name": "Compulsion For Risk",
+            "apiName": "GoHCompulsionForRisk",
+            "tier": "Silver",
+            "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain a %i:Augment% Prismatic Augment.",
+            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.arena_2026_s2.png"
+        },
+        {
+            "id": 371,
+            "name": "Compulsion For Wealth",
+            "apiName": "GoHCompulsionForWealth",
+            "tier": "Silver",
+            "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain +%i:goldCoins% gold.",
+            "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png"
+        },
+        {
+            "id": 17,
+            "name": "Contract Killer",
+            "apiName": "ContractKiller",
+            "tier": "Silver",
+            "effect": "Each round, mark an opposing champion. That champion takes % extra damage and grants an +%i:goldCoins% gold when killed.",
+            "iconSmall": "assets/ux/cherry/augments/icons/contractkiller_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/contractkiller_large.png"
+        },
+        {
+            "id": 18,
+            "name": "Courage of the Colossus",
+            "apiName": "CourageoftheColossus",
+            "tier": "Prismatic",
+            "effect": "Gain Shield after Immobilizing or Grounding an enemy champion. Shields Generated This Round: Shields Generated Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/courageofthecolossus_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/courageofthecolossus_large.png"
+        },
+        {
+            "id": 369,
+            "name": "Craving For Power",
+            "apiName": "GoHCravingForPower",
+            "tier": "Silver",
+            "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain Gold Stat Anvil.",
+            "iconSmall": "assets/ux/cherry/augments/icons/power_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/power_large.arena_2026_s2.png"
+        },
+        {
+            "id": 370,
+            "name": "Craving For Risk",
+            "apiName": "GoHCravingForRisk",
+            "tier": "Silver",
+            "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain a %i:Augment% Gold Augment.",
+            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.arena_2026_s2.png"
+        },
+        {
+            "id": 368,
+            "name": "Craving For Wealth",
+            "apiName": "GoHCravingForWealth",
+            "tier": "Silver",
+            "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain +%i:goldCoins% gold.",
+            "iconSmall": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png"
+        },
+        {
+            "id": 118,
+            "name": "Critical Healing",
+            "apiName": "CriticalHealing",
+            "tier": "Gold",
+            "effect": "{{Cherry_CriticalHealing_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/criticalhealing_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/criticalhealing_large.png"
+        },
+        {
+            "id": 215,
+            "name": "Dark Blessing",
+            "apiName": "DarkBlessing",
+            "tier": "Gold",
+            "effect": "When you Heal or Shield an allied champion, gain Cursed Power. Gain Ability Haste (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/darkblessing_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/darkblessing_large.png"
+        },
+        {
+            "id": 19,
+            "name": "Dashing",
+            "apiName": "Dashing",
+            "tier": "Prismatic",
+            "effect": "Your dash, leap, blink, or teleport Abilities gain Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/dashing_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dashing_large.png"
+        },
+        {
+            "id": 20,
+            "name": "Dawnbringer's Resolve",
+            "apiName": "DawnbringersResolve",
+            "tier": "Gold",
+            "effect": "{{Cherry_DawnbringersResolve_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/dawnbringersresolve_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dawnbringersresolve_large.png"
+        },
+        {
+            "id": 217,
+            "name": "Deathtouch",
+            "apiName": "Deathtouch",
+            "tier": "Gold",
+            "effect": "Attacking enemy champions grant you Cursed Power. Your Attacks deal an additional magic damage (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/deathtouch_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/deathtouch_large.png"
+        },
+        {
+            "id": 21,
+            "name": "Defensive Maneuvers",
+            "apiName": "DefensiveManeuvers",
+            "tier": "Gold",
+            "effect": "Cast Barrier and Heal on your team. Grants Shield, restores Health, and gives % Move Speed for 1 second.",
+            "iconSmall": "assets/ux/cherry/augments/icons/defensivemaneuvers_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/defensivemaneuvers_large.png"
+        },
+        {
+            "id": 22,
+            "name": "Deft",
+            "apiName": "Deft",
+            "tier": "Silver",
+            "effect": "Gain %i:scaleAS% % Attack Speed.",
+            "iconSmall": "assets/ux/cherry/augments/icons/deft_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/deft_large.png"
+        },
+        {
+            "id": 171,
+            "name": "Dematerialize",
+            "apiName": "Dematerialize",
+            "tier": "Silver",
+            "effect": "{{Cherry_Dematerialize_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/dematerialize_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dematerialize_large.png"
+        },
+        {
+            "id": 23,
+            "name": "Demon's Dance",
+            "apiName": "DemonsDance",
+            "tier": "Gold",
+            "effect": "Gain the Fleet Footwork and Grasp of the Undying Keystone Runes. Fleet Footwork - Moving and Attacking generates charges of Energize. At 100, your next Attack deals bonus damage, heals you, and grants you a burst of Move Speed. Grasp of the Undying - Being in combat for 3 seconds with an enemy marks them. Attacks consume the mark to deal bonus damage, heal you, and grant permanent max Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/demonsdance_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/demonsdance_large.png"
+        },
+        {
+            "id": 218,
+            "name": "Desecrator",
+            "apiName": "Desecrator",
+            "tier": "Silver",
+            "effect": "Immobilizing enemy champions grants you Cursed Power. Gain Armor and Magic Resistance (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/desecrator_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/desecrator_large.png"
+        },
+        {
+            "id": 330,
+            "name": "Despoil",
+            "apiName": "Despoil",
+            "tier": "Silver",
+            "effect": "Dashing or Blinking grants you Cursed Power if there is an enemy nearby. Gain Move Speed scaling with your Cursed Power. Gain Move Speed (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/desecrator_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/desecrator_large.png"
+        },
+        {
+            "id": 24,
+            "name": "Die Another Day",
+            "apiName": "DieAnotherDay",
+            "tier": "Gold",
+            "effect": "Bless the ground under you for 4s, preventing any unit inside from falling below 10% of their max Health. At the end, units inside are healed for Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/dieanotherday_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dieanotherday_large.png"
+        },
+        {
+            "id": 25,
+            "name": "Dive Bomber",
+            "apiName": "DiveBomber",
+            "tier": "Silver",
+            "effect": "Your team's first death each round explodes, dealing % of the targets max health as true damage to nearby enemies. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/divebomber_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/divebomber_large.png"
+        },
+        {
+            "id": 301,
+            "name": "Divine Intervention",
+            "apiName": "DivineIntervention",
+            "tier": "Gold",
+            "effect": "seconds into combat, call upon a protective star that slowly descends upon you. When it lands, you and nearby allies become Invulnerable for seconds. Then Autocast this every seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/slowactingpainkillers_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/slowactingpainkillers_large.png"
+        },
+        {
+            "id": 26,
+            "name": "Don't Blink",
+            "apiName": "DontBlink",
+            "tier": "Silver",
+            "effect": "Gain % bonus damage per 10 Move Speed you have more than the target. Bonus Damage This Round: Bonus Damage Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/dontblink_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dontblink_large.png"
+        },
+        {
+            "id": 102,
+            "name": "Don't Chase",
+            "apiName": "DontChase",
+            "tier": "Silver",
+            "effect": "You become Ghosted and leave a trail of poisonous gas behind you, dealing magic damage per second to enemies inside. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/dontchase_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dontchase_large.png"
+        },
+        {
+            "id": 219,
+            "name": "Doomsayer",
+            "apiName": "Doomsayer",
+            "tier": "Prismatic",
+            "effect": "Hitting an enemy champion with an ability grant you Cursed Power. Gain Adaptive Force (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/doomsayer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/doomsayer_large.png"
+        },
+        {
+            "id": 134,
+            "name": "Draw Your Sword",
+            "apiName": "DrawYourSword",
+            "tier": "Prismatic",
+            "effect": "You are now melee. Gain % Attack Damage, % Health, % Attack Speed, % Lifesteal, and % Move Speed (each further increased based on Attack Range lost).",
+            "iconSmall": "assets/ux/cherry/augments/icons/drawyoursword_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/drawyoursword_large.png"
+        },
+        {
+            "id": 216,
+            "name": "Dreadbringer",
+            "apiName": "Dreadbringer",
+            "tier": "Prismatic",
+            "effect": "Every second, gain Cursed Power per nearby enemy champion. Gain Health (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/plaguebearer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/plaguebearer_large.png"
+        },
+        {
+            "id": 225,
+            "name": "Dual Wield",
+            "apiName": "DualWield",
+            "tier": "Prismatic",
+            "effect": "When you Attack, fire a bolt that deals % damage and applies your {{ Item_Keyword_OnHit }} effects at % effectiveness. Gain % total Attack Speed.",
+            "iconSmall": "assets/ux/cherry/augments/icons/dualwield_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dualwield_large.png"
+        },
+        {
+            "id": 27,
+            "name": "Earthwake",
+            "apiName": "Earthwake",
+            "tier": "Prismatic",
+            "effect": "Your dash, leap, blink, or teleport Abilities leave behind a trail that detonates after 1 second, dealing physical damage. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/earthwake_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/earthwake_large.png"
+        },
+        {
+            "id": 344,
+            "name": "Energetic",
+            "apiName": "Energetic",
+            "tier": "Silver",
+            "effect": "Gain Energized % quicker. Triggering Energized fires a Magic Missile, dealing up to % max Health true damage based on distance traveled. Magic Missile Damage Dealt This Round: Magic Missile Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/energetic_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/energetic_large.png"
+        },
+        {
+            "id": 28,
+            "name": "Erosion",
+            "apiName": "Erosion",
+            "tier": "Silver",
+            "effect": "Damaging enemies shreds % Armor and Magic Resist for s, up to % at stacks.",
+            "iconSmall": "assets/ux/cherry/augments/icons/erosion_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/erosion_large.png"
+        },
+        {
+            "id": 206,
+            "name": "escAPADe",
+            "apiName": "escAPADe",
+            "tier": "Silver",
+            "effect": "Convert Ability Power to Bonus Attack Damage and gain Attack Damage. Current Conversion: Converts at a rate of Attack Damage per point of Ability Power.",
+            "iconSmall": "assets/ux/cherry/augments/icons/escapade_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/escapade_large.png"
+        },
+        {
+            "id": 29,
+            "name": "Ethereal Weapon",
+            "apiName": "EtherealWeapon",
+            "tier": "Gold",
+            "effect": "Your Abilities apply {{ Item_Keyword_OnHit }} effects time(s) . second cooldown per target. Times Triggered This Round: Times Triggered Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/etherealweapon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/etherealweapon_large.png"
+        },
+        {
+            "id": 30,
+            "name": "Eureka",
+            "apiName": "Eureka",
+            "tier": "Prismatic",
+            "effect": "Gain Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/eureka_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/eureka_large.png"
+        },
+        {
+            "id": 32,
+            "name": "Executioner",
+            "apiName": "Executioner",
+            "tier": "Silver",
+            "effect": "Deal % more damage to enemies below % health. Reset your basic abilities on takedown. Bonus Damage This Round: Bonus Damage Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/executioner_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/executioner_large.png"
+        },
+        {
+            "id": 33,
+            "name": "Extendo-Arm",
+            "apiName": "ExtendoArm",
+            "tier": "Gold",
+            "effect": "Autocast fire a Blitzcrank hook every 12 seconds at a nearby enemy champion. Hooks Landed:",
+            "iconSmall": "assets/ux/cherry/augments/icons/extendoarm_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/extendoarm_large.png"
+        },
+        {
+            "id": 34,
+            "name": "Fallen Aegis",
+            "apiName": "FallenAegis",
+            "tier": "Silver",
+            "effect": "Start combat with a Black Shield that blocks magic damage for s. The shield prevents Disabling and Immobilizing effects until it breaks. Shields Generated Total: Immobilizing Spells Blocked Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/fallenaegis_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/fallenaegis_large.png"
+        },
+        {
+            "id": 220,
+            "name": "Fan the Hammer",
+            "apiName": "FanTheHammer",
+            "tier": "Prismatic",
+            "effect": "When you Attack enemy champions, fire bolts that each deal physical damage. Each cardinal direction has a second Cooldown. Each bolt can Critically Strike and applies {{ Item_Keyword_OnHit }} at % effectiveness.",
+            "iconSmall": "assets/ux/cherry/augments/icons/fanthehammer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/fanthehammer_large.png"
+        },
+        {
+            "id": 35,
+            "name": "Feel the Burn",
+            "apiName": "FeeltheBurn",
+            "tier": "Prismatic",
+            "effect": "Casts Ignite and Exhaust on all nearby enemy champions.",
+            "iconSmall": "assets/ux/cherry/augments/icons/feeltheburn_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/feeltheburn_large.png"
+        },
+        {
+            "id": 194,
+            "name": "Fey Magic",
+            "apiName": "FeyMagic",
+            "tier": "Prismatic",
+            "effect": "Damaging with your Ultimate Polymorphs enemies for seconds ( second Cooldown).",
+            "iconSmall": "assets/ux/cherry/augments/icons/feymagic_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/feymagic_large.png"
+        },
+        {
+            "id": 229,
+            "name": "Fire Sale",
+            "apiName": "FireSale",
+            "tier": "Silver",
+            "effect": "Instantly sell all your non-quest items for % of their direct buy price. Great for all those discounted anvils. When removed or replaced gain +%i:goldCoins% gold equal to % of the gold gained from FireSale.",
+            "iconSmall": "assets/ux/cherry/augments/icons/firesale_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/firesale_large.png"
+        },
+        {
+            "id": 36,
+            "name": "Firebrand",
+            "apiName": "Firebrand",
+            "tier": "Gold",
+            "effect": "Your Attacks Burn enemies {{ Item_Keyword_OnHit }}, dealing % max Health Magic Damage damage per second over seconds. The Burn stacks infinitely. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/firebrand_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/firebrand_large.png"
+        },
+        {
+            "id": 308,
+            "name": "Firefox",
+            "apiName": "Firefox",
+            "tier": "Silver",
+            "effect": "Autocast: Gain % Movement Speed and conjure three flames that orbit you every seconds, targetting the closest visible enemy in range and dealing magic damage. Subsequent hits do % damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/firfox_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/firfox_large.png"
+        },
+        {
+            "id": 37,
+            "name": "First-Aid Kit",
+            "apiName": "FirstAidKit",
+            "tier": "Silver",
+            "effect": "Gain % Heal and Shield Power.",
+            "iconSmall": "assets/ux/cherry/augments/icons/firstaidkit_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/firstaidkit_large.png"
+        },
+        {
+            "id": 116,
+            "name": "Flashy",
+            "apiName": "Flashy",
+            "tier": "Gold",
+            "effect": "Your Flash has Ammo and a second Cooldown.",
+            "iconSmall": "assets/ux/cherry/augments/icons/flashy_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/flashy_large.png"
+        },
+        {
+            "id": 38,
+            "name": "From Beginning to End",
+            "apiName": "FromBeginningToEnd",
+            "tier": "Gold",
+            "effect": "Gain the First Strike and Dark Harvest Keystone Runes. First Strike - Damaging a champion makes them take increased damage for 3 seconds. At the end, gain +%i:goldCoins% Gold based on your bonus damage dealt. Dark Harvest - Damaging an enemy below 50% Health deals bonus damage and increases that bonus damage permanently.",
+            "iconSmall": "assets/ux/cherry/augments/icons/frombeginningtoend_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/frombeginningtoend_large.png"
+        },
+        {
+            "id": 39,
+            "name": "Frost Wraith",
+            "apiName": "FrostWraith",
+            "tier": "Silver",
+            "effect": "Autocast Root nearby enemies for seconds every seconds. Enemies Rooted This Round: Enemies Rooted Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/frostwraith_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/frostwraith_large.png"
+        },
+        {
+            "id": 40,
+            "name": "Frozen Foundations",
+            "apiName": "FrozenFoundations",
+            "tier": "Silver",
+            "effect": "Summon a wall of ice at target location.",
+            "iconSmall": "assets/ux/cherry/augments/icons/frozenfoundations_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/frozenfoundations_large.png"
+        },
+        {
+            "id": 222,
+            "name": "Fruits of Your Labor",
+            "apiName": "FruitsOfYourLabor",
+            "tier": "Silver",
+            "effect": "{{Cherry_FruitsOfYourLabor_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/fruitarian_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/fruitarian_large.png"
+        },
+        {
+            "id": 340,
+            "name": "Gain a Prismatic Stat Anvil",
+            "apiName": "CraftingPrisStatAnvil",
+            "tier": "Silver",
+            "effect": "Gain a Prismatic Stat Anvil, granting anything from this list. +%i:scaleCritMult% Critical Strike Damage +%i:scaleHealth% Health and Increased Size +%i:scaleAPen% Armor Penetration +%i:scaleMPen% Magic Penetration +%i:scaleMS% Move Speed and Reduced Size +%i:scaleTenacity% Tenacity +%i:scaleHealShield% Heal & Shield Power +%i:scaleSV% Omnivamp +%i:goldCoins% Gold",
+            "iconSmall": "assets/ux/cherry/augments/icons/crafting_prisstatanvil_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/crafting_prisstatanvil.png"
+        },
+        {
+            "id": 341,
+            "name": "Gain an Augment slot",
+            "apiName": "CraftingAugmentSlot",
+            "tier": "Silver",
+            "effect": "{{ Cherry_CraftingAugmentSlot_Summary }}",
+            "iconSmall": "assets/ux/cherry/augments/icons/crafting_slot_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/crafting_slot.png"
+        },
+        {
+            "id": 355,
+            "name": "Gain Stat Anvil",
+            "apiName": "GainStatAnvil",
+            "tier": "Silver",
+            "effect": "Gain a random %i:StatAnvil% Stat Anvil.",
+            "iconSmall": "assets/ux/cherry/augments/icons/gain_stat_anvil_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/gain_stat_anvil.png"
+        },
+        {
+            "id": 234,
+            "name": "Gamba Anvil",
+            "apiName": "GambaAnvil",
+            "tier": "Prismatic",
+            "effect": "Gain +%i:goldCoins% gold and reduce the price of all anvils. Prismatic Anvils: -%i:goldCoins%gold Legendary Anvils: -%i:goldCoins%gold Stat Anvils: -%i:goldCoins%gold Items acquired from anvils resell for -%i:goldCoins%500 gold less.",
+            "iconSmall": "assets/ux/cherry/augments/icons/thiefsgloves_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/thiefsgloves_large.png"
+        },
+        {
+            "id": 195,
+            "name": "Giant Slayer",
+            "apiName": "GiantSlayer",
+            "tier": "Prismatic",
+            "effect": "Become tiny, gain % Move Speed, and deal between % and % bonus damage to champions based on how much larger they are than you.",
+            "iconSmall": "assets/ux/cherry/augments/icons/giantslayer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/giantslayer_large.png"
+        },
+        {
+            "id": 41,
+            "name": "Goliath",
+            "apiName": "Goliath",
+            "tier": "Prismatic",
+            "effect": "Become large, gaining % Health and % Adaptive Force.",
+            "iconSmall": "assets/ux/cherry/augments/icons/goliath_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/goliath_large.png"
+        },
+        {
+            "id": 138,
+            "name": "Goredrink",
+            "apiName": "Goredrink",
+            "tier": "Silver",
+            "effect": "Gain % Omnivamp.",
+            "iconSmall": "assets/ux/cherry/augments/icons/goredrink_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/goredrink_large.png"
+        },
+        {
+            "id": 316,
+            "name": "Grevious Venom",
+            "apiName": "GrievousVenom",
+            "tier": "Silver",
+            "effect": "Dealing damage to an enemy champion reduces any shields they gain by %, and applies % Grievous Wounds for seconds. If an enemy heals for more than % of their maximum health while continously affected by Grievous Wounds, it is increased to % Grievous Wounds. {{ Item_Grievous_Wounds }} Only reduces General and Physical Damage shields, but not purely Magical Damage blocking shields.",
+            "iconSmall": "assets/ux/cherry/augments/icons/grevious_venmon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/grevious_venmon.png"
+        },
+        {
+            "id": 42,
+            "name": "Guilty Pleasure",
+            "apiName": "GuiltyPleasure",
+            "tier": "Silver",
+            "effect": "Immobilizing or Grounding enemy champions restores Health. Healing Done This Round: Healing Done Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/guiltypleasure_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/guiltypleasure_large.png"
+        },
+        {
+            "id": 241,
+            "name": "Hat Trick",
+            "apiName": "HatTrick",
+            "tier": "Gold",
+            "effect": "Instantly gain hats, and reduce the price of Cappa Juice by . Taking damage that would reduce your Health below % gain % Move Speed and a shield for , but lose one hat. second Cooldown. You no longer lose hats on round loss.",
+            "iconSmall": "assets/ux/cherry/augments/icons/hattrick_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/hattrick_large.png"
+        },
+        {
+            "id": 181,
+            "name": "Heavy Hitter",
+            "apiName": "HeavyHitter",
+            "tier": "Silver",
+            "effect": "Your Attacks deal additional physical damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/heavyhitter_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/heavyhitter_large.png"
+        },
+        {
+            "id": 338,
+            "name": "Hive Mind",
+            "apiName": "HiveMind",
+            "tier": "Prismatic",
+            "effect": "Start each round with Bee, gain additonal Bees by harvesting flowers. Damaging an enemy champion sends a Bee dealing magic damage over seconds on arrival, before returning to you.",
+            "iconSmall": "assets/ux/cherry/augments/icons/hive_mind_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/hive_mind_large.png"
+        },
+        {
+            "id": 207,
+            "name": "Hold Very Still",
+            "apiName": "HoldVeryStill",
+            "tier": "Silver",
+            "effect": "Gain Guerrilla Warfare After not moving for seconds, turn Invisibile until you move. When you exit this Invisibility, gain Attack Speed and % decaying Movement Speed for seconds. Your next attack deals an additional magic damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/holdverystill_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/holdverystill_large.png"
+        },
+        {
+            "id": 198,
+            "name": "Holy Fire",
+            "apiName": "HolyFire",
+            "tier": "Gold",
+            "effect": "Healing or Shielding applies an infinitely stacking Burn to a nearby enemy, dealing up to % max Health magic damage over seconds (min: %). The damage scales with the relative size of the Heal or Shielding to the max Health of the champion being aided. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/holyfire_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/holyfire_large.png"
+        },
+        {
+            "id": 105,
+            "name": "Homeguard",
+            "apiName": "Homeguard",
+            "tier": "Silver",
+            "effect": "Gain @spell.Augment_Homeguard:MovementSpeed*100@% Move Speed, disabled for @spell.Augment_Homeguard:DisableCooldown@ seconds after taking damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/homeguard_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/homeguard_large.png"
+        },
+        {
+            "id": 357,
+            "name": "Hybrid",
+            "apiName": "Hybrid",
+            "tier": "Gold",
+            "effect": "{{Cherry_Hybrid_Summary}} Abilities empower one Attack per cast.",
+            "iconSmall": "assets/ux/cherry/augments/icons/hybrid_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/hybrid_large.png"
+        },
+        {
+            "id": 44,
+            "name": "Ice Cold",
+            "apiName": "IceCold",
+            "tier": "Silver",
+            "effect": "Your Slowing effects reduce Move Speed by an extra .",
+            "iconSmall": "assets/ux/cherry/augments/icons/icecold_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/icecold_large.png"
+        },
+        {
+            "id": 149,
+            "name": "Impassable",
+            "apiName": "Impassable",
+            "tier": "Gold",
+            "effect": "Gain the Aftershock and Glacial Augment Keystone Runes. Aftershock: After Immobilizing an enemy champion, grants you Armor and Magic Resist for seconds, after which you explode, damaging nearby enemies based on your max Health. Glacial Augment - Immobilizing champions creates ice beneath them, Slowing enemies inside and reducing their damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/impassable_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/impassable_large.png"
+        },
+        {
+            "id": 45,
+            "name": "Infernal Conduit",
+            "apiName": "InfernalConduit",
+            "tier": "Prismatic",
+            "effect": "Your Abilities apply an infinitely stacking Burn, dealing magic damage per second for seconds. All your Burn effects lower your basic Ability Cooldowns by seconds when they damage enemies. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/infernalconduit_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/infernalconduit_large.png"
+        },
+        {
+            "id": 46,
+            "name": "Infernal Soul",
+            "apiName": "InfernalSoul",
+            "tier": "Silver",
+            "effect": "You gain the Infernal Soul, dealing bonus damage when you hit enemies with Abilities or Attacks.",
+            "iconSmall": "assets/ux/cherry/augments/icons/infernalsoul_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/infernalsoul_large.png"
+        },
+        {
+            "id": 47,
+            "name": "It's Critical",
+            "apiName": "ItsCritical",
+            "tier": "Gold",
+            "effect": "Gain %i:scaleCrit% % Crit chance.",
+            "iconSmall": "assets/ux/cherry/augments/icons/itscritical_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/itscritical_large.png"
+        },
+        {
+            "id": 211,
+            "name": "It's Killing Time",
+            "apiName": "ItsKillingTime",
+            "tier": "Gold",
+            "effect": "After casting your Ultimate, mark all enemy champions for death. The mark stores % of damage dealt to them, then detonates for the stored damage after seconds. ( second Cooldown).",
+            "iconSmall": "assets/ux/cherry/augments/icons/itskillingtime_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/itskillingtime_large.png"
+        },
+        {
+            "id": 48,
+            "name": "Jeweled Gauntlet",
+            "apiName": "JeweledGauntlet",
+            "tier": "Prismatic",
+            "effect": "Your Abilities can Critically Strike for % total damage. Gain %i:scaleCrit% % Crit Chance. Gain %i:scaleCrit% Crit Chance.",
+            "iconSmall": "assets/ux/cherry/augments/icons/jeweledgauntlet_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/jeweledgauntlet_large.png"
+        },
+        {
+            "id": 49,
+            "name": "Juice Box",
+            "apiName": "JuiceBox",
+            "tier": "Silver",
+            "effect": "Each round, everyone on your team gains Juice.",
+            "iconSmall": "assets/ux/cherry/augments/icons/juicebox_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/juicebox_large.png"
+        },
+        {
+            "id": 50,
+            "name": "Keystone Conjurer",
+            "apiName": "KeystoneConjurer",
+            "tier": "Gold",
+            "effect": "Gain the Summon Aery and Arcane Comet Keystone Runes. Summon Aery - Aery jumps onto enemies you damage or allies you Heal, Shield, or Buff, damaging enemies or Shielding allies. Arcane Comet - Dealing Ability damage launches a comet, damaing all enemies in an area.",
+            "iconSmall": "assets/ux/cherry/augments/icons/keystoneconjurer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/keystoneconjurer_large.png"
+        },
+        {
+            "id": 359,
+            "name": "Lamb's Respite",
+            "apiName": "GoHLamb",
+            "tier": "Silver",
+            "effect": "Gain additional revives, and cuts the time needed to revive in half.",
+            "iconSmall": "assets/ux/cherry/augments/icons/lamb_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/lamb_large.arena_2026_s2.png"
+        },
+        {
+            "id": 174,
+            "name": "Laser Eyes",
+            "apiName": "LaserEyes",
+            "tier": "Prismatic",
+            "effect": "There is a laser in the direction you are facing that deals magic damage per second. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/lasereyes_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/lasereyes_large.png"
+        },
+        {
+            "id": 305,
+            "name": "Leg Day",
+            "apiName": "LegDay",
+            "tier": "Silver",
+            "effect": "Gain Movement Speed and % Slow Resist.",
+            "iconSmall": "assets/ux/cherry/augments/icons/legday_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/legday_large.png"
+        },
+        {
+            "id": 342,
+            "name": "Level Augments",
+            "apiName": "CraftingSellAugment",
+            "tier": "Silver",
+            "effect": "Remove an %i:Augment% Augment. Gain random %i:AugmentLevel% Augment Levels. You have %i:AugmentLevel% levelable augment(s).",
+            "iconSmall": "assets/ux/cherry/augments/icons/crafting_sellaug_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/crafting_sellaug.png"
+        },
+        {
+            "id": 51,
+            "name": "Light 'em Up!",
+            "apiName": "LightemUp",
+            "tier": "Silver",
+            "effect": "Every 4th Attack deals additional magic damage {{ Item_Keyword_OnHit }}. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/lightemup_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/lightemup_large.png"
+        },
+        {
+            "id": 231,
+            "name": "Light Warden",
+            "apiName": "LightWarden",
+            "tier": "Gold",
+            "effect": "Every seconds, Autocast a warding light towards your ally, granting Shield to yourself and allies it passes through before returning, repeating the effect..",
+            "iconSmall": "assets/ux/cherry/augments/icons/lightwarden_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/lightwarden_large.png"
+        },
+        {
+            "id": 52,
+            "name": "Lightning Strikes",
+            "apiName": "LightningStrikes",
+            "tier": "Gold",
+            "effect": "Gain % total Attack Speed. At Attacks per second, gain magic damage {{ Item_Keyword_OnHit }}. Total Attack Speed is calculated as a multiplier of your Bonus Attack Speed On-hit Magic Damage Dealt:",
+            "iconSmall": "assets/ux/cherry/augments/icons/lightningstrikes_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/lightningstrikes_large.png"
+        },
+        {
+            "id": 53,
+            "name": "Mad Scientist",
+            "apiName": "MadScientist",
+            "tier": "Prismatic",
+            "effect": "On Round start you grow large, gaining (% Adaptive Force and % Health) or tiny ( Ability Haste and % Move Speed).",
+            "iconSmall": "assets/ux/cherry/augments/icons/madscientist_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/madscientist_large.png"
+        },
+        {
+            "id": 133,
+            "name": "Magic Missile",
+            "apiName": "MagicMissile",
+            "tier": "Gold",
+            "effect": "Dealing damage with an Ability fires magic missiles at each enemy hit, each dealing up to % max Health true damage based on distance traveled.",
+            "iconSmall": "assets/ux/cherry/augments/icons/magicmissile_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/magicmissile_large.png"
+        },
+        {
+            "id": 345,
+            "name": "Magical Girl",
+            "apiName": "MagicalGirl",
+            "tier": "Prismatic",
+            "effect": "Each round, a star falls over seconds. After picking it up you transform into a Magical Girl, knocking back nearby enemies, causing them to dance for second, while granting you Adaptive Force and a health Shield. As a Magical Girl, every - seconds stars fall from the sky striking around you and each of your enemies, dealing magic damage to those hit. Dancing enemies are invulnerable. Stars rain down more frequently on enemies within range of you.",
+            "iconSmall": "assets/ux/cherry/augments/icons/magic_girl_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/magic_girl.png"
+        },
+        {
+            "id": 129,
+            "name": "Marksmage",
+            "apiName": "Marksmage",
+            "tier": "Gold",
+            "effect": "Your Attacks deal additional physical damage. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/marksmage_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/marksmage_large.png"
+        },
+        {
+            "id": 54,
+            "name": "Master of Duality",
+            "apiName": "MasterofDuality",
+            "tier": "Prismatic",
+            "effect": "Your Attacks grant you Ability Power {{ Item_Keyword_OnHit }} and your Abilities grant you Attack Damage, until the end of the round.",
+            "iconSmall": "assets/ux/cherry/augments/icons/masterofduality_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/masterofduality_large.png"
+        },
+        {
+            "id": 56,
+            "name": "Mind to Matter",
+            "apiName": "MindtoMatter",
+            "tier": "Silver",
+            "effect": "Gain Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/mindtomatter_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/mindtomatter_large.png"
+        },
+        {
+            "id": 104,
+            "name": "Minionmancer",
+            "apiName": "Minionmancer",
+            "tier": "Gold",
+            "effect": "Your summons gain % increased size, health, and damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/minionmancer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/minionmancer_large.png"
+        },
+        {
+            "id": 172,
+            "name": "Mirror Image",
+            "apiName": "MirrorImage",
+            "tier": "Silver",
+            "effect": "When you drop below % Health, briefly become Invisible and create 4 clones of yourself.",
+            "iconSmall": "assets/ux/cherry/augments/icons/mirrorimage_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/mirrorimage_large.png"
+        },
+        {
+            "id": 57,
+            "name": "Mountain Soul",
+            "apiName": "MountainSoul",
+            "tier": "Silver",
+            "effect": "You gain the Mountain Soul, gaining Shield after being out of combat for a short time. Shields Generated Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/mountainsoul_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/mountainsoul_large.png"
+        },
+        {
+            "id": 58,
+            "name": "Mystic Punch",
+            "apiName": "MysticPunch",
+            "tier": "Prismatic",
+            "effect": "{{ Item_Keyword_OnHit }} reduce the cooldown of your abilities by seconds %i:scaleCooldown%.",
+            "iconSmall": "assets/ux/cherry/augments/icons/mysticpunch_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/mysticpunch_large.png"
+        },
+        {
+            "id": 177,
+            "name": "Nesting Doll",
+            "apiName": "NestingDoll",
+            "tier": "Gold",
+            "effect": "You automatically begin Reviving yourself after seconds and you can be Revived additional times. Each time you Revive, come back smaller and with % max Health. When you revive, knockback enemies around you.",
+            "iconSmall": "assets/ux/cherry/augments/icons/nesting_doll_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/nesting_doll.png"
+        },
+        {
+            "id": 43,
+            "name": "Now You See Me",
+            "apiName": "NowYouSeeMe",
+            "tier": "Silver",
+            "effect": "Passive: Leave a mark behind whenever you use a Movement Ability. Active: Return to a previous mark you've left. You then gain % Move Speed for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/nowyouseeme_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/nowyouseeme_large.png"
+        },
+        {
+            "id": 3,
+            "name": "Null Augment",
+            "apiName": "NullAugment",
+            "tier": "Silver",
+            "effect": "Null",
+            "iconSmall": "assets/ux/cherry/augments/icons/canttouchthis_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/canttouchthis_large.png"
+        },
+        {
+            "id": 251,
+            "name": "Numb to Pain",
+            "apiName": "NumbToPain",
+            "tier": "Silver",
+            "effect": "% of damage you take instead happens over seconds (% for ranged champions).",
+            "iconSmall": "assets/ux/cherry/augments/icons/numbtopain_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/numbtopain_large.png"
+        },
+        {
+            "id": 109,
+            "name": "Oathsworn",
+            "apiName": "Oathsworn",
+            "tier": "Gold",
+            "effect": "Replace Flee with Fate's Call. Fate's Call making your ally Untargetable for up to 4 seconds. your ally can launch themself out, Knocking Back enemies.",
+            "iconSmall": "assets/ux/cherry/augments/icons/oathsworn_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/oathsworn_large.png"
+        },
+        {
+            "id": 60,
+            "name": "Ocean Soul",
+            "apiName": "OceanSoul",
+            "tier": "Silver",
+            "effect": "Gain the Ocean Soul, granting high Health and Mana regen after damaging enemies.",
+            "iconSmall": "assets/ux/cherry/augments/icons/oceansoul_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/oceansoul_large.png"
+        },
+        {
+            "id": 61,
+            "name": "OK Boomerang",
+            "apiName": "OkBoomerang",
+            "tier": "Gold",
+            "effect": "Autocast throw a boomerang at a nearby enemy every s, dealing physical damage to enemies hit. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/okboomerang_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/okboomerang_large.png"
+        },
+        {
+            "id": 62,
+            "name": "Omni Soul",
+            "apiName": "OmniSoul",
+            "tier": "Prismatic",
+            "effect": "Gain random Dragon Souls.",
+            "iconSmall": "assets/ux/cherry/augments/icons/omnisoul_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/omnisoul_large.png"
+        },
+        {
+            "id": 208,
+            "name": "Orbital Laser",
+            "apiName": "OrbitalLaser",
+            "tier": "Prismatic",
+            "effect": "{{Cherry_OrbitalLaser_Summary}} Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/orbitallaser_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/orbitallaser_large.png"
+        },
+        {
+            "id": 63,
+            "name": "Outlaw's Grit",
+            "apiName": "OutlawsGrit",
+            "tier": "Gold",
+            "effect": "After using a dash, leap, blink, or teleport Ability you gain Armor and Magic Resist up to at stacks.",
+            "iconSmall": "assets/ux/cherry/augments/icons/outlawsgrit_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/outlawsgrit_large.png"
+        },
+        {
+            "id": 311,
+            "name": "Overflow",
+            "apiName": "Overflow",
+            "tier": "Gold",
+            "effect": "Your Mana costs double. Your Ability Heals, Shields, and damage are more effective.",
+            "iconSmall": "assets/ux/cherry/augments/icons/overflow_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/overflow_large.png"
+        },
+        {
+            "id": 317,
+            "name": "Pandora's Box",
+            "apiName": "PandorasBox",
+            "tier": "Prismatic",
+            "effect": "Transmute all of your augments into random Prismatic%i:Augment% Augments.",
+            "iconSmall": "assets/ux/cherry/augments/icons/pandoras_box_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/pandoras_box_large.png"
+        },
+        {
+            "id": 335,
+            "name": "Panic Room",
+            "apiName": "PanicRoom",
+            "tier": "Silver",
+            "effect": "Once per combat, when you would die, instead turn into a wisp, set yourself to % Health, and travel to a random spot in the arena.",
+            "iconSmall": "assets/ux/cherry/augments/icons/panic_room_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/panic_room_large.png"
+        },
+        {
+            "id": 240,
+            "name": "Parasitic Mutation",
+            "apiName": "ParasiticMutation",
+            "tier": "Silver",
+            "effect": "Every round this mutates into one of your opponent's augments. Only mutates into augments you could roll.",
+            "iconSmall": "assets/ux/cherry/augments/icons/parasiticmutation_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/parasiticmutation_large.png"
+        },
+        {
+            "id": 175,
+            "name": "Parasitic Relationship",
+            "apiName": "ParasiticRelationship",
+            "tier": "Gold",
+            "effect": "{{ Cherry_ParasiticRelationship_Summary }} Healing this round: Healing total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/parasiticrelationship_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/parasiticrelationship_large.png"
+        },
+        {
+            "id": 64,
+            "name": "Perseverance",
+            "apiName": "Perseverance",
+            "tier": "Gold",
+            "effect": "Gain % base Health Regen, increased to % base Health Regen below % Health. Healing Done This Round: Healing Done Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/perseverance_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/perseverance_large.png"
+        },
+        {
+            "id": 65,
+            "name": "Phenomenal Evil",
+            "apiName": "PhenomenalEvil",
+            "tier": "Gold",
+            "effect": "Permanently gain Ability Power when you hit an enemy with an Ability. second Cooldown per Ability. If taken after round , gain Ability Power.",
+            "iconSmall": "assets/ux/cherry/augments/icons/phenomenalevil_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/phenomenalevil_large.png"
+        },
+        {
+            "id": 224,
+            "name": "Prismatic Egg",
+            "apiName": "PrismaticEgg",
+            "tier": "Prismatic",
+            "effect": "{{Cherry_PrismaticEgg_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/quest_prismaticegg_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quest_prismaticegg_large.png"
+        },
+        {
+            "id": 66,
+            "name": "Quantum Computing",
+            "apiName": "QuantumComputing",
+            "tier": "Prismatic",
+            "effect": "Every seconds Autocast a massive slash around you, dealing physical damage. Enemies hit by the outer half are Slowed by % decaying over seconds, take an additional max Health physical damage, and you restore % champion damage dealt Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/quantumcomputing_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quantumcomputing_large.png"
+        },
+        {
+            "id": 192,
+            "name": "Quest: Angel of Retribution",
+            "apiName": "Quest_AngelofRetribution",
+            "tier": "Gold",
+            "effect": "Requirement: Heal or prevent damage to allies. Reward: Gain % Attack Speed, and your Attacks deal additional magic damage equal to % Heal/Shield Power. Damage Healed or Blocked: Damage Dealt:",
+            "iconSmall": "assets/ux/cherry/augments/icons/quest_angelofretribution_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quest_angelofretribution_large.png"
+        },
+        {
+            "id": 318,
+            "name": "Quest: Mad Hatter",
+            "apiName": "Quest_MadHatter",
+            "tier": "Gold",
+            "effect": "Requirement: Wear hats at the end of combat. Reward: Gain Adaptive Force, Armor and Magic Resist, % Tenacity, and Movement Speed per hat. Currently Granting: Adaptive Force, Armor and Magic Resist, % Tenacity, and Movement Speed. Lose half of your hats when you lose a round.",
+            "iconSmall": "assets/ux/cherry/augments/icons/mad_hatter_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/mad_hatter_large.png"
+        },
+        {
+            "id": 333,
+            "name": "Quest: Rite Of The Forge God",
+            "apiName": "Quest_RiteOfTheForgeGod",
+            "tier": "Prismatic",
+            "effect": "Requirement: Purchase Item Anvils. Reward: All of your items become Masterwork, increasing their stats by %.",
+            "iconSmall": "assets/ux/cherry/augments/icons/quest_rite_of_the_forge_god_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quest_rite_of_the_forge_god_large.png"
+        },
+        {
+            "id": 152,
+            "name": "Quest: Steel Your Heart",
+            "apiName": "Quest_SteelYourHeart",
+            "tier": "Gold",
+            "effect": "Requirement: Possess Heartsteel with + stacks. Reward: Multiply your Heartsteel stacks by . Increase your Health Regeneration by % of your Heartsteel stacks.",
+            "iconSmall": "assets/ux/cherry/augments/icons/quest_steelyourheart_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quest_steelyourheart_large.png"
+        },
+        {
+            "id": 319,
+            "name": "Quest: Three Sacred Treasures",
+            "apiName": "Quest_ThreeSacredTreasures",
+            "tier": "Gold",
+            "effect": "Requirement: Possess Infinity Edge, Perplexity, and Hextech Gunblade. Reward: Yunara's Attacks are replaced with lasers that deal physical damage + magic damage and apply %i:OnHit% On-Hit effects twice.",
+            "iconSmall": "assets/ux/cherry/augments/icons/threesacredtreasures_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/threesacredtreasures_large.png"
+        },
+        {
+            "id": 154,
+            "name": "Quest: Urf's Champion",
+            "apiName": "Quest_UrfsChampion",
+            "tier": "Gold",
+            "effect": "{{Cherry_Quest_UrfsChampion_Summary}} Takedowns:",
+            "iconSmall": "assets/ux/cherry/augments/icons/quest_urfschampion_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quest_urfschampion_large.png"
+        },
+        {
+            "id": 156,
+            "name": "Quest: Wooglet's Witchcap",
+            "apiName": "Quest_WoogletsWitchcap",
+            "tier": "Prismatic",
+            "effect": "Immediate: Gain Needlessly Large Rod. Requirement: Possess Rabadon's Deathcap and Zhonya's Hourglass. Reward: Gain Wooglet's Witchcap.",
+            "iconSmall": "assets/ux/cherry/augments/icons/quest_woogletswitchcap_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/quest_woogletswitchcap_large.png"
+        },
+        {
+            "id": 67,
+            "name": "Rabble Rousing",
+            "apiName": "RabbleRousing",
+            "tier": "Gold",
+            "effect": "Using an Ability restores Health. Healing Done This Round: Healing Done Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/rabblerousing_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/rabblerousing_large.png"
+        },
+        {
+            "id": 125,
+            "name": "Raid Boss",
+            "apiName": "RaidBoss",
+            "tier": "Prismatic",
+            "effect": "You start each round imprisoned in the center of the arena, unable to act. While imprisoned, you have up to % damage reduction and gain size, Health, Attack Damage, and Ability Power over time (max %). After seconds or reaching % Health, you break out, Knocking Back enemies and gaining % max Health Shield.",
+            "iconSmall": "assets/ux/cherry/augments/icons/raidboss_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/raidboss_large.png"
+        },
+        {
+            "id": 68,
+            "name": "Recursion",
+            "apiName": "Recursion",
+            "tier": "Gold",
+            "effect": "Gain Ability Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/recursion_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/recursion_large.png"
+        },
+        {
+            "id": 364,
+            "name": "Replace Augment",
+            "apiName": "ReplaceAugment",
+            "tier": "Silver",
+            "effect": "Replace one of your %i:Augment% Augments with an Augment %i:AugmentLevel% tier higher.",
+            "iconSmall": "assets/ux/cherry/augments/icons/replace_augment_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/replace_augment.png"
+        },
+        {
+            "id": 69,
+            "name": "Repulsor",
+            "apiName": "Repulsor",
+            "tier": "Silver",
+            "effect": "On dropping below % or % Health, nearby enemies are Knocked Back.",
+            "iconSmall": "assets/ux/cherry/augments/icons/repulsor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/repulsor_large.png"
+        },
+        {
+            "id": 165,
+            "name": "Restart",
+            "apiName": "Restart",
+            "tier": "Gold",
+            "effect": "Your non-Ultimate Abilities Automatically refresh every seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/restart_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/restart_large.png"
+        },
+        {
+            "id": 70,
+            "name": "Restless Restoration",
+            "apiName": "RestlessRestoration",
+            "tier": "Gold",
+            "effect": "You restore Health per 1000 distance traveled. Healing Done This Round: Healing Done Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/restlessrestoration_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/restlessrestoration_large.png"
+        },
+        {
+            "id": 343,
+            "name": "Righteous Fury",
+            "apiName": "RighteousFury",
+            "tier": "Prismatic",
+            "effect": "{{Cherry_RighteousFury_Summary}} s Cooldown per Ability cast, Augment, and Item.",
+            "iconSmall": "assets/ux/cherry/augments/icons/righteous_fury_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/righteous_fury_large.png"
+        },
+        {
+            "id": 303,
+            "name": "Sacrifice: For Gold",
+            "apiName": "GoHSacrificeForGold",
+            "tier": "Gold",
+            "effect": "Sacrifice % of your current health. After rounds, gain a bonus Gold Augment and restore your health. Rounds Remaining:",
+            "iconSmall": "assets/ux/cherry/augments/icons/gohsacrificefor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/gohsacrificeforgold_large.png"
+        },
+        {
+            "id": 304,
+            "name": "Sacrifice: For Prismatic",
+            "apiName": "GoHSacrificeForPrismatic",
+            "tier": "Prismatic",
+            "effect": "Sacrifice % of your current health. After rounds, gain a bonus Prismatic Augment and restore your health. Rounds Remaining:",
+            "iconSmall": "assets/ux/cherry/augments/icons/gohsacrificefor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/gohsacrificeforprismatic_large.png"
+        },
+        {
+            "id": 302,
+            "name": "Sacrifice: For Silver",
+            "apiName": "GoHSacrificeForSilver",
+            "tier": "Silver",
+            "effect": "After rounds, gain a bonus Silver Augment. Rounds Remaining:",
+            "iconSmall": "assets/ux/cherry/augments/icons/gohsacrificefor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/gohsacrificefor_large.png"
+        },
+        {
+            "id": 115,
+            "name": "Scopiest Weapons",
+            "apiName": "ScopiestWeapons",
+            "tier": "Prismatic",
+            "effect": "Gain Attack Range, reduced to if you are Ranged.",
+            "iconSmall": "assets/ux/cherry/augments/icons/scopiestweapons_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/scopiestweapons_large.png"
+        },
+        {
+            "id": 72,
+            "name": "Searing Dawn",
+            "apiName": "SearingDawn",
+            "tier": "Gold",
+            "effect": "Your Abilities mark enemies, causing them to take an additional + % max HP magic damage from your ally's next Attack or Ability. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/searingdawn_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/searingdawn_large.png"
+        },
+        {
+            "id": 108,
+            "name": "Self Destruct",
+            "apiName": "SelfDestruct",
+            "tier": "Silver",
+            "effect": "Every seconds Autocast, attach a bomb to yourself, it explodes, dealing % max Health true damage and Knocks Up nearby enemies for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/selfdestruct_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/selfdestruct_large.png"
+        },
+        {
+            "id": 120,
+            "name": "Serve Beyond Death",
+            "apiName": "ServeBeyondDeath",
+            "tier": "Silver",
+            "effect": "The first time you would die each round, instead return to full Health, decaying over seconds. Taking down an enemy champion while your Health is decaying stops the decay and sets your Health to % max Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/servebeyonddeath_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/servebeyonddeath_large.png"
+        },
+        {
+            "id": 73,
+            "name": "Shadow Runner",
+            "apiName": "ShadowRunner",
+            "tier": "Silver",
+            "effect": "After using a dash, leap, blink, or teleport Ability or exiting Stealth, gain @spell.Augment_ShadowRunner:MSAmount@ Move Speed for @spell.Augment_ShadowRunner:BuffDuration@ seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/shadowrunner_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/shadowrunner_large.png"
+        },
+        {
+            "id": 74,
+            "name": "Shrink Ray",
+            "apiName": "ShrinkRay",
+            "tier": "Gold",
+            "effect": "Your Attacks reduce the target's damage and size by % {{ Item_Keyword_OnHit }}.",
+            "iconSmall": "assets/ux/cherry/augments/icons/shrinkray_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/shrinkray_large.png"
+        },
+        {
+            "id": 356,
+            "name": "Silver Spoon",
+            "apiName": "SilverSpoon",
+            "tier": "Silver",
+            "effect": "Deal % increased damage per %i:Augment% Silver Augment you have. You deal % increased damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/silver_spoon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/silver_spoon.png"
+        },
+        {
+            "id": 113,
+            "name": "Skilled Sniper",
+            "apiName": "SkilledSniper",
+            "tier": "Gold",
+            "effect": "Hitting an enemy with a non-Ultimate Ability at over range reduces its Cooldown to seconds, periodic abilities are instead reset to seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/skilledsniper_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/skilledsniper_large.png"
+        },
+        {
+            "id": 136,
+            "name": "Slap Around",
+            "apiName": "SlapAround",
+            "tier": "Silver",
+            "effect": "{{ Cherry_SlapAround_Summary }} Current Adaptive Force:",
+            "iconSmall": "assets/ux/cherry/augments/icons/slaparound_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/slaparound_large.png"
+        },
+        {
+            "id": 232,
+            "name": "Slime Time",
+            "apiName": "SlimeTime",
+            "tier": "Silver",
+            "effect": "Every seconds Autocast a burst slime from your body, dealing plus max Health magic damage to nearby enemies. If you hit a champion, secrete a blob nearby. Walking over the blob restores Health, while enemies destroy the blob.",
+            "iconSmall": "assets/ux/cherry/augments/icons/slimetime_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/slimetime_large.png"
+        },
+        {
+            "id": 250,
+            "name": "Slow and Steady",
+            "apiName": "SlowAndSteady",
+            "tier": "Gold",
+            "effect": "Your Attack Speed can not go above . All bonus Attack Speed is converted to Attack Damage ( AD per 1% AS). Currently Gaining: Attack Damage",
+            "iconSmall": "assets/ux/cherry/augments/icons/slowandsteady_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/slowandsteady_large.png"
+        },
+        {
+            "id": 75,
+            "name": "Slow Cooker",
+            "apiName": "SlowCooker",
+            "tier": "Prismatic",
+            "effect": "Every second, apply an infinitely stacking Burn to nearby enemy champions, dealing magic damage per second for seconds. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/slowcooker_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/slowcooker_large.png"
+        },
+        {
+            "id": 76,
+            "name": "Sonic Boom",
+            "apiName": "SonicBoom",
+            "tier": "Silver",
+            "effect": "Buffing, Healing, or Shielding your ally deals true damage and Slows enemies surrounding them by @SlowAmount*-100@% for seconds. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/sonicboom_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/sonicboom_large.png"
+        },
+        {
+            "id": 77,
+            "name": "Soul Siphon",
+            "apiName": "SoulSiphon",
+            "tier": "Gold",
+            "effect": "{{Cherry_SoulSiphon_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/soulsiphon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/soulsiphon_large.png"
+        },
+        {
+            "id": 135,
+            "name": "Spellwake",
+            "apiName": "Spellwake",
+            "tier": "Prismatic",
+            "effect": "Hitting enemies with Abilities creates a blast that deals magic damage from you to the location you hit them. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/spellwake_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/spellwake_large.png"
+        },
+        {
+            "id": 214,
+            "name": "Spin To Win",
+            "apiName": "SpinToWin",
+            "tier": "Silver",
+            "effect": "{{ Cherry_SpinToWin_Summary }} Damage this round: Damage this game:",
+            "iconSmall": "assets/ux/cherry/augments/icons/spintowin_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/spintowin_large.png"
+        },
+        {
+            "id": 78,
+            "name": "Spirit Link",
+            "apiName": "SpiritLink",
+            "tier": "Prismatic",
+            "effect": "{{Cherry_SpiritLink_Summary}} Damage Redirected Total: Healing Done Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/spiritlink_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/spiritlink_large.png"
+        },
+        {
+            "id": 204,
+            "name": "Stackosaurus Rex",
+            "apiName": "StackosaurusRex",
+            "tier": "Silver",
+            "effect": "When you gain permanent Stacks of an Ability, gain % more!",
+            "iconSmall": "assets/ux/cherry/augments/icons/stackosaurusrex_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/stackosaurusrex_large.png"
+        },
+        {
+            "id": 228,
+            "name": "Stats on Stats on Stats!",
+            "apiName": "StatsOnStatsOnStats",
+            "tier": "Prismatic",
+            "effect": "Gain %i:StatAnvil% Stat Anvils!",
+            "iconSmall": "assets/ux/cherry/augments/icons/statsonstatsonstats_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/statsonstatsonstats_large.png"
+        },
+        {
+            "id": 227,
+            "name": "Stats on Stats!",
+            "apiName": "StatsOnStats",
+            "tier": "Gold",
+            "effect": "Gain %i:StatAnvil% Stat Anvils!",
+            "iconSmall": "assets/ux/cherry/augments/icons/statsonstats_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/statsonstats_large.png"
+        },
+        {
+            "id": 226,
+            "name": "Stats!",
+            "apiName": "Stats",
+            "tier": "Silver",
+            "effect": "Gain %i:StatAnvil% Stat Anvils!",
+            "iconSmall": "assets/ux/cherry/augments/icons/stats_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/stats_large.png"
+        },
+        {
+            "id": 223,
+            "name": "Summoner Revolution",
+            "apiName": "SummonerRevolution",
+            "tier": "Gold",
+            "effect": "Your Summoner Spells gain additional charge(s). Flash resets every round.",
+            "iconSmall": "assets/ux/cherry/augments/icons/summonerrevolution_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/summonerrevolution_large.png"
+        },
+        {
+            "id": 123,
+            "name": "Summoner's Roulette",
+            "apiName": "SummonersRoulette",
+            "tier": "Prismatic",
+            "effect": "Replace your Summoner Spells with random ones. When you use a Summoner Spell, replace it with another random one on a second Cooldown.",
+            "iconSmall": "assets/ux/cherry/augments/icons/summonersroulette_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/summonersroulette_large.png"
+        },
+        {
+            "id": 239,
+            "name": "Symbiotic Mutation",
+            "apiName": "SymbioticMutation",
+            "tier": "Gold",
+            "effect": "Every round this mutates into one of your ally's augments. Only mutates into augments you could roll.",
+            "iconSmall": "assets/ux/cherry/augments/icons/symbioticmutation_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/symbioticmutation_large.png"
+        },
+        {
+            "id": 79,
+            "name": "Symphony of War",
+            "apiName": "SymphonyofWar",
+            "tier": "Prismatic",
+            "effect": "Gain the Lethal Tempo and Conqueror Keystone Runes. Lethal Tempo - Attacking champions grants Attack Speed, stacking up to 6 times. At 6 stacks, your Attacks launch a bolt that deals additional damage. Conqueror - Attacks and Ability hits against champions grant you AdaptiveForce, stacking up to 12 times. At 12 stacks, heal for a percentage of damage you deal to champions.",
+            "iconSmall": "assets/ux/cherry/augments/icons/symphonyofwar_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/symphonyofwar_large.png"
+        },
+        {
+            "id": 313,
+            "name": "Tank Engine",
+            "apiName": "TankEngine",
+            "tier": "Gold",
+            "effect": "Gain % increase in size and % Bonus Health (% () per takedown). Takedowns:",
+            "iconSmall": "assets/ux/cherry/augments/icons/tank_engine_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/tank_engine_large.png"
+        },
+        {
+            "id": 80,
+            "name": "Tank It Or Leave It",
+            "apiName": "TankItOrLeaveIt",
+            "tier": "Silver",
+            "effect": "You can Critically Defend using your Crit Chance (max % chance), reducing damage taken by . Gain %i:scaleCrit% % Crit Chance.",
+            "iconSmall": "assets/ux/cherry/augments/icons/tankitorleaveit_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/tankitorleaveit_large.png"
+        },
+        {
+            "id": 81,
+            "name": "Tap Dancer",
+            "apiName": "TapDancer",
+            "tier": "Prismatic",
+            "effect": "Your Attacks grant you Move Speed {{ Item_Keyword_OnHit }}. Gain Attack Speed.",
+            "iconSmall": "assets/ux/cherry/augments/icons/tapdancer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/tapdancer_large.png"
+        },
+        {
+            "id": 82,
+            "name": "The Brutalizer",
+            "apiName": "TheBrutalizer",
+            "tier": "Silver",
+            "effect": "Gain Attack Damage, Ability Haste, and Lethality.",
+            "iconSmall": "assets/ux/cherry/augments/icons/thebrutalizer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/thebrutalizer_large.png"
+        },
+        {
+            "id": 84,
+            "name": "Thread the Needle",
+            "apiName": "ThreadtheNeedle",
+            "tier": "Gold",
+            "effect": "Gain % %i:scaleAPen% Armor Penetration and %i:scaleMPen% Magic Penetration.",
+            "iconSmall": "assets/ux/cherry/augments/icons/threadtheneedle_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/threadtheneedle_large.png"
+        },
+        {
+            "id": 85,
+            "name": "Tormentor",
+            "apiName": "Tormentor",
+            "tier": "Silver",
+            "effect": "Immobilizing or Grounding enemy champions applies a Burn, dealing % max Health Magic Damage per second for seconds. The Burn stacks infinitely. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/tormentor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/tormentor_large.png"
+        },
+        {
+            "id": 221,
+            "name": "Trailblazer",
+            "apiName": "Trailblazer",
+            "tier": "Silver",
+            "effect": "When you Dash or Blink, Burn a nearby enemy for % max Health magic damage over seconds. Damage dealt this round: Damage dealt this game:",
+            "iconSmall": "assets/ux/cherry/augments/icons/trailblazer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/trailblazer_large.png"
+        },
+        {
+            "id": 243,
+            "name": "Transmute: Chaos",
+            "apiName": "TransmuteChaos",
+            "tier": "Prismatic",
+            "effect": "Gain random %i:Augment%Augments.",
+            "iconSmall": "assets/ux/cherry/augments/icons/transmutechaos_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/transmutechaos_large.png"
+        },
+        {
+            "id": 237,
+            "name": "Transmute: Gold",
+            "apiName": "TransmuteGold",
+            "tier": "Silver",
+            "effect": "Gain a random %i:Augment% Gold Augment.",
+            "iconSmall": "assets/ux/cherry/augments/icons/transmutegold_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/transmutegold_large.png"
+        },
+        {
+            "id": 238,
+            "name": "Transmute: Prismatic",
+            "apiName": "TransmutePrismatic",
+            "tier": "Gold",
+            "effect": "Gain a random %i:Augment% Prismatic Augment.",
+            "iconSmall": "assets/ux/cherry/augments/icons/transmuteprismatic_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/transmuteprismatic_large.png"
+        },
+        {
+            "id": 236,
+            "name": "Trickster Demon",
+            "apiName": "TricksterDemon",
+            "tier": "Gold",
+            "effect": "{{ Cherry_TricksterDemon_Summary }} Damage Dealt this round: Damage Dealt total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/tricksterdemon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/tricksterdemon_large.png"
+        },
+        {
+            "id": 86,
+            "name": "Trueshot Prodigy",
+            "apiName": "TrueshotProdigy",
+            "tier": "Prismatic",
+            "effect": "When you damage someone from over units away, fire a Trueshot Barrage, dealing magic damage. s per target cooldown. Damage Dealt This Round: Damage Dealt Total:",
+            "iconSmall": "assets/ux/cherry/augments/icons/trueshotprodigy_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/trueshotprodigy_large.png"
+        },
+        {
+            "id": 107,
+            "name": "Twice Thrice",
+            "apiName": "TwiceThrice",
+            "tier": "Gold",
+            "effect": "Every attacks, your {{ Item_Keyword_OnHit }} effects trigger a second time.",
+            "iconSmall": "assets/ux/cherry/augments/icons/twicethrice_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/twicethrice_large.png"
+        },
+        {
+            "id": 87,
+            "name": "Typhoon",
+            "apiName": "Typhoon",
+            "tier": "Silver",
+            "effect": "Your Attacks fire a bolt at an additional target dealing % damage and applying {{ Item_Keyword_OnHit }} effects.",
+            "iconSmall": "assets/ux/cherry/augments/icons/typhoon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/typhoon_large.png"
+        },
+        {
+            "id": 88,
+            "name": "Ultimate Revolution",
+            "apiName": "UltimateRevolution",
+            "tier": "Prismatic",
+            "effect": "Once per round, refresh your Ultimate after casting it.",
+            "iconSmall": "assets/ux/cherry/augments/icons/ultimaterevolution_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/ultimaterevolution_large.png"
+        },
+        {
+            "id": 233,
+            "name": "Ultimate Roulette",
+            "apiName": "UltimateRoulette",
+            "tier": "Prismatic",
+            "effect": "Replace Flee with a random Ultimate. After casting the Ultimate, replace it with new random Ultimate. These spells are still ultimates.",
+            "iconSmall": "assets/ux/cherry/augments/icons/ultimaterevolution_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/ultimaterevolution_large.png"
+        },
+        {
+            "id": 112,
+            "name": "Ultimate Unstoppable",
+            "apiName": "UltimateUnstoppable",
+            "tier": "Silver",
+            "effect": "After using your Ultimate, you become immune to crowd control for seconds. ( second Cooldown).",
+            "iconSmall": "assets/ux/cherry/augments/icons/ultimateunstoppable_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/ultimateunstoppable_large.png"
+        },
+        {
+            "id": 327,
+            "name": "Undying Guard",
+            "apiName": "UndyingGuard",
+            "tier": "Gold",
+            "effect": "Upon activating Cultivation of War's revive, Zaahen unleashes a sweep around him that deals plus % current Health physical damage and Knocks Back all enemies. Afterwards, Zaahen becomes Immune to damage from enemies outside the sweep range and gains % Movement Speed for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/dawnbringersresolve_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dawnbringersresolve_large.png"
+        },
+        {
+            "id": 314,
+            "name": "Unshackled",
+            "apiName": "Unshackled",
+            "tier": "Gold",
+            "effect": "You can now Hijack your ally's ultimate. On takedown, reduce Hijack's lockout and cooldown by %. Gain Ultimate Haste.",
+            "iconSmall": "assets/ux/cherry/augments/icons/unshackled_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/unshackled_large.png"
+        },
+        {
+            "id": 89,
+            "name": "Vanish",
+            "apiName": "Vanish",
+            "tier": "Gold",
+            "effect": "Become Invisible for seconds or until you Attack or use an Ability.",
+            "iconSmall": "assets/ux/cherry/augments/icons/vanish_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/vanish_large.png"
+        },
+        {
+            "id": 90,
+            "name": "Vengeance",
+            "apiName": "Vengeance",
+            "tier": "Gold",
+            "effect": "{{Cherry_Vengeance_Summary}}",
+            "iconSmall": "assets/ux/cherry/augments/icons/vengeance_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/vengeance_large.png"
+        },
+        {
+            "id": 92,
+            "name": "Vulnerability",
+            "apiName": "Vulnerability",
+            "tier": "Gold",
+            "effect": "Your Item and damage over time effects can Critically Strike for % extra damage. Gain %i:scaleCrit% % Crit chance.",
+            "iconSmall": "assets/ux/cherry/augments/icons/vulnerability_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/vulnerability_large.png"
+        },
+        {
+            "id": 93,
+            "name": "Warmup Routine",
+            "apiName": "WarmupRoutine",
+            "tier": "Silver",
+            "effect": "Gain the Warmup Routine Summoner Spell. Channel your inner dancer to increase your damage by 2% per second, up to % max.",
+            "iconSmall": "assets/ux/cherry/augments/icons/warmuproutine_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/warmuproutine_large.png"
+        },
+        {
+            "id": 312,
+            "name": "We'll Be Right Back",
+            "apiName": "WellBeRightBack",
+            "tier": "Gold",
+            "effect": "Time Stop: All nearby champions are put in Stasis for seconds, or seconds for you. During which you restore % missing Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/wellberightback_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wellberightback_large.png"
+        },
+        {
+            "id": 94,
+            "name": "Willing Sacrifice",
+            "apiName": "WillingSacrifice",
+            "tier": "Gold",
+            "effect": "The first time an allied champion drops below % Health, trade % of your current Health to grant them a shield equal to % of your current Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/willingsacrifice_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/willingsacrifice_large.png"
+        },
+        {
+            "id": 96,
+            "name": "Wisdom of Ages",
+            "apiName": "WisdomofAges",
+            "tier": "Prismatic",
+            "effect": "Gain 1 level now, and 1 bonus level every other round. Your level cap is removed. If taken after round , gain additional levels. Leveling this augment instantly grants you levels",
+            "iconSmall": "assets/ux/cherry/augments/icons/wisdomofages_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wisdomofages_large.png"
+        },
+        {
+            "id": 97,
+            "name": "Witchful Thinking",
+            "apiName": "WitchfulThinking",
+            "tier": "Silver",
+            "effect": "Gain %i:scaleAP% Ability Power.",
+            "iconSmall": "assets/ux/cherry/augments/icons/witchfulthinking_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/witchfulthinking_large.png"
+        },
+        {
+            "id": 98,
+            "name": "With Haste",
+            "apiName": "WithHaste",
+            "tier": "Gold",
+            "effect": "Gain Move Speed.",
+            "iconSmall": "assets/ux/cherry/augments/icons/withhaste_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/withhaste_large.png"
+        },
+        {
+            "id": 358,
+            "name": "Wolf's Frenzy",
+            "apiName": "GoHWolf",
+            "tier": "Silver",
+            "effect": "Lose your innate revive. Increase your Health by %. If you deal damage that would leave a champion below below % maximum health, execute them.",
+            "iconSmall": "assets/ux/cherry/augments/icons/wolf_small.arena_2026_s2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wolf_large.arena_2026_s2.png"
+        }
+    ]
+}

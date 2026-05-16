@@ -74,6 +74,16 @@ function runMobalyticsSync() {
     timeout: 600000, // 10 min timeout
   });
   log('INFO', 'Mobalytics sync completed successfully');
+
+  log('INFO', 'Running Mobalytics ARAM/Mayhem mode sync...');
+  const modeSyncScript = path.join(__dirname, 'sync-mobalytics-modes.cjs');
+  execSync(`node ${modeSyncScript}`, {
+    cwd: path.resolve(__dirname, '..'),
+    encoding: 'utf-8',
+    stdio: 'inherit',
+    timeout: 600000,
+  });
+  log('INFO', 'Mobalytics mode sync completed successfully');
 }
 
 // ── Fetch augments master list ──
@@ -234,10 +244,19 @@ async function main() {
   // 5. Copy KB files to data repo if paths differ
   const kbDir = path.resolve(__dirname, '../shared/kb/data');
   if (fs.existsSync(kbDir) && kbDir !== META_DIR) {
-    for (const f of ['build-templates.json', 'rune-templates.json']) {
+    for (const f of [
+      'build-templates.json',
+      'rune-templates.json',
+      'build-templates-aram.json',
+      'build-templates-aram-mayhem.json',
+      'rune-templates-aram.json',
+      'rune-templates-aram-mayhem.json',
+      'augment-templates.json',
+      'augments-master.json',
+    ]) {
       const src = path.join(kbDir, f);
       if (fs.existsSync(src)) {
-        const dest = path.join(DATA_DIR, 'data', f);
+        const dest = path.join(DATA_DIR, 'data', 'kb', f);
         if (!fs.existsSync(path.dirname(dest))) fs.mkdirSync(path.dirname(dest), { recursive: true });
         fs.copyFileSync(src, dest);
         log('INFO', `Copied ${f} to data repo`);
@@ -248,6 +267,15 @@ async function main() {
   // 6. Read sync results
   const buildTemplates = JSON.parse(fs.readFileSync(path.join(kbDir, 'build-templates.json'), 'utf-8'));
   const totalCached = Object.keys(buildTemplates.data).length;
+  const aramTemplates = fs.existsSync(path.join(kbDir, 'build-templates-aram.json'))
+    ? JSON.parse(fs.readFileSync(path.join(kbDir, 'build-templates-aram.json'), 'utf-8'))
+    : { data: {} };
+  const mayhemTemplates = fs.existsSync(path.join(kbDir, 'build-templates-aram-mayhem.json'))
+    ? JSON.parse(fs.readFileSync(path.join(kbDir, 'build-templates-aram-mayhem.json'), 'utf-8'))
+    : { data: {} };
+  const augmentTemplates = fs.existsSync(path.join(kbDir, 'augment-templates.json'))
+    ? JSON.parse(fs.readFileSync(path.join(kbDir, 'augment-templates.json'), 'utf-8'))
+    : { data: {} };
   log('INFO', `Meta sync complete: ${totalCached} build entries`);
 
   // 7. QC — validate the generated KB files
@@ -270,13 +298,19 @@ async function main() {
     patch,
     generatedAt: new Date().toISOString(),
     champCount: totalCached,
+    modes: {
+      sr: totalCached,
+      aram: Object.keys(aramTemplates.data || {}).length,
+      aramMayhem: Object.keys(mayhemTemplates.data || {}).length,
+      augmentChampions: Object.keys(augmentTemplates.data || {}).length,
+    },
     qcPassed,
     qcFailed,
     source: 'mobalytics-auto-sync',
   };
-  if (fs.existsSync(META_DIR)) {
-    fs.writeFileSync(path.join(META_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
-  }
+  fs.mkdirSync(path.join(DATA_DIR, 'data', 'kb'), { recursive: true });
+  fs.writeFileSync(path.join(DATA_DIR, 'data', 'kb', 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
+  if (fs.existsSync(META_DIR)) fs.writeFileSync(path.join(META_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');
 
   // 11. Push to GitHub
   try {
@@ -292,11 +326,11 @@ async function main() {
   state.lastSyncedPatch = patch;
   state.lastSyncAt = new Date().toISOString();
   state.syncCount = (state.syncCount || 0) + 1;
-  state.lastResult = { totalCached, qcPassed, qcFailed, failedChamps: failedChamps.length };
+  state.lastResult = { totalCached, qcPassed, qcFailed, modes: manifest.modes };
   saveState(state);
 
   log('INFO', '═══════════════════════════════════════════════════');
-  log('INFO', `Done! Patch ${patch}: ${totalCached} builds, QC ${qcPassed}/${files.length}`);
+  log('INFO', `Done! Patch ${patch}: SR ${totalCached}, ARAM ${manifest.modes.aram}, Mayhem ${manifest.modes.aramMayhem}, Augments ${manifest.modes.augmentChampions}, QC ${qcPassed}/${Object.keys(btData).length}`);
   log('INFO', '═══════════════════════════════════════════════════');
 }
 

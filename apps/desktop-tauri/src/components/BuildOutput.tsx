@@ -85,6 +85,9 @@ interface Props {
   role?: string;
   liveUpdatedItems?: LiveUpdatedItem[] | null;  // Items updated by live advisor
   enemies?: string[];
+  refinementSummary?: string[];
+  metaStatus?: { status: 'exact' | 'missing-role' | 'missing-champion'; message: string } | null;
+  loadingMode?: 'meta' | 'ai';
 }
 
 // ipcRenderer replaced by bridge.ts
@@ -93,7 +96,7 @@ interface Props {
 
 const SECTION_KEYS = [
   'ANALYSIS', 'CONSTRAINTS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS',
-  'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH',
+  'CORE BUILD', 'SITUATIONAL ITEMS', 'AUGMENTS', 'JUNGLE PATH',
   'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES',
 ];
 
@@ -994,6 +997,38 @@ function renderAnalysis(content: string) {
   );
 }
 
+function renderAugments(content: string) {
+  const lines = content
+    .split('\n')
+    .map(line => line.trim().replace(/\*\*/g, ''))
+    .filter(Boolean);
+
+  if (!lines.length) return <div className="build-output augment-output">{content}</div>;
+
+  return (
+    <div className="augment-grid">
+      {lines.map((line, i) => {
+        const cleaned = line.replace(/^\d+[.)]\s*/, '').trim();
+        const [namePart, ...rest] = cleaned.split(' - ');
+        const metaMatch = namePart.match(/^(.+?)\s*\((.+)\)$/);
+        const name = (metaMatch ? metaMatch[1] : namePart).trim();
+        const meta = metaMatch ? metaMatch[2].trim() : '';
+        const effect = rest.join(' - ').trim();
+        return (
+          <div key={`${name}-${i}`} className="augment-card">
+            <div className="augment-rank">{i + 1}</div>
+            <div className="augment-body">
+              <div className="augment-name">{name}</div>
+              {meta && <div className="augment-meta">{meta}</div>}
+              {effect && <div className="augment-effect">{effect}</div>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function renderSection(
   title: string,
   content: string,
@@ -1011,6 +1046,7 @@ function renderSection(
       case 'STARTING ITEMS': return renderItems(content, lookups, false);
       case 'CORE BUILD': return renderItems(content, lookups, true);
       case 'SITUATIONAL ITEMS': return renderSituational(content, lookups);
+      case 'AUGMENTS': return renderAugments(content);
       case 'JUNGLE PATH': return renderJunglePath(content, version);
       case 'ENEMY POWER SPIKES': return renderPowerSpikes(content, true, enemies, version, lookups);
       case 'YOUR POWER SPIKES': return renderPowerSpikes(content, false, [], version, lookups);
@@ -1023,7 +1059,7 @@ function renderSection(
   }
 }
 
-export const BuildOutput = memo(function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems, enemies }: Props) {
+export const BuildOutput = memo(function BuildOutput({ result, iconLookups, loading, championId, role, liveUpdatedItems, enemies, refinementSummary = [], metaStatus = null, loadingMode = 'meta' }: Props) {
   const [exportStatus, setExportStatus] = React.useState<string | null>(null);
   const [championSpells, setChampionSpells] = useState<ChampionSpell[]>([]);
 
@@ -1072,16 +1108,59 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
     }
     setTimeout(() => setExportStatus(null), 6000);
   }, [result, championId, role, iconLookups]);
-  if (loading) {
+  if (loading && !result) {
+    const missingMeta = metaStatus?.status === 'missing-role' || metaStatus?.status === 'missing-champion';
+    const aiLoading = loadingMode === 'ai';
+    const loadingTitle = aiLoading ? 'Generating final AI build' : missingMeta ? 'Building from patch data' : 'Preparing meta baseline';
+    const loadingSubtitle = metaStatus?.message || (
+      aiLoading
+        ? 'Full draft is locked. The meta preview is hidden while the model validates matchup pressure, counter items, and runes.'
+        : missingMeta
+        ? 'No exact role page was found, so the advisor is checking champion data and matchup pressure.'
+        : 'Checking meta reference, draft pressure, and patch validation before showing the build.'
+    );
+
     return (
-      <div className="loading-spinner">
-        <div className="spinner" />
-        <div className="loading-text">Generating optimal build...</div>
+      <div className="generation-panel">
+        <div className="generation-panel-head">
+          <div className="generation-mark" aria-hidden="true">
+            <span />
+            <span />
+          </div>
+          <div className="generation-copy">
+            <div className="generation-kicker">Generation</div>
+            <div className="generation-title">{loadingTitle}</div>
+            <div className="generation-subtitle">{loadingSubtitle}</div>
+          </div>
+        </div>
+        <div className="generation-track" aria-hidden="true">
+          <div className="generation-track-fill" />
+        </div>
+        <div className="generation-grid">
+          <div className={`generation-step ${aiLoading ? 'generation-step-done' : 'generation-step-active'}`}><span />Meta source</div>
+          <div className={`generation-step ${aiLoading ? 'generation-step-active' : ''}`}><span />Matchup checks</div>
+          <div className="generation-step"><span />Build validation</div>
+        </div>
+        <div className="generation-skeleton" aria-hidden="true">
+          <div />
+          <div />
+          <div />
+        </div>
       </div>
     );
   }
 
   if (!result) {
+    if (metaStatus?.status === 'missing-role' || metaStatus?.status === 'missing-champion') {
+      return (
+        <div className="empty-state empty-state-meta-missing">
+          <div className="empty-icon empty-icon-warning">!</div>
+          <div className="empty-text">No Mobalytics meta available</div>
+          <div className="empty-hint">{metaStatus.message}</div>
+          <div className="empty-hint">Waiting for the full draft to run the AI build.</div>
+        </div>
+      );
+    }
     return (
       <div className="empty-state">
         <div className="empty-icon">
@@ -1114,7 +1193,7 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
   // LEFT: Runes → Summoners → Skill Order → Analysis → Enemy Power Spikes → Win Condition
   // RIGHT: Starting Items → Core Build → Situational Items → Jungle Path → Your Power Spikes
   const LEFT_COL_KEYS = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'ANALYSIS', 'ENEMY POWER SPIKES', 'WIN CONDITION'];
-  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'YOUR POWER SPIKES'];
+  const RIGHT_COL_KEYS = ['STARTING ITEMS', 'CORE BUILD', 'AUGMENTS', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'YOUR POWER SPIKES'];
 
   // Sort sections by the key array order, not by AI output order
   const sortByKeyOrder = (a: { title: string }, keyArray: string[]) => keyArray.indexOf(a.title);
@@ -1169,7 +1248,35 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
   );
 
   return (
-    <div>
+    <div className="build-output-shell">
+      {loading && result?.ok && (
+        <div className="ai-refine-banner">
+          <span className="ai-refine-dot" />
+          <span>{result.source === 'meta' ? 'Exact meta build is live. AI is refining the draft in the background.' : 'AI is finalizing validation.'}</span>
+        </div>
+      )}
+      {result?.ok && result.metaMessage && result.metaStatus !== 'exact' && (
+        <div className="meta-status-banner">
+          <span className="meta-status-icon">!</span>
+          <span>{result.metaMessage}</span>
+        </div>
+      )}
+      {!loading && result?.ok && refinementSummary.length > 0 && (
+        <div className="refinement-summary">
+          <div className="refinement-summary-head">
+            <span className="refinement-summary-kicker">AI Refinement</span>
+            <span className="refinement-summary-title">Changes from the meta baseline</span>
+          </div>
+          <div className="refinement-summary-list">
+            {refinementSummary.map((change, index) => (
+              <div key={`${index}-${change}`} className="refinement-summary-item">
+                <span className="refinement-summary-index">{index + 1}</span>
+                <span>{change}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {content}
     </div>
   );

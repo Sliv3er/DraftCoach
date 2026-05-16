@@ -301,7 +301,7 @@ function buildMechanicsContext(myChampion, role, mechMap) {
   const shieldFlags = [];
   const suppressionFlags = [];
   const qssTargets = [];
-  const zhonyaTargets = [];
+  const burstDefenseTargets = [];
   const bansheeTargets = [];
   const antiHealTargets = [];
   let totalHardCC = 0;
@@ -321,12 +321,12 @@ function buildMechanicsContext(myChampion, role, mechMap) {
       qssTargets.push(`${enemyName} (suppression — QSS mandatory)`);
     }
 
-    // Zhonya value — AP assassins / burst ults
+    // Burst defense value. Do not treat stasis as a generic answer for AD champions.
     if (d.dmg === 'AD' && d.dashes >= 2 && d.tags?.some(t => t === 'Assassin')) {
-      zhonyaTargets.push(`${enemyName} (AD assassin burst — Zhonya's negates)`);
+      burstDefenseTargets.push(`${enemyName} (AD assassin burst — armor/Guardian Angel/Sterak's/Death's Dance)`);
     }
     if (d.ult?.type === 'BURST' && d.dmg === 'AD') {
-      zhonyaTargets.push(`${enemyName} (burst ult — Zhonya's survives)`);
+      burstDefenseTargets.push(`${enemyName} (burst ult — class-appropriate defensive item, not off-class AP items)`);
     }
 
     // Banshee value — key ability reliant mages/hooks
@@ -354,16 +354,16 @@ function buildMechanicsContext(myChampion, role, mechMap) {
 
   // ── Output structured context ──
   if (suppressionFlags.length > 0 || totalHardCC > 0 || trueDmgFlags.length > 0 ||
-      antiHealTargets.length > 0 || zhonyaTargets.length > 0 || bansheeTargets.length > 0) {
+      antiHealTargets.length > 0 || burstDefenseTargets.length > 0 || bansheeTargets.length > 0) {
     lines.push('\nABILITY MECHANICS ANALYSIS (use this to make itemization decisions):');
   }
 
   if (suppressionFlags.length > 0) {
-    lines.push(`⚠️ SUPPRESSION DETECTED (${suppressionFlags.join(', ')}) — QSS or Quicksilver Sash is MANDATORY. Suppression cannot be avoided by dashes, Zhonyas, or tenacity.`);
+    lines.push(`⚠️ SUPPRESSION DETECTED (${suppressionFlags.join(', ')}) — QSS/Mercurial is mandatory. Suppression cannot be avoided by dashes, stasis, or tenacity.`);
   }
 
-  if (zhonyaTargets.length > 0) {
-    lines.push(`⚡ ZHONYA'S VALUE: ${zhonyaTargets.join(', ')}`);
+  if (burstDefenseTargets.length > 0) {
+    lines.push(`⚡ BURST DEFENSE VALUE: ${burstDefenseTargets.join(', ')}`);
   }
 
   if (bansheeTargets.length > 0) {
@@ -386,6 +386,10 @@ function buildMechanicsContext(myChampion, role, mechMap) {
 
   if (shieldFlags.length > 0) {
     lines.push(`SHIELD THREAT (${shieldFlags.join(', ')}) — enemy generates shields. Consider anti-shield options.`);
+  }
+
+  if (antiHealTargets.length > 0) {
+    lines.push('ANTI-HEAL ROLE GUARDRAIL: choose Grievous Wounds by champion role and economy. Tanks/fighters use Thornmail only if they will be hit. ADC/crit users use Mortal Reminder. AP/mages use Morellonomicon. Utility supports should usually use Ignite timing, Oblivion Orb only if AP support, or call for an ally anti-heal item; do not force Mortal Reminder or Thornmail on utility supports.');
   }
 
   return lines.join('\n');
@@ -443,7 +447,18 @@ function buildSystemPrompt(patch) {
 
 You will receive: RAG context (patch meta), VALID ITEMS list, ENEMY TEAM PROFILE, ABILITY MECHANICS ANALYSIS.
 
-Your output is a plain text build guide with section headers. Use the EXACT format below:
+Your output is a plain text build guide with section headers. Use the EXACT format below.
+DECISION TRACE is for backend quality validation and will not be shown to the user. It must be concrete, matchup-specific, and consistent with the final build.
+
+DECISION TRACE
+Enemy Damage Priority: <AD/AP/Mixed count and what defensive stat matters first>
+Primary Threats: <1-2 enemy champions and the exact mechanic that matters>
+Win Condition: <how my champion wins this game>
+Mobalytics Variant: <BUILD 1/2/3 and why; if switching, name the trigger>
+Item Swap Budget: <0/1/2 swaps and why that budget is justified>
+Boots Decision: <chosen boots and why they beat the alternative>
+Rune Decision: <keep/change and the specific reason>
+Anti-Heal/QSS Decision: <needed/not needed and who/what triggers it>
 
 ANALYSIS
 Matchup Type: ...
@@ -497,11 +512,13 @@ YOUR POWER SPIKES
 
 
 ANALYSIS RULES:
+- DECISION TRACE must be written first and must explain the real decision path before the visible guide.
 - Identify matchup type (poke/all-in/sustain/scaling)
 - Calculate enemy damage split (count AD vs AP vs Tank)
 - Identify 1-2 key threats using ABILITY MECHANICS data
 - Determine survivability requirements (specific stat thresholds)
 - List 1-3 most important item properties
+- Visible ANALYSIS must summarize the same logic as DECISION TRACE; never contradict it.
 
 ${RUNE_DECISION_TREE}
 
@@ -519,8 +536,11 @@ REFERENCE BUILD RULES (CRITICAL — your highest priority):
 - You will receive REFERENCE BUILDS from Mobalytics (real match data with high win rates).
 - You MUST use BUILD 1 (Most Popular) as your default. Only use BUILD 2 or 3 if the enemy comp makes BUILD 1 truly unviable.
 - Your coreBuild MUST contain the SAME core items from your chosen base build. You may reorder them but NOT replace them unless the matchup is extreme (4+ of one damage type).
+- Stability matters more than novelty. Do not change an item, rune, summoner, or skill order merely because another option is also viable.
+- If a reference item is playable, keep it. Use at most 1 targeted core swap in normal drafts; use 2 swaps only for extreme damage split, mandatory suppression/QSS, or overwhelming healing.
 - In your analysis, you MUST state "Base Build: BUILD 1" (or 2/3 if you switched) and explain why.
-- BOOTS and RUNES can be freely adapted to the matchup.
+- BOOTS, RUNES, and SUMMONERS are baseline-locked by default. Adapt them only for a major lane/gameplay reason such as Smite for jungle, Cleanse/QSS-style pressure, impossible lane survival, or 4+ enemy hard-CC/one-damage-type pressure. If unchanged, repeat the baseline exactly.
+- If you switch to BUILD 2/3, the DECISION TRACE must say exactly why BUILD 1 is weaker in this draft. If you keep BUILD 1, the trace must say why a swap is not needed.
 
 STARTING ITEMS RULES:
 - startingItems: Exactly 2 items — 1 starting item + 1 potion (Health Potion or Refillable Potion).
@@ -531,8 +551,8 @@ STARTING ITEMS RULES:
 - NEVER put Doran's items, companions, or potions in coreBuild — they belong ONLY in startingItems.
 
 - If Jungle: include companion in startingItems, provide junglePath with complete first clear (6+ camps separated by >).
-- For suppression enemies: ALWAYS include QSS in situationalItems.
-- ANTI-HEAL: If enemy has significant healing, include anti-heal in coreBuild or situationalItems.
+- For suppression enemies: include QSS/Mercurial Scimitar as situational unless the champion class normally wants that item.
+- ANTI-HEAL: If enemy has significant healing, include anti-heal in coreBuild or situationalItems, but choose by role/economy. Tanks/fighters: Thornmail if they are being hit. ADC/crit: Mortal Reminder. Mages/AP: Morellonomicon. Supports: prefer Ignite timing, Oblivion Orb if AP support, or ask an ally/ADC to buy anti-heal in ANALYSIS/WIN CONDITION; do not list Mortal Reminder, Thornmail, or Morellonomicon as support CORE/SITUATIONAL items for utility supports.
 - Every coreBuild item's "reason" field should explain why it counters a specific enemy threat.
 - skillOrder: Use format "Q > W > E > R" (max priority order).
 - summoners: Just spell names, no explanations.`;
@@ -635,7 +655,7 @@ ARAM-SPECIFIC RULES:
 - Champions get bonus healing/shielding/damage modifiers in ARAM (mode-specific balance)
 - Summoner Spells: Always Mark/Dash (Snowball) + Flash (or Clarity/Exhaust if applicable)
 - coreBuild: Exactly 6 items (including boots as item #1 or #2)
-- startingItems: Empty array [] — ARAM has no starting items (you die and buy on respawn)
+- startingItems: Use the Mobalytics ARAM opener when provided; otherwise return [].
 - No jungle path needed — omit junglePath field
 
 BUILD RULES:
@@ -683,7 +703,7 @@ BUILD RULES:
 - Pick shards from VALID STAT SHARDS list only.
 - NEVER suggest the same item twice in coreBuild.
 - NEVER use the same tree for primaryTree and secondaryTree.
-- startingItems: Empty array [] — ARAM Mayhem has no starting items.
+- startingItems: Use the Mobalytics ARAM/Mayhem opener when provided; otherwise return [].
 - summoners: Mark/Dash + Flash (or Clarity/Exhaust).
 
 AUGMENT RECOMMENDATIONS:

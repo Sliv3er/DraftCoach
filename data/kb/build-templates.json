@@ -2,12 +2,12 @@
     "meta": {
         "patch": "16.10",
         "source": "mobalytics-gql",
-        "generatedAt": "2026-05-16T06:03:53.544Z",
-        "buildHash": "moba-1778911433545",
+        "generatedAt": "2026-05-16T12:03:52.928Z",
+        "buildHash": "moba-1778933032928",
         "stats": {
             "champions": 172,
-            "roles": 258,
-            "builds": 674,
+            "roles": 261,
+            "builds": 682,
             "failed": 0
         }
     },
@@ -241,8 +241,8 @@
                             "name": "Sterak's Gage"
                         },
                         {
-                            "id": "3026",
-                            "name": "Guardian Angel"
+                            "id": "2517",
+                            "name": "Endless Hunger"
                         }
                     ],
                     "bootChoice": {
@@ -2651,7 +2651,7 @@
                         "first3": [
                             "Q",
                             "E",
-                            "E"
+                            "W"
                         ],
                         "maxOrder": [
                             "E",
@@ -3706,6 +3706,88 @@
                         "name": "Sorcerer's Shoes"
                     }
                 },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Deathfire Touch",
+                        "primarySlots": [
+                            "Manaflow Band",
+                            "Absolute Focus",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Resolve",
+                        "secondarySlots": [
+                            "Bone Plating",
+                            "Overgrowth"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Teleport"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "E",
+                            "Q",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1056",
+                            "name": "Doran's Ring"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3116",
+                            "name": "Rylai's Crystal Scepter"
+                        },
+                        {
+                            "id": "6653",
+                            "name": "Liandry's Torment"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3165",
+                            "name": "Morellonomicon"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -3796,6 +3878,88 @@
             "variants": {
                 "DAMAGE": {
                     "label": "DAMAGE",
+                    "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Deathfire Touch",
+                        "primarySlots": [
+                            "Manaflow Band",
+                            "Absolute Focus",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Precision",
+                        "secondarySlots": [
+                            "Presence of Mind",
+                            "Cut Down"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Teleport"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1056",
+                            "name": "Doran's Ring"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3116",
+                            "name": "Rylai's Crystal Scepter"
+                        },
+                        {
+                            "id": "6653",
+                            "name": "Liandry's Torment"
+                        },
+                        {
+                            "id": "8010",
+                            "name": "Bloodletter's Curse"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
+                "SAFETY": {
+                    "label": "SAFETY",
                     "runes": {
                         "primaryTree": "Sorcery",
                         "primaryKeystone": "Deathfire Touch",
@@ -5107,16 +5271,16 @@
                             "name": "Kraken Slayer"
                         },
                         {
-                            "id": "6333",
-                            "name": "Death's Dance"
-                        },
-                        {
                             "id": "3091",
                             "name": "Wit's End"
                         },
                         {
-                            "id": "6665",
-                            "name": "Jak'Sho, The Protean"
+                            "id": "6333",
+                            "name": "Death's Dance"
+                        },
+                        {
+                            "id": "3026",
+                            "name": "Guardian Angel"
                         }
                     ],
                     "bootChoice": {
@@ -6529,8 +6693,8 @@
                             "name": "Frozen Heart"
                         },
                         {
-                            "id": "2504",
-                            "name": "Kaenic Rookern"
+                            "id": "3109",
+                            "name": "Knight's Vow"
                         }
                     ],
                     "bootChoice": {
@@ -6839,6 +7003,84 @@
                         {
                             "id": "3036",
                             "name": "Lord Dominik's Regards"
+                        },
+                        {
+                            "id": "3072",
+                            "name": "Bloodthirster"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3006",
+                        "name": "Berserker's Greaves"
+                    }
+                },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Lethal Tempo",
+                        "primarySlots": [
+                            "Presence of Mind",
+                            "Legend: Bloodline",
+                            "Coup de Grace"
+                        ],
+                        "secondaryTree": "Sorcery",
+                        "secondarySlots": [
+                            "Absolute Focus",
+                            "Gathering Storm"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Barrier"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "W",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1055",
+                            "name": "Doran's Blade"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "6676",
+                            "name": "The Collector"
+                        },
+                        {
+                            "id": "3031",
+                            "name": "Infinity Edge"
+                        },
+                        {
+                            "id": "3036",
+                            "name": "Lord Dominik's Regards"
+                        },
+                        {
+                            "id": "3094",
+                            "name": "Rapid Firecannon"
                         },
                         {
                             "id": "3072",
@@ -7351,17 +7593,17 @@
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
-                        "primaryTree": "Precision",
-                        "primaryKeystone": "Conqueror",
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Deathfire Touch",
                         "primarySlots": [
-                            "Presence of Mind",
-                            "Legend: Haste",
-                            "Last Stand"
-                        ],
-                        "secondaryTree": "Sorcery",
-                        "secondarySlots": [
                             "Manaflow Band",
-                            "Transcendence"
+                            "Transcendence",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Precision",
+                        "secondarySlots": [
+                            "Coup de Grace",
+                            "Presence of Mind"
                         ],
                         "statShards": [
                             "Adaptive Force",
@@ -7377,7 +7619,7 @@
                         "first3": [
                             "E",
                             "Q",
-                            "W"
+                            "E"
                         ],
                         "maxOrder": [
                             "E",
@@ -7421,8 +7663,8 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3135",
-                            "name": "Void Staff"
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
                         }
                     ],
                     "bootChoice": {
@@ -8045,7 +8287,7 @@
                     },
                     "summonerSpells": [
                         "Flash",
-                        "Ignite"
+                        "Teleport"
                     ],
                     "skillOrder": {
                         "first3": [
@@ -9135,12 +9377,12 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3089",
-                            "name": "Rabadon's Deathcap"
-                        },
-                        {
                             "id": "4645",
                             "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
                         }
                     ],
                     "bootChoice": {
@@ -10571,8 +10813,8 @@
                             "name": "Health Potion"
                         },
                         {
-                            "id": "1082",
-                            "name": "Dark Seal"
+                            "id": "1001",
+                            "name": "Boots"
                         },
                         {
                             "id": "3340",
@@ -11102,6 +11344,88 @@
                             "Transcendence",
                             "Scorch"
                         ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Triple Tonic",
+                            "Cosmic Insight"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Heal"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "1052",
+                            "name": "Amplifying Tome"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3871",
+                            "name": "Zaz'Zak's Realmspike"
+                        },
+                        {
+                            "id": "6655",
+                            "name": "Luden's Echo"
+                        },
+                        {
+                            "id": "4646",
+                            "name": "Stormsurge"
+                        },
+                        {
+                            "id": "3100",
+                            "name": "Lich Bane"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Deathfire Touch",
+                        "primarySlots": [
+                            "Manaflow Band",
+                            "Transcendence",
+                            "Scorch"
+                        ],
                         "secondaryTree": "Precision",
                         "secondarySlots": [
                             "Legend: Haste",
@@ -11173,21 +11497,27 @@
                         "id": "3158",
                         "name": "Ionian Boots of Lucidity"
                     }
-                },
-                "UTILITY": {
-                    "label": "UTILITY",
+                }
+            }
+        },
+        "Ezreal_MID": {
+            "championId": "Ezreal",
+            "role": "MID",
+            "variants": {
+                "DAMAGE": {
+                    "label": "DAMAGE",
                     "runes": {
-                        "primaryTree": "Sorcery",
-                        "primaryKeystone": "Deathfire Touch",
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Lethal Tempo",
                         "primarySlots": [
-                            "Manaflow Band",
-                            "Transcendence",
-                            "Scorch"
+                            "Presence of Mind",
+                            "Legend: Bloodline",
+                            "Coup de Grace"
                         ],
                         "secondaryTree": "Inspiration",
                         "secondarySlots": [
-                            "Triple Tonic",
-                            "Cosmic Insight"
+                            "Biscuit Delivery",
+                            "Magical Footwear"
                         ],
                         "statShards": [
                             "Attack Speed",
@@ -11197,7 +11527,7 @@
                     },
                     "summonerSpells": [
                         "Flash",
-                        "Heal"
+                        "Barrier"
                     ],
                     "skillOrder": {
                         "first3": [
@@ -11213,16 +11543,12 @@
                     },
                     "startingItems": [
                         {
-                            "id": "2003",
-                            "name": "Health Potion"
+                            "id": "1055",
+                            "name": "Doran's Blade"
                         },
                         {
                             "id": "2003",
                             "name": "Health Potion"
-                        },
-                        {
-                            "id": "1052",
-                            "name": "Amplifying Tome"
                         },
                         {
                             "id": "3340",
@@ -11231,29 +11557,107 @@
                     ],
                     "coreItems": [
                         {
-                            "id": "3871",
-                            "name": "Zaz'Zak's Realmspike"
+                            "id": "3078",
+                            "name": "Trinity Force"
                         },
                         {
-                            "id": "6655",
-                            "name": "Luden's Echo"
+                            "id": "3004",
+                            "name": "Manamune"
                         },
                         {
-                            "id": "4646",
-                            "name": "Stormsurge"
+                            "id": "2517",
+                            "name": "Endless Hunger"
                         },
                         {
-                            "id": "3100",
-                            "name": "Lich Bane"
+                            "id": "6694",
+                            "name": "Serylda's Grudge"
                         },
                         {
-                            "id": "4645",
-                            "name": "Shadowflame"
+                            "id": "3110",
+                            "name": "Frozen Heart"
                         }
                     ],
                     "bootChoice": {
-                        "id": "3020",
-                        "name": "Sorcerer's Shoes"
+                        "id": "3158",
+                        "name": "Ionian Boots of Lucidity"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Conqueror",
+                        "primarySlots": [
+                            "Presence of Mind",
+                            "Legend: Bloodline",
+                            "Coup de Grace"
+                        ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Biscuit Delivery",
+                            "Magical Footwear"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Teleport"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1055",
+                            "name": "Doran's Blade"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3078",
+                            "name": "Trinity Force"
+                        },
+                        {
+                            "id": "3004",
+                            "name": "Manamune"
+                        },
+                        {
+                            "id": "3161",
+                            "name": "Spear of Shojin"
+                        },
+                        {
+                            "id": "6694",
+                            "name": "Serylda's Grudge"
+                        },
+                        {
+                            "id": "3110",
+                            "name": "Frozen Heart"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3158",
+                        "name": "Ionian Boots of Lucidity"
                     }
                 }
             }
@@ -11477,6 +11881,176 @@
                         {
                             "id": "3102",
                             "name": "Banshee's Veil"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                }
+            }
+        },
+        "Fiddlesticks_SUPPORT": {
+            "championId": "Fiddlesticks",
+            "role": "SUPPORT",
+            "variants": {
+                "DAMAGE": {
+                    "label": "DAMAGE",
+                    "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Arcane Comet",
+                        "primarySlots": [
+                            "Manaflow Band",
+                            "Transcendence",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Domination",
+                        "secondarySlots": [
+                            "Cheap Shot",
+                            "Ultimate Hunter"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Ignite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "E",
+                            "Q",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "W",
+                            "Q",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "1052",
+                            "name": "Amplifying Tome"
+                        },
+                        {
+                            "id": "3330",
+                            "name": "Scarecrow Effigy"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3871",
+                            "name": "Zaz'Zak's Realmspike"
+                        },
+                        {
+                            "id": "3118",
+                            "name": "Malignance"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3165",
+                            "name": "Morellonomicon"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Deathfire Touch",
+                        "primarySlots": [
+                            "Manaflow Band",
+                            "Transcendence",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Domination",
+                        "secondarySlots": [
+                            "Cheap Shot",
+                            "Ultimate Hunter"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Ignite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "E",
+                            "Q",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "W",
+                            "Q",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "1052",
+                            "name": "Amplifying Tome"
+                        },
+                        {
+                            "id": "3330",
+                            "name": "Scarecrow Effigy"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3871",
+                            "name": "Zaz'Zak's Realmspike"
+                        },
+                        {
+                            "id": "3118",
+                            "name": "Malignance"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
                         }
                     ],
                     "bootChoice": {
@@ -12946,84 +13520,6 @@
                         "name": "Berserker's Greaves"
                     }
                 },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Sorcery",
-                        "primaryKeystone": "Stormraider's Surge",
-                        "primarySlots": [
-                            "Axiom Arcanist",
-                            "Celerity",
-                            "Gathering Storm"
-                        ],
-                        "secondaryTree": "Resolve",
-                        "secondarySlots": [
-                            "Overgrowth",
-                            "Second Wind"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Ignite"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "E",
-                            "W"
-                        ],
-                        "maxOrder": [
-                            "E",
-                            "Q",
-                            "W"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "1054",
-                            "name": "Doran's Shield"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "6631",
-                            "name": "Stridebreaker"
-                        },
-                        {
-                            "id": "3046",
-                            "name": "Phantom Dancer"
-                        },
-                        {
-                            "id": "3033",
-                            "name": "Mortal Reminder"
-                        },
-                        {
-                            "id": "3742",
-                            "name": "Dead Man's Plate"
-                        },
-                        {
-                            "id": "4401",
-                            "name": "Force of Nature"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3006",
-                        "name": "Berserker's Greaves"
-                    }
-                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -13273,84 +13769,6 @@
                 "SAFETY": {
                     "label": "SAFETY",
                     "runes": {
-                        "primaryTree": "Precision",
-                        "primaryKeystone": "Conqueror",
-                        "primarySlots": [
-                            "Triumph",
-                            "Legend: Alacrity",
-                            "Last Stand"
-                        ],
-                        "secondaryTree": "Resolve",
-                        "secondarySlots": [
-                            "Bone Plating",
-                            "Overgrowth"
-                        ],
-                        "statShards": [
-                            "Attack Speed",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Teleport"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "W",
-                            "E"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "1055",
-                            "name": "Doran's Blade"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3078",
-                            "name": "Trinity Force"
-                        },
-                        {
-                            "id": "3071",
-                            "name": "Black Cleaver"
-                        },
-                        {
-                            "id": "3053",
-                            "name": "Sterak's Gage"
-                        },
-                        {
-                            "id": "3143",
-                            "name": "Randuin's Omen"
-                        },
-                        {
-                            "id": "3091",
-                            "name": "Wit's End"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3047",
-                        "name": "Plated Steelcaps"
-                    }
-                },
-                "UTILITY": {
-                    "label": "UTILITY",
-                    "runes": {
                         "primaryTree": "Resolve",
                         "primaryKeystone": "Grasp of the Undying",
                         "primarySlots": [
@@ -13419,6 +13837,84 @@
                         {
                             "id": "3143",
                             "name": "Randuin's Omen"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3047",
+                        "name": "Plated Steelcaps"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Conqueror",
+                        "primarySlots": [
+                            "Triumph",
+                            "Legend: Alacrity",
+                            "Last Stand"
+                        ],
+                        "secondaryTree": "Resolve",
+                        "secondarySlots": [
+                            "Bone Plating",
+                            "Overgrowth"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Teleport"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "W",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1055",
+                            "name": "Doran's Blade"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3078",
+                            "name": "Trinity Force"
+                        },
+                        {
+                            "id": "3071",
+                            "name": "Black Cleaver"
+                        },
+                        {
+                            "id": "3053",
+                            "name": "Sterak's Gage"
+                        },
+                        {
+                            "id": "3143",
+                            "name": "Randuin's Omen"
+                        },
+                        {
+                            "id": "3091",
+                            "name": "Wit's End"
                         }
                     ],
                     "bootChoice": {
@@ -14334,6 +14830,238 @@
                 }
             }
         },
+        "Gwen_JUNGLE": {
+            "championId": "Gwen",
+            "role": "JUNGLE",
+            "variants": {
+                "DAMAGE": {
+                    "label": "DAMAGE",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Conqueror",
+                        "primarySlots": [
+                            "Triumph",
+                            "Legend: Alacrity",
+                            "Last Stand"
+                        ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Cosmic Insight",
+                            "Magical Footwear"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Ghost",
+                        "Smite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "Q"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1102",
+                            "name": "Gustwalker Hatchling"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "2510",
+                            "name": "Dusk and Dawn"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        },
+                        {
+                            "id": "3135",
+                            "name": "Void Staff"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Conqueror",
+                        "primarySlots": [
+                            "Triumph",
+                            "Legend: Alacrity",
+                            "Last Stand"
+                        ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Cosmic Insight",
+                            "Magical Footwear"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Ghost",
+                        "Smite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "Q"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1102",
+                            "name": "Gustwalker Hatchling"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3115",
+                            "name": "Nashor's Tooth"
+                        },
+                        {
+                            "id": "2510",
+                            "name": "Dusk and Dawn"
+                        },
+                        {
+                            "id": "4633",
+                            "name": "Riftmaker"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3047",
+                        "name": "Plated Steelcaps"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Inspiration",
+                        "primaryKeystone": "First Strike",
+                        "primarySlots": [
+                            "Cash Back",
+                            "Triple Tonic",
+                            "Cosmic Insight"
+                        ],
+                        "secondaryTree": "Sorcery",
+                        "secondarySlots": [
+                            "Absolute Focus",
+                            "Gathering Storm"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Ghost",
+                        "Smite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "Q"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1102",
+                            "name": "Gustwalker Hatchling"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "2510",
+                            "name": "Dusk and Dawn"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3135",
+                            "name": "Void Staff"
+                        },
+                        {
+                            "id": "4646",
+                            "name": "Stormsurge"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                }
+            }
+        },
         "Hecarim": {
             "championId": "Hecarim",
             "role": "JUNGLE",
@@ -14735,8 +15463,8 @@
                             "name": "Shadowflame"
                         },
                         {
-                            "id": "3089",
-                            "name": "Rabadon's Deathcap"
+                            "id": "3165",
+                            "name": "Morellonomicon"
                         }
                     ],
                     "bootChoice": {
@@ -14744,20 +15472,20 @@
                         "name": "Sorcerer's Shoes"
                     }
                 },
-                "SAFETY": {
-                    "label": "SAFETY",
+                "UTILITY": {
+                    "label": "UTILITY",
                     "runes": {
-                        "primaryTree": "Sorcery",
-                        "primaryKeystone": "Arcane Comet",
+                        "primaryTree": "Domination",
+                        "primaryKeystone": "Electrocute",
                         "primarySlots": [
-                            "Manaflow Band",
-                            "Transcendence",
-                            "Scorch"
+                            "Cheap Shot",
+                            "Grisly Mementos",
+                            "Ultimate Hunter"
                         ],
-                        "secondaryTree": "Precision",
+                        "secondaryTree": "Sorcery",
                         "secondarySlots": [
-                            "Legend: Haste",
-                            "Presence of Mind"
+                            "Manaflow Band",
+                            "Scorch"
                         ],
                         "statShards": [
                             "Adaptive Force",
@@ -14772,8 +15500,8 @@
                     "skillOrder": {
                         "first3": [
                             "Q",
-                            "E",
-                            "W"
+                            "W",
+                            "E"
                         ],
                         "maxOrder": [
                             "Q",
@@ -14813,99 +15541,17 @@
                             "name": "Liandry's Torment"
                         },
                         {
-                            "id": "4645",
-                            "name": "Shadowflame"
-                        },
-                        {
                             "id": "3165",
                             "name": "Morellonomicon"
+                        },
+                        {
+                            "id": "3102",
+                            "name": "Banshee's Veil"
                         }
                     ],
                     "bootChoice": {
                         "id": "3020",
                         "name": "Sorcerer's Shoes"
-                    }
-                },
-                "UTILITY": {
-                    "label": "UTILITY",
-                    "runes": {
-                        "primaryTree": "Sorcery",
-                        "primaryKeystone": "Deathfire Touch",
-                        "primarySlots": [
-                            "Manaflow Band",
-                            "Transcendence",
-                            "Scorch"
-                        ],
-                        "secondaryTree": "Precision",
-                        "secondarySlots": [
-                            "Legend: Haste",
-                            "Presence of Mind"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Heal"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "E",
-                            "W"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "1052",
-                            "name": "Amplifying Tome"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3869",
-                            "name": "Celestial Opposition"
-                        },
-                        {
-                            "id": "2503",
-                            "name": "Blackfire Torch"
-                        },
-                        {
-                            "id": "6653",
-                            "name": "Liandry's Torment"
-                        },
-                        {
-                            "id": "8010",
-                            "name": "Bloodletter's Curse"
-                        },
-                        {
-                            "id": "3089",
-                            "name": "Rabadon's Deathcap"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3158",
-                        "name": "Ionian Boots of Lucidity"
                     }
                 }
             }
@@ -16171,8 +16817,12 @@
                     },
                     "startingItems": [
                         {
-                            "id": "1103",
-                            "name": "Mosstomper Seedling"
+                            "id": "1101",
+                            "name": "Scorchclaw Pup"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
                         },
                         {
                             "id": "3340",
@@ -17097,17 +17747,17 @@
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
-                        "primaryTree": "Domination",
-                        "primaryKeystone": "Dark Harvest",
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Fleet Footwork",
                         "primarySlots": [
-                            "Taste of Blood",
-                            "Grisly Mementos",
-                            "Treasure Hunter"
+                            "Presence of Mind",
+                            "Legend: Bloodline",
+                            "Coup de Grace"
                         ],
-                        "secondaryTree": "Precision",
+                        "secondaryTree": "Sorcery",
                         "secondarySlots": [
-                            "Coup de Grace",
-                            "Presence of Mind"
+                            "Celerity",
+                            "Gathering Storm"
                         ],
                         "statShards": [
                             "Adaptive Force",
@@ -17147,24 +17797,24 @@
                     ],
                     "coreItems": [
                         {
-                            "id": "6697",
-                            "name": "Hubris"
-                        },
-                        {
-                            "id": "6676",
-                            "name": "The Collector"
-                        },
-                        {
-                            "id": "3031",
-                            "name": "Infinity Edge"
+                            "id": "2523",
+                            "name": "Hexoptics C44"
                         },
                         {
                             "id": "3094",
                             "name": "Rapid Firecannon"
                         },
                         {
+                            "id": "3031",
+                            "name": "Infinity Edge"
+                        },
+                        {
                             "id": "3036",
                             "name": "Lord Dominik's Regards"
+                        },
+                        {
+                            "id": "3026",
+                            "name": "Guardian Angel"
                         }
                     ],
                     "bootChoice": {
@@ -19095,12 +19745,12 @@
                             "name": "Nashor's Tooth"
                         },
                         {
-                            "id": "2510",
-                            "name": "Dusk and Dawn"
-                        },
-                        {
                             "id": "3089",
                             "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
                         },
                         {
                             "id": "3135",
@@ -19737,12 +20387,12 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3135",
-                            "name": "Void Staff"
-                        },
-                        {
                             "id": "3089",
                             "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3135",
+                            "name": "Void Staff"
                         }
                     ],
                     "bootChoice": {
@@ -20310,84 +20960,6 @@
                         "name": "Plated Steelcaps"
                     }
                 },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Resolve",
-                        "primaryKeystone": "Grasp of the Undying",
-                        "primarySlots": [
-                            "Demolish",
-                            "Second Wind",
-                            "Overgrowth"
-                        ],
-                        "secondaryTree": "Precision",
-                        "secondarySlots": [
-                            "Last Stand",
-                            "Legend: Alacrity"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Ignite"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "E",
-                            "W"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "1055",
-                            "name": "Doran's Blade"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3748",
-                            "name": "Titanic Hydra"
-                        },
-                        {
-                            "id": "3181",
-                            "name": "Hullbreaker"
-                        },
-                        {
-                            "id": "2501",
-                            "name": "Overlord's Bloodmail"
-                        },
-                        {
-                            "id": "3053",
-                            "name": "Sterak's Gage"
-                        },
-                        {
-                            "id": "6699",
-                            "name": "Voltaic Cyclosword"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3047",
-                        "name": "Plated Steelcaps"
-                    }
-                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -20711,8 +21283,8 @@
                             "name": "Thornmail"
                         },
                         {
-                            "id": "2525",
-                            "name": "Protoplasm Harness"
+                            "id": "3143",
+                            "name": "Randuin's Omen"
                         }
                     ],
                     "bootChoice": {
@@ -21127,88 +21699,6 @@
                         {
                             "id": "3089",
                             "name": "Rabadon's Deathcap"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3020",
-                        "name": "Sorcerer's Shoes"
-                    }
-                },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Domination",
-                        "primaryKeystone": "Electrocute",
-                        "primarySlots": [
-                            "Sudden Impact",
-                            "Grisly Mementos",
-                            "Relentless Hunter"
-                        ],
-                        "secondaryTree": "Sorcery",
-                        "secondarySlots": [
-                            "Gathering Storm",
-                            "Transcendence"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Ignite"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "W",
-                            "E",
-                            "Q"
-                        ],
-                        "maxOrder": [
-                            "W",
-                            "Q",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "1052",
-                            "name": "Amplifying Tome"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3869",
-                            "name": "Celestial Opposition"
-                        },
-                        {
-                            "id": "6655",
-                            "name": "Luden's Echo"
-                        },
-                        {
-                            "id": "4646",
-                            "name": "Stormsurge"
-                        },
-                        {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
-                        },
-                        {
-                            "id": "3102",
-                            "name": "Banshee's Veil"
                         }
                     ],
                     "bootChoice": {
@@ -22013,12 +22503,12 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3116",
-                            "name": "Rylai's Crystal Scepter"
-                        },
-                        {
                             "id": "3089",
                             "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3116",
+                            "name": "Rylai's Crystal Scepter"
                         }
                     ],
                     "bootChoice": {
@@ -22046,88 +22536,6 @@
                         "secondarySlots": [
                             "Manaflow Band",
                             "Transcendence"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Teleport"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "W",
-                            "E"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "1056",
-                            "name": "Doran's Ring"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3118",
-                            "name": "Malignance"
-                        },
-                        {
-                            "id": "4645",
-                            "name": "Shadowflame"
-                        },
-                        {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
-                        },
-                        {
-                            "id": "3089",
-                            "name": "Rabadon's Deathcap"
-                        },
-                        {
-                            "id": "3135",
-                            "name": "Void Staff"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3020",
-                        "name": "Sorcerer's Shoes"
-                    }
-                },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Sorcery",
-                        "primaryKeystone": "Arcane Comet",
-                        "primarySlots": [
-                            "Manaflow Band",
-                            "Transcendence",
-                            "Scorch"
-                        ],
-                        "secondaryTree": "Domination",
-                        "secondarySlots": [
-                            "Cheap Shot",
-                            "Ultimate Hunter"
                         ],
                         "statShards": [
                             "Adaptive Force",
@@ -22605,6 +23013,84 @@
                 "SAFETY": {
                     "label": "SAFETY",
                     "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Summon Aery",
+                        "primarySlots": [
+                            "Manaflow Band",
+                            "Transcendence",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Resolve",
+                        "secondarySlots": [
+                            "Bone Plating",
+                            "Revitalize"
+                        ],
+                        "statShards": [
+                            "Ability Haste",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Heal"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "E",
+                            "Q",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "E",
+                            "W",
+                            "Q"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3869",
+                            "name": "Celestial Opposition"
+                        },
+                        {
+                            "id": "3504",
+                            "name": "Ardent Censer"
+                        },
+                        {
+                            "id": "6617",
+                            "name": "Moonstone Renewer"
+                        },
+                        {
+                            "id": "3107",
+                            "name": "Redemption"
+                        },
+                        {
+                            "id": "3190",
+                            "name": "Locket of the Iron Solari"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3158",
+                        "name": "Ionian Boots of Lucidity"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
                         "primaryTree": "Resolve",
                         "primaryKeystone": "Guardian",
                         "primarySlots": [
@@ -22657,84 +23143,6 @@
                         {
                             "id": "3870",
                             "name": "Dream Maker"
-                        },
-                        {
-                            "id": "3504",
-                            "name": "Ardent Censer"
-                        },
-                        {
-                            "id": "6617",
-                            "name": "Moonstone Renewer"
-                        },
-                        {
-                            "id": "3107",
-                            "name": "Redemption"
-                        },
-                        {
-                            "id": "3190",
-                            "name": "Locket of the Iron Solari"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3158",
-                        "name": "Ionian Boots of Lucidity"
-                    }
-                },
-                "UTILITY": {
-                    "label": "UTILITY",
-                    "runes": {
-                        "primaryTree": "Sorcery",
-                        "primaryKeystone": "Summon Aery",
-                        "primarySlots": [
-                            "Manaflow Band",
-                            "Transcendence",
-                            "Scorch"
-                        ],
-                        "secondaryTree": "Resolve",
-                        "secondarySlots": [
-                            "Bone Plating",
-                            "Revitalize"
-                        ],
-                        "statShards": [
-                            "Ability Haste",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Heal"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "E",
-                            "W"
-                        ],
-                        "maxOrder": [
-                            "E",
-                            "W",
-                            "Q"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3869",
-                            "name": "Celestial Opposition"
                         },
                         {
                             "id": "3504",
@@ -23807,8 +24215,12 @@
                     },
                     "startingItems": [
                         {
-                            "id": "1120",
-                            "name": "Doran's Helm"
+                            "id": "1056",
+                            "name": "Doran's Ring"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
                         },
                         {
                             "id": "2003",
@@ -24415,88 +24827,6 @@
                         {
                             "id": "3876",
                             "name": "Solstice Sleigh"
-                        },
-                        {
-                            "id": "3190",
-                            "name": "Locket of the Iron Solari"
-                        },
-                        {
-                            "id": "2524",
-                            "name": "Bandlepipes"
-                        },
-                        {
-                            "id": "3075",
-                            "name": "Thornmail"
-                        },
-                        {
-                            "id": "2525",
-                            "name": "Protoplasm Harness"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3009",
-                        "name": "Boots of Swiftness"
-                    }
-                },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Resolve",
-                        "primaryKeystone": "Aftershock",
-                        "primarySlots": [
-                            "Font of Life",
-                            "Bone Plating",
-                            "Unflinching"
-                        ],
-                        "secondaryTree": "Inspiration",
-                        "secondarySlots": [
-                            "Biscuit Delivery",
-                            "Cosmic Insight"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Health Scaling",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Ignite"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "W",
-                            "Q",
-                            "E"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "1001",
-                            "name": "Boots"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3869",
-                            "name": "Celestial Opposition"
                         },
                         {
                             "id": "3190",
@@ -25327,8 +25657,8 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3165",
-                            "name": "Morellonomicon"
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
                         }
                     ],
                     "bootChoice": {
@@ -25493,12 +25823,12 @@
                             "name": "Rabadon's Deathcap"
                         },
                         {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
-                        },
-                        {
                             "id": "3135",
                             "name": "Void Staff"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
                         }
                     ],
                     "bootChoice": {
@@ -26225,8 +26555,8 @@
                             "name": "Guardian Angel"
                         },
                         {
-                            "id": "3156",
-                            "name": "Maw of Malmortius"
+                            "id": "6609",
+                            "name": "Chempunk Chainsword"
                         }
                     ],
                     "bootChoice": {
@@ -28668,6 +28998,84 @@
                         "name": "Plated Steelcaps"
                     }
                 },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Lethal Tempo",
+                        "primarySlots": [
+                            "Triumph",
+                            "Legend: Alacrity",
+                            "Last Stand"
+                        ],
+                        "secondaryTree": "Domination",
+                        "secondarySlots": [
+                            "Grisly Mementos",
+                            "Ultimate Hunter"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Smite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "W",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1101",
+                            "name": "Scorchclaw Pup"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3073",
+                            "name": "Experimental Hexplate"
+                        },
+                        {
+                            "id": "6631",
+                            "name": "Stridebreaker"
+                        },
+                        {
+                            "id": "3071",
+                            "name": "Black Cleaver"
+                        },
+                        {
+                            "id": "6333",
+                            "name": "Death's Dance"
+                        },
+                        {
+                            "id": "3026",
+                            "name": "Guardian Angel"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3047",
+                        "name": "Plated Steelcaps"
+                    }
+                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -29205,8 +29613,8 @@
                             "name": "Death's Dance"
                         },
                         {
-                            "id": "3156",
-                            "name": "Maw of Malmortius"
+                            "id": "3053",
+                            "name": "Sterak's Gage"
                         },
                         {
                             "id": "6610",
@@ -30187,16 +30595,16 @@
                             "name": "Black Cleaver"
                         },
                         {
+                            "id": "3161",
+                            "name": "Spear of Shojin"
+                        },
+                        {
                             "id": "6333",
                             "name": "Death's Dance"
                         },
                         {
                             "id": "3053",
                             "name": "Sterak's Gage"
-                        },
-                        {
-                            "id": "6609",
-                            "name": "Chempunk Chainsword"
                         }
                     ],
                     "bootChoice": {
@@ -31649,8 +32057,8 @@
                             "name": "Lord Dominik's Regards"
                         },
                         {
-                            "id": "3031",
-                            "name": "Infinity Edge"
+                            "id": "3097",
+                            "name": "Stormrazor"
                         }
                     ],
                     "bootChoice": {
@@ -31661,17 +32069,17 @@
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
-                        "primaryTree": "Domination",
-                        "primaryKeystone": "Electrocute",
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Press the Attack",
                         "primarySlots": [
-                            "Sudden Impact",
-                            "Grisly Mementos",
-                            "Treasure Hunter"
+                            "Triumph",
+                            "Legend: Bloodline",
+                            "Cut Down"
                         ],
-                        "secondaryTree": "Sorcery",
+                        "secondaryTree": "Domination",
                         "secondarySlots": [
-                            "Absolute Focus",
-                            "Gathering Storm"
+                            "Taste of Blood",
+                            "Treasure Hunter"
                         ],
                         "statShards": [
                             "Attack Speed",
@@ -31711,26 +32119,30 @@
                     ],
                     "coreItems": [
                         {
-                            "id": "6697",
-                            "name": "Hubris"
+                            "id": "6672",
+                            "name": "Kraken Slayer"
                         },
                         {
-                            "id": "3008",
-                            "name": "Gluttonous Greaves"
+                            "id": "6676",
+                            "name": "The Collector"
                         },
                         {
-                            "id": "6698",
-                            "name": "Profane Hydra"
+                            "id": "3031",
+                            "name": "Infinity Edge"
+                        },
+                        {
+                            "id": "3036",
+                            "name": "Lord Dominik's Regards"
                         },
                         {
                             "id": "3814",
                             "name": "Edge of Night"
-                        },
-                        {
-                            "id": "3033",
-                            "name": "Mortal Reminder"
                         }
-                    ]
+                    ],
+                    "bootChoice": {
+                        "id": "3006",
+                        "name": "Berserker's Greaves"
+                    }
                 }
             }
         },
@@ -31847,9 +32259,9 @@
                     ],
                     "skillOrder": {
                         "first3": [
+                            "Q",
                             "W",
-                            "E",
-                            "Q"
+                            "E"
                         ],
                         "maxOrder": [
                             "W",
@@ -32595,8 +33007,8 @@
                         ],
                         "maxOrder": [
                             "E",
-                            "Q",
-                            "W"
+                            "W",
+                            "Q"
                         ]
                     },
                     "startingItems": [
@@ -33013,10 +33425,6 @@
                             "name": "Voltaic Cyclosword"
                         },
                         {
-                            "id": "3008",
-                            "name": "Gluttonous Greaves"
-                        },
-                        {
                             "id": "6698",
                             "name": "Profane Hydra"
                         },
@@ -33027,8 +33435,16 @@
                         {
                             "id": "3814",
                             "name": "Edge of Night"
+                        },
+                        {
+                            "id": "3031",
+                            "name": "Infinity Edge"
                         }
-                    ]
+                    ],
+                    "bootChoice": {
+                        "id": "3158",
+                        "name": "Ionian Boots of Lucidity"
+                    }
                 }
             }
         },
@@ -33585,8 +34001,8 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "4645",
-                            "name": "Shadowflame"
+                            "id": "3165",
+                            "name": "Morellonomicon"
                         },
                         {
                             "id": "3089",
@@ -33917,6 +34333,10 @@
                             "name": "Rod of Ages"
                         },
                         {
+                            "id": "3008",
+                            "name": "Gluttonous Greaves"
+                        },
+                        {
                             "id": "3003",
                             "name": "Archangel's Staff"
                         },
@@ -33927,16 +34347,8 @@
                         {
                             "id": "3089",
                             "name": "Rabadon's Deathcap"
-                        },
-                        {
-                            "id": "3135",
-                            "name": "Void Staff"
                         }
-                    ],
-                    "bootChoice": {
-                        "id": "3020",
-                        "name": "Sorcerer's Shoes"
-                    }
+                    ]
                 },
                 "UTILITY": {
                     "label": "UTILITY",
@@ -36064,7 +36476,7 @@
                             "Ultimate Hunter"
                         ],
                         "statShards": [
-                            "Adaptive Force",
+                            "Ability Haste",
                             "Adaptive Force",
                             "Health Scaling"
                         ]
@@ -36162,8 +36574,8 @@
                             "W"
                         ],
                         "maxOrder": [
-                            "Q",
                             "E",
+                            "Q",
                             "W"
                         ]
                     },
@@ -36313,7 +36725,7 @@
                         ],
                         "statShards": [
                             "Attack Speed",
-                            "Adaptive Force",
+                            "Health Scaling",
                             "Health Scaling"
                         ]
                     },
@@ -36844,6 +37256,88 @@
                         "name": "Boots of Swiftness"
                     }
                 },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Sorcery",
+                        "primaryKeystone": "Deathfire Touch",
+                        "primarySlots": [
+                            "Nimbus Cloak",
+                            "Celerity",
+                            "Scorch"
+                        ],
+                        "secondaryTree": "Precision",
+                        "secondarySlots": [
+                            "Last Stand",
+                            "Triumph"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Move Speed",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Ghost"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "Q",
+                            "E",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1056",
+                            "name": "Doran's Ring"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3116",
+                            "name": "Rylai's Crystal Scepter"
+                        },
+                        {
+                            "id": "6653",
+                            "name": "Liandry's Torment"
+                        },
+                        {
+                            "id": "2525",
+                            "name": "Protoplasm Harness"
+                        },
+                        {
+                            "id": "6665",
+                            "name": "Jak'Sho, The Protean"
+                        },
+                        {
+                            "id": "4633",
+                            "name": "Riftmaker"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3009",
+                        "name": "Boots of Swiftness"
+                    }
+                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -37010,6 +37504,84 @@
                         "name": "Plated Steelcaps"
                     }
                 },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Resolve",
+                        "primaryKeystone": "Grasp of the Undying",
+                        "primarySlots": [
+                            "Demolish",
+                            "Conditioning",
+                            "Overgrowth"
+                        ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Approach Velocity",
+                            "Cash Back"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Teleport"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "W",
+                            "Q",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1054",
+                            "name": "Doran's Shield"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "6664",
+                            "name": "Hollow Radiance"
+                        },
+                        {
+                            "id": "2502",
+                            "name": "Unending Despair"
+                        },
+                        {
+                            "id": "6665",
+                            "name": "Jak'Sho, The Protean"
+                        },
+                        {
+                            "id": "3075",
+                            "name": "Thornmail"
+                        },
+                        {
+                            "id": "3143",
+                            "name": "Randuin's Omen"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3111",
+                        "name": "Mercury's Treads"
+                    }
+                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -37067,20 +37639,20 @@
                             "name": "Heartsteel"
                         },
                         {
-                            "id": "3748",
-                            "name": "Titanic Hydra"
+                            "id": "2502",
+                            "name": "Unending Despair"
                         },
                         {
-                            "id": "2501",
-                            "name": "Overlord's Bloodmail"
+                            "id": "3748",
+                            "name": "Titanic Hydra"
                         },
                         {
                             "id": "3075",
                             "name": "Thornmail"
                         },
                         {
-                            "id": "3143",
-                            "name": "Randuin's Omen"
+                            "id": "2501",
+                            "name": "Overlord's Bloodmail"
                         }
                     ],
                     "bootChoice": {
@@ -37163,8 +37735,8 @@
                             "name": "Jak'Sho, The Protean"
                         },
                         {
-                            "id": "2501",
-                            "name": "Overlord's Bloodmail"
+                            "id": "3143",
+                            "name": "Randuin's Omen"
                         }
                     ],
                     "bootChoice": {
@@ -37334,6 +37906,84 @@
                         "name": "Berserker's Greaves"
                     }
                 },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Lethal Tempo",
+                        "primarySlots": [
+                            "Presence of Mind",
+                            "Legend: Bloodline",
+                            "Cut Down"
+                        ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Cash Back",
+                            "Triple Tonic"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Barrier"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "W",
+                            "Q",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1055",
+                            "name": "Doran's Blade"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3032",
+                            "name": "Yun Tal Wildarrows"
+                        },
+                        {
+                            "id": "6675",
+                            "name": "Navori Flickerblade"
+                        },
+                        {
+                            "id": "3031",
+                            "name": "Infinity Edge"
+                        },
+                        {
+                            "id": "3036",
+                            "name": "Lord Dominik's Regards"
+                        },
+                        {
+                            "id": "3072",
+                            "name": "Bloodthirster"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3006",
+                        "name": "Berserker's Greaves"
+                    }
+                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -37362,8 +38012,8 @@
                     "skillOrder": {
                         "first3": [
                             "Q",
-                            "W",
-                            "E"
+                            "E",
+                            "W"
                         ],
                         "maxOrder": [
                             "Q",
@@ -37741,80 +38391,6 @@
                         {
                             "id": "6665",
                             "name": "Jak'Sho, The Protean"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3047",
-                        "name": "Plated Steelcaps"
-                    }
-                },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Resolve",
-                        "primaryKeystone": "Grasp of the Undying",
-                        "primarySlots": [
-                            "Shield Bash",
-                            "Conditioning",
-                            "Overgrowth"
-                        ],
-                        "secondaryTree": "Inspiration",
-                        "secondarySlots": [
-                            "Approach Velocity",
-                            "Magical Footwear"
-                        ],
-                        "statShards": [
-                            "Ability Haste",
-                            "Health Scaling",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Smite"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "W",
-                            "E"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "1101",
-                            "name": "Scorchclaw Pup"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "2525",
-                            "name": "Protoplasm Harness"
-                        },
-                        {
-                            "id": "2524",
-                            "name": "Bandlepipes"
-                        },
-                        {
-                            "id": "2502",
-                            "name": "Unending Despair"
-                        },
-                        {
-                            "id": "3065",
-                            "name": "Spirit Visage"
-                        },
-                        {
-                            "id": "3143",
-                            "name": "Randuin's Omen"
                         }
                     ],
                     "bootChoice": {
@@ -39188,88 +39764,6 @@
                         "name": "Sorcerer's Shoes"
                     }
                 },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Precision",
-                        "primaryKeystone": "Conqueror",
-                        "primarySlots": [
-                            "Presence of Mind",
-                            "Legend: Haste",
-                            "Last Stand"
-                        ],
-                        "secondaryTree": "Resolve",
-                        "secondarySlots": [
-                            "Conditioning",
-                            "Overgrowth"
-                        ],
-                        "statShards": [
-                            "Adaptive Force",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Ignite"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "E",
-                            "W",
-                            "Q"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "W",
-                            "E"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "1052",
-                            "name": "Amplifying Tome"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3871",
-                            "name": "Zaz'Zak's Realmspike"
-                        },
-                        {
-                            "id": "3116",
-                            "name": "Rylai's Crystal Scepter"
-                        },
-                        {
-                            "id": "6653",
-                            "name": "Liandry's Torment"
-                        },
-                        {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
-                        },
-                        {
-                            "id": "3065",
-                            "name": "Spirit Visage"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3020",
-                        "name": "Sorcerer's Shoes"
-                    }
-                },
                 "UTILITY": {
                     "label": "UTILITY",
                     "runes": {
@@ -39317,8 +39811,8 @@
                             "name": "Health Potion"
                         },
                         {
-                            "id": "1052",
-                            "name": "Amplifying Tome"
+                            "id": "1028",
+                            "name": "Ruby Crystal"
                         },
                         {
                             "id": "3340",
@@ -40207,7 +40701,7 @@
                     },
                     "summonerSpells": [
                         "Flash",
-                        "Ignite"
+                        "Teleport"
                     ],
                     "skillOrder": {
                         "first3": [
@@ -40509,8 +41003,8 @@
                             "name": "Shadowflame"
                         },
                         {
-                            "id": "4633",
-                            "name": "Riftmaker"
+                            "id": "3165",
+                            "name": "Morellonomicon"
                         }
                     ],
                     "bootChoice": {
@@ -41499,8 +41993,8 @@
                             "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3165",
-                            "name": "Morellonomicon"
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
                         }
                     ],
                     "bootChoice": {
@@ -42512,8 +43006,8 @@
                         ]
                     },
                     "summonerSpells": [
-                        "Exhaust",
-                        "Flash"
+                        "Flash",
+                        "Barrier"
                     ],
                     "skillOrder": {
                         "first3": [
@@ -42723,8 +43217,8 @@
                             "name": "Shadowflame"
                         },
                         {
-                            "id": "3165",
-                            "name": "Morellonomicon"
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
                         }
                     ],
                     "bootChoice": {
@@ -43047,8 +43541,8 @@
                             "name": "Rabadon's Deathcap"
                         },
                         {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
+                            "id": "3165",
+                            "name": "Morellonomicon"
                         }
                     ],
                     "bootChoice": {
@@ -43697,8 +44191,8 @@
                             "name": "Spirit Visage"
                         },
                         {
-                            "id": "3143",
-                            "name": "Randuin's Omen"
+                            "id": "3075",
+                            "name": "Thornmail"
                         }
                     ],
                     "bootChoice": {
@@ -43849,12 +44343,12 @@
                             "name": "Hullbreaker"
                         },
                         {
-                            "id": "3065",
-                            "name": "Spirit Visage"
-                        },
-                        {
                             "id": "3075",
                             "name": "Thornmail"
+                        },
+                        {
+                            "id": "3065",
+                            "name": "Spirit Visage"
                         }
                     ],
                     "bootChoice": {
@@ -44753,8 +45247,8 @@
                             "name": "Jak'Sho, The Protean"
                         },
                         {
-                            "id": "2502",
-                            "name": "Unending Despair"
+                            "id": "4633",
+                            "name": "Riftmaker"
                         }
                     ],
                     "bootChoice": {
@@ -44827,8 +45321,8 @@
                             "name": "Spirit Visage"
                         },
                         {
-                            "id": "3742",
-                            "name": "Dead Man's Plate"
+                            "id": "6665",
+                            "name": "Jak'Sho, The Protean"
                         }
                     ],
                     "bootChoice": {
@@ -45031,8 +45525,8 @@
                         ],
                         "maxOrder": [
                             "W",
-                            "E",
-                            "Q"
+                            "Q",
+                            "E"
                         ]
                     },
                     "startingItems": [
@@ -45051,8 +45545,8 @@
                     ],
                     "coreItems": [
                         {
-                            "id": "6631",
-                            "name": "Stridebreaker"
+                            "id": "3142",
+                            "name": "Youmuu's Ghostblade"
                         },
                         {
                             "id": "3071",
@@ -45063,17 +45557,17 @@
                             "name": "Sterak's Gage"
                         },
                         {
-                            "id": "3075",
-                            "name": "Thornmail"
+                            "id": "6665",
+                            "name": "Jak'Sho, The Protean"
                         },
                         {
-                            "id": "2501",
-                            "name": "Overlord's Bloodmail"
+                            "id": "3143",
+                            "name": "Randuin's Omen"
                         }
                     ],
                     "bootChoice": {
-                        "id": "3047",
-                        "name": "Plated Steelcaps"
+                        "id": "3009",
+                        "name": "Boots of Swiftness"
                     }
                 }
             }
@@ -46736,8 +47230,8 @@
                         ],
                         "secondaryTree": "Precision",
                         "secondarySlots": [
-                            "Legend: Haste",
-                            "Cut Down"
+                            "Cut Down",
+                            "Legend: Haste"
                         ],
                         "statShards": [
                             "Adaptive Force",
@@ -48199,8 +48693,8 @@
                             "name": "Void Staff"
                         },
                         {
-                            "id": "6653",
-                            "name": "Liandry's Torment"
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
                         }
                     ],
                     "bootChoice": {
@@ -49078,8 +49572,8 @@
                         }
                     ],
                     "bootChoice": {
-                        "id": "3111",
-                        "name": "Mercury's Treads"
+                        "id": "3047",
+                        "name": "Plated Steelcaps"
                     }
                 }
             }
@@ -49410,15 +49904,15 @@
                         "name": "Sorcerer's Shoes"
                     }
                 },
-                "UTILITY": {
-                    "label": "UTILITY",
+                "SAFETY": {
+                    "label": "SAFETY",
                     "runes": {
-                        "primaryTree": "Domination",
-                        "primaryKeystone": "Dark Harvest",
+                        "primaryTree": "Inspiration",
+                        "primaryKeystone": "First Strike",
                         "primarySlots": [
-                            "Cheap Shot",
-                            "Grisly Mementos",
-                            "Ultimate Hunter"
+                            "Magical Footwear",
+                            "Biscuit Delivery",
+                            "Cosmic Insight"
                         ],
                         "secondaryTree": "Sorcery",
                         "secondarySlots": [
@@ -49467,8 +49961,8 @@
                     ],
                     "coreItems": [
                         {
-                            "id": "3118",
-                            "name": "Malignance"
+                            "id": "6655",
+                            "name": "Luden's Echo"
                         },
                         {
                             "id": "4645",
@@ -49485,6 +49979,88 @@
                         {
                             "id": "4628",
                             "name": "Horizon Focus"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Domination",
+                        "primaryKeystone": "Dark Harvest",
+                        "primarySlots": [
+                            "Cheap Shot",
+                            "Grisly Mementos",
+                            "Ultimate Hunter"
+                        ],
+                        "secondaryTree": "Sorcery",
+                        "secondarySlots": [
+                            "Manaflow Band",
+                            "Scorch"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Teleport"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "W",
+                            "Q",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1056",
+                            "name": "Doran's Ring"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3118",
+                            "name": "Malignance"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3135",
+                            "name": "Void Staff"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
                         }
                     ],
                     "bootChoice": {
@@ -49512,6 +50088,88 @@
                         "secondarySlots": [
                             "Coup de Grace",
                             "Presence of Mind"
+                        ],
+                        "statShards": [
+                            "Adaptive Force",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Heal"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "W",
+                            "Q",
+                            "E"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "W",
+                            "E"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
+                        },
+                        {
+                            "id": "1052",
+                            "name": "Amplifying Tome"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "3871",
+                            "name": "Zaz'Zak's Realmspike"
+                        },
+                        {
+                            "id": "6655",
+                            "name": "Luden's Echo"
+                        },
+                        {
+                            "id": "4645",
+                            "name": "Shadowflame"
+                        },
+                        {
+                            "id": "3089",
+                            "name": "Rabadon's Deathcap"
+                        },
+                        {
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3020",
+                        "name": "Sorcerer's Shoes"
+                    }
+                },
+                "SAFETY": {
+                    "label": "SAFETY",
+                    "runes": {
+                        "primaryTree": "Inspiration",
+                        "primaryKeystone": "First Strike",
+                        "primarySlots": [
+                            "Magical Footwear",
+                            "Biscuit Delivery",
+                            "Cosmic Insight"
+                        ],
+                        "secondaryTree": "Sorcery",
+                        "secondarySlots": [
+                            "Manaflow Band",
+                            "Scorch"
                         ],
                         "statShards": [
                             "Adaptive Force",
@@ -49653,8 +50311,8 @@
                             "name": "Rabadon's Deathcap"
                         },
                         {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
+                            "id": "3135",
+                            "name": "Void Staff"
                         }
                     ],
                     "bootChoice": {
@@ -50519,8 +51177,8 @@
                     ],
                     "skillOrder": {
                         "first3": [
-                            "E",
                             "Q",
+                            "E",
                             "W"
                         ],
                         "maxOrder": [
@@ -50531,8 +51189,12 @@
                     },
                     "startingItems": [
                         {
-                            "id": "1055",
-                            "name": "Doran's Blade"
+                            "id": "1086",
+                            "name": "Doran's Bow"
+                        },
+                        {
+                            "id": "2003",
+                            "name": "Health Potion"
                         },
                         {
                             "id": "2003",
@@ -51020,8 +51682,8 @@
                         ]
                     },
                     "summonerSpells": [
-                        "Flash",
-                        "Ignite"
+                        "Exhaust",
+                        "Flash"
                     ],
                     "skillOrder": {
                         "first3": [
@@ -52035,10 +52697,6 @@
                             "name": "Dream Maker"
                         },
                         {
-                            "id": "1001",
-                            "name": "Boots"
-                        },
-                        {
                             "id": "3222",
                             "name": "Mikael's Blessing"
                         },
@@ -52049,8 +52707,16 @@
                         {
                             "id": "3504",
                             "name": "Ardent Censer"
+                        },
+                        {
+                            "id": "3107",
+                            "name": "Redemption"
                         }
-                    ]
+                    ],
+                    "bootChoice": {
+                        "id": "3158",
+                        "name": "Ionian Boots of Lucidity"
+                    }
                 },
                 "UTILITY": {
                     "label": "UTILITY",
@@ -52353,8 +53019,8 @@
                             "name": "Endless Hunger"
                         },
                         {
-                            "id": "3156",
-                            "name": "Maw of Malmortius"
+                            "id": "3026",
+                            "name": "Guardian Angel"
                         }
                     ],
                     "bootChoice": {
@@ -52509,6 +53175,80 @@
                         {
                             "id": "3026",
                             "name": "Guardian Angel"
+                        }
+                    ],
+                    "bootChoice": {
+                        "id": "3047",
+                        "name": "Plated Steelcaps"
+                    }
+                },
+                "UTILITY": {
+                    "label": "UTILITY",
+                    "runes": {
+                        "primaryTree": "Precision",
+                        "primaryKeystone": "Conqueror",
+                        "primarySlots": [
+                            "Triumph",
+                            "Legend: Haste",
+                            "Coup de Grace"
+                        ],
+                        "secondaryTree": "Inspiration",
+                        "secondarySlots": [
+                            "Cosmic Insight",
+                            "Magical Footwear"
+                        ],
+                        "statShards": [
+                            "Attack Speed",
+                            "Adaptive Force",
+                            "Health Scaling"
+                        ]
+                    },
+                    "summonerSpells": [
+                        "Flash",
+                        "Smite"
+                    ],
+                    "skillOrder": {
+                        "first3": [
+                            "E",
+                            "Q",
+                            "W"
+                        ],
+                        "maxOrder": [
+                            "Q",
+                            "E",
+                            "W"
+                        ]
+                    },
+                    "startingItems": [
+                        {
+                            "id": "1102",
+                            "name": "Gustwalker Hatchling"
+                        },
+                        {
+                            "id": "3340",
+                            "name": "Stealth Ward"
+                        }
+                    ],
+                    "coreItems": [
+                        {
+                            "id": "6610",
+                            "name": "Sundered Sky"
+                        },
+                        {
+                            "id": "6631",
+                            "name": "Stridebreaker"
+                        },
+                        {
+                            "id": "6333",
+                            "name": "Death's Dance"
+                        },
+                        {
+                            "id": "2517",
+                            "name": "Endless Hunger"
+                        },
+                        {
+                            "id": "3053",
+                            "name": "Sterak's Gage"
                         }
                     ],
                     "bootChoice": {
@@ -53227,88 +53967,6 @@
                         {
                             "id": "3032",
                             "name": "Yun Tal Wildarrows"
-                        },
-                        {
-                            "id": "2512",
-                            "name": "Fiendhunter Bolts"
-                        },
-                        {
-                            "id": "3031",
-                            "name": "Infinity Edge"
-                        },
-                        {
-                            "id": "3036",
-                            "name": "Lord Dominik's Regards"
-                        },
-                        {
-                            "id": "3072",
-                            "name": "Bloodthirster"
-                        }
-                    ],
-                    "bootChoice": {
-                        "id": "3006",
-                        "name": "Berserker's Greaves"
-                    }
-                },
-                "SAFETY": {
-                    "label": "SAFETY",
-                    "runes": {
-                        "primaryTree": "Precision",
-                        "primaryKeystone": "Lethal Tempo",
-                        "primarySlots": [
-                            "Triumph",
-                            "Legend: Bloodline",
-                            "Cut Down"
-                        ],
-                        "secondaryTree": "Inspiration",
-                        "secondarySlots": [
-                            "Cash Back",
-                            "Triple Tonic"
-                        ],
-                        "statShards": [
-                            "Attack Speed",
-                            "Adaptive Force",
-                            "Health Scaling"
-                        ]
-                    },
-                    "summonerSpells": [
-                        "Flash",
-                        "Barrier"
-                    ],
-                    "skillOrder": {
-                        "first3": [
-                            "Q",
-                            "E",
-                            "W"
-                        ],
-                        "maxOrder": [
-                            "Q",
-                            "E",
-                            "W"
-                        ]
-                    },
-                    "startingItems": [
-                        {
-                            "id": "1086",
-                            "name": "Doran's Bow"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "2003",
-                            "name": "Health Potion"
-                        },
-                        {
-                            "id": "3340",
-                            "name": "Stealth Ward"
-                        }
-                    ],
-                    "coreItems": [
-                        {
-                            "id": "3097",
-                            "name": "Stormrazor"
                         },
                         {
                             "id": "2512",
@@ -54069,6 +54727,10 @@
                             "name": "Luden's Echo"
                         },
                         {
+                            "id": "3100",
+                            "name": "Lich Bane"
+                        },
+                        {
                             "id": "4645",
                             "name": "Shadowflame"
                         },
@@ -54079,10 +54741,6 @@
                         {
                             "id": "3157",
                             "name": "Zhonya's Hourglass"
-                        },
-                        {
-                            "id": "3135",
-                            "name": "Void Staff"
                         }
                     ],
                     "bootChoice": {
@@ -54325,8 +54983,8 @@
                             "name": "Luden's Echo"
                         },
                         {
-                            "id": "4645",
-                            "name": "Shadowflame"
+                            "id": "4628",
+                            "name": "Horizon Focus"
                         },
                         {
                             "id": "3157",
@@ -54411,12 +55069,12 @@
                             "name": "Shadowflame"
                         },
                         {
-                            "id": "4628",
-                            "name": "Horizon Focus"
+                            "id": "3157",
+                            "name": "Zhonya's Hourglass"
                         },
                         {
-                            "id": "3089",
-                            "name": "Rabadon's Deathcap"
+                            "id": "4628",
+                            "name": "Horizon Focus"
                         }
                     ],
                     "bootChoice": {
@@ -54497,8 +55155,8 @@
                             "name": "Shurelya's Battlesong"
                         },
                         {
-                            "id": "3157",
-                            "name": "Zhonya's Hourglass"
+                            "id": "3165",
+                            "name": "Morellonomicon"
                         }
                     ],
                     "bootChoice": {
@@ -54829,8 +55487,8 @@
                             "name": "Rabadon's Deathcap"
                         },
                         {
-                            "id": "3135",
-                            "name": "Void Staff"
+                            "id": "3165",
+                            "name": "Morellonomicon"
                         }
                     ],
                     "bootChoice": {

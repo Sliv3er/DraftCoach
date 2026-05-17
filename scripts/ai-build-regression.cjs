@@ -285,6 +285,7 @@ function runStaticAdvisorChecks() {
   if (!source.includes('preserveCanonicalBootSlot') || !source.includes('_canonicalBuildItems')) issues.push('live advisor can still drop canonical boots from full plan');
   if (!source.includes('scoreKBBuildTemplateData') || !source.includes('kbGeneratedAtMs')) issues.push('KB loader can still prefer stale incomplete same-patch cache data');
   if (!source.includes('antiHealDecisionForChampion') || !source.includes('BRUISER_THORNMAIL_OK_CHAMPIONS') || !source.includes('AD bruisers like Darius/Renekton/Aatrox may prefer Thornmail') || !source.includes('do not force full anti-heal for one minor healing source')) issues.push('anti-heal selection is not draft/class aware enough');
+  if (!source.includes('reorderPlanFromNextItems') || !source.includes('NEXT ITEMS may reorder unowned items')) issues.push('live advisor NEXT ITEMS cannot reorder the validated build queue');
   if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');
   if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with role-safe full items');
   for (const [key, template] of Object.entries(buildTemplates.data || {})) {

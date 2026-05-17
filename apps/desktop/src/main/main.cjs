@@ -7174,7 +7174,7 @@ RULES:
 - NEXT ITEMS must be a numbered list of completed item goals only, never components
 - Treat VALIDATED LIVE BUILD PLAN as the source of truth.
 - Default action is CONTINUE: keep the build plan and list the next 1-2 unowned items from it.
-- Only change the build plan by writing an explicit CHANGES line. Do not sneak a new item into NEXT ITEMS unless it also appears as OldItem -> NewItem under CHANGES.
+- Only add a brand-new item to the build plan by writing an explicit CHANGES line. NEXT ITEMS may reorder unowned items that already exist in the validated build plan, but must not introduce a new item unless it also appears as OldItem -> NewItem under CHANGES.
 - If CURRENTLY BUILDING is specified, it should remain NEXT ITEM 1 unless CHANGES explicitly swaps that exact item for an emergency counter.
 - Preserve the validated build queue unless the current game state creates a clear emergency.
 - Be stable across repeated checks. If gold, inventory, enemy threats, and objective state are materially unchanged from PREVIOUS ADVICE, keep the same NEXT ITEMS and write "None needed" under CHANGES.
@@ -7460,6 +7460,57 @@ RULES:
         .slice(0, 2)
         .map(bi => bi.name);
       const aiNextItems = [...nextItems];
+      const reorderPlanFromNextItems = async (suggestedItems) => {
+        const suggestions = [];
+        for (const name of suggestedItems || []) {
+          const resolved = await resolveDdragonItem(name);
+          suggestions.push({ name, id: resolved?.id || '', key: itemKey(resolved?.name || name) });
+        }
+        if (!suggestions.length) return false;
+
+        const remaining = updatedItems.slice(lockIndex);
+        const movableIndexes = [];
+        for (let offset = 0; offset < remaining.length; offset++) {
+          const bi = remaining[offset];
+          if (!isValidOverlayPlanItem(bi)) continue;
+          const buildName = bi.name.toLowerCase().trim();
+          const owned = ownedItemNames.some(owned => owned === buildName || owned.includes(buildName) || buildName.includes(owned));
+          const bootsSkip = advisorHasBoots && bi.id && advisorIsBootsId(bi.id);
+          if (!owned && !bootsSkip) movableIndexes.push(lockIndex + offset);
+        }
+        if (!movableIndexes.length) return false;
+
+        const selectedIndexes = [];
+        for (const suggestion of suggestions) {
+          const found = movableIndexes.find(index => {
+            if (selectedIndexes.includes(index)) return false;
+            const bi = updatedItems[index];
+            const sameId = suggestion.id && bi.id && suggestion.id === bi.id;
+            const sameName = itemKey(bi.name) === suggestion.key;
+            return sameId || sameName;
+          });
+          if (found === undefined) return false;
+          selectedIndexes.push(found);
+        }
+
+        const expected = selectedIndexes.every((index, order) => index === movableIndexes[order]);
+        if (expected) return false;
+
+        const selectedSet = new Set(selectedIndexes);
+        const selectedItems = selectedIndexes.map(index => updatedItems[index]);
+        const remainingMovable = movableIndexes
+          .filter(index => !selectedSet.has(index))
+          .map(index => updatedItems[index]);
+        const reordered = [...selectedItems, ...remainingMovable];
+        movableIndexes.forEach((index, order) => {
+          updatedItems[index] = reordered[order];
+        });
+        sendAdvisorDebug(`[overlay] Reordered remaining build queue from NEXT ITEMS: [${suggestions.map(s => s.name).join(', ')}]`);
+        return true;
+      };
+      if (await reorderPlanFromNextItems(aiNextItems)) {
+        modified = true;
+      }
       const planNextItems = derivePlanNextItems();
       if (planNextItems.length > 0) {
         nextItems.length = 0;

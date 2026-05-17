@@ -1163,9 +1163,12 @@ async function syncMetaFromCDN() {
       if (fs.existsSync(localKbManifestPath)) localKbManifest = JSON.parse(fs.readFileSync(localKbManifestPath, 'utf-8'));
     } catch {}
     const needsKbManifest = Boolean(manifest.modes);
+    const remoteGeneratedAt = Date.parse(manifest.generatedAt || manifest.updatedAt || '');
+    const localGeneratedAt = Date.parse(localKbManifest?.generatedAt || localKbManifest?.updatedAt || '');
+    const kbIsFresh = !Number.isFinite(remoteGeneratedAt) || (Number.isFinite(localGeneratedAt) && localGeneratedAt >= remoteGeneratedAt);
     if (
       localMeta && localMeta.patch === manifest.patch && localMeta.champCount >= manifest.champCount &&
-      (!needsKbManifest || (localKbManifest && localKbManifest.patch === manifest.patch))
+      (!needsKbManifest || (localKbManifest && localKbManifest.patch === manifest.patch && kbIsFresh))
     ) {
       log('INFO', `[cdn] Local meta data already up-to-date (patch ${manifest.patch}, ${localMeta.champCount} champs)`);
       return true;
@@ -1340,18 +1343,28 @@ function loadKBBuildTemplates(gameMode = 'sr') {
   const fileName = kbBuildTemplateFileForMode(gameMode);
   if (_kbBuildTemplatesCache.has(fileName)) return _kbBuildTemplatesCache.get(fileName);
   const kbPaths = kbDataPaths(fileName);
+  const candidates = [];
   for (const p of kbPaths) {
     if (fs.existsSync(p)) {
       try {
         const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
         const data = raw.data || {};
-        _kbBuildTemplatesCache.set(fileName, data);
-        log('INFO', `[KB] Loaded ${fileName} from: ${p} (${Object.keys(data).length} entries)`);
-        return data;
+        candidates.push({ path: p, raw, data, quality: scoreKBBuildTemplateData(raw), generatedAt: kbGeneratedAtMs(raw) });
       } catch (e) {
         log('WARN', `[KB] Failed to parse ${p}: ${e.message}`);
       }
     }
+  }
+  if (candidates.length) {
+    candidates.sort((a, b) => a.quality.bad - b.quality.bad || b.generatedAt - a.generatedAt);
+    const chosen = candidates[0];
+    if (chosen.quality.bad > 0) {
+      log('WARN', `[KB] Loaded ${fileName} from: ${chosen.path} with ${chosen.quality.bad} incomplete variants; no cleaner local candidate found`);
+    } else {
+      log('INFO', `[KB] Loaded ${fileName} from: ${chosen.path} (${Object.keys(chosen.data).length} entries, quality ok)`);
+    }
+    _kbBuildTemplatesCache.set(fileName, chosen.data);
+    return chosen.data;
   }
   if (fileName !== 'build-templates.json') {
     log('WARN', `[KB] ${fileName} not found; falling back to SR build-templates.json`);
@@ -1361,6 +1374,24 @@ function loadKBBuildTemplates(gameMode = 'sr') {
   }
   log('WARN', `[KB] ${fileName} not found in any search path`);
   return {};
+}
+
+function kbGeneratedAtMs(raw) {
+  const stamp = raw?.generatedAt || raw?.meta?.generatedAt || raw?.updatedAt || raw?.meta?.updatedAt || '';
+  const parsed = Date.parse(stamp);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function scoreKBBuildTemplateData(raw) {
+  let bad = 0;
+  const data = raw?.data || {};
+  for (const template of Object.values(data)) {
+    for (const variant of Object.values(template?.variants || {})) {
+      const coreCount = (variant?.coreItems || []).length + (variant?.bootChoice ? 1 : 0);
+      if (!variant?.bootChoice || coreCount < 6) bad++;
+    }
+  }
+  return { bad };
 }
 
 /**

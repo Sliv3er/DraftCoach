@@ -1155,7 +1155,7 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
       return (
         <div className="empty-state empty-state-meta-missing">
           <div className="empty-icon empty-icon-warning">!</div>
-          <div className="empty-text">No Mobalytics meta available</div>
+          <div className="empty-text">No U.GG meta available</div>
           <div className="empty-hint">{metaStatus.message}</div>
           <div className="empty-hint">Waiting for the full draft to run the AI build.</div>
         </div>

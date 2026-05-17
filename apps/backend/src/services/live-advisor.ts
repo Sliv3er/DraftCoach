@@ -18,7 +18,7 @@ function getKBPlannedBuild(championName: string): string {
   if (v.coreItems) items.push(...v.coreItems.map((i: any) => i.name));
 
   return items.length > 0
-    ? `\nPLANNED BUILD PATH (from Mobalytics meta data):\n${items.map((n, i) => `${i + 1}. ${n}`).join('\n')}\n`
+    ? `\nPLANNED BUILD PATH (from U.GG meta data):\n${items.map((n, i) => `${i + 1}. ${n}`).join('\n')}\n`
     : '';
 }
 

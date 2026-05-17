@@ -295,6 +295,11 @@ function buildMechanicsContext(myChampion, role, mechMap) {
   }
 
   // ── Enemy mechanics — only fields relevant to itemization ──
+  const myTags = myData?.tags || [];
+  const myCanUseMercurial = !/support/i.test(role || '')
+    && (myData?.dmg === 'AD' || myTags.includes('Marksman'))
+    && !myTags.includes('Mage');
+
   const ccFlags = [];
   const trueDmgFlags = [];
   const healFlags = [];
@@ -318,7 +323,7 @@ function buildMechanicsContext(myChampion, role, mechMap) {
     // Suppression
     if (d.ult?.type === 'SUPPRESSION' || d.cc?.some(c => c.type === 'SUPPRESSION')) {
       suppressionFlags.push(enemyName);
-      qssTargets.push(`${enemyName} (suppression — QSS mandatory)`);
+      qssTargets.push(`${enemyName} (suppression - ${myCanUseMercurial ? 'QSS/Mercurial candidate' : 'cleanse/positioning/AP defense, not Mercurial'})`);
     }
 
     // Burst defense value. Do not treat stasis as a generic answer for AD champions.
@@ -359,7 +364,9 @@ function buildMechanicsContext(myChampion, role, mechMap) {
   }
 
   if (suppressionFlags.length > 0) {
-    lines.push(`⚠️ SUPPRESSION DETECTED (${suppressionFlags.join(', ')}) — QSS/Mercurial is mandatory. Suppression cannot be avoided by dashes, stasis, or tenacity.`);
+    lines.push(myCanUseMercurial
+      ? `SUPPRESSION DETECTED (${suppressionFlags.join(', ')}) - Mercurial/QSS is a situational answer for this champion class.`
+      : `SUPPRESSION DETECTED (${suppressionFlags.join(', ')}) - do not force Mercurial on this champion class; use Cleanse if available, Banshee's Veil/Zhonya's, spacing, and target priority.`);
   }
 
   if (burstDefenseTargets.length > 0) {
@@ -454,7 +461,7 @@ DECISION TRACE
 Enemy Damage Priority: <AD/AP/Mixed count and what defensive stat matters first>
 Primary Threats: <1-2 enemy champions and the exact mechanic that matters>
 Win Condition: <how my champion wins this game>
-Mobalytics Variant: <BUILD 1/2/3 and why; if switching, name the trigger>
+U.GG Variant: <BUILD 1/2/3 and why; if switching, name the trigger>
 Item Swap Budget: <0/1/2 swaps and why that budget is justified>
 Boots Decision: <chosen boots and why they beat the alternative>
 Rune Decision: <keep/change and the specific reason>
@@ -533,7 +540,7 @@ BUILD RULES:
 - NEVER use the same tree for primaryTree and secondaryTree.
 
 REFERENCE BUILD RULES (CRITICAL — your highest priority):
-- You will receive REFERENCE BUILDS from Mobalytics (real match data with high win rates).
+- You will receive REFERENCE BUILDS from U.GG (real match data with high win rates).
 - You MUST use BUILD 1 (Most Popular) as your default. Only use BUILD 2 or 3 if the enemy comp makes BUILD 1 truly unviable.
 - Your coreBuild MUST contain the SAME core items from your chosen base build. You may reorder them but NOT replace them unless the matchup is extreme (4+ of one damage type).
 - Stability matters more than novelty. Do not change an item, rune, summoner, or skill order merely because another option is also viable.
@@ -551,7 +558,7 @@ STARTING ITEMS RULES:
 - NEVER put Doran's items, companions, or potions in coreBuild — they belong ONLY in startingItems.
 
 - If Jungle: include companion in startingItems, provide junglePath with complete first clear (6+ camps separated by >).
-- For suppression enemies: include QSS/Mercurial Scimitar as situational unless the champion class normally wants that item.
+- For suppression enemies: include Mercurial Scimitar only for AD/marksman/fighter champions that can actually use it. AP mages/assassins should use Cleanse if chosen, Banshee's Veil/Zhonya's, spacing, and target-priority notes instead of off-class QSS completion.
 - ANTI-HEAL: If enemy has significant healing, include anti-heal in coreBuild or situationalItems, but choose by role/economy. Tanks/fighters: Thornmail if they are being hit. ADC/crit: Mortal Reminder. Mages/AP: Morellonomicon. Supports: prefer Ignite timing, Oblivion Orb if AP support, or ask an ally/ADC to buy anti-heal in ANALYSIS/WIN CONDITION; do not list Mortal Reminder, Thornmail, or Morellonomicon as support CORE/SITUATIONAL items for utility supports.
 - Every coreBuild item's "reason" field should explain why it counters a specific enemy threat.
 - skillOrder: Use format "Q > W > E > R" (max priority order).
@@ -655,7 +662,7 @@ ARAM-SPECIFIC RULES:
 - Champions get bonus healing/shielding/damage modifiers in ARAM (mode-specific balance)
 - Summoner Spells: Always Mark/Dash (Snowball) + Flash (or Clarity/Exhaust if applicable)
 - coreBuild: Exactly 6 items (including boots as item #1 or #2)
-- startingItems: Use the Mobalytics ARAM opener when provided; otherwise return [].
+- startingItems: Use the U.GG ARAM opener when provided; otherwise return [].
 - No jungle path needed — omit junglePath field
 
 BUILD RULES:
@@ -703,7 +710,7 @@ BUILD RULES:
 - Pick shards from VALID STAT SHARDS list only.
 - NEVER suggest the same item twice in coreBuild.
 - NEVER use the same tree for primaryTree and secondaryTree.
-- startingItems: Use the Mobalytics ARAM/Mayhem opener when provided; otherwise return [].
+- startingItems: Use the U.GG ARAM/Mayhem opener when provided; otherwise return [].
 - summoners: Mark/Dash + Flash (or Clarity/Exhaust).
 
 AUGMENT RECOMMENDATIONS:

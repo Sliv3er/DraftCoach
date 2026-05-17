@@ -896,7 +896,7 @@ export function App() {
           const payload = JSON.parse(line.slice(6));
           if (payload.phase === 'meta' && payload.fullText) {
             if (draftCompleteRef.current || statusRef.current === 'fetching') return;
-            setMetaStatus({ status: 'exact', message: 'Exact Mobalytics role baseline loaded.' });
+            setMetaStatus({ status: 'exact', message: 'Exact U.GG role baseline loaded.' });
             setStatus('meta');
             setBuildResult({
               ok: true,
@@ -904,7 +904,7 @@ export function App() {
               patchDetected: payload.patchUsed || patchVersion,
               text: payload.fullText,
               metaStatus: 'exact',
-              metaMessage: 'Exact Mobalytics role baseline loaded.',
+              metaMessage: 'Exact U.GG role baseline loaded.',
             } as BuildResponse);
             return;
           }
@@ -912,8 +912,8 @@ export function App() {
             if (draftCompleteRef.current || statusRef.current === 'fetching') return;
             const statusValue = payload.source === 'meta-missing-role' ? 'missing-role' : 'missing-champion';
             const missingMessage = statusValue === 'missing-role'
-              ? `No exact Mobalytics ${champRole} meta is available for ${championId}.`
-              : `No Mobalytics meta is available for ${championId}.`;
+              ? `No exact U.GG ${champRole} meta is available for ${championId}.`
+              : `No U.GG meta is available for ${championId}.`;
             setMetaStatus({ status: statusValue, message: missingMessage });
             setStatus('meta-fallback');
             setBuildResult(null);
@@ -999,7 +999,7 @@ export function App() {
 
             if (payload.phase === 'meta' && payload.fullText) {
               metaBaselineText = payload.fullText;
-              currentMetaStatus = { status: 'exact', message: 'Exact Mobalytics role baseline loaded.' };
+              currentMetaStatus = { status: 'exact', message: 'Exact U.GG role baseline loaded.' };
               setMetaStatus(currentMetaStatus);
               if (payload.model) setBuildModel(payload.model);
               continue;

@@ -63,19 +63,19 @@ async function getAllChampions(patch) {
   return champs;
 }
 
-// ── Mobalytics Sync (replaces Gemini-based fetchMetaBuildBatch) ──
-function runMobalyticsSync() {
-  log('INFO', 'Running Mobalytics meta sync...');
-  const syncScript = path.join(__dirname, 'sync-mobalytics.cjs');
+// U.GG sync (replaces legacy scraped/meta fetches)
+function runUggSync() {
+  log('INFO', 'Running U.GG meta sync...');
+  const syncScript = path.join(__dirname, 'sync-ugg.cjs');
   execSync(`node ${syncScript}`, {
     cwd: path.resolve(__dirname, '..'),
     encoding: 'utf-8',
     stdio: 'inherit',
-    timeout: 600000, // 10 min timeout
+    timeout: 900000,
   });
-  log('INFO', 'Mobalytics sync completed successfully');
+  log('INFO', 'U.GG sync completed successfully');
 
-  log('INFO', 'Running Mobalytics ARAM/Mayhem mode sync...');
+  log('INFO', 'Running ARAM/Mayhem mode sync...');
   const modeSyncScript = path.join(__dirname, 'sync-mobalytics-modes.cjs');
   execSync(`node ${modeSyncScript}`, {
     cwd: path.resolve(__dirname, '..'),
@@ -83,7 +83,7 @@ function runMobalyticsSync() {
     stdio: 'inherit',
     timeout: 600000,
   });
-  log('INFO', 'Mobalytics mode sync completed successfully');
+  log('INFO', 'Mode sync completed successfully');
 }
 
 // ── Fetch augments master list ──
@@ -233,11 +233,11 @@ async function main() {
     if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
   }
 
-  // 4. Run Mobalytics sync (writes to shared/kb/data/)
+  // 4. Run U.GG sync (writes to shared/kb/data/)
   try {
-    runMobalyticsSync();
+    runUggSync();
   } catch (err) {
-    log('ERROR', `Mobalytics sync failed: ${err.message}`);
+    log('ERROR', `U.GG sync failed: ${err.message}`);
     process.exit(1);
   }
 
@@ -306,7 +306,7 @@ async function main() {
     },
     qcPassed,
     qcFailed,
-    source: 'mobalytics-auto-sync',
+    source: 'ugg-auto-sync',
   };
   fs.mkdirSync(path.join(DATA_DIR, 'data', 'kb'), { recursive: true });
   fs.writeFileSync(path.join(DATA_DIR, 'data', 'kb', 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf-8');

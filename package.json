@@ -20,7 +20,8 @@
     "test": "npx jest --config shared/jest.config.js",
     "test:engine": "npx jest --config shared/jest.config.js --testPathPattern=engine",
     "test:ai-regression": "node scripts/ai-build-regression.cjs",
-    "sync:mobalytics:modes": "node scripts/sync-mobalytics-modes.cjs",
+    "sync:ugg": "node scripts/sync-ugg.cjs",
+    "sync:ugg:modes": "node scripts/sync-mobalytics-modes.cjs",
     "validate:kb": "node tools/meta-builder/validate.js shared/kb/data",
     "postinstall": "cd apps/backend && npm install && cd apps/desktop && npm install && cd apps/web && npm install && cd apps/billing && npm install"
   },

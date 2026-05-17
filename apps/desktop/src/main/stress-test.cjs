@@ -181,7 +181,7 @@ const TEST_CASES = [
     input: `ANALYSIS
 Matchup Type: All-In / Sustain
 Enemy Damage Split: Mixed (2 AP / 2 AD / 1 Tank) — 4 Assassins present.
-Key Threats: Ambessa (Suppression/Burst), Akali (AP Burst/Shroud)
+Key Threats: Ambessa (Dive/Burst), Akali (AP Burst/Shroud)
 Survivability Requirement: High HP + Mixed Resistances (3500+ HP, 150+ Armor/MR)
 Item Priorities: Stickiness/Mobility, Anti-Burst, Anti-Suppression
 
@@ -189,7 +189,7 @@ CONSTRAINTS
 THREAT_1: Ambessa — Suppression — COUNTER: Mercurial Scimitar (Mandatory QSS effect)
 THREAT_2: Akali/Ahri — AP Burst — COUNTER: Sterak's Gage (Shield) + Mercury's Treads
 ANTI_HEAL_NEEDED: Yes (Ahri/Alistar) — COUNTER: Thornmail
-SUPPRESSION_QSS_NEEDED: Yes (Ambessa)
+SUPPRESSION_QSS_NEEDED: No
 BOOTS_CHOICE: Mercury's Treads
 
 RUNES
@@ -239,7 +239,7 @@ STEP 5 — EXECUTION
 Check enemy builds at 15 minutes.
 
 ENEMY POWER SPIKES
-Ambessa: Level 6 (R suppression)
+Ambessa: Level 6 (R dive/execute pressure)
 Akali: Level 6 (R all-in)
 
 WIN CONDITION

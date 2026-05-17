@@ -1180,7 +1180,7 @@ async function syncMetaFromCDN() {
       } catch {}
     }
 
-    // 5. Download unified KB files used by instant Mobalytics preview,
+    // 5. Download unified KB files used by instant U.GG preview,
     // ARAM baselines, ARAM Mayhem baselines, and augment recommendations.
     let kbDownloaded = 0;
     for (const file of kbFiles) {
@@ -1267,7 +1267,7 @@ function formatMetaReference(data, isOffRole = false) {
 }
 
 // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-//  MOBALYTICS KB BUILD REFERENCE SYSTEM
+//  U.GG KB BUILD REFERENCE SYSTEM
 //  Reads build-templates.json from shared/kb/data (dev) or
 //  kb-data/ (production). Injects all 3 variants as AI baseline.
 // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
@@ -1325,7 +1325,7 @@ function loadKBBuildTemplates(gameMode = 'sr') {
 }
 
 /**
- * Get Mobalytics KB build context for a champion+role.
+ * Get U.GG KB build context for a champion+role.
  * Returns a formatted prompt string with all 3 variants (DAMAGE/SAFETY/UTILITY)
  * that the AI uses as its baseline reference.
  */
@@ -1366,7 +1366,7 @@ function getKBBuildContext(champion, role, gameMode = 'sr') {
   log('INFO', `[KB] Injecting ${champion} ${engineRole} ${mode}: ${variantKeys.length} variants (${variantKeys.join(', ')})`);
 
   const modeLabel = mode === 'aram-mayhem' ? 'ARAM: Mayhem' : mode === 'aram' ? 'ARAM' : engineRole;
-  const lines = [`\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â REFERENCE BUILDS for ${champion} ${modeLabel} (Mobalytics Patch ${loadKBBuildTemplatesMeta(mode)}) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â`];
+  const lines = [`\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â REFERENCE BUILDS for ${champion} ${modeLabel} (U.GG Patch ${loadKBBuildTemplatesMeta(mode)}) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â`];
   lines.push(`You MUST use one of these as your base build. State which one you chose in your ANALYSIS.`);
   const variantLabels = {
     DAMAGE: 'BUILD 1 Ã¢â‚¬â€ Most Popular (highest pick rate)',
@@ -1500,7 +1500,7 @@ function buildInstantMetaText(body, patchDisplay) {
 
   return [
     'ANALYSIS',
-    `Base Build: BUILD 1 from Mobalytics reference data, shown instantly while AI refines in the background.`,
+    `Base Build: BUILD 1 from U.GG reference data, shown instantly while AI refines in the background.`,
     `Champion: ${body.myChampion} ${modeLabel}. Patch reference: ${loadKBBuildTemplatesMeta(gameMode)}; live patch: ${patchDisplay}.`,
     enemyLine,
     '',
@@ -1526,7 +1526,7 @@ function buildInstantMetaText(body, patchDisplay) {
     ...augmentSection,
     '',
     'WIN CONDITION',
-    'Use the Mobalytics core as the stable baseline. Treat this as the instant meta view; final AI output may reorder or adjust only when the draft strongly demands it.',
+    'Use the U.GG core as the stable baseline. Treat this as the instant meta view; final AI output may reorder or adjust only when the draft strongly demands it.',
   ].filter(Boolean).join('\n');
 }
 
@@ -1536,14 +1536,14 @@ function buildAiRefinementBaseline(metaText) {
     '\nMETA BASELINE ALREADY SHOWN TO THE USER:',
     metaText,
     '\nREFINEMENT TASK:',
-    '- Start from the meta baseline above; it is the trusted Mobalytics plan already visible to the user.',
-    '- Write DECISION TRACE first. It is backend-only and must include enemy damage priority, primary threats, win condition, Mobalytics variant, item swap budget, boots decision, rune decision, and anti-heal/QSS decision.',
+    '- Start from the meta baseline above; it is the trusted U.GG plan already visible to the user.',
+    '- Write DECISION TRACE first. It is backend-only and must include enemy damage priority, primary threats, win condition, U.GG variant, item swap budget, boots decision, rune decision, and anti-heal/QSS decision.',
     '- This is a refinement pass, not a fresh build generation. Keep the visible baseline as the answer unless a listed enemy threat creates a concrete need.',
-    '- You may switch to another listed Mobalytics reference build when its runes/items are a better matchup fit. If you switch, state the chosen BUILD number and the exact trigger.',
+    '- You may switch to another listed U.GG reference build when its runes/items are a better matchup fit. If you switch, state the chosen BUILD number and the exact trigger.',
     '- Keep summoners, starting items, and skill order exactly as baseline unless there is a critical role/legality issue.',
-    '- Runes may change only when the enemy draft creates a real lane/teamfight need, such as extreme poke, unavoidable hard CC, oppressive burst, or a different Mobalytics build variant already supports that rune page.',
+    '- Runes may change only when the enemy draft creates a real lane/teamfight need, such as extreme poke, unavoidable hard CC, oppressive burst, or a different U.GG build variant already supports that rune page.',
     '- Do not write "keep baseline", "preserved", or similar shorthand inside build sections. Repeat the exact rune, summoner, skill, and item names so the UI can render icons correctly.',
-    '- Keep the core build unless the enemy draft strongly demands a change. Prefer choosing another Mobalytics variant, reordering, or 1 targeted swap. Use 2 swaps only for extreme cases such as 4+ one damage type, mandatory QSS/suppression, or overwhelming healing.',
+    '- Keep the core build unless the enemy draft strongly demands a change. Prefer choosing another U.GG variant, reordering, or 1 targeted swap. Use 2 swaps only for extreme cases such as 4+ one damage type, mandatory QSS/suppression, or overwhelming healing.',
     '- Do not change an item merely because another item is also good. If the baseline item is playable, preserve it.',
     '- If changing a baseline choice, state the concrete trigger in ANALYSIS: damage split, fed threat, suppression, heavy healing, or impossible lane survival.',
     '- Never swap to off-class items. Respect champion role, gold economy, and normal item users.',
@@ -1720,7 +1720,7 @@ function judgeReasoningQuality(finalText, body, mechanicsMap = null) {
     'Enemy Damage Priority',
     'Primary Threats',
     'Win Condition',
-    'Mobalytics Variant',
+    'U.GG Variant',
     'Item Swap Budget',
     'Boots Decision',
     'Rune Decision',
@@ -1752,11 +1752,14 @@ function judgeReasoningQuality(finalText, body, mechanicsMap = null) {
     }
   }
   if (draft.suppression > 0) {
-    if (!hasAnyText(reasoningText, ['suppression', 'QSS', 'Mercurial', 'cleanse'])) {
+    const canUseQssItem = championCanUseMercurial(body, mechanicsMap);
+    if (!hasAnyText(reasoningText, canUseQssItem ? ['suppression', 'QSS', 'Mercurial', 'cleanse'] : ['suppression', 'cleanse', 'Banshee', 'Zhonya', 'positioning', 'stasis'])) {
       issues.push('suppression not acknowledged in reasoning');
     }
-    if (!hasAnyText(`${coreText}\n${situational}`, ['Mercurial Scimitar', 'QSS', 'Quicksilver'])) {
+    if (canUseQssItem && !hasAnyText(`${coreText}\n${situational}`, ['Mercurial Scimitar', 'QSS', 'Quicksilver'])) {
       issues.push('suppression draft lacks QSS/Mercurial option');
+    } else if (!canUseQssItem && hasAnyText(`${coreText}\n${situational}`, ['Mercurial Scimitar', 'Quicksilver Sash'])) {
+      issues.push('AP/non-QSS class received off-class Mercurial option');
     }
   }
   if (draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0) {
@@ -1845,7 +1848,7 @@ function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
     `Enemy Damage Split: ${draft.ap} AP / ${draft.ad} AD / ${draft.hybrid} mixed. ${draft.heavyAp ? 'MR is the first defensive priority.' : draft.heavyAd ? 'Armor is the first defensive priority.' : 'Balanced defenses are acceptable.'}`,
     `Key Threats: ${(body?.enemies || []).slice(0, 2).join(', ') || 'enemy draft'}.`,
     `Survivability Requirement: ${boots} plus ${draft.heavyAp ? 'magic resist' : draft.heavyAd ? 'armor' : 'health and role-safe defenses'}.`,
-    `Item Priorities: Base Build: fallback from validated patch data because no exact Mobalytics role page was usable. ${isSupport ? `${supportUpgrade} is required for support economy.` : ''} ${needsAntiHeal ? `${antiHeal} covers enemy healing.` : ''}`,
+    `Item Priorities: Base Build: fallback from validated patch data because no exact U.GG role page was usable. ${isSupport ? `${supportUpgrade} is required for support economy.` : ''} ${needsAntiHeal ? `${antiHeal} covers enemy healing.` : ''}`,
     '',
     'RUNES',
     tags.includes('Mage') ? 'Primary: Domination' : 'Primary: Precision',
@@ -1997,7 +2000,6 @@ function inferDamageFromTagsAndInfo(champion, mechanicsMap = null) {
 }
 
 const KNOWN_SUPPRESSION_CHAMPIONS = new Set([
-  'Ambessa',
   'Malzahar',
   'Skarner',
   'Urgot',
@@ -2060,7 +2062,7 @@ function stabilizeAgainstMetaBaseline(finalText, metaText) {
       stabilized = replaceBuildSection(
         stabilized,
         'ANALYSIS',
-        `${analysis}\nItem Stability: Preserved the Mobalytics core because the draft did not justify more than two baseline swaps.`
+        `${analysis}\nItem Stability: Preserved the U.GG core because the draft did not justify more than two baseline swaps.`
       );
     }
   }
@@ -2098,6 +2100,34 @@ const OFF_CLASS_AP_ITEMS = [
   'Void Staff',
   'Morellonomicon',
 ];
+
+const OFF_CLASS_AD_ITEMS_FOR_AP = [
+  'Mercurial Scimitar',
+  'Mortal Reminder',
+  'Chempunk Chainsword',
+  'Black Cleaver',
+  "Serylda's Grudge",
+  "Lord Dominik's Regards",
+  'Terminus',
+  'Maw of Malmortius',
+  "Death's Dance",
+  "Sterak's Gage",
+];
+
+function championCanUseMercurial(body, mechanicsMap = null) {
+  const role = String(body?.role || '').toLowerCase();
+  const tags = getChampionTags(body?.myChampion);
+  const dmg = inferDamageFromTagsAndInfo(body?.myChampion, mechanicsMap);
+  if (/support/.test(role)) return false;
+  if (/^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman')) return true;
+  return dmg === 'AD' && !tags.includes('Mage');
+}
+
+function apClassDefenseCandidates(body, draft = null) {
+  const role = String(body?.role || '').toLowerCase();
+  if (/support/.test(role)) return ["Mikael's Blessing", "Banshee's Veil", 'Redemption', 'Locket of the Iron Solari'];
+  return ["Banshee's Veil", "Zhonya's Hourglass", 'Cryptbloom', 'Cosmic Drive', "Rabadon's Deathcap"];
+}
 
 function replaceFirstCoreMatch(text, matchNames, replacementName, reason) {
   const core = extractBuildSection(text, 'CORE BUILD');
@@ -2213,6 +2243,23 @@ function enforceRoleSafeItems(finalText, body) {
       nonApReplacements,
       isSupportRole ? 'support quest upgrade; off-class AP stasis/carry item removed' : 'role-safe defensive item; off-class AP item removed'
     );
+  }
+
+  if (isApChampion && !isMarksman) {
+    const apFallbacks = apClassDefenseCandidates(body);
+    safe = replaceAllCoreMatchesWithCandidates(
+      safe,
+      OFF_CLASS_AD_ITEMS_FOR_AP,
+      apFallbacks,
+      'AP class-safe item; off-class AD/QSS item removed'
+    );
+    safe = rewriteItemsInSection(safe, 'SITUATIONAL ITEMS', (item, line, used) => {
+      if (!exactItemMatch(item, OFF_CLASS_AD_ITEMS_FOR_AP)) return line;
+      const replacement = firstAvailableItem(apFallbacks, used, OFF_CLASS_AD_ITEMS_FOR_AP);
+      return replacement
+        ? lineWithReplacement(line, replacement, itemIntentReason(replacement, body, analyzeEnemyDraft(body.enemies || [])))
+        : null;
+    });
   }
 
   if (isSupportRole) {
@@ -2359,7 +2406,9 @@ function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null
   const hasItem = (name) => allItems.some(item => item === String(name || '').toLowerCase().replace(/[â€™']/g, "'"));
   const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
   const supportUpgrade = supportQuestUpgradeForChampion(body.myChampion, tags, mechanicsMap);
-  const fallbackDefense = hasItem('Mercurial Scimitar')
+  const fallbackDefense = isApChampion
+    ? (hasItem("Banshee's Veil") ? "Banshee's Veil" : hasItem("Zhonya's Hourglass") ? "Zhonya's Hourglass" : 'class-appropriate AP defensive itemization')
+    : hasItem('Mercurial Scimitar')
     ? 'Mercurial Scimitar'
     : hasItem('Guardian Angel')
     ? 'Guardian Angel'
@@ -2377,6 +2426,7 @@ function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null
     { item: 'Thornmail', aliases: ['Thornmail'], force: isSupport, replacement: hasItem('Thornmail') && !isSupport ? null : (hasItem(preferredAntiHeal) ? preferredAntiHeal : 'class-appropriate anti-heal') },
     { item: 'Mortal Reminder', aliases: ['Mortal Reminder'], force: isSupport, replacement: hasItem('Mortal Reminder') && !isSupport ? null : (hasItem(preferredAntiHeal) ? preferredAntiHeal : 'class-appropriate anti-heal') },
     { item: 'Morellonomicon', aliases: ['Morellonomicon'], force: isSupport, replacement: hasItem('Morellonomicon') && !isSupport ? null : (hasItem(preferredAntiHeal) ? preferredAntiHeal : 'class-appropriate anti-heal') },
+    { item: 'Mercurial Scimitar', aliases: ['Mercurial Scimitar', 'Quicksilver Sash', 'QSS'], force: isApChampion, replacement: isApChampion ? fallbackDefense : null },
   ];
 
   let safe = finalText;
@@ -2916,11 +2966,18 @@ function enforceDraftCounterLogic(finalText, body, mechanicsMap = null) {
     safe = ensureCoreItem(safe, desiredBoots, desiredBootsReason, /support/.test(role) ? 1 : 0);
   }
 
-  if (draft.suppression > 0) {
+  if (draft.suppression > 0 && championCanUseMercurial(body, mechanicsMap)) {
     safe = ensureSituationalItem(
       safe,
       'Mercurial Scimitar',
       'QSS active vs suppression/lockdown when cleanse is required'
+    );
+  } else if (draft.suppression > 0) {
+    const answer = apClassDefenseCandidates(body, draft)[0];
+    safe = ensureSituationalItem(
+      safe,
+      answer,
+      'class-appropriate defensive answer; avoid off-class QSS completion'
     );
   }
 
@@ -3232,7 +3289,7 @@ function getAugmentsReference(champion = '', body = {}, mechanicsMap = null) {
 
     const candidates = getDraftAugmentCandidates(champion, body, mechanicsMap, 48);
     let ref = `\n\nARAM MAYHEM AUGMENT KNOWLEDGE (CommunityDragon Patch ${data.patch || '?'}):\n`;
-    ref += `Mobalytics does not provide reliable ARAM Mayhem augment meta. Treat CommunityDragon effect text and tier as the source of truth.\n`;
+    ref += `U.GG does not provide reliable ARAM Mayhem augment meta. Treat CommunityDragon effect text and tier as the source of truth.\n`;
     ref += `Use ONLY exact augment names from this catalog. NEVER invent augment names.\n`;
     ref += `Total valid augments: ${data.augments.length}\n\n`;
 
@@ -4650,7 +4707,7 @@ ${userMessage.slice(0, 2000)}`;
               source: 'meta',
               patchUsed: patchDisplay,
               fullText: instantMetaText,
-              model: 'mobalytics-kb',
+              model: 'ugg-kb',
             });
             if (body.generationMode === 'meta-preview') {
               sendSSE({ allDone: true });
@@ -4667,10 +4724,10 @@ ${userMessage.slice(0, 2000)}`;
               requestedRole: body.role,
               availableRole: anyRoleTemplate?.role || null,
               message: isModeMeta
-                ? `No Mobalytics ${requestedGameMode === 'aram-mayhem' ? 'ARAM Mayhem' : 'ARAM'} meta is available for ${body.myChampion}; AI is building from validated patch data instead.`
+                ? `No U.GG ${requestedGameMode === 'aram-mayhem' ? 'ARAM Mayhem' : 'ARAM'} meta is available for ${body.myChampion}; AI is building from validated patch data instead.`
                 : anyRoleTemplate?.role
-                ? `No exact Mobalytics ${body.role} page is available for ${body.myChampion}; AI is adapting from validated patch data instead.`
-                : `No Mobalytics page is available for ${body.myChampion}; AI is building from validated patch data instead.`,
+                ? `No exact U.GG ${body.role} page is available for ${body.myChampion}; AI is adapting from validated patch data instead.`
+                : `No U.GG page is available for ${body.myChampion}; AI is building from validated patch data instead.`,
             });
             if (body.generationMode === 'meta-preview') {
               sendSSE({ allDone: true });
@@ -4730,7 +4787,7 @@ ${userMessage.slice(0, 2000)}`;
           const mayhemAugmentTask = gameMode === 'aram-mayhem'
             ? `\n\nARAM MAYHEM AUGMENT TASK:\n- You MUST output an AUGMENTS section with exactly 4 augment recommendations.\n- Choose from DRAFT-SCORED AUGMENT CANDIDATES first; use the FULL CATALOG only when a matchup-specific reason clearly beats a candidate.\n- Each line must include: augment name, tier, pick timing/priority, and a matchup-specific reason.\n- Rank Prismatic/Gold/Silver by actual power, champion synergy, enemy threats, damage profile, and whether the effect solves this draft. Do not blindly choose highest tier if it does not fit.\n- Never invent augment names. Never omit AUGMENTS in ARAM: Mayhem.`
             : '';
-          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the Mobalytics ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${mayhemAugmentTask}\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
+          fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the U.GG ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${mayhemAugmentTask}\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
         } else {
           const variantContext = hasMetaBaseline ? getKBBuildContext(body.myChampion, body.role) : kbContext;
           const metaGuidance = refinementBaseline
@@ -4796,8 +4853,8 @@ ${userMessage.slice(0, 2000)}`;
           if (!isUsableBuildText(validated, body.role)) {
             if (instantMetaText) {
               const fallbackText = fallbackToMetaBuild(instantMetaText, body, mechMap3);
-              log('WARN', `[dual] ${getModelDisplayName(aiModel)} returned an unusable build; falling back to validated Mobalytics baseline`);
-              sendSSE({ phase: 'full', done: true, source: 'meta-fallback', patchUsed: patchDisplay, fullText: stripDecisionTrace(fallbackText), model: 'mobalytics-kb' });
+              log('WARN', `[dual] ${getModelDisplayName(aiModel)} returned an unusable build; falling back to validated U.GG baseline`);
+              sendSSE({ phase: 'full', done: true, source: 'meta-fallback', patchUsed: patchDisplay, fullText: stripDecisionTrace(fallbackText), model: 'ugg-kb' });
               sendSSE({ allDone: true });
               return res.end();
             }
@@ -4822,7 +4879,7 @@ ${userMessage.slice(0, 2000)}`;
           if (cached) {
             sendSSE({ phase: 'full', chunk: cached.text, done: true, source: 'stale-cache', patchUsed: cached.patchDetected, model: 'cache' });
           } else if (instantMetaText) {
-            sendSSE({ phase: 'full', done: true, source: 'meta-fallback', patchUsed: patchDisplay, fullText: stripDecisionTrace(instantMetaText), model: 'mobalytics-kb' });
+            sendSSE({ phase: 'full', done: true, source: 'meta-fallback', patchUsed: patchDisplay, fullText: stripDecisionTrace(instantMetaText), model: 'ugg-kb' });
           } else {
             sendSSE({ error: err.message });
           }
@@ -7024,7 +7081,7 @@ RULES:
         return false;
       }
       if (!isCompletedStoreItem(String(resolved.id), data, 11)) {
-        sendAdvisorDebug(`[validation] REJECTED unavailable/component item in live advisor: "${resolved.name || name}"`);
+        sendAdvisorDebug(`[validation] REJECTED component in live advisor: "${resolved.name || name}"`);
         return false;
       }
       return true;

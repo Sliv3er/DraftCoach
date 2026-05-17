@@ -51,7 +51,7 @@ export function getRagStatus() {
 }
 
 /**
- * Sync RAG pipeline — reads patch info from the Mobalytics-synced
+ * Sync RAG pipeline — reads patch info from the U.GG-synced
  * build-templates.json meta field (no more Gemini Search grounding).
  */
 export async function checkAndSyncRagPipeline(force: boolean = false): Promise<void> {
@@ -72,15 +72,15 @@ export async function checkAndSyncRagPipeline(force: boolean = false): Promise<v
         if (localPatchMajorMinor !== livePatchMajorMinor || force) {
             console.log(`[RAG] Patch change detected. Live: ${livePatch}, Local: ${localMeta?.patch || 'None'}`);
 
-            // Read meta from Mobalytics-synced KB data
+            // Read meta from U.GG-synced KB data
             let kbPatch = livePatchMajorMinor;
-            let kbSource = 'mobalytics-gql';
+            let kbSource = 'ugg-gql';
             let kbStats = '';
             try {
                 if (fs.existsSync(KB_BUILD_TEMPLATES)) {
                     const btData = JSON.parse(fs.readFileSync(KB_BUILD_TEMPLATES, 'utf-8'));
                     kbPatch = btData.meta?.patch || livePatchMajorMinor;
-                    kbSource = btData.meta?.source || 'mobalytics-gql';
+                    kbSource = btData.meta?.source || 'ugg-gql';
                     const entryCount = Object.keys(btData.data || {}).length;
                     kbStats = `${entryCount} build entries available from ${kbSource}.`;
                 }
@@ -88,7 +88,7 @@ export async function checkAndSyncRagPipeline(force: boolean = false): Promise<v
                 console.warn('[RAG] Could not read build-templates.json meta:', err);
             }
 
-            const metaContext = `Patch ${kbPatch} is live. Meta build data sourced from Mobalytics (real match statistics). ${kbStats} Build recommendations are based on actual win rates and pick rates from ranked play.`;
+            const metaContext = `Patch ${kbPatch} is live. Meta build data sourced from U.GG (real match statistics). ${kbStats} Build recommendations are based on actual win rates and pick rates from ranked play.`;
 
             const newDataset: RagDataset = { metaContext, patch: kbPatch };
 

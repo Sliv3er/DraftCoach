@@ -2,13 +2,13 @@
     "meta": {
         "patch": "16.10",
         "source": "mobalytics-gql+cdragon",
-        "generatedAt": "2026-05-16T20:39:07.154Z",
-        "buildHash": "moba-modes-1778963947154",
+        "generatedAt": "2026-05-17T13:30:12.731Z",
+        "buildHash": "moba-modes-1779024612732",
         "stats": {
             "champions": 172,
             "aramBuilds": 172,
             "mayhemBuilds": 172,
-            "augmentChampions": 172,
+            "augmentChampions": 0,
             "augmentMasterCount": 220,
             "failed": 0
         }
@@ -47,10 +47,10 @@
                 "Legend: Haste",
                 "Last Stand"
             ],
-            "secondaryTree": "Resolve",
+            "secondaryTree": "Domination",
             "secondarySlots": [
-                "Bone Plating",
-                "Revitalize"
+                "Taste of Blood",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -464,6 +464,28 @@
                 "Cheap Shot",
                 "Grisly Mementos",
                 "Treasure Hunter"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Coup de Grace",
+                "Presence of Mind"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Anivia_ARAM_MAYHEM_SAFETY": {
+            "championId": "Anivia",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Arcane Comet",
+            "primarySlots": [
+                "Manaflow Band",
+                "Transcendence",
+                "Scorch"
             ],
             "secondaryTree": "Precision",
             "secondarySlots": [
@@ -1114,6 +1136,28 @@
                 "Health Scaling"
             ]
         },
+        "Braum_ARAM_MAYHEM_SAFETY": {
+            "championId": "Braum",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Grasp of the Undying",
+            "primarySlots": [
+                "Font of Life",
+                "Conditioning",
+                "Overgrowth"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Legend: Haste",
+                "Triumph"
+            ],
+            "statShards": [
+                "Ability Haste",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
         "Braum_ARAM_MAYHEM_UTILITY": {
             "championId": "Braum",
             "role": "ARAM_MAYHEM",
@@ -1272,17 +1316,17 @@
             "championId": "Camille",
             "role": "ARAM_MAYHEM",
             "label": "UTILITY",
-            "primaryTree": "Resolve",
-            "primaryKeystone": "Grasp of the Undying",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Conqueror",
             "primarySlots": [
-                "Shield Bash",
-                "Conditioning",
-                "Overgrowth"
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
             ],
-            "secondaryTree": "Precision",
+            "secondaryTree": "Resolve",
             "secondarySlots": [
-                "Legend: Haste",
-                "Triumph"
+                "Overgrowth",
+                "Shield Bash"
             ],
             "statShards": [
                 "Attack Speed",
@@ -1620,28 +1664,6 @@
                 "Health Scaling"
             ]
         },
-        "Draven_ARAM_MAYHEM_SAFETY": {
-            "championId": "Draven",
-            "role": "ARAM_MAYHEM",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Press the Attack",
-            "primarySlots": [
-                "Presence of Mind",
-                "Legend: Bloodline",
-                "Coup de Grace"
-            ],
-            "secondaryTree": "Domination",
-            "secondarySlots": [
-                "Taste of Blood",
-                "Treasure Hunter"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Draven_ARAM_MAYHEM_UTILITY": {
             "championId": "Draven",
             "role": "ARAM_MAYHEM",
@@ -1690,28 +1712,6 @@
             "championId": "DrMundo",
             "role": "ARAM_MAYHEM",
             "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Haste",
-                "Last Stand"
-            ],
-            "secondaryTree": "Resolve",
-            "secondarySlots": [
-                "Conditioning",
-                "Overgrowth"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "DrMundo_ARAM_MAYHEM_UTILITY": {
-            "championId": "DrMundo",
-            "role": "ARAM_MAYHEM",
-            "label": "UTILITY",
             "primaryTree": "Resolve",
             "primaryKeystone": "Grasp of the Undying",
             "primarySlots": [
@@ -1727,6 +1727,28 @@
             "statShards": [
                 "Ability Haste",
                 "Health Scaling",
+                "Health Scaling"
+            ]
+        },
+        "DrMundo_ARAM_MAYHEM_UTILITY": {
+            "championId": "DrMundo",
+            "role": "ARAM_MAYHEM",
+            "label": "UTILITY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Conqueror",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Haste",
+                "Last Stand"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Conditioning",
+                "Overgrowth"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
                 "Health Scaling"
             ]
         },
@@ -1785,10 +1807,10 @@
                 "Grisly Mementos",
                 "Ultimate Hunter"
             ],
-            "secondaryTree": "Sorcery",
+            "secondaryTree": "Precision",
             "secondarySlots": [
-                "Gathering Storm",
-                "Transcendence"
+                "Coup de Grace",
+                "Presence of Mind"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -1822,17 +1844,17 @@
             "championId": "Elise",
             "role": "ARAM_MAYHEM",
             "label": "SAFETY",
-            "primaryTree": "Sorcery",
-            "primaryKeystone": "Arcane Comet",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Dark Harvest",
             "primarySlots": [
-                "Manaflow Band",
-                "Transcendence",
-                "Scorch"
+                "Cheap Shot",
+                "Grisly Mementos",
+                "Treasure Hunter"
             ],
-            "secondaryTree": "Precision",
+            "secondaryTree": "Sorcery",
             "secondarySlots": [
-                "Coup de Grace",
-                "Presence of Mind"
+                "Manaflow Band",
+                "Transcendence"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -1844,12 +1866,12 @@
             "championId": "Elise",
             "role": "ARAM_MAYHEM",
             "label": "UTILITY",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Dark Harvest",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Arcane Comet",
             "primarySlots": [
-                "Cheap Shot",
-                "Grisly Mementos",
-                "Treasure Hunter"
+                "Manaflow Band",
+                "Transcendence",
+                "Scorch"
             ],
             "secondaryTree": "Precision",
             "secondarySlots": [
@@ -2192,6 +2214,28 @@
                 "Health Scaling"
             ]
         },
+        "Galio_ARAM_MAYHEM_SAFETY": {
+            "championId": "Galio",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Aftershock",
+            "primarySlots": [
+                "Font of Life",
+                "Conditioning",
+                "Overgrowth"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Legend: Haste",
+                "Triumph"
+            ],
+            "statShards": [
+                "Ability Haste",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
         "Galio_ARAM_MAYHEM_UTILITY": {
             "championId": "Galio",
             "role": "ARAM_MAYHEM",
@@ -2262,17 +2306,17 @@
             "championId": "Gangplank",
             "role": "ARAM_MAYHEM",
             "label": "UTILITY",
-            "primaryTree": "Inspiration",
-            "primaryKeystone": "First Strike",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Dark Harvest",
             "primarySlots": [
-                "Magical Footwear",
-                "Time Warp Tonic",
-                "Cosmic Insight"
+                "Cheap Shot",
+                "Grisly Mementos",
+                "Ultimate Hunter"
             ],
-            "secondaryTree": "Domination",
+            "secondaryTree": "Precision",
             "secondarySlots": [
-                "Taste of Blood",
-                "Treasure Hunter"
+                "Coup de Grace",
+                "Presence of Mind"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -2361,6 +2405,28 @@
             "secondarySlots": [
                 "Taste of Blood",
                 "Treasure Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Gnar_ARAM_MAYHEM_SAFETY": {
+            "championId": "Gnar",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Fleet Footwork",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Last Stand"
+            ],
+            "secondaryTree": "Resolve",
+            "secondarySlots": [
+                "Conditioning",
+                "Overgrowth"
             ],
             "statShards": [
                 "Attack Speed",
@@ -2478,34 +2544,12 @@
                 "Health Scaling"
             ]
         },
-        "Graves_ARAM_MAYHEM_SAFETY": {
-            "championId": "Graves",
-            "role": "ARAM_MAYHEM",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Fleet Footwork",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Alacrity",
-                "Coup de Grace"
-            ],
-            "secondaryTree": "Domination",
-            "secondarySlots": [
-                "Taste of Blood",
-                "Treasure Hunter"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Graves_ARAM_MAYHEM_UTILITY": {
             "championId": "Graves",
             "role": "ARAM_MAYHEM",
             "label": "UTILITY",
             "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
+            "primaryKeystone": "Fleet Footwork",
             "primarySlots": [
                 "Triumph",
                 "Legend: Alacrity",
@@ -3208,17 +3252,17 @@
             "championId": "Jhin",
             "role": "ARAM_MAYHEM",
             "label": "UTILITY",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Dark Harvest",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Fleet Footwork",
             "primarySlots": [
-                "Taste of Blood",
-                "Grisly Mementos",
-                "Treasure Hunter"
-            ],
-            "secondaryTree": "Precision",
-            "secondarySlots": [
+                "Presence of Mind",
                 "Legend: Bloodline",
-                "Presence of Mind"
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Taste of Blood",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -3798,10 +3842,10 @@
                 "Health Scaling"
             ]
         },
-        "Kennen_ARAM_MAYHEM_UTILITY": {
+        "Kennen_ARAM_MAYHEM_SAFETY": {
             "championId": "Kennen",
             "role": "ARAM_MAYHEM",
-            "label": "UTILITY",
+            "label": "SAFETY",
             "primaryTree": "Domination",
             "primaryKeystone": "Dark Harvest",
             "primarySlots": [
@@ -3820,21 +3864,21 @@
                 "Health Scaling"
             ]
         },
-        "Khazix_ARAM_MAYHEM_DAMAGE": {
-            "championId": "Khazix",
+        "Kennen_ARAM_MAYHEM_UTILITY": {
+            "championId": "Kennen",
             "role": "ARAM_MAYHEM",
-            "label": "DAMAGE",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Dark Harvest",
+            "label": "UTILITY",
+            "primaryTree": "Sorcery",
+            "primaryKeystone": "Arcane Comet",
             "primarySlots": [
-                "Sudden Impact",
-                "Grisly Mementos",
-                "Treasure Hunter"
+                "Axiom Arcanist",
+                "Transcendence",
+                "Gathering Storm"
             ],
-            "secondaryTree": "Precision",
+            "secondaryTree": "Domination",
             "secondarySlots": [
-                "Coup de Grace",
-                "Presence of Mind"
+                "Grisly Mementos",
+                "Relentless Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -3842,10 +3886,10 @@
                 "Health Scaling"
             ]
         },
-        "Khazix_ARAM_MAYHEM_SAFETY": {
+        "Khazix_ARAM_MAYHEM_DAMAGE": {
             "championId": "Khazix",
             "role": "ARAM_MAYHEM",
-            "label": "SAFETY",
+            "label": "DAMAGE",
             "primaryTree": "Domination",
             "primaryKeystone": "Dark Harvest",
             "primarySlots": [
@@ -4431,7 +4475,7 @@
                 "Presence of Mind"
             ],
             "statShards": [
-                "Adaptive Force",
+                "Ability Haste",
                 "Adaptive Force",
                 "Health Scaling"
             ]
@@ -4740,28 +4784,6 @@
             ],
             "statShards": [
                 "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Mel_ARAM_MAYHEM_SAFETY": {
-            "championId": "Mel",
-            "role": "ARAM_MAYHEM",
-            "label": "SAFETY",
-            "primaryTree": "Sorcery",
-            "primaryKeystone": "Arcane Comet",
-            "primarySlots": [
-                "Manaflow Band",
-                "Transcendence",
-                "Scorch"
-            ],
-            "secondaryTree": "Precision",
-            "secondarySlots": [
-                "Coup de Grace",
-                "Presence of Mind"
-            ],
-            "statShards": [
-                "Ability Haste",
                 "Adaptive Force",
                 "Health Scaling"
             ]
@@ -6658,6 +6680,28 @@
                 "Health Scaling"
             ]
         },
+        "Ryze_ARAM_MAYHEM_SAFETY": {
+            "championId": "Ryze",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Conqueror",
+            "primarySlots": [
+                "Presence of Mind",
+                "Legend: Haste",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Sorcery",
+            "secondarySlots": [
+                "Manaflow Band",
+                "Transcendence"
+            ],
+            "statShards": [
+                "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Ryze_ARAM_MAYHEM_UTILITY": {
             "championId": "Ryze",
             "role": "ARAM_MAYHEM",
@@ -7164,28 +7208,6 @@
                 "Health Scaling"
             ]
         },
-        "Singed_ARAM_MAYHEM_SAFETY": {
-            "championId": "Singed",
-            "role": "ARAM_MAYHEM",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Haste",
-                "Last Stand"
-            ],
-            "secondaryTree": "Sorcery",
-            "secondarySlots": [
-                "Celerity",
-                "Nimbus Cloak"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Singed_ARAM_MAYHEM_UTILITY": {
             "championId": "Singed",
             "role": "ARAM_MAYHEM",
@@ -7637,10 +7659,10 @@
                 "Legend: Haste",
                 "Last Stand"
             ],
-            "secondaryTree": "Resolve",
+            "secondaryTree": "Domination",
             "secondarySlots": [
-                "Second Wind",
-                "Unflinching"
+                "Taste of Blood",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -7652,17 +7674,17 @@
             "championId": "Sylas",
             "role": "ARAM_MAYHEM",
             "label": "UTILITY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Dark Harvest",
             "primarySlots": [
-                "Presence of Mind",
-                "Legend: Haste",
-                "Last Stand"
+                "Sudden Impact",
+                "Grisly Mementos",
+                "Ultimate Hunter"
             ],
-            "secondaryTree": "Domination",
+            "secondaryTree": "Precision",
             "secondarySlots": [
-                "Taste of Blood",
-                "Treasure Hunter"
+                "Coup de Grace",
+                "Presence of Mind"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -7890,28 +7912,6 @@
                 "Health Scaling"
             ]
         },
-        "Talon_ARAM_MAYHEM_SAFETY": {
-            "championId": "Talon",
-            "role": "ARAM_MAYHEM",
-            "label": "SAFETY",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Electrocute",
-            "primarySlots": [
-                "Sudden Impact",
-                "Grisly Mementos",
-                "Ultimate Hunter"
-            ],
-            "secondaryTree": "Precision",
-            "secondarySlots": [
-                "Coup de Grace",
-                "Triumph"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Talon_ARAM_MAYHEM_UTILITY": {
             "championId": "Talon",
             "role": "ARAM_MAYHEM",
@@ -8110,6 +8110,28 @@
                 "Health Scaling"
             ]
         },
+        "Tristana_ARAM_MAYHEM_SAFETY": {
+            "championId": "Tristana",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Lethal Tempo",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Taste of Blood",
+                "Treasure Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Tristana_ARAM_MAYHEM_UTILITY": {
             "championId": "Tristana",
             "role": "ARAM_MAYHEM",
@@ -8180,6 +8202,28 @@
             "championId": "Tryndamere",
             "role": "ARAM_MAYHEM",
             "label": "DAMAGE",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Last Stand"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Sudden Impact",
+                "Ultimate Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Tryndamere_ARAM_MAYHEM_SAFETY": {
+            "championId": "Tryndamere",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
             "primaryTree": "Precision",
             "primaryKeystone": "Press the Attack",
             "primarySlots": [
@@ -8436,6 +8480,28 @@
             ],
             "statShards": [
                 "Adaptive Force",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Varus_ARAM_MAYHEM_SAFETY": {
+            "championId": "Varus",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Press the Attack",
+            "primarySlots": [
+                "Presence of Mind",
+                "Legend: Bloodline",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Taste of Blood",
+                "Treasure Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
                 "Adaptive Force",
                 "Health Scaling"
             ]
@@ -8895,6 +8961,28 @@
             "secondarySlots": [
                 "Taste of Blood",
                 "Treasure Hunter"
+            ],
+            "statShards": [
+                "Ability Haste",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Vladimir_ARAM_MAYHEM_SAFETY": {
+            "championId": "Vladimir",
+            "role": "ARAM_MAYHEM",
+            "label": "SAFETY",
+            "primaryTree": "Domination",
+            "primaryKeystone": "Dark Harvest",
+            "primarySlots": [
+                "Taste of Blood",
+                "Grisly Mementos",
+                "Treasure Hunter"
+            ],
+            "secondaryTree": "Sorcery",
+            "secondarySlots": [
+                "Gathering Storm",
+                "Transcendence"
             ],
             "statShards": [
                 "Ability Haste",

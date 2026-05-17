@@ -24,7 +24,7 @@ function getKBBuildContext(champion: string, role: string): string {
 
   if (!template?.variants) return '';
 
-  const lines: string[] = ['\n═══ REFERENCE BUILDS (Mobalytics real match stats — use as baseline) ═══'];
+  const lines: string[] = ['\n═══ REFERENCE BUILDS (U.GG real match stats — use as baseline) ═══'];
   const variantLabels: Record<string, string> = {
     DAMAGE: 'BUILD 1 — Most Popular',
     SAFETY: 'BUILD 2 — Secondary',
@@ -78,7 +78,7 @@ const REMOVED_ITEMS = [
 function buildSystemPrompt(patch: string): string {
   return `You are a Grandmaster League of Legends Draft & Itemization Engine for Season 2026, Patch ${patch}.
 
-You will receive REFERENCE BUILDS from Mobalytics (real ranked match statistics). These are the proven meta builds — use them as your BASELINE. Your job is to SELECT the best base build for the matchup and make targeted adaptations to counter the specific enemy team.
+You will receive REFERENCE BUILDS from U.GG (real ranked match statistics). These are the proven meta builds — use them as your BASELINE. Your job is to SELECT the best base build for the matchup and make targeted adaptations to counter the specific enemy team.
 
 CRITICAL: The following items have been REMOVED from the game and MUST NEVER be suggested:
 ${REMOVED_ITEMS.join(', ')}

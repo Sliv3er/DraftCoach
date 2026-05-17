@@ -1,14 +1,14 @@
 {
   "patch": "16.10",
-  "generatedAt": "2026-05-16T22:07:10.763Z",
-  "champCount": 271,
+  "generatedAt": "2026-05-17T14:06:01.608Z",
+  "champCount": 853,
   "modes": {
-    "sr": 271,
+    "sr": 853,
     "aram": 172,
     "aramMayhem": 172,
-    "augmentChampions": 172
+    "augmentChampions": 0
   },
-  "qcPassed": 271,
+  "qcPassed": 853,
   "qcFailed": 0,
-  "source": "mobalytics-auto-sync"
+  "source": "ugg-auto-sync"
 }

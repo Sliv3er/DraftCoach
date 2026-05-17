@@ -1783,7 +1783,8 @@ function isUsableBuildText(text, role) {
   const required = ['RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS'];
   if (!required.every(title => extractBuildSection(text, title))) return false;
   const expectedCore = /^(adc|bot|bottom)$/i.test(String(role || '')) ? 7 : 6;
-  return sectionItems(text, 'CORE BUILD').length === expectedCore;
+  const coreItems = sectionItems(text, 'CORE BUILD');
+  return coreItems.length === expectedCore && coreItems.some(isBootItemName);
 }
 
 function fallbackToMetaBuild(instantMetaText, body, mechanicsMap = null) {
@@ -2209,7 +2210,7 @@ function ensureSupportQuestUpgrade(finalText, body, tags) {
     const clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
     return `${index + 1}. ${clean}`;
   }).join('\n');
-  return replaceBuildSection(finalText, 'CORE BUILD', renumbered);
+  return enforceBootInvariant(replaceBuildSection(finalText, 'CORE BUILD', renumbered), body);
 }
 
 function enforceRoleSafeItems(finalText, body) {
@@ -2389,7 +2390,7 @@ function dedupeAndPadCoreBuild(finalText, body) {
     return `${index + 1}. ${clean}`;
   }).join('\n');
 
-  return replaceBuildSection(finalText, 'CORE BUILD', renumbered);
+  return enforceBootInvariant(replaceBuildSection(finalText, 'CORE BUILD', renumbered), body);
 }
 
 function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null) {
@@ -2510,7 +2511,69 @@ const BOOT_ITEMS = [
   "Berserker's Greaves",
   'Ionian Boots of Lucidity',
   "Sorcerer's Shoes",
+  'Symbiotic Soles',
 ];
+
+function isBootItemName(name) {
+  return exactItemMatch(name, BOOT_ITEMS);
+}
+
+function chooseBootsForBuild(body, mechanicsMap = null) {
+  const role = String(body?.role || '').toLowerCase();
+  const tags = getChampionTags(body?.myChampion);
+  const draft = analyzeEnemyDraft(body?.enemies || [], mechanicsMap);
+  const champDmg = inferDamageFromTagsAndInfo(body?.myChampion, mechanicsMap);
+  const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+  const isApChampion = champDmg === 'AP' || tags.includes('Mage');
+  const isSupport = /support|utility/.test(role);
+
+  if (draft.heavyAd && draft.effectiveAp < 1.5) return 'Plated Steelcaps';
+  if (draft.heavyAp || draft.highCc) return "Mercury's Treads";
+  if (draft.ad >= 3) return 'Plated Steelcaps';
+  if (isMarksman) return "Berserker's Greaves";
+  if (isApChampion) return "Sorcerer's Shoes";
+  if (isSupport) return 'Ionian Boots of Lucidity';
+  return 'Plated Steelcaps';
+}
+
+function enforceBootInvariant(finalText, body, mechanicsMap = null) {
+  if (!finalText || !body) return finalText;
+  const core = extractBuildSection(finalText, 'CORE BUILD');
+  if (!core) return finalText;
+
+  const role = String(body.role || '').toLowerCase();
+  const expected = /^(adc|bot|bottom)$/.test(role) ? 7 : 6;
+  const desiredBoots = chooseBootsForBuild(body, mechanicsMap);
+  const originalLines = core.split('\n').filter(line => line.trim());
+  const bootLines = originalLines.filter(line => isBootItemName(normalizeBuildLine(line)));
+  const hasDesired = bootLines.some(line => itemKey(normalizeBuildLine(line)) === itemKey(desiredBoots));
+  const chosenBoots = hasDesired ? desiredBoots : (bootLines[0] ? normalizeBuildLine(bootLines[0]) : desiredBoots);
+  const draft = analyzeEnemyDraft(body?.enemies || [], mechanicsMap);
+  const shouldForceCounterBoots = draft.heavyAd || draft.heavyAp || draft.highCc || draft.ad >= 3;
+  const finalBoots = shouldForceCounterBoots ? desiredBoots : chosenBoots;
+  const bootReason = finalBoots === 'Plated Steelcaps'
+    ? 'armor vs physical pressure'
+    : finalBoots === "Mercury's Treads"
+      ? 'tenacity and magic resist vs AP/CC pressure'
+      : finalBoots === "Berserker's Greaves"
+        ? 'attack speed for DPS uptime'
+        : finalBoots === "Sorcerer's Shoes"
+          ? 'magic penetration for AP damage'
+          : finalBoots === 'Ionian Boots of Lucidity'
+            ? 'haste and spell tempo'
+            : 'movement utility';
+
+  const withoutBoots = originalLines.filter(line => !isBootItemName(normalizeBuildLine(line)));
+  const insertIndex = /support|utility/.test(role) ? Math.min(1, withoutBoots.length) : Math.min(1, withoutBoots.length);
+  withoutBoots.splice(insertIndex, 0, `${finalBoots} (${bootReason})`);
+
+  const renumbered = withoutBoots.slice(0, expected).map((line, index) => {
+    const clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
+    return `${index + 1}. ${clean}`;
+  }).join('\n');
+
+  return replaceBuildSection(finalText, 'CORE BUILD', renumbered);
+}
 
 function ensureCoreItem(text, itemName, reason, insertIndex = 0) {
   const core = extractBuildSection(text, 'CORE BUILD');

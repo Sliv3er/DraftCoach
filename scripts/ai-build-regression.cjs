@@ -43,6 +43,7 @@ const SCENARIOS = [
   { name: 'Aatrox off-role support suppression', myChampion: 'Aatrox', role: 'support', allies: ['Udyr', 'KSante', 'Caitlyn', 'Lux'], enemies: ['Ambessa', 'Amumu', 'Viktor', 'Thresh', 'Lucian'], expect: { supportStart: true, supportUpgrade: true, supportUpgradeFirst: true, boots: ['Mercury'], noCore: ["Zhonya's Hourglass", "Rabadon's Deathcap", 'Shadowflame', 'Malignance', "Luden's Echo", 'Void Staff', 'Morellonomicon'], noText: ["Zhonya", "Rabadon", 'Shadowflame', 'Malignance', "Luden", 'Void Staff', 'Morellonomicon', 'Thornmail', 'Mortal Reminder'] } },
   { name: 'Caitlyn ADC no heal no forced antiheal', myChampion: 'Caitlyn', role: 'adc', allies: ['Lulu', 'Orianna', 'Sejuani', 'Garen'], enemies: ['Jhin', 'Zed', 'Orianna', 'Leona', 'Graves'], expect: { adcItems: true, noAntiHeal: true, exclusiveArmorPen: true, noCore: ['Thornmail', 'Mortal Reminder', 'Morellonomicon', 'Chempunk Chainsword'] } },
   { name: 'Jinx ADC tanks healing armor pen exclusivity', myChampion: 'Jinx', role: 'adc', allies: ['Lulu', 'Orianna', 'Sejuani', 'Garen'], enemies: ['DrMundo', 'Soraka', 'Ornn', 'Zed', 'Jhin'], expect: { adcItems: true, antiHeal: ['Mortal Reminder'], exclusiveArmorPen: true, noCore: ['Black Cleaver', "Serylda's Grudge", "Lord Dominik's Regards"] } },
+  { name: 'Jax top physical pressure keeps boots', myChampion: 'Jax', role: 'top', allies: ['Viego', 'Akali', 'Ashe', 'Seraphine'], enemies: ['Urgot', 'Khazix', 'Ahri', 'Smolder', 'Poppy'], expect: { boots: ['Plated Steelcaps'], armor: 1, noCore: ["Sorcerer's Shoes", "Mercury's Treads"] } },
   { name: 'Darius top confirmed Kayle lane roles', myChampion: 'Darius', role: 'top', allies: ['Vladimir', 'Graves', 'Bard', 'Yone'], enemies: ['Senna', 'Lucian', 'Vi', 'Galio', 'Kayle'], enemyRoles: { Senna: 'adc', Lucian: 'mid', Vi: 'jungle', Galio: 'support', Kayle: 'top' }, expect: { boots: ['Mercury'], noText: ['Senna Top'], mustText: ['Kayle'] } },
   { name: 'Fizz mid AP assassin class safety', myChampion: 'Fizz', role: 'mid', allies: ['Camille', 'XinZhao', 'Ezreal', 'Malphite'], enemies: ['Milio', 'Kaisa', 'Akshan', 'Tryndamere', 'Kayn'], enemyRoles: { Milio: 'support', Kaisa: 'adc', Akshan: 'top', Tryndamere: 'mid', Kayn: 'jungle' }, expect: { apItems: 3, noCore: ['Chempunk Chainsword', "Sterak's Gage", 'Guardian Angel', 'Maw of Malmortius', 'Black Cleaver', 'Sundered Sky'], noText: ['off-class AP item removed', 'class-appropriate Grievous Wounds'] } },
 ];
@@ -57,6 +58,7 @@ const COMPONENT_NAMES = ['Null-Magic Mantle', 'Kindlegem', 'Ruby Crystal', 'Long
 const GRIEVOUS_ITEMS = ['Thornmail', 'Mortal Reminder', 'Morellonomicon', 'Chempunk Chainsword'];
 const ARMOR_PEN_EXCLUSIVE_ITEMS = ['Black Cleaver', "Lord Dominik's Regards", 'Mortal Reminder', "Serylda's Grudge", 'Terminus'];
 const AP_ITEMS = ["Zhonya's Hourglass", "Rabadon's Deathcap", 'Shadowflame', 'Void Staff', 'Cryptbloom', "Banshee's Veil", 'Morellonomicon', 'Lich Bane', 'Stormsurge', 'Cosmic Drive', "Nashor's Tooth", 'Malignance', "Luden's Echo", "Liandry's Torment", "Rylai's Crystal Scepter", "Mejai's Soulstealer", "Zaz'Zak's Realmspike"];
+const BOOTS = ['Plated Steelcaps', "Mercury's Treads", 'Boots of Swiftness', "Berserker's Greaves", 'Ionian Boots of Lucidity', "Sorcerer's Shoes", 'Symbiotic Soles'];
 
 function section(text, header) {
   const others = HEADERS.filter(h => h !== header).join('|');
@@ -141,6 +143,7 @@ function audit(text, scenario) {
   if (!/Primary:/i.test(runes) || !/Secondary:/i.test(runes) || !/Keystone:/i.test(runes)) issues.push('runes incomplete');
   const expectedCore = /^(adc|bot|bottom)$/i.test(scenario.role) ? 7 : 6;
   if (core.length !== expectedCore) issues.push(`core count ${core.length}/${expectedCore}`);
+  if (!core.some(x => BOOTS.some(boot => boot.toLowerCase() === x.toLowerCase()))) issues.push('missing upgraded boots');
   const duplicate = core.filter((x, i, arr) => arr.findIndex(y => y.toLowerCase() === x.toLowerCase()) !== i);
   if (duplicate.length) issues.push(`duplicate ${duplicate.join(',')}`);
   for (const component of COMPONENT_NAMES) {
@@ -272,6 +275,7 @@ function runStaticAdvisorChecks() {
   if (!source.includes('DECISION TRACE')) issues.push('backend decision trace prompt/gate is missing');
   if (!source.includes('stripDecisionTrace')) issues.push('backend does not strip decision trace before UI output');
   if (!source.includes('judgeReasoningQuality')) issues.push('backend reasoning judge is missing');
+  if (!source.includes('enforceBootInvariant') || !source.includes('coreItems.length === expectedCore && coreItems.some(isBootItemName)')) issues.push('core build boot invariant is missing');
   return issues;
 }
 

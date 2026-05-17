@@ -2,8 +2,8 @@
     "meta": {
         "patch": "16.10",
         "source": "mobalytics-gql+cdragon",
-        "generatedAt": "2026-05-17T14:06:00.769Z",
-        "buildHash": "moba-modes-1779026760770",
+        "generatedAt": "2026-05-17T17:04:09.266Z",
+        "buildHash": "moba-modes-1779037449266",
         "stats": {
             "champions": 172,
             "aramBuilds": 172,
@@ -18,28 +18,6 @@
             "championId": "Aatrox",
             "role": "ARAM",
             "label": "DAMAGE",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Haste",
-                "Last Stand"
-            ],
-            "secondaryTree": "Resolve",
-            "secondarySlots": [
-                "Bone Plating",
-                "Revitalize"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Aatrox_ARAM_SAFETY": {
-            "championId": "Aatrox",
-            "role": "ARAM",
-            "label": "SAFETY",
             "primaryTree": "Precision",
             "primaryKeystone": "Conqueror",
             "primarySlots": [
@@ -399,10 +377,10 @@
                 "Legend: Haste",
                 "Last Stand"
             ],
-            "secondaryTree": "Domination",
+            "secondaryTree": "Resolve",
             "secondarySlots": [
-                "Sudden Impact",
-                "Treasure Hunter"
+                "Overgrowth",
+                "Second Wind"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -1142,6 +1120,28 @@
             "label": "DAMAGE",
             "primaryTree": "Resolve",
             "primaryKeystone": "Guardian",
+            "primarySlots": [
+                "Font of Life",
+                "Conditioning",
+                "Overgrowth"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Legend: Haste",
+                "Triumph"
+            ],
+            "statShards": [
+                "Ability Haste",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
+        "Braum_ARAM_SAFETY": {
+            "championId": "Braum",
+            "role": "ARAM",
+            "label": "SAFETY",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Grasp of the Undying",
             "primarySlots": [
                 "Font of Life",
                 "Conditioning",
@@ -2126,6 +2126,28 @@
                 "Health Scaling"
             ]
         },
+        "Fiora_ARAM_SAFETY": {
+            "championId": "Fiora",
+            "role": "ARAM",
+            "label": "SAFETY",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Conqueror",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Taste of Blood",
+                "Treasure Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
         "Fiora_ARAM_UTILITY": {
             "championId": "Fiora",
             "role": "ARAM",
@@ -2526,17 +2548,17 @@
             "championId": "Gragas",
             "role": "ARAM",
             "label": "UTILITY",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Dark Harvest",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Grasp of the Undying",
             "primarySlots": [
-                "Sudden Impact",
-                "Grisly Mementos",
-                "Ultimate Hunter"
+                "Font of Life",
+                "Conditioning",
+                "Overgrowth"
             ],
-            "secondaryTree": "Sorcery",
+            "secondaryTree": "Precision",
             "secondarySlots": [
-                "Manaflow Band",
-                "Transcendence"
+                "Legend: Haste",
+                "Presence of Mind"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -3736,6 +3758,28 @@
             "championId": "Kayle",
             "role": "ARAM",
             "label": "DAMAGE",
+            "primaryTree": "Precision",
+            "primaryKeystone": "Lethal Tempo",
+            "primarySlots": [
+                "Triumph",
+                "Legend: Alacrity",
+                "Coup de Grace"
+            ],
+            "secondaryTree": "Domination",
+            "secondarySlots": [
+                "Taste of Blood",
+                "Treasure Hunter"
+            ],
+            "statShards": [
+                "Attack Speed",
+                "Adaptive Force",
+                "Health Scaling"
+            ]
+        },
+        "Kayle_ARAM_SAFETY": {
+            "championId": "Kayle",
+            "role": "ARAM",
+            "label": "SAFETY",
             "primaryTree": "Precision",
             "primaryKeystone": "Lethal Tempo",
             "primarySlots": [
@@ -5008,28 +5052,6 @@
                 "Health Scaling"
             ]
         },
-        "MonkeyKing_ARAM_SAFETY": {
-            "championId": "MonkeyKing",
-            "role": "ARAM",
-            "label": "SAFETY",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Haste",
-                "Coup de Grace"
-            ],
-            "secondaryTree": "Domination",
-            "secondarySlots": [
-                "Sudden Impact",
-                "Treasure Hunter"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "MonkeyKing_ARAM_UTILITY": {
             "championId": "MonkeyKing",
             "role": "ARAM",
@@ -5056,28 +5078,6 @@
             "championId": "Mordekaiser",
             "role": "ARAM",
             "label": "DAMAGE",
-            "primaryTree": "Precision",
-            "primaryKeystone": "Conqueror",
-            "primarySlots": [
-                "Triumph",
-                "Legend: Haste",
-                "Last Stand"
-            ],
-            "secondaryTree": "Resolve",
-            "secondarySlots": [
-                "Conditioning",
-                "Revitalize"
-            ],
-            "statShards": [
-                "Attack Speed",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
-        "Mordekaiser_ARAM_SAFETY": {
-            "championId": "Mordekaiser",
-            "role": "ARAM",
-            "label": "SAFETY",
             "primaryTree": "Precision",
             "primaryKeystone": "Conqueror",
             "primarySlots": [
@@ -5325,6 +5325,28 @@
             "primarySlots": [
                 "Shield Bash",
                 "Bone Plating",
+                "Overgrowth"
+            ],
+            "secondaryTree": "Precision",
+            "secondarySlots": [
+                "Legend: Haste",
+                "Triumph"
+            ],
+            "statShards": [
+                "Ability Haste",
+                "Health Scaling",
+                "Health Scaling"
+            ]
+        },
+        "Nautilus_ARAM_SAFETY": {
+            "championId": "Nautilus",
+            "role": "ARAM",
+            "label": "SAFETY",
+            "primaryTree": "Resolve",
+            "primaryKeystone": "Grasp of the Undying",
+            "primarySlots": [
+                "Shield Bash",
+                "Conditioning",
                 "Overgrowth"
             ],
             "secondaryTree": "Precision",
@@ -5954,34 +5976,12 @@
                 "Health Scaling"
             ]
         },
-        "Pyke_ARAM_SAFETY": {
-            "championId": "Pyke",
-            "role": "ARAM",
-            "label": "SAFETY",
-            "primaryTree": "Domination",
-            "primaryKeystone": "Hail of Blades",
-            "primarySlots": [
-                "Sudden Impact",
-                "Grisly Mementos",
-                "Ultimate Hunter"
-            ],
-            "secondaryTree": "Precision",
-            "secondarySlots": [
-                "Coup de Grace",
-                "Triumph"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Pyke_ARAM_UTILITY": {
             "championId": "Pyke",
             "role": "ARAM",
             "label": "UTILITY",
             "primaryTree": "Domination",
-            "primaryKeystone": "Hail of Blades",
+            "primaryKeystone": "Dark Harvest",
             "primarySlots": [
                 "Sudden Impact",
                 "Grisly Mementos",
@@ -5990,7 +5990,7 @@
             "secondaryTree": "Precision",
             "secondarySlots": [
                 "Coup de Grace",
-                "Triumph"
+                "Presence of Mind"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -6625,10 +6625,10 @@
                 "Legend: Haste",
                 "Last Stand"
             ],
-            "secondaryTree": "Sorcery",
+            "secondaryTree": "Domination",
             "secondarySlots": [
-                "Gathering Storm",
-                "Transcendence"
+                "Taste of Blood",
+                "Treasure Hunter"
             ],
             "statShards": [
                 "Adaptive Force",
@@ -9298,28 +9298,6 @@
                 "Health Scaling"
             ]
         },
-        "Xerath_ARAM_SAFETY": {
-            "championId": "Xerath",
-            "role": "ARAM",
-            "label": "SAFETY",
-            "primaryTree": "Sorcery",
-            "primaryKeystone": "Arcane Comet",
-            "primarySlots": [
-                "Manaflow Band",
-                "Transcendence",
-                "Scorch"
-            ],
-            "secondaryTree": "Precision",
-            "secondarySlots": [
-                "Coup de Grace",
-                "Presence of Mind"
-            ],
-            "statShards": [
-                "Adaptive Force",
-                "Adaptive Force",
-                "Health Scaling"
-            ]
-        },
         "Xerath_ARAM_UTILITY": {
             "championId": "Xerath",
             "role": "ARAM",
@@ -9331,10 +9309,10 @@
                 "Grisly Mementos",
                 "Ultimate Hunter"
             ],
-            "secondaryTree": "Precision",
+            "secondaryTree": "Sorcery",
             "secondarySlots": [
-                "Coup de Grace",
-                "Presence of Mind"
+                "Manaflow Band",
+                "Transcendence"
             ],
             "statShards": [
                 "Adaptive Force",

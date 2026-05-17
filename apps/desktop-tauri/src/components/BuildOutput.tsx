@@ -499,6 +499,14 @@ function renderItems(content: string, lookups: IconLookups | null, numbered: boo
 }
 
 // Render live-updated items from the advisor (replaces stale CORE BUILD text)
+function liveUpdatedItemsContainBoots(items: LiveUpdatedItem[] | null | undefined) {
+  const bootPatterns = ['boots', 'greaves', 'treads', 'steelcaps', 'sorcerer', 'swiftness', 'lucidity', 'ionian', 'symbiotic'];
+  return (items || []).some((item) => {
+    const name = String(item?.name || '').toLowerCase();
+    return bootPatterns.some((pattern) => name.includes(pattern));
+  });
+}
+
 function renderLiveUpdatedItems(items: LiveUpdatedItem[]) {
   return (
     <div className="items-list">
@@ -1217,7 +1225,7 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
           <h3>{s.title}</h3>
         </div>
         {/* Use live-updated items for CORE BUILD when available (from live advisor) */}
-        {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0
+        {s.title === 'CORE BUILD' && liveUpdatedItems && liveUpdatedItems.length > 0 && liveUpdatedItemsContainBoots(liveUpdatedItems)
           ? renderLiveUpdatedItems(liveUpdatedItems)
           : renderSection(s.title, s.content, iconLookups, championSpells, version, enemies || [])
         }

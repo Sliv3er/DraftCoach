@@ -263,6 +263,12 @@ async function assertServer() {
 function runStaticAdvisorChecks() {
   const mainPath = path.resolve(__dirname, '..', 'apps/desktop/src/main/main.cjs');
   const source = fs.readFileSync(mainPath, 'utf8');
+  const buildOutputPath = path.resolve(__dirname, '..', 'apps/desktop-tauri/src/components/BuildOutput.tsx');
+  const buildOutputSource = fs.readFileSync(buildOutputPath, 'utf8');
+  const uggSyncPath = path.resolve(__dirname, 'sync-ugg.cjs');
+  const uggSyncSource = fs.readFileSync(uggSyncPath, 'utf8');
+  const buildTemplatesPath = path.resolve(__dirname, '..', 'shared/kb/data/build-templates.json');
+  const buildTemplates = JSON.parse(fs.readFileSync(buildTemplatesPath, 'utf8'));
   const issues = [];
   if (!source.includes('REJECTED component in live advisor')) issues.push('live advisor does not reject component next-items');
   if (!source.includes('completed item goals only')) issues.push('live advisor prompt does not require completed item goals');
@@ -276,6 +282,19 @@ function runStaticAdvisorChecks() {
   if (!source.includes('stripDecisionTrace')) issues.push('backend does not strip decision trace before UI output');
   if (!source.includes('judgeReasoningQuality')) issues.push('backend reasoning judge is missing');
   if (!source.includes('enforceBootInvariant') || !source.includes('coreItems.length === expectedCore && coreItems.some(isBootItemName)')) issues.push('core build boot invariant is missing');
+  if (!source.includes('preserveCanonicalBootSlot') || !source.includes('_canonicalBuildItems')) issues.push('live advisor can still drop canonical boots from full plan');
+  if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');
+  if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with role-safe full items');
+  for (const [key, template] of Object.entries(buildTemplates.data || {})) {
+    for (const [label, variant] of Object.entries(template.variants || {})) {
+      const coreCount = (variant.coreItems || []).length + (variant.bootChoice ? 1 : 0);
+      if (!variant.bootChoice || coreCount < 6) {
+        issues.push(`U.GG baseline incomplete: ${key}/${label} has ${coreCount} items`);
+        break;
+      }
+    }
+    if (issues.some(issue => issue.startsWith(`U.GG baseline incomplete: ${key}/`))) break;
+  }
   return issues;
 }
 

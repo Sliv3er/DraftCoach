@@ -53,6 +53,21 @@ const SPELL_MAP = {
   32: 'Snowball',
 };
 
+const AP_DAMAGE_CHAMPIONS = new Set([
+  'Ahri', 'Akali', 'Anivia', 'Annie', 'AurelionSol', 'Aurora', 'Azir', 'Brand', 'Cassiopeia', 'Diana', 'Ekko',
+  'Elise', 'Evelynn', 'Fiddlesticks', 'Fizz', 'Galio', 'Gragas', 'Gwen', 'Heimerdinger', 'Hwei',
+  'Ivern', 'Karthus', 'Kassadin', 'Katarina', 'Kennen', 'Leblanc', 'LeBlanc', 'Lillia', 'Lissandra',
+  'Malzahar', 'Mordekaiser', 'Morgana', 'Neeko', 'Nidalee', 'Orianna', 'Rumble', 'Ryze', 'Seraphine',
+  'Singed', 'Swain', 'Sylas', 'Syndra', 'Taliyah', 'Teemo', 'TwistedFate', 'Veigar', 'Velkoz', 'Vex',
+  'Viktor', 'Vladimir', 'Xerath', 'Ziggs', 'Zoe', 'Zyra',
+]);
+
+const OFF_CLASS_AP_ITEMS = new Set([
+  "Zhonya's Hourglass", "Rabadon's Deathcap", 'Shadowflame', 'Malignance', "Luden's Echo",
+  'Void Staff', 'Cryptbloom', 'Morellonomicon', "Banshee's Veil", 'Stormsurge', 'Cosmic Drive',
+  "Liandry's Torment", "Rylai's Crystal Scepter", "Mejai's Soulstealer",
+]);
+
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const singleIdx = args.indexOf('--champion');
@@ -100,7 +115,7 @@ function isCurrentStoreItem(item) {
 
 function isCompletedItem(item) {
   if (!isCurrentStoreItem(item)) return false;
-  if (isBoot(item)) return item.gold > 300 && (!item.into || item.into.length === 0);
+  if (isBoot(item)) return item.gold > 300 && item.id !== '1001';
   return item.gold >= 2000 && item.from?.length > 0 && (!item.into || item.into.length === 0) && item.tags?.length > 0;
 }
 
@@ -108,6 +123,12 @@ function itemEntry(id, dd) {
   const item = dd.itemMap[String(id)];
   if (!isCompletedItem(item)) return null;
   return { id: String(id), name: item.name };
+}
+
+function itemEntryByName(name, dd) {
+  const key = String(name || '').toLowerCase().replace(/[']/g, "'").trim();
+  const found = Object.values(dd.itemMap).find(item => String(item.name || '').toLowerCase().replace(/[']/g, "'").trim() === key);
+  return found ? itemEntry(found.id, dd) : null;
 }
 
 function starterEntry(id, dd) {
@@ -144,6 +165,7 @@ async function fetchDDragon() {
     id: c.id,
     key: String(c.key),
     name: c.name,
+    tags: c.tags || [],
     slug: uggSlug(c),
   }));
 
@@ -224,38 +246,121 @@ function resolveStarting(entry, dd) {
     .slice(0, 3);
 }
 
-function optionIds(entry) {
-  const ids = [];
+function optionGroups(entry) {
+  const groups = [];
   for (const key of ['item_options_1', 'item_options_2', 'item_options_3', 'item_options_4']) {
-    const best = (entry?.[key] || [])
+    const group = (entry?.[key] || [])
       .filter(row => row && row.id)
-      .sort((a, b) => (b.matches || 0) - (a.matches || 0) || (b.win_rate || 0) - (a.win_rate || 0))[0];
-    if (best) ids.push(best.id);
+      .sort((a, b) => (b.matches || 0) - (a.matches || 0) || (b.win_rate || 0) - (a.win_rate || 0));
+    if (group.length) groups.push(group);
   }
-  return ids;
+  return groups;
 }
 
-function resolveItems(entry, dd) {
+function defaultBootChoice(champ, role, dd) {
+  const tags = champ?.tags || [];
+  const roleUpper = String(role || '').toUpperCase();
+  const candidates = roleUpper === 'SUPPORT'
+    ? ['Ionian Boots of Lucidity', 'Boots of Swiftness', "Mercury's Treads", 'Plated Steelcaps']
+    : roleUpper === 'ADC' || tags.includes('Marksman')
+      ? ["Berserker's Greaves", 'Plated Steelcaps', "Mercury's Treads"]
+      : tags.includes('Mage')
+        ? ["Sorcerer's Shoes", 'Ionian Boots of Lucidity', "Mercury's Treads", 'Plated Steelcaps']
+        : tags.includes('Tank')
+          ? ['Plated Steelcaps', "Mercury's Treads", 'Boots of Swiftness']
+          : ['Plated Steelcaps', "Mercury's Treads", 'Boots of Swiftness', 'Ionian Boots of Lucidity'];
+  return candidates.map(name => itemEntryByName(name, dd)).find(Boolean) || null;
+}
+
+function safeCompletionCandidates(champ, role) {
+  const tags = champ?.tags || [];
+  const roleUpper = String(role || '').toUpperCase();
+  if (roleUpper === 'SUPPORT' || tags.includes('Support')) {
+    return ['Locket of the Iron Solari', 'Redemption', "Knight's Vow", "Mikael's Blessing", 'Trailblazer', 'Dawncore', "Shurelya's Battlesong", 'Ardent Censer', 'Staff of Flowing Water'];
+  }
+  if (roleUpper === 'ADC' || tags.includes('Marksman')) {
+    return ['Infinity Edge', 'Bloodthirster', "Lord Dominik's Regards", 'Guardian Angel', "Runaan's Hurricane", 'Rapid Firecannon', 'Maw of Malmortius'];
+  }
+  if (tags.includes('Mage')) {
+    const mageCore = ["Zhonya's Hourglass", "Banshee's Veil", "Rabadon's Deathcap", 'Void Staff', 'Shadowflame', 'Cosmic Drive', "Liandry's Torment", "Rylai's Crystal Scepter"];
+    if (tags.includes('Tank')) {
+      return mageCore.concat(["Jak'Sho, The Protean", "Randuin's Omen", 'Force of Nature', 'Spirit Visage', 'Frozen Heart', 'Thornmail', "Dead Man's Plate"]);
+    }
+    return mageCore;
+  }
+  if (tags.includes('Tank') && !tags.includes('Fighter')) {
+    return ["Jak'Sho, The Protean", "Randuin's Omen", 'Force of Nature', 'Spirit Visage', 'Frozen Heart', 'Thornmail', "Dead Man's Plate"];
+  }
+  if (tags.includes('Assassin')) {
+    return ['Edge of Night', "Serylda's Grudge", 'Guardian Angel', 'Maw of Malmortius', 'Axiom Arc', "Youmuu's Ghostblade"];
+  }
+  return ['Spear of Shojin', 'Sundered Sky', "Sterak's Gage", "Death's Dance", 'Black Cleaver', 'Maw of Malmortius', 'Guardian Angel', "Randuin's Omen", 'Force of Nature'];
+}
+
+function padCoreItems(coreItems, used, champ, role, dd) {
+  for (const name of safeCompletionCandidates(champ, role)) {
+    if (coreItems.length >= 5) break;
+    const item = itemEntryByName(name, dd);
+    if (!item || used.has(item.id) || isBoot(dd.itemMap[item.id]) || !itemAllowedForChampion(item, champ)) continue;
+    used.add(item.id);
+    coreItems.push(item);
+  }
+}
+
+function itemAllowedForChampion(item, champ) {
+  if (!item) return false;
+  if (AP_DAMAGE_CHAMPIONS.has(champ?.id) || (champ?.tags || []).includes('Mage')) return true;
+  return !OFF_CLASS_AP_ITEMS.has(item.name);
+}
+
+function resolveItems(entry, dd, champ, role) {
   const used = new Set();
-  const bootChoice = (entry?.t3_boots_options || [])
+  let bootChoice = (entry?.rec_core_items?.ids || [])
+    .map(id => itemEntry(id, dd))
+    .find(item => item && isBoot(dd.itemMap[item.id])) || null;
+
+  if (!bootChoice) {
+    bootChoice = (entry?.t3_boots_options || [])
     .map(row => itemEntry(row.id, dd))
     .filter(Boolean)
     .sort((a, b) => (dd.itemMap[b.id]?.gold || 0) - (dd.itemMap[a.id]?.gold || 0))[0];
+  }
 
+  if (!bootChoice) bootChoice = defaultBootChoice(champ, role, dd);
   if (bootChoice) used.add(bootChoice.id);
 
-  const rawIds = [
-    ...(entry?.rec_core_items?.ids || []),
-    ...optionIds(entry),
-  ];
   const coreItems = [];
-  for (const id of rawIds) {
+  for (const id of (entry?.rec_core_items?.ids || [])) {
     const item = itemEntry(id, dd);
-    if (!item || used.has(item.id) || isBoot(dd.itemMap[item.id])) continue;
+    if (!item || used.has(item.id) || isBoot(dd.itemMap[item.id]) || !itemAllowedForChampion(item, champ)) continue;
     used.add(item.id);
     coreItems.push(item);
     if (coreItems.length >= 5) break;
   }
+
+  for (const group of optionGroups(entry)) {
+    if (coreItems.length >= 5) break;
+    const item = group
+      .map(row => itemEntry(row.id, dd))
+      .find(candidate => candidate && !used.has(candidate.id) && !isBoot(dd.itemMap[candidate.id]) && itemAllowedForChampion(candidate, champ));
+    if (!item) continue;
+    used.add(item.id);
+    coreItems.push(item);
+  }
+
+  if (coreItems.length < 5) {
+    const fallbackPool = optionGroups(entry)
+      .flat()
+      .sort((a, b) => (b.win_rate || 0) - (a.win_rate || 0) || (b.matches || 0) - (a.matches || 0));
+    for (const row of fallbackPool) {
+      if (coreItems.length >= 5) break;
+      const item = itemEntry(row.id, dd);
+      if (!item || used.has(item.id) || isBoot(dd.itemMap[item.id]) || !itemAllowedForChampion(item, champ)) continue;
+      used.add(item.id);
+      coreItems.push(item);
+    }
+  }
+  if (coreItems.length < 5) padCoreItems(coreItems, used, champ, role, dd);
 
   return { coreItems, bootChoice };
 }
@@ -264,8 +369,8 @@ function resolveSpells(entry) {
   return (entry?.rec_summoner_spells?.ids || []).map(id => SPELL_MAP[id] || `Spell(${id})`);
 }
 
-function buildVariant(entry, dd, label) {
-  const items = resolveItems(entry, dd);
+function buildVariant(entry, dd, label, champ, role) {
+  const items = resolveItems(entry, dd, champ, role);
   return {
     label,
     sample: {
@@ -306,9 +411,9 @@ function buildRoleTemplate(champ, role, overviews, dd) {
   const safety = tankIsCredible ? tank : rec;
   const utility = chooseUtilityOverview(overviews, roleKey) || rec;
   const variants = {
-    DAMAGE: buildVariant(rec, dd, 'DAMAGE'),
-    SAFETY: buildVariant(safety, dd, 'SAFETY'),
-    UTILITY: buildVariant(utility, dd, 'UTILITY'),
+    DAMAGE: buildVariant(rec, dd, 'DAMAGE', champ, role),
+    SAFETY: buildVariant(safety, dd, 'SAFETY', champ, role),
+    UTILITY: buildVariant(utility, dd, 'UTILITY', champ, role),
   };
 
   return {

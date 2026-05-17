@@ -56,7 +56,7 @@ function isCurrentStoreItem(id, item, mapId = 11) {
 function isCompletedStoreItem(id, item, mapId = 11) {
   if (!isCurrentStoreItem(id, item, mapId)) return false;
   const isBoots = item.tags && item.tags.includes('Boots');
-  if (isBoots) return item.gold > 300 && (!item.into || item.into.length === 0);
+  if (isBoots) return item.gold > 300 && String(id) !== '1001';
   if (item.gold < 2000) return false;
   if (!item.from || item.from.length === 0) return false;
   if (item.into && item.into.length > 0) return false;
@@ -349,6 +349,45 @@ let ddragonItemCache = null; // { version, items: Map<normalizedName, {id, name,
 let ddragonItemCachePromise = null; // Lock to prevent duplicate fetches
 let ddragonRuneCache = null; // { version, trees: [{name, keystones, slots}], shardOptions, reference }
 
+function cloneOverlayItem(item) {
+  return item ? { ...item } : item;
+}
+
+function isOverlayBootItem(item) {
+  if (!item) return false;
+  if (item.name && typeof isBootItemName === 'function' && isBootItemName(item.name)) return true;
+  if (item.id && ddragonItemCache?.byId) {
+    const data = ddragonItemCache.byId.get(String(item.id));
+    if (data?.tags?.includes('Boots') && data.gold > 300) return true;
+  }
+  return false;
+}
+
+function preserveCanonicalBootSlot(items, canonicalItems) {
+  const next = (items || []).filter(Boolean).map(cloneOverlayItem);
+  const canonical = (canonicalItems || []).filter(Boolean);
+  if (!canonical.length || next.some(isOverlayBootItem)) return next;
+
+  const bootIndex = canonical.findIndex(isOverlayBootItem);
+  if (bootIndex < 0) return next;
+
+  const maxItems = canonical.length || next.length || 6;
+  next.splice(Math.max(0, Math.min(bootIndex, next.length)), 0, cloneOverlayItem(canonical[bootIndex]));
+
+  while (next.length > maxItems) {
+    let removeIndex = next.length - 1;
+    for (let i = next.length - 1; i >= 0; i--) {
+      if (!isOverlayBootItem(next[i])) {
+        removeIndex = i;
+        break;
+      }
+    }
+    next.splice(removeIndex, 1);
+  }
+
+  return next;
+}
+
 // Fetch and cache DDragon runes (runesReforged.json)
 async function fetchDdragonRunes() {
   if (ddragonRuneCache) return ddragonRuneCache;
@@ -421,7 +460,7 @@ function getValidBootsReference(mapId = 11) {
   for (const [id, item] of ddragonItemCache.byId) {
     if (!isCurrentStoreItem(id, item, mapId)) continue;
     // Boots have Boots of Speed (1001) in their recipe tree and cost > 300g (not base boots)
-    if (item.from && item.from.includes('1001') && item.gold > 300 && (!item.into || item.into.length === 0)) {
+    if (item.from && item.from.includes('1001') && item.gold > 300 && String(id) !== '1001') {
       boots.push(item.name);
     }
   }
@@ -6234,6 +6273,7 @@ ipcMain.on('overlay-data', (_event, data) => {
   log('INFO', '[main] Received overlay data from renderer');
   overlayGeneration++;
   data._generation = overlayGeneration;
+  data._canonicalBuildItems = (data.buildItems || []).map(cloneOverlayItem);
   overlayData = data;
   if (overlayWindow && !overlayWindow.isDestroyed()) {
     overlayWindow.webContents.send('overlay-data-update', data);
@@ -6245,11 +6285,11 @@ ipcMain.on('update-overlay-items', (_event, newItems) => {
   log('INFO', `[main] Overlay items updated: ${newItems.length} items`);
   overlayGeneration++;
   if (overlayData) {
-    overlayData.buildItems = newItems;
+    overlayData.buildItems = preserveCanonicalBootSlot(newItems, overlayData._canonicalBuildItems || overlayData.buildItems);
     overlayData._generation = overlayGeneration;
   }
   if (overlayWindow && !overlayWindow.isDestroyed()) {
-    overlayWindow.webContents.send('overlay-items-update', newItems, overlayGeneration);
+    overlayWindow.webContents.send('overlay-items-update', overlayData?.buildItems || newItems, overlayGeneration);
   }
 });
 
@@ -7235,7 +7275,7 @@ RULES:
     }
     // Ã¢â€â‚¬Ã¢â€â‚¬ Apply updates to overlay Ã¢â€â‚¬Ã¢â€â‚¬
     if (overlayData && overlayData.buildItems && overlayData.buildItems.length > 0) {
-      const updatedItems = [...overlayData.buildItems];
+      let updatedItems = [...overlayData.buildItems];
       let modified = false;
       for (let i = updatedItems.length - 1; i >= 0; i--) {
         if (!isValidOverlayPlanItem(updatedItems[i])) {
@@ -7418,6 +7458,7 @@ RULES:
       }
 
       if (modified) {
+        updatedItems = preserveCanonicalBootSlot(updatedItems, overlayData._canonicalBuildItems || overlayData.buildItems);
         // Fix: Global safety net Ã¢â‚¬â€ deduplicate items by ID before pushing to overlay
         const seenIds = new Set();
         for (let i = updatedItems.length - 1; i >= 0; i--) {

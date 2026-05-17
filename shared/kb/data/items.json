@@ -2025,23 +2025,6 @@
             "passiveKeywords": [
                 "ENERGIZED_SLOW"
             ]
-        },
-        "6701": {
-            "id": "6701",
-            "name": "Opportunity",
-            "tags": [
-                "AD",
-                "LETHALITY"
-            ],
-            "cost": 2700,
-            "spikeTiming": "MID",
-            "statProfile": {
-                "ad": 55,
-                "lethality": 18
-            },
-            "passiveKeywords": [
-                "AMBUSH_DAMAGE"
-            ]
         }
     }
 }

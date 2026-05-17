@@ -122,7 +122,6 @@ const ITEMS = [
     ["3814", "Edge of Night", ["AD", "LETHALITY", "DEFENSIVE", "SAFETY"], 2800, "MID", { ad: 50, lethality: 15, health: 250 }, ["SPELL_SHIELD"]],
     ["6698", "Voltaic Cyclosword", ["AD", "LETHALITY", "ENERGIZED"], 2900, "MID", { ad: 55, lethality: 18 }, ["ENERGIZED_SLOW"]],
     ["3508", "Essence Reaver", ["AD", "CRIT", "MANA"], 2800, "MID", { ad: 45, critChance: 25, abilityHaste: 20 }, ["SPELLBLADE", "MANA_RESTORE"]],
-    ["6701", "Opportunity", ["AD", "LETHALITY"], 2700, "MID", { ad: 55, lethality: 18 }, ["AMBUSH_DAMAGE"]],
     ["3179", "Umbral Glaive", ["AD", "LETHALITY", "VISION"], 2600, "MID", { ad: 50, lethality: 15, abilityHaste: 15 }, ["WARD_KILLER"]],
     ["6621", "Dawncore", ["SUPPORT", "HEAL_SHIELD", "HEAL_SHIELD_AMP", "SUPPORT_ECONOMY"], 2700, "MID", { healShieldPower: 20, abilityHaste: 20 }, ["MEGA_HEAL_SHIELD"]],
     ["3860", "Celestial Opposition", ["SUPPORT", "TANK", "SLOW", "SUPPORT_ECONOMY"], 2300, "MID", { health: 200, armor: 30, mr: 30 }, ["SLOW_ZONE"]],

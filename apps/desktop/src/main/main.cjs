@@ -36,6 +36,43 @@ const CACHE_DIR = path.join(app.getPath('userData'), 'icon-cache');
 const _distIndexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
 const isDev = !app.isPackaged && !require('fs').existsSync(_distIndexPath);
 
+const BLOCKED_ITEM_IDS = new Set(['6701', '226701']); // Opportunity: present in DDragon metadata, not purchasable in current SR.
+const BLOCKED_ITEM_NAMES = new Set(['opportunity']);
+
+function normalizeItemNameKey(name) {
+  return String(name || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+}
+
+function isCurrentStoreItem(id, item, mapId = 11) {
+  if (!item) return false;
+  const key = normalizeItemNameKey(item.name);
+  if (BLOCKED_ITEM_IDS.has(String(id)) || BLOCKED_ITEM_NAMES.has(key)) return false;
+  const onMap = mapId === 12 ? item.isARAM : item.isSR;
+  if (!onMap) return false;
+  if (item.inStore === false || item.hideFromAll === true || item.purchasable === false) return false;
+  return true;
+}
+
+function isCompletedStoreItem(id, item, mapId = 11) {
+  if (!isCurrentStoreItem(id, item, mapId)) return false;
+  const isBoots = item.tags && item.tags.includes('Boots');
+  if (isBoots) return item.gold > 300 && (!item.into || item.into.length === 0);
+  if (item.gold < 2000) return false;
+  if (!item.from || item.from.length === 0) return false;
+  if (item.into && item.into.length > 0) return false;
+  if (!item.tags || item.tags.length === 0) return false;
+  return true;
+}
+
+function isKnownCompletedStoreItemName(name, mapId = 11) {
+  if (!ddragonItemCache?.byId) return true;
+  const key = normalizeItemNameKey(name);
+  for (const [id, item] of ddragonItemCache.byId) {
+    if (normalizeItemNameKey(item.name) === key) return isCompletedStoreItem(id, item, mapId);
+  }
+  return false;
+}
+
 // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 //  OPENROUTER / DEEPSEEK V4 FLASH Ã¢â‚¬â€ Universal LLM wrapper
 //  Uses OpenRouter API (OpenAI-compatible) for DeepSeek generation.
@@ -382,11 +419,9 @@ function getValidBootsReference(mapId = 11) {
   if (!ddragonItemCache || !ddragonItemCache.byId) return '';
   const boots = [];
   for (const [id, item] of ddragonItemCache.byId) {
-    // Check map availability
-    const onMap = mapId === 12 ? item.isARAM : item.isSR;
-    if (!onMap) continue;
+    if (!isCurrentStoreItem(id, item, mapId)) continue;
     // Boots have Boots of Speed (1001) in their recipe tree and cost > 300g (not base boots)
-    if (item.from && item.from.includes('1001') && item.gold > 300) {
+    if (item.from && item.from.includes('1001') && item.gold > 300 && (!item.into || item.into.length === 0)) {
       boots.push(item.name);
     }
   }
@@ -399,19 +434,7 @@ function getValidItemsReference(mapId = 11) {
   if (!ddragonItemCache || !ddragonItemCache.byId) return '';
   const categories = {};
   for (const [id, item] of ddragonItemCache.byId) {
-    // Check map availability
-    const onMap = mapId === 12 ? item.isARAM : item.isSR;
-    if (!onMap) continue;
-    // Only include truly completed items:
-    // - Must cost >= 2000g (skip cheap components)
-    // - Must have a build path (builds FROM something)
-    // - Must NOT build INTO anything else (it's a final item)
-    // - Exception: boots (which are cheaper but still "completed")
-    const isBoots = item.tags && item.tags.includes('Boots');
-    if (!isBoots && item.gold < 2000) continue;
-    if (!isBoots && (!item.from || item.from.length === 0)) continue;
-    if (item.into && item.into.length > 0) continue; // Skip mid-tier components
-    if (!item.tags || item.tags.length === 0) continue;
+    if (!isCompletedStoreItem(id, item, mapId)) continue;
     const primaryTag = item.tags[0];
     if (!categories[primaryTag]) categories[primaryTag] = [];
     if (!categories[primaryTag].includes(item.name)) {
@@ -451,7 +474,7 @@ function getValidStartingItemsReference(role, mapId = 11) {
   for (const [id, item] of ddragonItemCache.byId) {
     if (EXCLUDED_IDS.has(id)) continue;
     if (id.length > 4 && id.startsWith('32')) continue; // Duplicate IDs (e.g. 323070)
-    if (!item.isSR) continue;
+    if (!isCurrentStoreItem(id, item, 11)) continue;
     if (item.gold > 500) continue;
     if (item.from && item.from.length > 0) continue; // Must be a base item
     if (item.name.includes('Ornn') || item.name === 'Stat Bonus' || item.name === 'Anvil Voucher') continue;
@@ -821,19 +844,33 @@ async function resolveDdragonItem(itemName) {
           const items = new Map();
           const byId = new Map();
           for (const [id, d] of Object.entries(itemsData.data)) {
-            const norm = d.name.toLowerCase().replace(/['\u2019]/g, "'").replace(/\s+/g, ' ').trim();
+            const norm = normalizeItemNameKey(d.name);
             const iconUrl = `https://ddragon.leagueoflegends.com/cdn/${ver}/img/item/${id}.png`;
             const isSR = d.maps?.['11'] === true; // Summoner's Rift
             const isARAM = d.maps?.['12'] === true; // Howling Abyss (ARAM)
             // CRITICAL: Only include Summoner's Rift items in the name lookup
             // This prevents Arena/ARAM-only items (Goredrinker, Stridebreaker, etc.) from being resolved
-            if (isSR) {
+            const itemRecord = {
+              name: d.name,
+              from: d.from || [],
+              into: d.into || [],
+              gold: d.gold?.total || 0,
+              base: d.gold?.base || 0,
+              purchasable: d.gold?.purchasable !== false,
+              inStore: d.inStore !== false,
+              hideFromAll: d.hideFromAll === true,
+              iconUrl,
+              tags: d.tags || [],
+              isSR,
+              isARAM,
+            };
+            if (isCompletedStoreItem(id, itemRecord, 11)) {
               if (!items.has(norm)) {
                 items.set(norm, { id, name: d.name, iconUrl, gold: d.gold?.total || 0 });
               }
             }
             // byId stores ALL items (needed for component resolution) but marks map availability
-            byId.set(id, { name: d.name, from: d.from || [], into: d.into || [], gold: d.gold?.total || 0, base: d.gold?.base || 0, iconUrl, tags: d.tags || [], isSR, isARAM });
+            byId.set(id, itemRecord);
           }
           console.log(`[ddragon] Cached ${items.size} SR items out of ${byId.size} total`);
           ddragonItemCache = { version: ver, items, byId };
@@ -842,7 +879,7 @@ async function resolveDdragonItem(itemName) {
       }
       await ddragonItemCachePromise;
     }
-    const norm = itemName.toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ').trim();
+    const norm = normalizeItemNameKey(itemName);
     // Exact match (primary Ã¢â‚¬â€ fastest)
     if (ddragonItemCache.items.has(norm)) return ddragonItemCache.items.get(norm);
     // Strict prefix match only Ã¢â‚¬â€ no loose substring matching
@@ -2225,6 +2262,7 @@ function enforceRoleSafeItems(finalText, body) {
 function dedupeAndPadCoreBuild(finalText, body) {
   if (!finalText || !body) return finalText;
   const role = String(body.role || '').toLowerCase();
+  const mapId = body.gameMode === 'aram' || body.gameMode === 'aram-mayhem' ? 12 : 11;
   const coreContent = extractBuildSection(finalText, 'CORE BUILD');
   if (!coreContent) return finalText;
 
@@ -2249,6 +2287,7 @@ function dedupeAndPadCoreBuild(finalText, body) {
   for (const line of coreContent.split('\n')) {
     const item = normalizeBuildLine(line);
     if (!item) continue;
+    if (!isKnownCompletedStoreItemName(item, mapId)) continue;
     const key = item.toLowerCase();
     if (used.has(key)) continue;
     used.add(key);
@@ -6451,7 +6490,7 @@ function checkLiveAdvisorTriggers(gameData) {
     const majorItems = (e.items || []).filter(i => {
       if (!ddragonItemCache || !ddragonItemCache.byId) return false;
       const d = ddragonItemCache.byId.get(String(i.itemID));
-      return d && d.gold >= 2500 && d.from && d.from.length > 0;
+      return d && isCompletedStoreItem(String(i.itemID), d, 11) && d.gold >= 2500;
     }).length;
     enemyItemCounts[e.championName] = majorItems;
   }
@@ -6522,6 +6561,14 @@ async function pollLiveClient() {
       const d = ddragonItemCache.byId.get(String(id));
       return d && d.tags && d.tags.includes('Boots') && d.gold > 300;
     };
+    const isValidOverlayPlanItem = (bi) => {
+      if (!bi?.name) return false;
+      if (bi.id && ddragonItemCache?.byId) {
+        const data = ddragonItemCache.byId.get(String(bi.id));
+        return isCompletedStoreItem(String(bi.id), data, 11);
+      }
+      return isKnownCompletedStoreItemName(bi.name, 11);
+    };
     const myItemIds = (myPlayer?.items || []).map(i => String(i.itemID));
     const advisorHasBootsFromInventory = myItemIds.some(id => advisorIsBootsId(id));
     // Also check names for quest boots that might not have standard IDs
@@ -6539,6 +6586,7 @@ async function pollLiveClient() {
     if (overlayData && overlayData.buildItems && overlayData.buildItems.length > 0) {
       const ownedNames = (myPlayer?.items || []).map(i => (i.displayName || '').toLowerCase().trim()).filter(Boolean);
       for (const bi of overlayData.buildItems) {
+        if (!isValidOverlayPlanItem(bi)) continue;
         const bn = bi.name.toLowerCase().trim();
         const owned = ownedNames.some(o => o === bn || o.includes(bn) || bn.includes(o));
         // Skip boots if player already has boots (quest slot)
@@ -6555,6 +6603,7 @@ async function pollLiveClient() {
     if (overlayData && overlayData.buildItems && overlayData.buildItems.length > 0) {
       const ownedNames = (myPlayer?.items || []).map(i => (i.displayName || '').toLowerCase().trim()).filter(Boolean);
       const remaining = overlayData.buildItems.filter(bi => {
+        if (!isValidOverlayPlanItem(bi)) return false;
         const bn = bi.name.toLowerCase().trim();
         const owned = ownedNames.some(o => o === bn || o.includes(bn) || bn.includes(o));
         // Skip boots if player already has boots (quest slot)
@@ -6566,7 +6615,7 @@ async function pollLiveClient() {
       }
     }
     const validatedBuildPlan = overlayData?.buildItems?.length
-      ? overlayData.buildItems.map((bi, idx) => `${idx + 1}. ${bi.name}${bi.reason ? ` (${bi.reason})` : ''}`).join('\n')
+      ? (overlayData.buildItems.filter(isValidOverlayPlanItem).map((bi, idx) => `${idx + 1}. ${bi.name}${bi.reason ? ` (${bi.reason})` : ''}`).join('\n') || 'No validated build plan loaded yet.')
       : 'No validated build plan loaded yet.';
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ Game Phase Detection Ã¢â€â‚¬Ã¢â€â‚¬
@@ -6761,12 +6810,7 @@ async function pollLiveClient() {
       const validItems = [];
       const alwaysIncludeTags = ['Health', 'Armor', 'SpellBlock']; // defensive items for everyone
       for (const [id, d] of ddragonItemCache.byId) {
-        // CRITICAL: Only include Summoner's Rift items
-        if (!d.isSR) continue;
-        if (d.gold < 2000 || !d.from || d.from.length === 0) continue;
-        // Exclude mid-tier components that build INTO other items (e.g., Kindlegem Ã¢â€ â€™ Spirit Visage)
-        // Same logic as getValidItemsReference() for consistency
-        if (d.into && d.into.length > 0) continue;
+        if (!isCompletedStoreItem(id, d, 11)) continue;
         // Check if item is relevant to champion class
         const itemTags = d.tags || [];
         let relevant = false;
@@ -6979,10 +7023,8 @@ RULES:
         sendAdvisorDebug(`[validation] REJECTED non-SR item: "${resolved.name || name}"`);
         return false;
       }
-      const isBoots = advisorIsBootsId(resolved.id);
-      const isCompleted = isBoots || (data.gold >= 2000 && (!data.into || data.into.length === 0));
-      if (!isCompleted) {
-        sendAdvisorDebug(`[validation] REJECTED component in live advisor: "${resolved.name || name}"`);
+      if (!isCompletedStoreItem(String(resolved.id), data, 11)) {
+        sendAdvisorDebug(`[validation] REJECTED unavailable/component item in live advisor: "${resolved.name || name}"`);
         return false;
       }
       return true;
@@ -7075,6 +7117,13 @@ RULES:
     if (overlayData && overlayData.buildItems && overlayData.buildItems.length > 0) {
       const updatedItems = [...overlayData.buildItems];
       let modified = false;
+      for (let i = updatedItems.length - 1; i >= 0; i--) {
+        if (!isValidOverlayPlanItem(updatedItems[i])) {
+          sendAdvisorDebug(`[overlay] Removed unavailable item from build plan: ${updatedItems[i]?.name || 'unknown'}`);
+          updatedItems.splice(i, 1);
+          modified = true;
+        }
+      }
 
       // Figure out which items the player already has (to find the "next" item)
       const ownedItemNames = (myPlayer?.items || []).map(i => (i.displayName || '').toLowerCase().trim()).filter(Boolean);
@@ -7129,6 +7178,7 @@ RULES:
       const derivePlanNextItems = () => updatedItems
         .slice(lockIndex)
         .filter((bi) => {
+          if (!isValidOverlayPlanItem(bi)) return false;
           const buildName = bi.name.toLowerCase().trim();
           const owned = ownedItemNames.some(owned => owned === buildName || owned.includes(buildName) || buildName.includes(owned));
           const bootsSkip = advisorHasBoots && bi.id && advisorIsBootsId(bi.id);

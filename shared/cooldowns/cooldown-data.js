@@ -193,7 +193,6 @@ const ITEM_ABILITY_HASTE = {
   6695: 15,  // Serpent's Fang
   6693: 15,  // Prowler's Claw
   3814: 15,  // Edge of Night
-  6701: 20,  // Opportunity
 
   // AD Fighter/Bruiser
   3071: 25,  // Black Cleaver

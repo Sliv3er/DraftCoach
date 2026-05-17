@@ -174,6 +174,16 @@ export interface IconLookups {
   itemFullData: Map<string, { name: string; from?: string[]; gold: { total: number } }>;
 }
 
+const BLOCKED_ITEM_IDS = new Set(['6701', '226701']);
+const BLOCKED_ITEM_NAMES = new Set(['opportunity']);
+
+function isCurrentStoreLookupItem(id: string, item: any) {
+  const name = String(item?.name || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+  if (BLOCKED_ITEM_IDS.has(String(id)) || BLOCKED_ITEM_NAMES.has(name)) return false;
+  if (item?.inStore === false || item?.hideFromAll === true || item?.gold?.purchasable === false) return false;
+  return item?.maps?.['11'] === true || item?.maps?.['12'] === true;
+}
+
 // ── Section keys for parsing AI output ──────────────────────────────
 
 const SECTION_KEYS = [
@@ -676,10 +686,12 @@ export function App() {
 
         for (const [id, item] of Object.entries<any>(iData.data)) {
           const normName = item.name.toLowerCase();
-          items.set(normName, `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${id}.png`);
-          const existing = itemIds.get(normName);
-          if (!existing || id.length < existing.length) {
-            itemIds.set(normName, id);
+          if (isCurrentStoreLookupItem(id, item)) {
+            items.set(normName, `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${id}.png`);
+            const existing = itemIds.get(normName);
+            if (!existing || id.length < existing.length) {
+              itemIds.set(normName, id);
+            }
           }
           // Store full item data for component path resolution
           itemFullData.set(id, {

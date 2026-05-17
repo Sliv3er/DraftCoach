@@ -1883,8 +1883,9 @@ function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
   const boots = draft.heavyAd && draft.effectiveAp < 1.5
     ? 'Plated Steelcaps'
     : (draft.heavyAp || draft.highCc ? "Mercury's Treads" : (isMarksman ? "Berserker's Greaves" : 'Boots of Swiftness'));
-  const antiHeal = antiHealItemForChampion(champ, role, mechanicsMap);
-  const needsAntiHeal = draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0;
+  const antiHealDecision = antiHealDecisionForChampion(champ, role, draft, mechanicsMap);
+  const antiHeal = antiHealDecision.item;
+  const needsAntiHeal = draftNeedsAntiHeal(draft);
 
   const core = [];
   const push = (item) => {
@@ -1899,7 +1900,7 @@ function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
   } else {
     push('Stridebreaker'); push('Black Cleaver'); push("Sterak's Gage");
   }
-  if (needsAntiHeal) push(antiHeal);
+  if (needsAntiHeal && antiHeal) push(antiHeal);
   if (draft.heavyAp) { push('Kaenic Rookern'); push('Force of Nature'); }
   if (draft.heavyAd) { push("Randuin's Omen"); push('Frozen Heart'); }
   if (isSupport) { push('Trailblazer'); push("Knight's Vow"); }
@@ -1919,7 +1920,7 @@ function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
     `Enemy Damage Split: ${draft.ap} AP / ${draft.ad} AD / ${draft.hybrid} mixed. ${draft.heavyAp ? 'MR is the first defensive priority.' : draft.heavyAd ? 'Armor is the first defensive priority.' : 'Balanced defenses are acceptable.'}`,
     `Key Threats: ${(body?.enemies || []).slice(0, 2).join(', ') || 'enemy draft'}.`,
     `Survivability Requirement: ${boots} plus ${draft.heavyAp ? 'magic resist' : draft.heavyAd ? 'armor' : 'health and role-safe defenses'}.`,
-    `Item Priorities: Base Build: fallback from validated patch data because no exact U.GG role page was usable. ${isSupport ? `${supportUpgrade} is required for support economy.` : ''} ${needsAntiHeal ? `${antiHeal} covers enemy healing.` : ''}`,
+    `Item Priorities: Base Build: fallback from validated patch data because no exact U.GG role page was usable. ${isSupport ? `${supportUpgrade} is required for support economy.` : ''} ${needsAntiHeal && antiHeal ? `${antiHeal} covers enemy healing.` : draftHasAnyHealing(draft) ? antiHealDecision.reason : ''}`,
     '',
     'RUNES',
     tags.includes('Mage') ? 'Primary: Domination' : 'Primary: Precision',
@@ -2088,6 +2089,10 @@ function analyzeEnemyDraft(enemies, mechanicsMap = null) {
     suppression: 0,
     enchanterHealing: 0,
     selfHealingFrontliners: 0,
+    enchanterHealingNames: [],
+    selfHealingNames: [],
+    selfHealingAd: 0,
+    selfHealingAp: 0,
   };
   for (const raw of enemies || []) {
     const dmg = inferDamageFromTagsAndInfo(raw, mechanicsMap);
@@ -2103,8 +2108,16 @@ function analyzeEnemyDraft(enemies, mechanicsMap = null) {
     if (tags.includes('Tank')) result.tanks++;
     if (ccList.some(c => c.type === 'HARD_CC' || c.type === 'SUPPRESSION' || c.type === 'DISPLACEMENT') || hasSuppression) result.hardCc++;
     if (hasSuppression) result.suppression++;
-    if (mech?.healThreat && tags.includes('Support')) result.enchanterHealing++;
-    if (mech?.healThreat && !tags.includes('Support')) result.selfHealingFrontliners++;
+    if (mech?.healThreat && tags.includes('Support')) {
+      result.enchanterHealing++;
+      result.enchanterHealingNames.push(raw);
+    }
+    if (mech?.healThreat && !tags.includes('Support')) {
+      result.selfHealingFrontliners++;
+      result.selfHealingNames.push(raw);
+      if (dmg === 'AP') result.selfHealingAp++;
+      else result.selfHealingAd++;
+    }
   }
   result.effectiveAp = result.ap + result.hybrid * 0.5;
   result.effectiveAd = result.ad + result.hybrid * 0.5;
@@ -2475,7 +2488,7 @@ function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null
     ...sectionItems(finalText, 'SITUATIONAL ITEMS'),
   ].map(item => item.toLowerCase().replace(/[â€™']/g, "'"));
   const hasItem = (name) => allItems.some(item => item === String(name || '').toLowerCase().replace(/[â€™']/g, "'"));
-  const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
+  const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap) || 'ally anti-heal';
   const supportUpgrade = supportQuestUpgradeForChampion(body.myChampion, tags, mechanicsMap);
   const fallbackDefense = isApChampion
     ? (hasItem("Banshee's Veil") ? "Banshee's Veil" : hasItem("Zhonya's Hourglass") ? "Zhonya's Hourglass" : 'class-appropriate AP defensive itemization')
@@ -2703,14 +2716,62 @@ function ensureSituationalItem(text, itemName, reason) {
   return replaceBuildSection(text, 'SITUATIONAL ITEMS', lines.join('\n'));
 }
 
-function antiHealItemForChampion(champion, role, mechanicsMap = null) {
+const CRIT_MELEE_CHAMPIONS = new Set(['Yasuo', 'Yone', 'Tryndamere', 'Gangplank']);
+
+function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap = null) {
   const tags = getChampionTags(champion);
   const dmg = inferDamageFromTagsAndInfo(champion, mechanicsMap);
   const roleLower = String(role || '').toLowerCase();
-  if (/^(adc|bot|bottom)$/.test(roleLower) || tags.includes('Marksman')) return 'Mortal Reminder';
-  if (dmg === 'AP' || tags.includes('Mage')) return 'Morellonomicon';
-  if (tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman')) return 'Thornmail';
-  return 'Chempunk Chainsword';
+  const compactChampion = String(champion || '').replace(/\s+/g, '');
+  const isSupportRole = /support|utility/.test(roleLower);
+  const isMarksman = /^(adc|bot|bottom)$/.test(roleLower) || tags.includes('Marksman');
+  const isApChampion = dmg === 'AP' || tags.includes('Mage');
+  const isPureTank = tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman');
+  const isCritMelee = CRIT_MELEE_CHAMPIONS.has(compactChampion);
+  const enchanterHealing = draft?.enchanterHealing || 0;
+  const selfHealing = draft?.selfHealingFrontliners || 0;
+  const forceCore = selfHealing > 0 || enchanterHealing >= 2;
+
+  if (isSupportRole && !isApChampion) {
+    return {
+      item: null,
+      forceCore: false,
+      reason: 'support economy is better spent on quest/utility items; call for Ignite or an ally Grievous Wounds item',
+    };
+  }
+  if (isMarksman || isCritMelee) {
+    return {
+      item: 'Mortal Reminder',
+      forceCore,
+      reason: 'crit-compatible Grievous Wounds; replaces other armor-penetration items when healing is the priority',
+    };
+  }
+  if (isApChampion) {
+    return {
+      item: 'Morellonomicon',
+      forceCore,
+      reason: 'AP Grievous Wounds applied through spell damage',
+    };
+  }
+  if (isPureTank) {
+    const thornmailReliable = (draft?.selfHealingAd || 0) > 0 || draft?.heavyAd;
+    return {
+      item: thornmailReliable ? 'Thornmail' : null,
+      forceCore: forceCore && thornmailReliable,
+      reason: thornmailReliable
+        ? 'tank Grievous Wounds when AD/basic-attack healers are hitting you'
+        : 'Thornmail is unreliable into non-attacking healers; prefer normal tank defense and ally anti-heal',
+    };
+  }
+  return {
+    item: 'Chempunk Chainsword',
+    forceCore,
+    reason: 'AD fighter Grievous Wounds without breaking the champion build',
+  };
+}
+
+function antiHealItemForChampion(champion, role, mechanicsMap = null, draft = null) {
+  return antiHealDecisionForChampion(champion, role, draft, mechanicsMap).item;
 }
 
 function hasGrievousItem(items) {
@@ -2730,6 +2791,10 @@ function exactItemMatch(name, candidates) {
 }
 
 function draftNeedsAntiHeal(draft) {
+  return Boolean(draft && (draft.selfHealingFrontliners > 0 || draft.enchanterHealing >= 2));
+}
+
+function draftHasAnyHealing(draft) {
   return Boolean(draft && (draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0));
 }
 
@@ -2844,34 +2909,32 @@ function scrubUnneededAntiHealNarrative(text) {
 function enforceAntiHealClassFit(finalText, body, draft, mechanicsMap = null) {
   if (!finalText || !body) return finalText;
   const role = String(body.role || '').toLowerCase();
-  const desired = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
-  const desiredReason = desired === 'Morellonomicon'
-    ? 'AP Grievous Wounds for enemy healing'
-    : desired === 'Mortal Reminder'
-      ? 'crit-compatible Grievous Wounds and armor penetration for enemy healing'
-      : desired === 'Thornmail'
-        ? 'tank Grievous Wounds when enemies hit you'
-        : 'fighter Grievous Wounds for enemy healing';
+  const decision = antiHealDecisionForChampion(body.myChampion, role, draft, mechanicsMap);
+  const desired = decision.item;
+  const desiredReason = decision.reason;
   let safe = finalText;
   const coreItems = sectionItems(safe, 'CORE BUILD');
   const needsAntiHeal = draftNeedsAntiHeal(draft);
 
-  if (!needsAntiHeal) {
+  if (!needsAntiHeal || !desired) {
     const candidates = replacementCandidatesForBuild(body, draft, mechanicsMap);
     safe = rewriteItemsInSection(safe, 'CORE BUILD', (item, line, used) => {
       if (!exactItemMatch(item, GRIEVOUS_ITEMS)) return line;
       const replacement = firstAvailableItem(candidates, used, GRIEVOUS_ITEMS);
       return replacement
-        ? lineWithReplacement(line, replacement, 'no major healing threat; role-safe completion item')
+        ? lineWithReplacement(line, replacement, desired ? 'single healing source; role-safe completion item' : desiredReason)
         : null;
     });
     safe = rewriteItemsInSection(safe, 'SITUATIONAL ITEMS', (item, line, used) => {
       if (!exactItemMatch(item, GRIEVOUS_ITEMS)) return line;
       const replacement = firstAvailableItem(candidates, used, GRIEVOUS_ITEMS);
       return replacement
-        ? lineWithReplacement(line, replacement, 'situational defense; anti-heal is not forced in this draft')
+        ? lineWithReplacement(line, replacement, desired ? 'situational defense; anti-heal is not forced in this draft' : desiredReason)
         : null;
     });
+    if (!needsAntiHeal && draftHasAnyHealing(draft) && desired) {
+      safe = ensureSituationalItem(safe, desired, desiredReason);
+    }
     return scrubUnneededAntiHealNarrative(safe);
   }
 
@@ -2923,7 +2986,7 @@ function enforceAntiHealClassFit(finalText, body, draft, mechanicsMap = null) {
 
 function chooseArmorPenKeep(groupItems, body, draft, mechanicsMap = null) {
   const needsAntiHeal = draftNeedsAntiHeal(draft);
-  const desiredAntiHeal = antiHealItemForChampion(body?.myChampion, body?.role, mechanicsMap);
+  const desiredAntiHeal = antiHealItemForChampion(body?.myChampion, body?.role, mechanicsMap, draft) || '';
   if (needsAntiHeal && exactItemMatch(desiredAntiHeal, ARMOR_PEN_EXCLUSIVE_ITEMS) && exactItemMatch(desiredAntiHeal, groupItems)) {
     return groupItems.find(item => itemKey(item) === itemKey(desiredAntiHeal));
   }
@@ -3129,14 +3192,15 @@ function enforceDraftCounterLogic(finalText, body, mechanicsMap = null) {
   if (safe !== before) {
     let analysis = extractBuildSection(safe, 'ANALYSIS');
     if (draft.enchanterHealing > 0 && draft.selfHealingFrontliners === 0) {
-      const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap);
+      const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap, draft) || 'ally anti-heal';
       analysis = analysis
         .replace(/adding Thornmail[^.]*\./i, `using ${preferredAntiHeal} because it applies Grievous Wounds through this champion's normal damage pattern.`)
         .replace(/add Mortal Reminder[^.]*\./i, `use ${preferredAntiHeal} because it fits this champion's damage profile better than crit anti-heal.`)
         .replace(/Mortal Reminder for Nami's healing/gi, `${preferredAntiHeal} for Nami's healing`)
         .replace(/Thornmail for Nami's healing/gi, `${preferredAntiHeal} for Nami's healing`);
     }
-    analysis = analysis.replace(/Thornmail[^.]*Grievous Wounds[^.]*\./gi, `${antiHealItemForChampion(body.myChampion, role, mechanicsMap)} is the correct Grievous Wounds item if enemy healing must be answered directly.`);
+    const antiHealLabel = antiHealItemForChampion(body.myChampion, role, mechanicsMap, draft) || 'ally anti-heal';
+    analysis = analysis.replace(/Thornmail[^.]*Grievous Wounds[^.]*\./gi, `${antiHealLabel} is the correct Grievous Wounds answer if enemy healing must be answered directly.`);
     if (fullAdPressure) {
       analysis = analysis
         .replace(/Mercury's Treads are required[^.]*\./gi, 'Plated Steelcaps are preferred because the enemy damage profile is overwhelmingly AD.')
@@ -3174,7 +3238,7 @@ function getCompactRefinementReference(role) {
     'Baseline preservation: keep runes, summoners, starting items, and skill order unless the matchup creates a critical need. Do not change them just because an alternative is also viable. Always repeat exact baseline names; never output "keep baseline" shorthand.',
     `Starting items: ${isJungle ? 'jungle companion + Health Potion' : isSupport ? 'support starter + Health Potion' : 'one lane starter + Health Potion'}.`,
     roleGuardrail,
-    'Anti-heal by role: Thornmail for tanks/fighters being hit, Mortal Reminder for ADC/crit users, Morellonomicon for AP/mages, Ignite/Oblivion Orb/ally-callout for supports.',
+    'Anti-heal by role: do not force full anti-heal for one minor healing source. Thornmail only when tanking AD/basic-attack healers, Mortal Reminder for ADC/crit users and replaces other armor-pen items, Morellonomicon for AP/mages, Chempunk Chainsword for AD fighters, Ignite/Oblivion Orb/ally-callout for utility supports.',
     'Common defensive/counter items: Plated Steelcaps, Mercury\'s Treads, Ionian Boots of Lucidity, Boots of Swiftness, Thornmail, Mortal Reminder, Morellonomicon, Serpent\'s Fang, Randuin\'s Omen, Frozen Heart, Force of Nature, Spirit Visage, Kaenic Rookern, Maw of Malmortius, Death\'s Dance, Guardian Angel, Zhonya\'s Hourglass, Banshee\'s Veil, Mercurial Scimitar.',
     'If you name an item, use its exact current in-game name. Backend validation will reject invented items.',
   ].join('\n');
@@ -7097,7 +7161,7 @@ RULES:
 - Preserve the validated build queue unless the current game state creates a clear emergency.
 - Be stable across repeated checks. If gold, inventory, enemy threats, and objective state are materially unchanged from PREVIOUS ADVICE, keep the same NEXT ITEMS and write "None needed" under CHANGES.
 - Respect champion class and support economy. Do not recommend expensive off-class carry items to utility supports.
-- Anti-heal must fit the champion: tanks/fighters use Thornmail only if they are being hit, ADC/crit users use Mortal Reminder, AP/mages use Morellonomicon. Utility supports usually rely on Ignite/Oblivion Orb if AP or ask an ally to cover anti-heal; do not put off-class anti-heal items in CHANGES or NEXT ITEMS for a utility support.
+- Anti-heal must fit the champion and the healer. Do not force full anti-heal for one minor healing source. Thornmail only works when AD/basic-attack healers are hitting you. ADC/crit users use Mortal Reminder, AP/mages use Morellonomicon, AD fighters use Chempunk Chainsword. Utility supports usually rely on Ignite or ask an ally to cover anti-heal; do not put off-class anti-heal items in CHANGES or NEXT ITEMS for a utility support.
 - Ignore current gold for item naming: the UI needs the next completed item goal, not the shop component to buy this recall.`;
 
     const advisorSeed = stableHashSeed([

@@ -2717,6 +2717,11 @@ function ensureSituationalItem(text, itemName, reason) {
 }
 
 const CRIT_MELEE_CHAMPIONS = new Set(['Yasuo', 'Yone', 'Tryndamere', 'Gangplank']);
+const BRUISER_THORNMAIL_OK_CHAMPIONS = new Set([
+  'Aatrox', 'Ambessa', 'Camille', 'Darius', 'DrMundo', 'Fiora', 'Garen', 'Illaoi',
+  'Jax', 'Kled', 'KSante', 'Mordekaiser', 'Nasus', 'Olaf', 'Pantheon', 'Renekton',
+  'Riven', 'Sett', 'Trundle', 'Udyr', 'Urgot', 'Volibear', 'Warwick', 'Yorick',
+]);
 
 function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap = null) {
   const tags = getChampionTags(champion);
@@ -2727,6 +2732,7 @@ function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap 
   const isMarksman = /^(adc|bot|bottom)$/.test(roleLower) || tags.includes('Marksman');
   const isApChampion = dmg === 'AP' || tags.includes('Mage');
   const isPureTank = tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman');
+  const isFighter = tags.includes('Fighter') || (!isMarksman && !isApChampion && dmg === 'AD');
   const isCritMelee = CRIT_MELEE_CHAMPIONS.has(compactChampion);
   const enchanterHealing = draft?.enchanterHealing || 0;
   const selfHealing = draft?.selfHealingFrontliners || 0;
@@ -2761,6 +2767,18 @@ function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap 
       reason: thornmailReliable
         ? 'tank Grievous Wounds when AD/basic-attack healers are hitting you'
         : 'Thornmail is unreliable into non-attacking healers; prefer normal tank defense and ally anti-heal',
+    };
+  }
+  if (isFighter) {
+    const armorAlreadyValuable = (draft?.selfHealingAd || 0) > 0 || draft?.heavyAd || (draft?.ad || 0) >= 3;
+    const enchanterOnly = enchanterHealing > 0 && selfHealing === 0;
+    const thornmailFitsBruiser = BRUISER_THORNMAIL_OK_CHAMPIONS.has(compactChampion) && armorAlreadyValuable && !enchanterOnly;
+    return {
+      item: thornmailFitsBruiser ? 'Thornmail' : 'Chempunk Chainsword',
+      forceCore,
+      reason: thornmailFitsBruiser
+        ? 'bruiser armor anti-heal into AD/basic-attack healing pressure'
+        : 'AD fighter offensive Grievous Wounds when armor anti-heal is not the better fit',
     };
   }
   return {
@@ -3238,7 +3256,7 @@ function getCompactRefinementReference(role) {
     'Baseline preservation: keep runes, summoners, starting items, and skill order unless the matchup creates a critical need. Do not change them just because an alternative is also viable. Always repeat exact baseline names; never output "keep baseline" shorthand.',
     `Starting items: ${isJungle ? 'jungle companion + Health Potion' : isSupport ? 'support starter + Health Potion' : 'one lane starter + Health Potion'}.`,
     roleGuardrail,
-    'Anti-heal by role: do not force full anti-heal for one minor healing source. Thornmail only when tanking AD/basic-attack healers, Mortal Reminder for ADC/crit users and replaces other armor-pen items, Morellonomicon for AP/mages, Chempunk Chainsword for AD fighters, Ignite/Oblivion Orb/ally-callout for utility supports.',
+    'Anti-heal by role: do not force full anti-heal for one minor healing source. Thornmail only when tanking AD/basic-attack healers; AD bruisers like Darius/Renekton/Aatrox may prefer Thornmail when armor is already high-value, otherwise Chempunk Chainsword is the offensive fighter option. Mortal Reminder for ADC/crit users and replaces other armor-pen items, Morellonomicon for AP/mages, Ignite/Oblivion Orb/ally-callout for utility supports.',
     'Common defensive/counter items: Plated Steelcaps, Mercury\'s Treads, Ionian Boots of Lucidity, Boots of Swiftness, Thornmail, Mortal Reminder, Morellonomicon, Serpent\'s Fang, Randuin\'s Omen, Frozen Heart, Force of Nature, Spirit Visage, Kaenic Rookern, Maw of Malmortius, Death\'s Dance, Guardian Angel, Zhonya\'s Hourglass, Banshee\'s Veil, Mercurial Scimitar.',
     'If you name an item, use its exact current in-game name. Backend validation will reject invented items.',
   ].join('\n');
@@ -7161,7 +7179,7 @@ RULES:
 - Preserve the validated build queue unless the current game state creates a clear emergency.
 - Be stable across repeated checks. If gold, inventory, enemy threats, and objective state are materially unchanged from PREVIOUS ADVICE, keep the same NEXT ITEMS and write "None needed" under CHANGES.
 - Respect champion class and support economy. Do not recommend expensive off-class carry items to utility supports.
-- Anti-heal must fit the champion and the healer. Do not force full anti-heal for one minor healing source. Thornmail only works when AD/basic-attack healers are hitting you. ADC/crit users use Mortal Reminder, AP/mages use Morellonomicon, AD fighters use Chempunk Chainsword. Utility supports usually rely on Ignite or ask an ally to cover anti-heal; do not put off-class anti-heal items in CHANGES or NEXT ITEMS for a utility support.
+- Anti-heal must fit the champion and the healer. Do not force full anti-heal for one minor healing source. Thornmail only works when AD/basic-attack healers are hitting you; AD bruisers like Darius/Renekton/Aatrox may prefer Thornmail when armor is already high-value, otherwise Chempunk Chainsword is the offensive fighter option. ADC/crit users use Mortal Reminder, AP/mages use Morellonomicon. Utility supports usually rely on Ignite or ask an ally to cover anti-heal; do not put off-class anti-heal items in CHANGES or NEXT ITEMS for a utility support.
 - Ignore current gold for item naming: the UI needs the next completed item goal, not the shop component to buy this recall.`;
 
     const advisorSeed = stableHashSeed([

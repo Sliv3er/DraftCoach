@@ -46,6 +46,7 @@ const SCENARIOS = [
   { name: 'Jax top physical pressure keeps boots', myChampion: 'Jax', role: 'top', allies: ['Viego', 'Akali', 'Ashe', 'Seraphine'], enemies: ['Urgot', 'Khazix', 'Ahri', 'Smolder', 'Poppy'], expect: { boots: ['Plated Steelcaps'], armor: 1, noCore: ["Sorcerer's Shoes", "Mercury's Treads"] } },
   { name: 'Darius top confirmed Kayle lane roles', myChampion: 'Darius', role: 'top', allies: ['Vladimir', 'Graves', 'Bard', 'Yone'], enemies: ['Senna', 'Lucian', 'Vi', 'Galio', 'Kayle'], enemyRoles: { Senna: 'adc', Lucian: 'mid', Vi: 'jungle', Galio: 'support', Kayle: 'top' }, expect: { boots: ['Mercury'], noText: ['Senna Top'], mustText: ['Kayle'] } },
   { name: 'Fizz mid AP assassin class safety', myChampion: 'Fizz', role: 'mid', allies: ['Camille', 'XinZhao', 'Ezreal', 'Malphite'], enemies: ['Milio', 'Kaisa', 'Akshan', 'Tryndamere', 'Kayn'], enemyRoles: { Milio: 'support', Kaisa: 'adc', Akshan: 'top', Tryndamere: 'mid', Kayn: 'jungle' }, expect: { apItems: 3, noCore: ['Chempunk Chainsword', "Sterak's Gage", 'Guardian Angel', 'Maw of Malmortius', 'Black Cleaver', 'Sundered Sky'], noText: ['off-class AP item removed', 'class-appropriate Grievous Wounds'] } },
+  { name: 'Ornn Mayhem tank fallback stays tank', myChampion: 'Ornn', role: 'mid', gameMode: 'aram-mayhem', allies: ['Hwei', 'XinZhao'], enemies: [], expect: { boots: ['Mercury'], noCore: ["Death's Dance", 'Chempunk Chainsword', 'Mortal Reminder'], noText: ["Death's Dance"] } },
 ];
 
 const HEADERS = ['ANALYSIS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES'];
@@ -234,7 +235,7 @@ async function runOne(model, scenario) {
     const response = await fetch(API, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...scenario, model: model.id, gameMode: 'sr' }),
+      body: JSON.stringify({ ...scenario, model: model.id, gameMode: scenario.gameMode || 'sr' }),
       signal: controller.signal,
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -286,6 +287,7 @@ function runStaticAdvisorChecks() {
   if (!source.includes('scoreKBBuildTemplateData') || !source.includes('kbGeneratedAtMs')) issues.push('KB loader can still prefer stale incomplete same-patch cache data');
   if (!source.includes('antiHealDecisionForChampion') || !source.includes('BRUISER_THORNMAIL_OK_CHAMPIONS') || !source.includes('AD bruisers like Darius/Renekton/Aatrox may prefer Thornmail') || !source.includes('do not force full anti-heal for one minor healing source')) issues.push('anti-heal selection is not draft/class aware enough');
   if (!source.includes('reorderPlanFromNextItems') || !source.includes('NEXT ITEMS may reorder unowned items')) issues.push('live advisor NEXT ITEMS cannot reorder the validated build queue');
+  if (!source.includes('isTankItemChampion') || !source.includes('TANK_COMPLETION_CANDIDATES') || !source.includes('resolveLCUGameModePayload')) issues.push('tank item fallback or robust LCU mode detection is missing');
   if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');
   if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with role-safe full items');
   for (const [key, template] of Object.entries(buildTemplates.data || {})) {

@@ -2316,8 +2316,8 @@ function enforceRoleSafeItems(finalText, body) {
   if (!isApChampion) {
     const nonApReplacements = isSupportRole
       ? [supportQuestUpgradeForChampion(body.myChampion, tags), 'Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Redemption']
-      : tags.includes('Tank') && !tags.includes('Fighter')
-        ? ["Jak'Sho, The Protean", "Randuin's Omen", 'Force of Nature', 'Frozen Heart', "Dead Man's Plate", 'Guardian Angel']
+      : isTankItemChampion(body.myChampion, tags)
+        ? TANK_COMPLETION_CANDIDATES
         : tags.includes('Marksman') || isMarksmanRole
           ? ['Guardian Angel', 'Mercurial Scimitar', 'Maw of Malmortius', 'Bloodthirster', 'Rapid Firecannon']
           : ["Death's Dance", "Sterak's Gage", 'Guardian Angel', 'Maw of Malmortius', "Randuin's Omen", 'Force of Nature'];
@@ -2407,11 +2407,13 @@ function dedupeAndPadCoreBuild(finalText, body) {
     ? ['Redemption', "Mikael's Blessing", 'Trailblazer', "Knight's Vow", 'Locket of the Iron Solari', 'Dawncore']
     : /^(adc|bot|bottom)$/.test(role)
       ? ['Guardian Angel', 'Bloodthirster', 'Mercurial Scimitar', 'Maw of Malmortius', "Runaan's Hurricane", 'Rapid Firecannon']
+      : isApChampion
+        ? ['Guardian Angel', 'Zhonya\'s Hourglass', 'Banshee\'s Veil', 'Void Staff', 'Rabadon\'s Deathcap']
+      : isTankItemChampion(body.myChampion, tags)
+        ? TANK_COMPLETION_CANDIDATES
       : /jungle|top/.test(role)
         ? ['Death\'s Dance', 'Sterak\'s Gage', 'Guardian Angel', 'Force of Nature', 'Randuin\'s Omen', 'Frozen Heart']
-        : isApChampion
-          ? ['Guardian Angel', 'Zhonya\'s Hourglass', 'Banshee\'s Veil', 'Void Staff', 'Rabadon\'s Deathcap']
-          : ['Guardian Angel', 'Death\'s Dance', 'Sterak\'s Gage', 'Maw of Malmortius', 'Randuin\'s Omen', 'Force of Nature'];
+        : ['Guardian Angel', 'Death\'s Dance', 'Sterak\'s Gage', 'Maw of Malmortius', 'Randuin\'s Omen', 'Force of Nature'];
 
   let kept = [];
   const used = new Set();
@@ -2723,15 +2725,45 @@ const BRUISER_THORNMAIL_OK_CHAMPIONS = new Set([
   'Riven', 'Sett', 'Trundle', 'Udyr', 'Urgot', 'Volibear', 'Warwick', 'Yorick',
 ]);
 
+const TANK_ITEM_CHAMPIONS = new Set([
+  'Alistar', 'Amumu', 'Braum', 'Chogath', 'DrMundo', 'Galio', 'KSante', 'Leona',
+  'Malphite', 'Maokai', 'Nautilus', 'Nunu', 'NunuWillump', 'Ornn', 'Poppy',
+  'Rammus', 'Rell', 'Sejuani', 'Shen', 'Sion', 'Skarner', 'TahmKench', 'Taric',
+  'Zac',
+]);
+
+const TANK_COMPLETION_CANDIDATES = [
+  "Jak'Sho, The Protean",
+  "Randuin's Omen",
+  'Frozen Heart',
+  'Force of Nature',
+  'Kaenic Rookern',
+  'Spirit Visage',
+  'Unending Despair',
+  "Warmog's Armor",
+  "Dead Man's Plate",
+  'Thornmail',
+  'Heartsteel',
+];
+
+function championKey(champion) {
+  return String(champion || '').replace(/[\s.'-]/g, '');
+}
+
+function isTankItemChampion(champion, tags = getChampionTags(champion)) {
+  const pureTankTags = tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman');
+  return pureTankTags || TANK_ITEM_CHAMPIONS.has(championKey(champion));
+}
+
 function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap = null) {
   const tags = getChampionTags(champion);
   const dmg = inferDamageFromTagsAndInfo(champion, mechanicsMap);
   const roleLower = String(role || '').toLowerCase();
-  const compactChampion = String(champion || '').replace(/\s+/g, '');
+  const compactChampion = championKey(champion);
   const isSupportRole = /support|utility/.test(roleLower);
   const isMarksman = /^(adc|bot|bottom)$/.test(roleLower) || tags.includes('Marksman');
   const isApChampion = dmg === 'AP' || tags.includes('Mage');
-  const isPureTank = tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman');
+  const isTankChampion = isTankItemChampion(champion, tags);
   const isFighter = tags.includes('Fighter') || (!isMarksman && !isApChampion && dmg === 'AD');
   const isCritMelee = CRIT_MELEE_CHAMPIONS.has(compactChampion);
   const enchanterHealing = draft?.enchanterHealing || 0;
@@ -2759,7 +2791,7 @@ function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap 
       reason: 'AP Grievous Wounds applied through spell damage',
     };
   }
-  if (isPureTank) {
+  if (isTankChampion) {
     const thornmailReliable = (draft?.selfHealingAd || 0) > 0 || draft?.heavyAd;
     return {
       item: thornmailReliable ? 'Thornmail' : null,
@@ -2835,6 +2867,11 @@ function replacementCandidatesForBuild(body, draft, mechanicsMap = null) {
     return draft?.heavyAp
       ? ["Banshee's Veil", "Zhonya's Hourglass", "Rabadon's Deathcap", 'Void Staff', 'Cosmic Drive']
       : ["Zhonya's Hourglass", "Banshee's Veil", "Rabadon's Deathcap", 'Void Staff', 'Cosmic Drive'];
+  }
+  if (isTankItemChampion(body?.myChampion, tags)) {
+    return draft?.heavyAp
+      ? ['Kaenic Rookern', 'Force of Nature', 'Spirit Visage', "Jak'Sho, The Protean", "Warmog's Armor", 'Unending Despair', "Randuin's Omen", 'Frozen Heart']
+      : ["Randuin's Omen", 'Frozen Heart', 'Unending Despair', "Jak'Sho, The Protean", "Warmog's Armor", "Dead Man's Plate", 'Force of Nature', 'Kaenic Rookern'];
   }
   return draft?.heavyAp
     ? ['Maw of Malmortius', 'Kaenic Rookern', 'Force of Nature', "Sterak's Gage", "Death's Dance", 'Guardian Angel', "Randuin's Omen", 'Frozen Heart']
@@ -3920,7 +3957,7 @@ Rules:
   Grasp Ã¢â€ â€™ bruiser/tank items (Sundered Sky, Sterak's Gage, Heartsteel)
   Dark Harvest Ã¢â€ â€™ snowball items (Mejai's Soulstealer, Shadowflame)
 - ITEMS: Use ONLY items from the VALID COMPLETED ITEMS list provided. NEVER invent item names or use removed items.
-- COUNTER-ITEMS: Use the CHAMPION-SPECIFIC COUNTER TIPS from the ENEMY TEAM PROFILE, but keep every item class-legal. Stasis/AP items are only legal for AP/mage champions; AD fighters use Guardian Angel, Sterak's Gage, Death's Dance, Maw, Randuin's, or Mercurial when appropriate.
+- COUNTER-ITEMS: Use the CHAMPION-SPECIFIC COUNTER TIPS from the ENEMY TEAM PROFILE, but keep every item class-legal. Stasis/AP items are only legal for AP/mage champions; AD fighters use Guardian Angel, Sterak's Gage, Death's Dance, Maw, Randuin's, or Mercurial when appropriate. True tanks such as Ornn/Malphite/Rammus/Sejuani use tank defense (Jak'Sho, Randuin's, Frozen Heart, Force of Nature, Kaenic, Unending Despair, Warmog's) instead of AD fighter items like Death's Dance.
 - CORE BUILD must ALWAYS have exactly 6 items (7 items if the role is Bottom/ADC, since bottom laners have 7 item slots in Season 2026).
 - SITUATIONAL ITEMS must ALWAYS have at least 4 items with clear conditions (e.g. "vs heavy AP", "if behind", "vs tanks").
 - BOOTS: ONE pair of upgraded boots MUST be in CORE BUILD for all roles. ALWAYS place the upgraded boots as the FIRST or SECOND item in CORE BUILD. If you pick the "Magical Footwear" rune, include the UPGRADED boots. For Bottom/ADC: list 7 items total, placing boots 1st or 2nd.
@@ -6493,56 +6530,76 @@ ipcMain.handle('lcu-champ-select', async () => {
   return { ok: true, session };
 });
 
+function collectModeProbeText(value, depth = 0, out = []) {
+  if (!value || depth > 4 || out.length > 80) return out;
+  if (typeof value === 'string') {
+    out.push(value);
+    return out;
+  }
+  if (typeof value !== 'object') return out;
+  for (const [key, nested] of Object.entries(value)) {
+    if (/mode|queue|map|game|description|name|mutator|category|type/i.test(key)) {
+      if (typeof nested === 'string') out.push(nested);
+      else collectModeProbeText(nested, depth + 1, out);
+    }
+  }
+  return out;
+}
+
+function resolveLCUGameModePayload(payload, source) {
+  const queue =
+    payload?.gameData?.queue ||
+    payload?.queue ||
+    payload?.gameConfig ||
+    {};
+  const queueId =
+    queue?.id ??
+    queue?.queueId ??
+    payload?.gameConfig?.queueId ??
+    payload?.queueId ??
+    payload?.gameData?.queue?.id;
+  const mapId =
+    payload?.map?.id ??
+    payload?.gameData?.map?.id ??
+    payload?.gameData?.queue?.mapId ??
+    payload?.gameConfig?.mapId ??
+    queue?.mapId;
+  const text = collectModeProbeText(payload).join(' ').toLowerCase();
+
+  if (/mayhem|aram[_\s-]*mayhem|ultbook|ultimate\s*spellbook/.test(text)) {
+    return { ok: true, mode: 'aram-mayhem', queueId, source: `${source}-text` };
+  }
+  if (Number(mapId) === 12 && /augment|cherry|strawberry|mayhem/.test(text)) {
+    return { ok: true, mode: 'aram-mayhem', queueId, source: `${source}-map-text` };
+  }
+
+  const QUEUE_MODE_MAP = {
+    400: 'sr', 420: 'sr', 430: 'sr', 440: 'sr', 490: 'sr',
+    450: 'aram', 930: 'aram',
+  };
+  if (queueId && QUEUE_MODE_MAP[Number(queueId)]) {
+    return { ok: true, mode: QUEUE_MODE_MAP[Number(queueId)], queueId, source };
+  }
+  if (Number(mapId) === 12) return { ok: true, mode: 'aram', queueId, source: `${source}-map` };
+  if (Number(mapId) === 11) return { ok: true, mode: 'sr', queueId, source: `${source}-map` };
+  return null;
+}
+
 // LCU auto-detect game mode from lobby/gameflow
 ipcMain.handle('lcu-game-mode', async () => {
-  // Queue ID Ã¢â€ â€™ game mode mapping
-  // SR queues: 400 (Draft), 420 (Ranked Solo), 430 (Blind), 440 (Flex), 490 (Quickplay)
-  // ARAM queues: 450 (ARAM), 930 (Poro King on HA)
-  // ARAM Mayhem: queue ID TBD by Riot (we'll detect via gameMode string)
-  const QUEUE_MODE_MAP = {
-    400: 'sr', 420: 'sr', 430: 'sr', 440: 'sr', 490: 'sr',   // SR queues
-    450: 'aram', 930: 'aram',                                    // ARAM queues
-  };
-
   try {
     // Try gameflow session first Ã¢â‚¬â€ more reliable during champ select
     const gameflow = await lcuCall('GET', '/lol-gameflow/v1/session');
     if (gameflow && !gameflow.__lcuError && !gameflow.__lcuOk) {
-      const queueId = gameflow.gameData?.queue?.id;
-      const gameMode = gameflow.gameData?.queue?.gameMode;
-
-      // Check for ARAM Mayhem via gameMode string (Riot labels it differently)
-      if (gameMode && (gameMode.toLowerCase().includes('mayhem') || gameMode.toLowerCase().includes('ultbook'))) {
-        return { ok: true, mode: 'aram-mayhem', queueId, source: 'gameflow' };
-      }
-
-      if (queueId && QUEUE_MODE_MAP[queueId]) {
-        return { ok: true, mode: QUEUE_MODE_MAP[queueId], queueId, source: 'gameflow' };
-      }
-
-      // Fallback: check map ID (11 = SR, 12 = HA/ARAM)
-      const mapId = gameflow.map?.id || gameflow.gameData?.queue?.mapId;
-      if (mapId === 12) return { ok: true, mode: 'aram', queueId, source: 'gameflow-map' };
-      if (mapId === 11) return { ok: true, mode: 'sr', queueId, source: 'gameflow-map' };
+      const resolved = resolveLCUGameModePayload(gameflow, 'gameflow');
+      if (resolved) return resolved;
     }
 
     // Fallback: try lobby endpoint
     const lobby = await lcuCall('GET', '/lol-lobby/v2/lobby');
     if (lobby && !lobby.__lcuError && !lobby.__lcuOk) {
-      const queueId = lobby.gameConfig?.queueId;
-      const gameMode = lobby.gameConfig?.gameMode;
-
-      if (gameMode && (gameMode.toLowerCase().includes('mayhem') || gameMode.toLowerCase().includes('ultbook'))) {
-        return { ok: true, mode: 'aram-mayhem', queueId, source: 'lobby' };
-      }
-
-      if (queueId && QUEUE_MODE_MAP[queueId]) {
-        return { ok: true, mode: QUEUE_MODE_MAP[queueId], queueId, source: 'lobby' };
-      }
-
-      const mapId = lobby.gameConfig?.mapId;
-      if (mapId === 12) return { ok: true, mode: 'aram', queueId, source: 'lobby-map' };
-      if (mapId === 11) return { ok: true, mode: 'sr', queueId, source: 'lobby-map' };
+      const resolved = resolveLCUGameModePayload(lobby, 'lobby');
+      if (resolved) return resolved;
     }
 
     return { ok: false, error: 'No lobby or gameflow session found' };

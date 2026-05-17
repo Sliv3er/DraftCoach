@@ -272,6 +272,23 @@ function defaultBootChoice(champ, role, dd) {
   return candidates.map(name => itemEntryByName(name, dd)).find(Boolean) || null;
 }
 
+const TANK_ITEM_CHAMPIONS = new Set([
+  'Alistar', 'Amumu', 'Braum', 'Chogath', 'DrMundo', 'Galio', 'KSante', 'Leona',
+  'Malphite', 'Maokai', 'Nautilus', 'Nunu', 'NunuWillump', 'Ornn', 'Poppy',
+  'Rammus', 'Rell', 'Sejuani', 'Shen', 'Sion', 'Skarner', 'TahmKench', 'Taric',
+  'Zac',
+]);
+
+function championKey(champ) {
+  return String(champ?.id || champ?.name || '').replace(/[\s.'-]/g, '');
+}
+
+function isTankItemChampion(champ) {
+  const tags = champ?.tags || [];
+  const pureTankTags = tags.includes('Tank') && !tags.includes('Fighter') && !tags.includes('Mage') && !tags.includes('Marksman');
+  return pureTankTags || TANK_ITEM_CHAMPIONS.has(championKey(champ));
+}
+
 function safeCompletionCandidates(champ, role) {
   const tags = champ?.tags || [];
   const roleUpper = String(role || '').toUpperCase();
@@ -288,7 +305,7 @@ function safeCompletionCandidates(champ, role) {
     }
     return mageCore;
   }
-  if (tags.includes('Tank') && !tags.includes('Fighter')) {
+  if (isTankItemChampion(champ)) {
     return ["Jak'Sho, The Protean", "Randuin's Omen", 'Force of Nature', 'Spirit Visage', 'Frozen Heart', 'Thornmail', "Dead Man's Plate"];
   }
   if (tags.includes('Assassin')) {

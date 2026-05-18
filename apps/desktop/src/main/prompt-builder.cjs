@@ -200,10 +200,12 @@ function _parseChampionData(champ) {
   const trueDmg = TRUE_DMG_PATTERN.test(allText);
 
   // ── Heal threat ──
-  const healThreat = HEAL_PATTERNS.some(p => p.test(allText));
+  const healSpellCount = [...spellTexts, passiveText].filter(text => HEAL_PATTERNS.some(p => p.test(text))).length;
+  const healThreat = healSpellCount > 0;
 
   // ── Shield threat ──
-  const shieldThreat = SHIELD_PATTERNS.some(p => p.test(allText));
+  const shieldSpellCount = [...spellTexts, passiveText].filter(text => SHIELD_PATTERNS.some(p => p.test(text))).length;
+  const shieldThreat = shieldSpellCount > 0;
 
   // ── Dash count ──
   let dashes = 0;
@@ -229,7 +231,7 @@ function _parseChampionData(champ) {
     cc: ccFound,
     dashes,
     ult: { type: ultType },
-    trueDmg, healThreat, shieldThreat,
+    trueDmg, healThreat, shieldThreat, healSpellCount, shieldSpellCount,
     counters,
     tags,
   };
@@ -388,7 +390,7 @@ function buildMechanicsContext(myChampion, role, mechMap) {
   }
 
   if (antiHealTargets.length > 0) {
-    lines.push(`⚠️ HEALING THREAT (${antiHealTargets.join(', ')}) — Grievous Wounds is MANDATORY. Include Thornmail (tank/fighter), Mortal Reminder (ADC), or Morellonomicon (mage).`);
+    lines.push(`HEALING WATCH (${antiHealTargets.join(', ')}) — decide if Grievous Wounds is actually worth a full item. Core it only into multiple/major sustain threats; otherwise use situational anti-heal, Ignite timing, or ally coverage.`);
   }
 
   if (shieldFlags.length > 0) {
@@ -396,7 +398,7 @@ function buildMechanicsContext(myChampion, role, mechMap) {
   }
 
   if (antiHealTargets.length > 0) {
-    lines.push('ANTI-HEAL ROLE GUARDRAIL: choose Grievous Wounds by champion role and economy. Tanks/fighters use Thornmail only if they will be hit. ADC/crit users use Mortal Reminder. AP/mages use Morellonomicon. Utility supports should usually use Ignite timing, Oblivion Orb only if AP support, or call for an ally anti-heal item; do not force Mortal Reminder or Thornmail on utility supports.');
+    lines.push('ANTI-HEAL ROLE GUARDRAIL: first score healing pressure, then choose Grievous Wounds by champion role and application pattern. Tanks use Thornmail only if they will be hit by AD/basic attackers. ADC/crit users use Mortal Reminder when it is worth the armor-pen slot. AP/mages use Morellonomicon. AD fighters use Chempunk only when they can apply it reliably. Utility supports should usually use Ignite timing, Oblivion Orb only if AP support, or call for an ally anti-heal item; do not force Mortal Reminder or Thornmail on utility supports.');
   }
 
   return lines.join('\n');
@@ -559,7 +561,7 @@ STARTING ITEMS RULES:
 
 - If Jungle: include companion in startingItems, provide junglePath with complete first clear (6+ camps separated by >).
 - For suppression enemies: include Mercurial Scimitar only for AD/marksman/fighter champions that can actually use it. AP mages/assassins should use Cleanse if chosen, Banshee's Veil/Zhonya's, spacing, and target-priority notes instead of off-class QSS completion.
-- ANTI-HEAL: If enemy has significant healing, include anti-heal in coreBuild or situationalItems, but choose by role/economy. Tanks/fighters: Thornmail if they are being hit. ADC/crit: Mortal Reminder. Mages/AP: Morellonomicon. Supports: prefer Ignite timing, Oblivion Orb if AP support, or ask an ally/ADC to buy anti-heal in ANALYSIS/WIN CONDITION; do not list Mortal Reminder, Thornmail, or Morellonomicon as support CORE/SITUATIONAL items for utility supports.
+- ANTI-HEAL: If enemy has significant healing, include anti-heal in coreBuild or situationalItems, but only after weighing slot pressure. One incidental sustain source is not enough to force a full item. Tanks: Thornmail only if they are being hit by AD/basic attackers. AD fighters: Chempunk if they can apply it reliably. ADC/crit: Mortal Reminder when it is worth the armor-pen slot. Mages/AP: Morellonomicon. Supports: prefer Ignite timing, Oblivion Orb if AP support, or ask an ally/ADC to buy anti-heal in ANALYSIS/WIN CONDITION; do not list Mortal Reminder, Thornmail, or Morellonomicon as support CORE/SITUATIONAL items for utility supports.
 - Every coreBuild item's "reason" field should explain why it counters a specific enemy threat.
 - skillOrder: Use format "Q > W > E > R" (max priority order).
 - summoners: Just spell names, no explanations.`;

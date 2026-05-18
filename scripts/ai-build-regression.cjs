@@ -285,7 +285,8 @@ function runStaticAdvisorChecks() {
   if (!source.includes('enforceBootInvariant') || !source.includes('coreItems.length === expectedCore && coreItems.some(isBootItemName)')) issues.push('core build boot invariant is missing');
   if (!source.includes('preserveCanonicalBootSlot') || !source.includes('_canonicalBuildItems')) issues.push('live advisor can still drop canonical boots from full plan');
   if (!source.includes('scoreKBBuildTemplateData') || !source.includes('kbGeneratedAtMs')) issues.push('KB loader can still prefer stale incomplete same-patch cache data');
-  if (!source.includes('antiHealDecisionForChampion') || !source.includes('BRUISER_THORNMAIL_OK_CHAMPIONS') || !source.includes('AD bruisers like Darius/Renekton/Aatrox may prefer Thornmail') || !source.includes('do not force full anti-heal for one minor healing source')) issues.push('anti-heal selection is not draft/class aware enough');
+  if (!source.includes('scoreGrievousItemForBuild') || !source.includes('antiHealPressureLevel') || !source.includes('Core anti-heal only for multiple/major sustain threats') || !source.includes('Do not buy full Grievous Wounds for one low-impact or incidental heal')) issues.push('anti-heal selection is not draft/class aware enough');
+  if (!source.includes('scoreKBBuildVariantForDraft') || !source.includes('Draft-scored recommendation')) issues.push('U.GG variant selection is not draft-scored');
   if (!source.includes('reorderPlanFromNextItems') || !source.includes('NEXT ITEMS may reorder unowned items')) issues.push('live advisor NEXT ITEMS cannot reorder the validated build queue');
   if (!source.includes('isTankItemChampion') || !source.includes('TANK_COMPLETION_CANDIDATES') || !source.includes('resolveLCUGameModePayload')) issues.push('tank item fallback or robust LCU mode detection is missing');
   if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');

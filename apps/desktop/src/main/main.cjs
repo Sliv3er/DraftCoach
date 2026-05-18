@@ -573,9 +573,9 @@ async function computeEnemyProfile(enemies) {
     'Vayne': 'Vayne [True Dmg] Ã¢â€ â€™ HP stacking > armor, burst < 3 autos',
     'Fiora': 'Fiora [True Dmg] Ã¢â€ â€™ Thornmail + Frozen Heart',
     'Veigar': 'Veigar [AP Scaling] Ã¢â€ â€™ Banshee\'s blocks E cage, MR',
-    'Sylas': 'Sylas [AP Bruiser] Ã¢â€ â€™ Anti-heal CRITICAL, MR',
-    'Vladimir': 'Vladimir [AP Sustain] Ã¢â€ â€™ Anti-heal MANDATORY',
-    'Aatrox': 'Aatrox [AD Drain] Ã¢â€ â€™ Anti-heal MANDATORY',
+    'Sylas': 'Sylas [AP Bruiser] Ã¢â€ â€™ sustained healing threat; weigh MR and anti-heal pressure',
+    'Vladimir': 'Vladimir [AP Sustain] Ã¢â€ â€™ major sustain threat; anti-heal may be core if he is primary carry',
+    'Aatrox': 'Aatrox [AD Drain] Ã¢â€ â€™ major drain threat; anti-heal may be core when frontline fights are unavoidable',
     'DrMundo': 'Dr. Mundo [HP Tank] Ã¢â€ â€™ Anti-heal + % HP damage',
     'Warwick': 'Warwick [Healing Fighter] Ã¢â€ â€™ Anti-heal, CC interrupts R',
     'Yasuo': 'Yasuo [AD Crit] Ã¢â€ â€™ Randuin\'s (anti-crit)',
@@ -619,7 +619,7 @@ async function computeEnemyProfile(enemies) {
   if (adCount >= 3) analysis += 'Ã¢Å¡Â Ã¯Â¸Â HEAVY AD TEAM Ã¢â‚¬â€ Prioritize Armor items (Plated Steelcaps, Randuin\'s Omen, Frozen Heart, Dead Man\'s Plate)\n';
   if (tankCount >= 2) analysis += 'Ã¢Å¡Â Ã¯Â¸Â TANKY TEAM Ã¢â‚¬â€ Prioritize penetration/% HP items (Lord Dominik\'s Regards, Void Staff, Liandry\'s Torment, Black Cleaver)\n';
   if (assassinCount >= 2) analysis += 'Ã¢Å¡Â Ã¯Â¸Â ASSASSIN-HEAVY Ã¢â‚¬â€ Consider class-appropriate defensive items early (Guardian Angel, Sterak\'s Gage, Death\'s Dance, Maw; stasis only for AP champions)\n';
-  if (hasHealing) analysis += 'Ã¢Å¡Â Ã¯Â¸Â ENEMY HAS HEALING Ã¢â‚¬â€ Consider anti-heal (Mortal Reminder, Morellonomicon, Thornmail)\n';
+  if (hasHealing) analysis += 'Ã¢Å¡Â Ã¯Â¸Â ENEMY HAS HEALING Ã¢â‚¬â€ Score healing pressure before buying full anti-heal; preserve core unless sustain is a real win-condition problem.\n';
   if (counterHints.length > 0) analysis += '\nCHAMPION-SPECIFIC COUNTER TIPS:\n' + counterHints.join('\n') + '\n';
   return analysis;
 }
@@ -1394,12 +1394,62 @@ function scoreKBBuildTemplateData(raw) {
   return { bad };
 }
 
+function itemNamesFromVariant(variant) {
+  return [
+    typeof variant?.bootChoice === 'string' ? variant.bootChoice : variant?.bootChoice?.name,
+    ...names(variant?.coreItems || []),
+  ].filter(Boolean);
+}
+
+function countItemsMatching(items, patterns) {
+  return items.reduce((sum, item) => sum + (patterns.some(pattern => pattern.test(item)) ? 1 : 0), 0);
+}
+
+function scoreKBBuildVariantForDraft(variant, body = {}, engineRole = '', mechanicsMap = null) {
+  const draft = analyzeEnemyDraft(body.enemies || [], mechanicsMap);
+  const items = itemNamesFromVariant(variant);
+  const itemText = items.join(' | ');
+  const runes = variant?.runes || {};
+  let score = variant?.sourceType === 'MOST_POPULAR' ? 8 : 0;
+  const mrCount = countItemsMatching(items, [/Mercury/i, /Kaenic/i, /Force of Nature/i, /Spirit Visage/i, /Maw of Malmortius/i, /Banshee/i, /Wit's End/i]);
+  const armorCount = countItemsMatching(items, [/Plated Steelcaps/i, /Randuin/i, /Frozen Heart/i, /Dead Man/i, /Thornmail/i, /Zhonya/i, /Guardian Angel/i, /Unending Despair/i]);
+  const damageCount = countItemsMatching(items, [/Infinity Edge/i, /Rabadon/i, /Shadowflame/i, /Lich Bane/i, /Collector/i, /Youmuu/i, /Hubris/i, /Trinity Force/i, /Spear of Shojin/i, /Eclipse/i]);
+  const penCount = countItemsMatching(items, [/Black Cleaver/i, /Lord Dominik/i, /Mortal Reminder/i, /Serylda/i, /Void Staff/i, /Cryptbloom/i, /Terminus/i]);
+  const sustainCount = countItemsMatching(items, [/Sundered Sky/i, /Bloodthirster/i, /Riftmaker/i, /Unending Despair/i, /Spirit Visage/i, /Warmog/i, /Heartsteel/i]);
+
+  if (draft.heavyAp) score += mrCount * 18 - armorCount * 5;
+  if (draft.heavyAd && draft.effectiveAp < 1.5) score += armorCount * 18 - mrCount * 5;
+  else if (draft.heavyAd) score += armorCount * 10;
+  if (draft.highCc && /Mercury's Treads/i.test(itemText)) score += 14;
+  if (draft.tanks >= 2) score += penCount * 10;
+  if (antiHealPressureLevel(draft) === 'core') score += countItemsMatching(items, [/Thornmail/i, /Mortal Reminder/i, /Morellonomicon/i, /Chempunk/i]) * 12;
+  if (!body.enemies?.length) score += damageCount * 2;
+  if (/Grasp|Aftershock|Guardian/i.test(`${runes.primaryKeystone || ''}`) && (draft.heavyAd || draft.heavyAp || draft.highCc)) score += 5;
+  if (/Conqueror|Lethal Tempo/i.test(`${runes.primaryKeystone || ''}`) && !draft.heavyAp && !draft.highCc) score += 4;
+  if (/support/i.test(engineRole) && countItemsMatching(items, [/Locket/i, /Redemption/i, /Knight's Vow/i, /Mikael/i, /Trailblazer/i]) >= 2) score += 12;
+  if (/ADC/i.test(engineRole) && countItemsMatching(items, [/Infinity Edge/i, /Bloodthirster/i, /Rapid Firecannon/i, /Runaan/i, /Lord Dominik/i, /Mortal Reminder/i]) >= 2) score += 12;
+  if (draft.highCc && damageCount >= 4) score -= 8;
+  if (draft.heavyAp && armorCount >= 3 && mrCount === 0) score -= 18;
+  if (draft.heavyAd && mrCount >= 3 && armorCount === 0) score -= 18;
+  if (draft.effectiveAd + draft.effectiveAp >= 4 && sustainCount > 0) score += Math.min(10, sustainCount * 3);
+  return score;
+}
+
+function chooseKBBuildVariant(template, body = {}, engineRole = '', mechanicsMap = null) {
+  const entries = Object.entries(template?.variants || {});
+  if (!entries.length) return { key: '', variant: null, score: 0, ranked: [] };
+  const ranked = entries
+    .map(([key, variant]) => ({ key, variant, score: scoreKBBuildVariantForDraft(variant, body, engineRole, mechanicsMap) }))
+    .sort((a, b) => b.score - a.score);
+  return { ...ranked[0], ranked };
+}
+
 /**
  * Get U.GG KB build context for a champion+role.
  * Returns a formatted prompt string with all 3 variants (DAMAGE/SAFETY/UTILITY)
  * that the AI uses as its baseline reference.
  */
-function getKBBuildContext(champion, role, gameMode = 'sr') {
+function getKBBuildContext(champion, role, gameMode = 'sr', body = null, mechanicsMap = null) {
   const roleMap = {
     top: 'TOP', jungle: 'JUNGLE', mid: 'MID',
     adc: 'ADC', bot: 'ADC', bottom: 'ADC', support: 'SUPPORT',
@@ -1434,10 +1484,14 @@ function getKBBuildContext(champion, role, gameMode = 'sr') {
 
   const variantKeys = Object.keys(template.variants);
   log('INFO', `[KB] Injecting ${champion} ${engineRole} ${mode}: ${variantKeys.length} variants (${variantKeys.join(', ')})`);
+  const recommended = chooseKBBuildVariant(template, body || { myChampion: champion, role, gameMode }, engineRole, mechanicsMap);
 
   const modeLabel = mode === 'aram-mayhem' ? 'ARAM: Mayhem' : mode === 'aram' ? 'ARAM' : engineRole;
   const lines = [`\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â REFERENCE BUILDS for ${champion} ${modeLabel} (U.GG Patch ${loadKBBuildTemplatesMeta(mode)}) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â`];
   lines.push(`You MUST use one of these as your base build. State which one you chose in your ANALYSIS.`);
+  if (recommended?.key) {
+    lines.push(`Draft-scored recommendation: ${recommended.key} variant (score ${Math.round(recommended.score)}). Use it unless your reasoning finds a clearly stronger listed variant.`);
+  }
   const variantLabels = {
     DAMAGE: 'BUILD 1 Ã¢â‚¬â€ Most Popular (highest pick rate)',
     SAFETY: 'BUILD 2 Ã¢â‚¬â€ Secondary (alternative popular build)',
@@ -1469,8 +1523,8 @@ function getKBBuildContext(champion, role, gameMode = 'sr') {
 
   lines.push(`\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â`);
   lines.push(`\nCRITICAL RULES FOR USING REFERENCE BUILDS:`);
-  lines.push(`1. You MUST use BUILD 1 (Most Popular) as your default base build.`);
-  lines.push(`2. Only switch to BUILD 2 or BUILD 3 if the enemy composition STRONGLY demands it (e.g., BUILD 1 is pure offense but enemy has 4+ assassins).`);
+  lines.push(`1. Prefer the draft-scored recommendation above, not blindly BUILD 1.`);
+  lines.push(`2. Use BUILD 1 only when it still fits the enemy damage profile and win condition. Switch to BUILD 2/3 when their items/runes answer the draft better.`);
   lines.push(`3. Your CORE BUILD output MUST contain the same core items from your chosen base build.`);
   lines.push(`4. You may reorder items based on the matchup or mode pressure.`);
   lines.push(`5. You may ONLY swap a core item in an extreme scenario. If you swap, you MUST explain why in ANALYSIS.`);
@@ -1552,8 +1606,10 @@ function buildInstantMetaText(body, patchDisplay) {
   const { template, engineRole } = findKBBuildTemplate(body.myChampion, body.role, gameMode);
   if (!template || !template.variants) return '';
 
-  const base = template.variants.DAMAGE || Object.values(template.variants)[0];
+  const chosen = chooseKBBuildVariant(template, body, engineRole);
+  const base = chosen.variant || template.variants.DAMAGE || Object.values(template.variants)[0];
   if (!base) return '';
+  const chosenIndex = chosen.key === 'SAFETY' ? 2 : chosen.key === 'UTILITY' ? 3 : 1;
 
   const starting = normalizeMetaStartingItems(base.startingItems, engineRole);
   const core = names(base.coreItems);
@@ -1570,7 +1626,7 @@ function buildInstantMetaText(body, patchDisplay) {
 
   return [
     'ANALYSIS',
-    `Base Build: BUILD 1 from U.GG reference data, shown instantly while AI refines in the background.`,
+    `Base Build: BUILD ${chosenIndex} from U.GG reference data, draft-scored as the best instant baseline while AI refines in the background.`,
     `Champion: ${body.myChampion} ${modeLabel}. Patch reference: ${loadKBBuildTemplatesMeta(gameMode)}; live patch: ${patchDisplay}.`,
     enemyLine,
     '',
@@ -1613,8 +1669,8 @@ function buildAiRefinementBaseline(metaText) {
     '- Keep summoners, starting items, and skill order exactly as baseline unless there is a critical role/legality issue.',
     '- Runes may change only when the enemy draft creates a real lane/teamfight need, such as extreme poke, unavoidable hard CC, oppressive burst, or a different U.GG build variant already supports that rune page.',
     '- Do not write "keep baseline", "preserved", or similar shorthand inside build sections. Repeat the exact rune, summoner, skill, and item names so the UI can render icons correctly.',
-    '- Keep the core build unless the enemy draft strongly demands a change. Prefer choosing another U.GG variant, reordering, or 1 targeted swap. Use 2 swaps only for extreme cases such as 4+ one damage type, mandatory QSS/suppression, or overwhelming healing.',
-    '- Do not change an item merely because another item is also good. If the baseline item is playable, preserve it.',
+    '- Choose the best U.GG variant for this draft first. Then prefer reordering or 1 targeted swap. Use 2 swaps only for extreme cases such as 4+ one damage type, suppression, or overwhelming healing.',
+    '- Do not change an item merely because another item is also good. If the draft-scored baseline item is playable, preserve it.',
     '- If changing a baseline choice, state the concrete trigger in ANALYSIS: damage split, fed threat, suppression, heavy healing, or impossible lane survival.',
     '- Never swap to off-class items. Respect champion role, gold economy, and normal item users.',
     '- Output the full final build in the normal DraftCoach section format.',
@@ -2093,6 +2149,11 @@ function analyzeEnemyDraft(enemies, mechanicsMap = null) {
     selfHealingNames: [],
     selfHealingAd: 0,
     selfHealingAp: 0,
+    healingPressure: 0,
+    antiHealPressure: 0,
+    healingThreats: [],
+    basicAttackHealingNames: [],
+    shieldThreats: [],
   };
   for (const raw of enemies || []) {
     const dmg = inferDamageFromTagsAndInfo(raw, mechanicsMap);
@@ -2108,15 +2169,33 @@ function analyzeEnemyDraft(enemies, mechanicsMap = null) {
     if (tags.includes('Tank')) result.tanks++;
     if (ccList.some(c => c.type === 'HARD_CC' || c.type === 'SUPPRESSION' || c.type === 'DISPLACEMENT') || hasSuppression) result.hardCc++;
     if (hasSuppression) result.suppression++;
-    if (mech?.healThreat && tags.includes('Support')) {
-      result.enchanterHealing++;
-      result.enchanterHealingNames.push(raw);
+    if (mech?.shieldThreat) {
+      result.shieldThreats.push(raw);
     }
-    if (mech?.healThreat && !tags.includes('Support')) {
-      result.selfHealingFrontliners++;
-      result.selfHealingNames.push(raw);
-      if (dmg === 'AP') result.selfHealingAp++;
-      else result.selfHealingAd++;
+    if (mech?.healThreat) {
+      const isSupportHealer = tags.includes('Support');
+      const isFrontliner = tags.includes('Tank') || tags.includes('Fighter') || mech?.range === 'MELEE';
+      const healSpellCount = Number(mech?.healSpellCount || (mech?.healThreat ? 1 : 0));
+      const basePressure = isSupportHealer
+        ? 0.95
+        : isFrontliner
+          ? 0.85
+          : 0.45;
+      const pressure = basePressure + Math.min(0.7, Math.max(0, healSpellCount - 1) * 0.25);
+      result.healingPressure += pressure;
+      result.antiHealPressure += pressure;
+      result.healingThreats.push({ champion: raw, pressure, type: isSupportHealer ? 'enchanter' : isFrontliner ? 'frontliner' : 'incidental' });
+
+      if (isSupportHealer) {
+        result.enchanterHealing++;
+        result.enchanterHealingNames.push(raw);
+      } else if (isFrontliner) {
+        result.selfHealingFrontliners++;
+        result.selfHealingNames.push(raw);
+        if (dmg === 'AP') result.selfHealingAp++;
+        else result.selfHealingAd++;
+        if (dmg === 'AD' || tags.includes('Marksman') || tags.includes('Fighter')) result.basicAttackHealingNames.push(raw);
+      }
     }
   }
   result.effectiveAp = result.ap + result.hybrid * 0.5;
@@ -2719,11 +2798,6 @@ function ensureSituationalItem(text, itemName, reason) {
 }
 
 const CRIT_MELEE_CHAMPIONS = new Set(['Yasuo', 'Yone', 'Tryndamere', 'Gangplank']);
-const BRUISER_THORNMAIL_OK_CHAMPIONS = new Set([
-  'Aatrox', 'Ambessa', 'Camille', 'Darius', 'DrMundo', 'Fiora', 'Garen', 'Illaoi',
-  'Jax', 'Kled', 'KSante', 'Mordekaiser', 'Nasus', 'Olaf', 'Pantheon', 'Renekton',
-  'Riven', 'Sett', 'Trundle', 'Udyr', 'Urgot', 'Volibear', 'Warwick', 'Yorick',
-]);
 
 const TANK_ITEM_CHAMPIONS = new Set([
   'Alistar', 'Amumu', 'Braum', 'Chogath', 'DrMundo', 'Galio', 'KSante', 'Leona',
@@ -2755,68 +2829,110 @@ function isTankItemChampion(champion, tags = getChampionTags(champion)) {
   return pureTankTags || TANK_ITEM_CHAMPIONS.has(championKey(champion));
 }
 
+function antiHealPressureLevel(draft = null) {
+  const pressure = Number(draft?.antiHealPressure || 0);
+  if (pressure >= 2.2 || (draft?.selfHealingFrontliners || 0) >= 2 || ((draft?.selfHealingFrontliners || 0) >= 1 && (draft?.enchanterHealing || 0) >= 1)) return 'core';
+  if (pressure >= 1.15 || (draft?.enchanterHealing || 0) >= 2) return 'situational';
+  if (pressure > 0) return 'watch';
+  return 'none';
+}
+
+function scoreGrievousItemForBuild(item, context) {
+  const { role, tags, dmg, draft } = context;
+  const isSupportRole = /support|utility/.test(role);
+  const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+  const isCritMelee = CRIT_MELEE_CHAMPIONS.has(context.compactChampion);
+  const isApChampion = dmg === 'AP' || tags.includes('Mage');
+  const isTankChampion = isTankItemChampion(context.champion, tags);
+  const isFighter = tags.includes('Fighter') || (!isMarksman && !isApChampion && dmg === 'AD');
+  const pressure = Number(draft?.antiHealPressure || 0);
+  const healingFrontline = Number(draft?.selfHealingFrontliners || 0);
+  const enchanters = Number(draft?.enchanterHealing || 0);
+  const adPressure = Number(draft?.effectiveAd || 0);
+  const apPressure = Number(draft?.effectiveAp || 0);
+  const heavyBasicOrAdHealing = Number(draft?.selfHealingAd || 0) > 0 || (draft?.basicAttackHealingNames || []).length > 0;
+  let score = 0;
+
+  if (pressure <= 0) score -= 60;
+  if (isSupportRole && !isApChampion) score -= 80;
+  if (item === 'Mortal Reminder') {
+    score += isMarksman || isCritMelee ? 84 : -55;
+    score += healingFrontline >= 1 ? 12 : 0;
+  } else if (item === 'Morellonomicon') {
+    score += isApChampion ? 84 : -60;
+    score += enchanters >= 1 ? 6 : 0;
+  } else if (item === 'Thornmail') {
+    score += isTankChampion ? 78 : isFighter ? 26 : -60;
+    score += heavyBasicOrAdHealing ? 24 : -22;
+    score += adPressure >= apPressure ? 10 : -12;
+    score += enchanters > 0 && healingFrontline === 0 ? -22 : 0;
+  } else if (item === 'Chempunk Chainsword') {
+    score += isFighter && !isTankChampion ? 72 : -45;
+    score += adPressure >= apPressure ? 8 : 0;
+    score += healingFrontline >= 1 ? 10 : 0;
+  }
+  return score;
+}
+
 function antiHealDecisionForChampion(champion, role, draft = null, mechanicsMap = null) {
   const tags = getChampionTags(champion);
   const dmg = inferDamageFromTagsAndInfo(champion, mechanicsMap);
   const roleLower = String(role || '').toLowerCase();
   const compactChampion = championKey(champion);
-  const isSupportRole = /support|utility/.test(roleLower);
-  const isMarksman = /^(adc|bot|bottom)$/.test(roleLower) || tags.includes('Marksman');
-  const isApChampion = dmg === 'AP' || tags.includes('Mage');
-  const isTankChampion = isTankItemChampion(champion, tags);
-  const isFighter = tags.includes('Fighter') || (!isMarksman && !isApChampion && dmg === 'AD');
-  const isCritMelee = CRIT_MELEE_CHAMPIONS.has(compactChampion);
-  const enchanterHealing = draft?.enchanterHealing || 0;
-  const selfHealing = draft?.selfHealingFrontliners || 0;
-  const forceCore = selfHealing > 0 || enchanterHealing >= 2;
+  const pressureLevel = antiHealPressureLevel(draft);
+  if (pressureLevel === 'none') {
+    return {
+      item: null,
+      forceCore: false,
+      level: 'none',
+      score: 0,
+      reason: 'no meaningful healing source; preserve the meta build instead of forcing Grievous Wounds',
+    };
+  }
 
+  const isSupportRole = /support|utility/.test(roleLower);
+  const isApChampion = dmg === 'AP' || tags.includes('Mage');
   if (isSupportRole && !isApChampion) {
     return {
       item: null,
       forceCore: false,
+      level: pressureLevel,
+      score: 0,
       reason: 'support economy is better spent on quest/utility items; call for Ignite or an ally Grievous Wounds item',
     };
   }
-  if (isMarksman || isCritMelee) {
+
+  const context = { champion, compactChampion, role: roleLower, tags, dmg, draft };
+  const ranked = GRIEVOUS_ITEMS
+    .map(item => ({ item, score: scoreGrievousItemForBuild(item, context) }))
+    .sort((a, b) => b.score - a.score);
+  const best = ranked[0] || { item: null, score: -999 };
+  const forceCore = pressureLevel === 'core' && best.score >= 48;
+  const item = best.score >= 42 ? best.item : null;
+  if (!item) {
     return {
-      item: 'Mortal Reminder',
-      forceCore,
-      reason: 'crit-compatible Grievous Wounds; replaces other armor-penetration items when healing is the priority',
+      item: null,
+      forceCore: false,
+      level: pressureLevel,
+      score: best.score,
+      reason: 'healing exists, but no class-efficient full Grievous Wounds item beats preserving the meta build; use Ignite, components, or ally coverage',
     };
   }
-  if (isApChampion) {
-    return {
-      item: 'Morellonomicon',
-      forceCore,
-      reason: 'AP Grievous Wounds applied through spell damage',
-    };
-  }
-  if (isTankChampion) {
-    const thornmailReliable = (draft?.selfHealingAd || 0) > 0 || draft?.heavyAd;
-    return {
-      item: thornmailReliable ? 'Thornmail' : null,
-      forceCore: forceCore && thornmailReliable,
-      reason: thornmailReliable
-        ? 'tank Grievous Wounds when AD/basic-attack healers are hitting you'
-        : 'Thornmail is unreliable into non-attacking healers; prefer normal tank defense and ally anti-heal',
-    };
-  }
-  if (isFighter) {
-    const armorAlreadyValuable = (draft?.selfHealingAd || 0) > 0 || draft?.heavyAd || (draft?.ad || 0) >= 3;
-    const enchanterOnly = enchanterHealing > 0 && selfHealing === 0;
-    const thornmailFitsBruiser = BRUISER_THORNMAIL_OK_CHAMPIONS.has(compactChampion) && armorAlreadyValuable && !enchanterOnly;
-    return {
-      item: thornmailFitsBruiser ? 'Thornmail' : 'Chempunk Chainsword',
-      forceCore,
-      reason: thornmailFitsBruiser
-        ? 'bruiser armor anti-heal into AD/basic-attack healing pressure'
-        : 'AD fighter offensive Grievous Wounds when armor anti-heal is not the better fit',
-    };
-  }
+  const reasonByItem = {
+    'Mortal Reminder': 'crit-compatible Grievous Wounds when healing is important enough to occupy the armor-penetration slot',
+    'Morellonomicon': 'AP Grievous Wounds applied naturally through spell damage',
+    'Thornmail': 'armor Grievous Wounds only when AD/basic-attack healers will reliably hit you',
+    'Chempunk Chainsword': 'AD fighter Grievous Wounds when offensive stats and direct damage application fit better than armor anti-heal',
+  };
   return {
-    item: 'Chempunk Chainsword',
+    item,
     forceCore,
-    reason: 'AD fighter Grievous Wounds without breaking the champion build',
+    level: pressureLevel,
+    score: best.score,
+    alternatives: ranked.slice(1, 4),
+    reason: pressureLevel === 'watch'
+      ? `${reasonByItem[item]}; keep situational because the healing pressure is low`
+      : reasonByItem[item],
   };
 }
 
@@ -2841,11 +2957,11 @@ function exactItemMatch(name, candidates) {
 }
 
 function draftNeedsAntiHeal(draft) {
-  return Boolean(draft && (draft.selfHealingFrontliners > 0 || draft.enchanterHealing >= 2));
+  return antiHealPressureLevel(draft) === 'core';
 }
 
 function draftHasAnyHealing(draft) {
-  return Boolean(draft && (draft.enchanterHealing > 0 || draft.selfHealingFrontliners > 0));
+  return Boolean(draft && Number(draft.antiHealPressure || 0) > 0);
 }
 
 function replacementCandidatesForBuild(body, draft, mechanicsMap = null) {
@@ -2987,7 +3103,7 @@ function enforceAntiHealClassFit(finalText, body, draft, mechanicsMap = null) {
         ? lineWithReplacement(line, replacement, desired ? 'situational defense; anti-heal is not forced in this draft' : desiredReason)
         : null;
     });
-    if (!needsAntiHeal && draftHasAnyHealing(draft) && desired) {
+    if (!needsAntiHeal && draftHasAnyHealing(draft) && desired && decision.level === 'situational') {
       safe = ensureSituationalItem(safe, desired, desiredReason);
     }
     return scrubUnneededAntiHealNarrative(safe);
@@ -3293,7 +3409,7 @@ function getCompactRefinementReference(role) {
     'Baseline preservation: keep runes, summoners, starting items, and skill order unless the matchup creates a critical need. Do not change them just because an alternative is also viable. Always repeat exact baseline names; never output "keep baseline" shorthand.',
     `Starting items: ${isJungle ? 'jungle companion + Health Potion' : isSupport ? 'support starter + Health Potion' : 'one lane starter + Health Potion'}.`,
     roleGuardrail,
-    'Anti-heal by role: do not force full anti-heal for one minor healing source. Thornmail only when tanking AD/basic-attack healers; AD bruisers like Darius/Renekton/Aatrox may prefer Thornmail when armor is already high-value, otherwise Chempunk Chainsword is the offensive fighter option. Mortal Reminder for ADC/crit users and replaces other armor-pen items, Morellonomicon for AP/mages, Ignite/Oblivion Orb/ally-callout for utility supports.',
+    'Anti-heal decision: score the enemy healing pressure first. Do not buy full Grievous Wounds for one low-impact or incidental heal. Core anti-heal only for multiple/major sustain threats; otherwise make it situational or call for ally/Ignite coverage. Choose the item by champion class and application pattern: Mortal Reminder for crit/marksman, Morellonomicon for AP spell users, Thornmail only when armor and being hit by AD/basic attackers are already valuable, Chempunk only for AD fighters who can apply it reliably.',
     'Common defensive/counter items: Plated Steelcaps, Mercury\'s Treads, Ionian Boots of Lucidity, Boots of Swiftness, Thornmail, Mortal Reminder, Morellonomicon, Serpent\'s Fang, Randuin\'s Omen, Frozen Heart, Force of Nature, Spirit Visage, Kaenic Rookern, Maw of Malmortius, Death\'s Dance, Guardian Angel, Zhonya\'s Hourglass, Banshee\'s Veil, Mercurial Scimitar.',
     'If you name an item, use its exact current in-game name. Backend validation will reject invented items.',
   ].join('\n');
@@ -4714,7 +4830,7 @@ ${userMessage.slice(0, 2000)}`;
       const allChamps = [body.myChampion, ...(body.enemies || [])];
       const mechMap = await _prompts.fetchMultipleChampionMechanics(allChamps);
       const mechContext = _prompts.buildMechanicsContext(body.myChampion, body.role, mechMap);
-      const kbContext = getKBBuildContext(body.myChampion, body.role);
+      const kbContext = getKBBuildContext(body.myChampion, body.role, body.gameMode || 'sr', body, mechMap);
       const userMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${enemyProfile}\n${enemyRoleContext.context}\n${mechContext}\n${kbContext ? '\n' + kbContext + '\n' : ''}${matchupLine}Champion: ${body.myChampion}, Role: ${body.role}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). This role has ${itemSlots} item slots Ã¢â‚¬â€ CORE BUILD must list exactly ${itemSlots} items (including boots). Use ONLY starting items from the VALID STARTING ITEMS list. startingItems must be exactly 2 items (1 starter + 1 potion).\n\nNEVER invent item names. If Jungle, include jungle path with 6+ camps.`;
 
       const { text: cleanText } = await fetchRobustJsonBuild(null, null, systemPrompt, userMessage, false, body.model);
@@ -5028,20 +5144,20 @@ ${userMessage.slice(0, 2000)}`;
           await ensureDdragonChampCache().catch(() => null);
         }
         const refinementBaseline = buildAiRefinementBaseline(instantMetaText);
-        const kbContext = refinementBaseline ? '' : getKBBuildContext(body.myChampion, body.role);
+        const kbContext = refinementBaseline ? '' : getKBBuildContext(body.myChampion, body.role, gameMode, body, mechMap3);
 
         // Build user message
         let fullUserMessage;
         if (isARAM) {
           const modeLabel = gameMode === 'aram-mayhem' ? 'ARAM: Mayhem' : 'ARAM';
           const augmentsRef = gameMode === 'aram-mayhem' ? getAugmentsReference(body.myChampion, body, mechMap3) : '';
-          const modeKbContext = getKBBuildContext(body.myChampion, body.role, gameMode);
+          const modeKbContext = getKBBuildContext(body.myChampion, body.role, gameMode, body, mechMap3);
           const mayhemAugmentTask = gameMode === 'aram-mayhem'
             ? `\n\nARAM MAYHEM AUGMENT TASK:\n- You MUST output an AUGMENTS section with exactly 4 augment recommendations.\n- Choose from DRAFT-SCORED AUGMENT CANDIDATES first; use the FULL CATALOG only when a matchup-specific reason clearly beats a candidate.\n- Each line must include: augment name, tier, pick timing/priority, and a matchup-specific reason.\n- Rank Prismatic/Gold/Silver by actual power, champion synergy, enemy threats, damage profile, and whether the effect solves this draft. Do not blindly choose highest tier if it does not fit.\n- Never invent augment names. Never omit AUGMENTS in ARAM: Mayhem.`
             : '';
           fullUserMessage = `${ragContext}\n\n${runesRef}${bootsRef}${itemsRef}${startingItemsRef}${sumSpellsRef}${augmentsRef}\n${mechContext}\n${modeKbContext ? '\n' + modeKbContext + '\n' : ''}${metaRef ? '\n' + metaRef + '\n' : ''}Champion: ${body.myChampion}, Mode: ${modeLabel}, Allies: ${(body.allies || []).join(', ') || 'none'}, Enemies: ${(body.enemies || []).join(', ') || 'none'}, Patch: ${patchDisplay} (Season 2026). coreBuild must list exactly 6 items (including boots). startingItems should use the U.GG ARAM opener when available; otherwise return []. Use ONLY items from the VALID COMPLETED ITEMS list above. Use ONLY runes from the VALID RUNES list above.${mayhemAugmentTask}\n\nNEVER invent item names. This is ${modeLabel} mode Ã¢â‚¬â€ no Doran's items, no jungle, no lane matchup.`;
         } else {
-          const variantContext = hasMetaBaseline ? getKBBuildContext(body.myChampion, body.role) : kbContext;
+          const variantContext = hasMetaBaseline ? getKBBuildContext(body.myChampion, body.role, gameMode, body, mechMap3) : kbContext;
           const metaGuidance = refinementBaseline
             ? `${refinementBaseline}\n${variantContext ? '\n' + variantContext + '\n' : ''}`
             : (kbContext ? '\n' + kbContext + '\n' : '');

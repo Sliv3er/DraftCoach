@@ -87,7 +87,7 @@ interface Props {
   enemies?: string[];
   refinementSummary?: string[];
   metaStatus?: { status: 'exact' | 'missing-role' | 'missing-champion'; message: string } | null;
-  loadingMode?: 'meta' | 'ai';
+  loadingMode?: 'meta' | 'ai' | 'roles';
 }
 
 // ipcRenderer replaced by bridge.ts
@@ -1119,9 +1119,12 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
   if (loading && !result) {
     const missingMeta = metaStatus?.status === 'missing-role' || metaStatus?.status === 'missing-champion';
     const aiLoading = loadingMode === 'ai';
-    const loadingTitle = aiLoading ? 'Generating final AI build' : missingMeta ? 'Building from patch data' : 'Preparing meta baseline';
+    const roleLoading = loadingMode === 'roles';
+    const loadingTitle = roleLoading ? 'Waiting for loading screen roles' : aiLoading ? 'Generating final AI build' : missingMeta ? 'Building from patch data' : 'Preparing meta baseline';
     const loadingSubtitle = metaStatus?.message || (
-      aiLoading
+      roleLoading
+        ? 'Draft is locked. Final AI generation will start when the League client exposes confirmed enemy lane assignments.'
+        : aiLoading
         ? 'Full draft is locked. The meta preview is hidden while the model validates matchup pressure, counter items, and runes.'
         : missingMeta
         ? 'No exact role page was found, so the advisor is checking champion data and matchup pressure.'
@@ -1145,9 +1148,9 @@ export const BuildOutput = memo(function BuildOutput({ result, iconLookups, load
           <div className="generation-track-fill" />
         </div>
         <div className="generation-grid">
-          <div className={`generation-step ${aiLoading ? 'generation-step-done' : 'generation-step-active'}`}><span />Meta source</div>
-          <div className={`generation-step ${aiLoading ? 'generation-step-active' : ''}`}><span />Matchup checks</div>
-          <div className="generation-step"><span />Build validation</div>
+          <div className={`generation-step ${aiLoading || roleLoading ? 'generation-step-done' : 'generation-step-active'}`}><span />Meta source</div>
+          <div className={`generation-step ${roleLoading ? 'generation-step-active' : aiLoading ? 'generation-step-done' : ''}`}><span />Role confirmation</div>
+          <div className={`generation-step ${aiLoading ? 'generation-step-active' : ''}`}><span />Build validation</div>
         </div>
         <div className="generation-skeleton" aria-hidden="true">
           <div />

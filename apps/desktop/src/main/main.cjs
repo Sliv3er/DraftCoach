@@ -1990,7 +1990,7 @@ function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
     `Matchup Type: Fallback validated plan for ${champ} ${body?.role || role}.`,
     `Enemy Damage Split: ${draft.ap} AP / ${draft.ad} AD / ${draft.hybrid} mixed. ${draft.heavyAp ? 'MR is the first defensive priority.' : draft.heavyAd ? 'Armor is the first defensive priority.' : 'Balanced defenses are acceptable.'}`,
     `Key Threats: ${(body?.enemies || []).slice(0, 2).join(', ') || 'enemy draft'}.`,
-    `Survivability Requirement: ${boots} plus ${draft.heavyAp ? 'magic resist' : draft.heavyAd ? 'armor' : 'health and role-safe defenses'}.`,
+    `Survivability Requirement: ${boots} plus ${draft.heavyAp ? 'magic resist' : draft.heavyAd ? 'armor' : 'health and class-fitting defenses'}.`,
     `Item Priorities: Base Build: fallback from validated patch data because no exact U.GG role page was usable. ${isSupport ? `${supportUpgrade} is required for support economy.` : ''} ${needsAntiHeal && antiHeal ? `${antiHeal} covers enemy healing.` : draftHasAnyHealing(draft) ? antiHealDecision.reason : ''}`,
     '',
     'RUNES',
@@ -2015,7 +2015,7 @@ function buildEmergencyFallbackText(body, patchDisplay, mechanicsMap = null) {
     ...starting,
     '',
     'CORE BUILD',
-    ...finalCore.map((item, index) => `${index + 1}. ${item} (${index === 0 && item === supportUpgrade ? 'support quest upgrade' : 'role-safe validated item'})`),
+    ...finalCore.map((item, index) => `${index + 1}. ${item} (${index === 0 && item === supportUpgrade ? 'support quest upgrade' : 'validated build item'})`),
     '',
     'SITUATIONAL ITEMS',
     'Locket of the Iron Solari: buy when teamwide burst mitigation matters.',
@@ -2419,7 +2419,7 @@ function enforceRoleSafeItems(finalText, body) {
       safe,
       OFF_CLASS_AP_ITEMS,
       nonApReplacements,
-      isSupportRole ? 'support quest upgrade; off-class AP stasis/carry item removed' : 'role-safe defensive item; off-class AP item removed'
+      isSupportRole ? 'support quest upgrade; off-class AP stasis/carry item removed' : 'class-fitting defensive item; off-class AP item removed'
     );
   }
 
@@ -2553,13 +2553,13 @@ function dedupeAndPadCoreBuild(finalText, body) {
     const key = filler.toLowerCase();
     if (used.has(key)) continue;
     used.add(key);
-    kept.push(`${kept.length + 1}. ${filler} (role-safe completion item)`);
+    kept.push(`${kept.length + 1}. ${filler} (completed build slot from patch validation)`);
   }
 
   const renumbered = kept.slice(0, expected).map((line, index) => {
     let clean = line.replace(/^\s*\d+[.)]\s*/, '').trim();
     if (/\b(wait|let'?s|we have|need \d|core is \d|reference has)\b/i.test(clean)) {
-      clean = `${clean.split('(')[0].trim()} (role-safe validated item)`;
+      clean = `${clean.split('(')[0].trim()} (validated build item)`;
     }
     clean = clean.replace(
       /Sundered Sky\s*\([^)]*(?:anti-heal|grievous|damage reduction|true damage|%HP|shield)[^)]*\)/i,
@@ -2594,7 +2594,7 @@ function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null
     ? 'Guardian Angel'
     : hasItem("Sterak's Gage")
       ? "Sterak's Gage"
-      : 'role-safe defensive itemization';
+      : 'class-fitting defensive itemization';
 
   const itemRewrites = [
     { item: "Zhonya's Hourglass", aliases: ["Zhonya's Hourglass", "Zhonya's"], force: !isApChampion, replacement: !isApChampion ? fallbackDefense : null },
@@ -3137,7 +3137,7 @@ function itemIntentReason(item, body, draft) {
   if (name === itemKey('Rapid Firecannon')) return 'safer range to hit first in fights';
   if (name === itemKey("Runaan's Hurricane")) return 'multi-target DPS in front-to-back fights';
   if (/support/.test(String(body?.role || '').toLowerCase())) return 'support-economy utility for teamfights';
-  return draft?.heavyAp ? 'role-safe magic-resist adaptation' : draft?.heavyAd ? 'role-safe armor adaptation' : 'role-safe completion item';
+  return draft?.heavyAp ? 'magic-resist adaptation' : draft?.heavyAd ? 'armor adaptation' : 'validated completion item';
 }
 
 function scrubUnneededAntiHealNarrative(text) {
@@ -3166,7 +3166,7 @@ function enforceAntiHealClassFit(finalText, body, draft, mechanicsMap = null) {
       if (!exactItemMatch(item, GRIEVOUS_ITEMS)) return line;
       const replacement = firstAvailableItem(candidates, used, GRIEVOUS_ITEMS);
       return replacement
-        ? lineWithReplacement(line, replacement, desired ? 'single healing source; role-safe completion item' : desiredReason)
+        ? lineWithReplacement(line, replacement, desired ? 'single healing source; validated completion item' : desiredReason)
         : null;
     });
     safe = rewriteItemsInSection(safe, 'SITUATIONAL ITEMS', (item, line, used) => {
@@ -6907,33 +6907,6 @@ async function extractRoleSnapshotFromGameflow(gameflow) {
   return { ok: true, source: 'gameflow-role-snapshot', allies, enemies, enemyRoles, gameTime: 0 };
 }
 
-async function extractRoleSnapshotFromChampSelect(session) {
-  if (!session?.theirTeam?.length) return null;
-  const keyMap = await ensureDdragonChampCache().catch(() => null);
-  const pickedChampByCellId = new Map();
-  for (const phase of session.actions || []) {
-    for (const action of phase || []) {
-      if (action.type === 'pick' && action.championId && action.championId !== 0 && (action.completed || action.isInProgress)) {
-        pickedChampByCellId.set(action.actorCellId, action.championId);
-      }
-    }
-  }
-
-  const enemies = [];
-  const enemyRoles = {};
-  for (const p of session.theirTeam || []) {
-    const pickedId = pickedChampByCellId.get(p.cellId) || p.championId || p.championIdSelected;
-    const entry = pickedId ? keyMap?.get(String(pickedId)) : null;
-    const champ = entry?.name || entry?.id || p.championName || '';
-    const enemyRole = normalizeBackendRole(p.assignedPosition || p.position || p.selectedPosition || p.lane || p.role);
-    if (champ) enemies.push(champ);
-    if (champ && enemyRole) enemyRoles[champ] = enemyRole;
-  }
-
-  if (!enemies.length || !Object.keys(enemyRoles).length) return null;
-  return { ok: true, source: 'champ-select-role-snapshot', enemies, enemyRoles, gameTime: 0 };
-}
-
 async function readLiveGameSnapshot() {
   const nodeFetch = require('node-fetch');
   try {
@@ -7012,13 +6985,7 @@ ipcMain.handle('lcu-role-snapshot', async () => {
     if (snapshot?.ok) return snapshot;
   }
 
-  const champSelect = await lcuCall('GET', '/lol-champ-select/v1/session');
-  if (champSelect && !champSelect.__lcuError && !champSelect.__lcuOk) {
-    const snapshot = await extractRoleSnapshotFromChampSelect(champSelect);
-    if (snapshot?.ok) return snapshot;
-  }
-
-  return { ok: false, error: 'No confirmed enemy roles available yet' };
+  return { ok: false, error: 'No loading/live confirmed enemy roles available yet' };
 });
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ Live Game AI Advisor Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬

@@ -154,7 +154,7 @@ const LCU_POSITION_MAP: Record<string, Role> = {
   utility: 'support',
 };
 
-type Status = 'idle' | 'fetching' | 'grounded' | 'cache' | 'stale-cache' | 'meta' | 'meta-fallback' | 'error';
+type Status = 'idle' | 'waiting-roles' | 'fetching' | 'grounded' | 'cache' | 'stale-cache' | 'meta' | 'meta-fallback' | 'error';
 
 interface ChampionData {
   id: string;
@@ -481,6 +481,7 @@ export function App() {
   const [buildResult, setBuildResult] = useState<BuildResponse | null>(null);
   const [refinementSummary, setRefinementSummary] = useState<string[]>([]);
   const [metaStatus, setMetaStatus] = useState<{ status: 'exact' | 'missing-role' | 'missing-champion'; message: string } | null>(null);
+  const [roleConfirmation, setRoleConfirmation] = useState<'unknown' | 'confirmed'>('unknown');
   const [iconLookups, setIconLookups] = useState<IconLookups | null>(null);
   const [selectedModel, setSelectedModel] = useState<AiModel>('deepseek/deepseek-v4-flash');
   const [autoDetect, setAutoDetect] = useState(true);
@@ -498,6 +499,7 @@ export function App() {
   const enemiesRef = useRef<string[]>([]);
   const enemyRolesRef = useRef<Record<string, Role>>({});
   const gameModeRef = useRef<GameMode>('sr');
+  const roleConfirmationRef = useRef<'unknown' | 'confirmed'>('unknown');
   const roleResolvedKeyRef = useRef<string>('');
 
   // ── New UI state: RAG, overlay, settings ───────────────────────
@@ -533,6 +535,7 @@ export function App() {
   enemiesRef.current = enemies;
   enemyRolesRef.current = enemyRoles;
   gameModeRef.current = gameMode;
+  roleConfirmationRef.current = roleConfirmation;
 
   useEffect(() => {
     const handler = (_event: any, advice: any) => { setLiveAdvice(advice); };
@@ -937,6 +940,16 @@ export function App() {
 
   const handleGenerate = useCallback(async () => {
     if (!myChampion) return;
+    const srDraftComplete = gameMode === 'sr' && allies.length >= 4 && enemies.length >= 5;
+    const confirmedRoleCount = Object.keys(enemyRoles || {}).length;
+    if (autoDetect && srDraftComplete && (roleConfirmationRef.current !== 'confirmed' || confirmedRoleCount < enemies.length)) {
+      console.log('[App] Generate held until loading screen confirms enemy roles');
+      setBuildResult(null);
+      setRefinementSummary([]);
+      setMetaStatus(null);
+      setStatus('waiting-roles');
+      return;
+    }
     // Don't generate if DDragon hasn't loaded yet
     if (!patchVersion || patchVersion === '...') {
       console.warn('[App] handleGenerate called before patchVersion is ready, skipping');
@@ -1157,6 +1170,19 @@ export function App() {
     if (!myChampion || allies.length < 4 || enemies.length < 5) return;
     // Don't auto-generate until DDragon data is loaded
     if (!patchVersion || patchVersion === '...') return;
+    const confirmedRoleCount = Object.keys(enemyRoles || {}).length;
+    if (gameMode === 'sr' && (roleConfirmation !== 'confirmed' || confirmedRoleCount < enemies.length)) {
+      const waitKey = `${gameMode}|${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}|waiting-loading-roles`;
+      if (autoGenKeyRef.current !== waitKey) {
+        autoGenKeyRef.current = waitKey;
+        setBuildResult(null);
+        setRefinementSummary([]);
+        setMetaStatus(null);
+        setStatus('waiting-roles');
+        console.log('[App] Full draft detected - waiting for loading screen enemy roles before AI generation');
+      }
+      return;
+    }
     // Build a key so we don't re-trigger for the same exact draft
     const rolesKey = Object.entries(enemyRoles)
       .sort(([a], [b]) => a.localeCompare(b))
@@ -1167,7 +1193,7 @@ export function App() {
     autoGenKeyRef.current = comboKey;
     console.log('[App] All 10 champions detected — auto-generating build');
     handleGenerate();
-  }, [autoDetect, myChampion, role, gameMode, allies, enemies, enemyRoles, status, handleGenerate, patchVersion]);
+  }, [autoDetect, myChampion, role, gameMode, allies, enemies, enemyRoles, roleConfirmation, status, handleGenerate, patchVersion]);
 
   useEffect(() => {
     if (!myChampion) {
@@ -1177,7 +1203,7 @@ export function App() {
       metaPreviewKeyRef.current = '';
       return;
     }
-    if (status === 'fetching' || status === 'grounded' || status === 'cache' || status === 'stale-cache') return;
+    if (status === 'fetching' || status === 'waiting-roles' || status === 'grounded' || status === 'cache' || status === 'stale-cache') return;
     if (allies.length >= 4 && enemies.length >= 5) return;
     const previewKey = `${gameMode}|${myChampion}|${role}|${patchVersion}`;
     if (metaPreviewKeyRef.current === previewKey) return;
@@ -1208,6 +1234,7 @@ export function App() {
     setBuildResult(null);
     setRefinementSummary([]);
     setMetaStatus(null);
+    setRoleConfirmation('unknown');
     setStatus('idle');
     metaPreviewKeyRef.current = '';
     roleResolvedKeyRef.current = '';
@@ -1281,6 +1308,8 @@ export function App() {
 
     roleResolvedKeyRef.current = nextKey;
     setEnemyRoles(resolvedRoles);
+    roleConfirmationRef.current = 'confirmed';
+    setRoleConfirmation('confirmed');
     setLiveUpdatedItems(null);
     console.log('[App] Confirmed enemy roles from live/loading screen:', nextKey);
 
@@ -1321,6 +1350,8 @@ export function App() {
           autoGenKeyRef.current = '';
           metaPreviewKeyRef.current = '';
           roleResolvedKeyRef.current = '';
+          roleConfirmationRef.current = 'unknown';
+          setRoleConfirmation('unknown');
           // Clear stale data from previous session
           setMyChampion('');
           setAllies([]);
@@ -1375,20 +1406,30 @@ export function App() {
 
         // Enemies — only confirmed picks from their team
         const enemyIds: string[] = [];
-        const detectedEnemyRoles: Record<string, Role> = {};
         for (const p of session.theirTeam || []) {
           const pickedId = pickedChampByCellId.get(p.cellId);
           if (pickedId) {
             const champ = keyMap.get(String(pickedId));
             if (champ) {
               enemyIds.push(champ.id);
-              const mappedEnemyRole = LCU_POSITION_MAP[String(p.assignedPosition || '').toLowerCase()];
-              if (mappedEnemyRole) detectedEnemyRoles[champ.id] = mappedEnemyRole;
             }
           }
         }
+        const previousEnemyKey = [...enemiesRef.current].sort().join('|');
+        const nextEnemyKey = [...enemyIds].sort().join('|');
+        enemiesRef.current = enemyIds;
         setEnemies(enemyIds);
-        setEnemyRoles(detectedEnemyRoles);
+        if (previousEnemyKey !== nextEnemyKey || roleConfirmationRef.current !== 'confirmed') {
+          setEnemyRoles({});
+          roleConfirmationRef.current = 'unknown';
+          setRoleConfirmation('unknown');
+        }
+        if (allyIds.length >= 4 && enemyIds.length >= 5) {
+          try {
+            const roleSnapshot = await ipcInvoke('lcu-role-snapshot');
+            if (roleSnapshot?.ok) applyConfirmedEnemyRoles(roleSnapshot);
+          } catch {}
+        }
         return; // champ select worked, no fallback needed
       }
 
@@ -1491,7 +1532,11 @@ export function App() {
         }
         if (liveEnemies.length > 0) {
           setEnemies(prev => liveEnemies.length >= prev.length ? liveEnemies : prev);
-          if (Object.keys(liveEnemyRoles).length > 0) setEnemyRoles(liveEnemyRoles);
+          if (Object.keys(liveEnemyRoles).length > 0) {
+            setEnemyRoles(liveEnemyRoles);
+            roleConfirmationRef.current = 'confirmed';
+            setRoleConfirmation('confirmed');
+          }
         }
 
         // Show overlay when in-game (reliable fallback for SSE)
@@ -1558,6 +1603,7 @@ export function App() {
   const generationStage =
     status === 'fetching' && buildResult?.ok ? 'AI refining'
       : status === 'fetching' ? 'AI generating'
+      : status === 'waiting-roles' ? 'Waiting roles'
       : status === 'grounded' ? 'AI validated'
       : status === 'meta' || status === 'meta-fallback' ? 'Meta baseline'
       : status === 'cache' ? 'Saved build'
@@ -1573,7 +1619,7 @@ export function App() {
     {
       key: 'draft',
       label: 'Draft',
-      state: status === 'fetching' && !buildResult?.ok ? 'active' : status === 'idle' || status === 'error' ? 'pending' : 'done',
+      state: status === 'waiting-roles' ? 'active' : status === 'fetching' && !buildResult?.ok ? 'done' : status === 'idle' || status === 'error' ? 'pending' : 'done',
     },
     {
       key: 'ai',
@@ -1805,15 +1851,27 @@ export function App() {
             <h3>Enemies (up to 5)</h3>
             <ChampionPicker
               champions={champions} selected={enemies}
-              onSelect={(id) => setEnemies((p) => p.length < 5 ? [...p, id] : p)}
-              onRemove={(id) => setEnemies((p) => p.filter((e_) => e_ !== id))}
+              onSelect={(id) => {
+                setEnemies((p) => p.length < 5 ? [...p, id] : p);
+                setEnemyRoles({});
+                roleConfirmationRef.current = 'unknown';
+                setRoleConfirmation('unknown');
+              }}
+              onRemove={(id) => {
+                setEnemies((p) => p.filter((e_) => e_ !== id));
+                setEnemyRoles({});
+                roleConfirmationRef.current = 'unknown';
+                setRoleConfirmation('unknown');
+              }}
               max={5} getIconUrl={getChampIconUrl}
             />
           </div>
 
-          <button id="btn-generate" className="btn-generate" onClick={handleGenerate} disabled={!myChampion || status === 'fetching'}>
+          <button id="btn-generate" className="btn-generate" onClick={handleGenerate} disabled={!myChampion || status === 'fetching' || status === 'waiting-roles'}>
             {status === 'fetching' ? (
               <><span className="btn-generate-spinner" />Generating...</>
+            ) : status === 'waiting-roles' ? (
+              <><span className="btn-generate-spinner" />Waiting for roles...</>
             ) : (
               <>
                 <svg className="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 14L12 4M9 2h5v5M6 10l-2 2 2 2"/></svg>
@@ -1856,8 +1914,8 @@ export function App() {
           <BuildOutput
             result={buildResult}
             iconLookups={iconLookups}
-            loading={status === 'fetching' || metaPreviewLoading}
-            loadingMode={status === 'fetching' ? 'ai' : 'meta'}
+            loading={status === 'fetching' || status === 'waiting-roles' || metaPreviewLoading}
+            loadingMode={status === 'waiting-roles' ? 'roles' : status === 'fetching' ? 'ai' : 'meta'}
             championId={myChampion}
             role={role}
             liveUpdatedItems={liveUpdatedItems}

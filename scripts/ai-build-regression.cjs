@@ -293,7 +293,7 @@ function runStaticAdvisorChecks() {
   if (!source.includes('reorderPlanFromNextItems') || !source.includes('NEXT ITEMS may reorder unowned items')) issues.push('live advisor NEXT ITEMS cannot reorder the validated build queue');
   if (!source.includes('isTankItemChampion') || !source.includes('TANK_COMPLETION_CANDIDATES') || !source.includes('resolveLCUGameModePayload')) issues.push('tank item fallback or robust LCU mode detection is missing');
   if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');
-  if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with role-safe full items');
+  if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with validated full items');
   for (const [key, template] of Object.entries(buildTemplates.data || {})) {
     for (const [label, variant] of Object.entries(template.variants || {})) {
       const coreCount = (variant.coreItems || []).length + (variant.bootChoice ? 1 : 0);

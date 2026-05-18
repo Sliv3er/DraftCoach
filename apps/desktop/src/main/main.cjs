@@ -939,6 +939,12 @@ async function resolveDdragonItem(itemName) {
     return null;
   }
 }
+
+async function ensureDdragonItemCacheLoaded() {
+  if (!ddragonItemCache) await resolveDdragonItem('Boots');
+  return ddragonItemCache;
+}
+
 let gameDetectionInterval = null;
 let fgMonitorProc = null;
 let lastFgTitle = '';
@@ -1416,10 +1422,18 @@ function scoreKBBuildVariantForDraft(variant, body = {}, engineRole = '', mechan
   const damageCount = countItemsMatching(items, [/Infinity Edge/i, /Rabadon/i, /Shadowflame/i, /Lich Bane/i, /Collector/i, /Youmuu/i, /Hubris/i, /Trinity Force/i, /Spear of Shojin/i, /Eclipse/i]);
   const penCount = countItemsMatching(items, [/Black Cleaver/i, /Lord Dominik/i, /Mortal Reminder/i, /Serylda/i, /Void Staff/i, /Cryptbloom/i, /Terminus/i]);
   const sustainCount = countItemsMatching(items, [/Sundered Sky/i, /Bloodthirster/i, /Riftmaker/i, /Unending Despair/i, /Spirit Visage/i, /Warmog/i, /Heartsteel/i]);
+  const myInfo = ddragonChampCache?.get(body?.myChampion);
+  const myTags = myInfo?.tags || [];
+  const isFrontlineChampion =
+    myTags.includes('Tank') ||
+    (myTags.includes('Fighter') && !myTags.includes('Marksman')) ||
+    (/support/i.test(String(engineRole || '')) && !myTags.includes('Mage') && !myTags.includes('Marksman'));
 
   if (draft.heavyAp) score += mrCount * 18 - armorCount * 5;
   if (draft.heavyAd && draft.effectiveAp < 1.5) score += armorCount * 18 - mrCount * 5;
   else if (draft.heavyAd) score += armorCount * 10;
+  if (isFrontlineChampion && draft.heavyAp && mrCount < 2) score -= (2 - mrCount) * 18 + damageCount * 4;
+  if (isFrontlineChampion && draft.heavyAd && armorCount < 2) score -= (2 - armorCount) * 18 + damageCount * 4;
   if (draft.highCc && /Mercury's Treads/i.test(itemText)) score += 14;
   if (draft.tanks >= 2) score += penCount * 10;
   if (antiHealPressureLevel(draft) === 'core') score += countItemsMatching(items, [/Thornmail/i, /Mortal Reminder/i, /Morellonomicon/i, /Chempunk/i]) * 12;
@@ -1670,6 +1684,7 @@ function buildAiRefinementBaseline(metaText) {
     '- Runes may change only when the enemy draft creates a real lane/teamfight need, such as extreme poke, unavoidable hard CC, oppressive burst, or a different U.GG build variant already supports that rune page.',
     '- Do not write "keep baseline", "preserved", or similar shorthand inside build sections. Repeat the exact rune, summoner, skill, and item names so the UI can render icons correctly.',
     '- Choose the best U.GG variant for this draft first. Then prefer reordering or 1 targeted swap. Use 2 swaps only for extreme cases such as 4+ one damage type, suppression, or overwhelming healing.',
+    '- For frontline Tank/Fighter champions into 4+ AD or AP threats, the final core must keep a real defensive budget for that damage type. Do not switch to a glass-cannon U.GG variant unless it still contains at least two relevant defensive items including boots.',
     '- Do not change an item merely because another item is also good. If the draft-scored baseline item is playable, preserve it.',
     '- If changing a baseline choice, state the concrete trigger in ANALYSIS: damage split, fed threat, suppression, heavy healing, or impossible lane survival.',
     '- Never swap to off-class items. Respect champion role, gold economy, and normal item users.',
@@ -2994,6 +3009,64 @@ function replacementCandidatesForBuild(body, draft, mechanicsMap = null) {
     : ["Death's Dance", "Sterak's Gage", 'Guardian Angel', "Randuin's Omen", 'Frozen Heart', 'Force of Nature', 'Maw of Malmortius'];
 }
 
+const MAGIC_RESIST_CORE_ITEMS = ["Mercury's Treads", 'Kaenic Rookern', 'Force of Nature', 'Spirit Visage', 'Maw of Malmortius', "Banshee's Veil", "Wit's End", 'Mercurial Scimitar'];
+const ARMOR_CORE_ITEMS = ['Plated Steelcaps', "Randuin's Omen", 'Frozen Heart', "Dead Man's Plate", 'Thornmail', "Zhonya's Hourglass", 'Guardian Angel', 'Unending Despair', "Jak'Sho, The Protean"];
+const HIGH_GREED_DAMAGE_ITEMS = [
+  'Stormsurge', 'Shadowflame', "Rabadon's Deathcap", 'Void Staff', 'Cryptbloom', 'Malignance', 'Lich Bane',
+  'The Collector', "Youmuu's Ghostblade", 'Opportunity', 'Hubris', 'Profane Hydra', 'Infinity Edge',
+  "Navori Flickerblade", 'Spear of Shojin', 'Eclipse', 'Trinity Force',
+];
+
+function isFrontlineBudgetChampion(body, mechanicsMap = null) {
+  const tags = getChampionTags(body?.myChampion);
+  const role = String(body?.role || '').toLowerCase();
+  const isSupport = /support|utility/.test(role);
+  return tags.includes('Tank') ||
+    (tags.includes('Fighter') && !tags.includes('Marksman')) ||
+    (isSupport && !tags.includes('Mage') && !tags.includes('Marksman'));
+}
+
+function countCoreDefenseItems(coreItems, candidates) {
+  return coreItems.filter(item => exactItemMatch(item, candidates)).length;
+}
+
+function chooseReplaceableGreedItem(coreItems) {
+  const preferred = [...coreItems].reverse().find(item => exactItemMatch(item, HIGH_GREED_DAMAGE_ITEMS));
+  if (preferred) return preferred;
+  return [...coreItems].reverse().find(item =>
+    !isBootItemName(item) &&
+    !exactItemMatch(item, MAGIC_RESIST_CORE_ITEMS) &&
+    !exactItemMatch(item, ARMOR_CORE_ITEMS) &&
+    !exactItemMatch(item, GRIEVOUS_ITEMS)
+  );
+}
+
+function enforceFrontlineDefenseBudget(finalText, body, draft, mechanicsMap = null) {
+  if (!finalText || !body || !isFrontlineBudgetChampion(body, mechanicsMap)) return finalText;
+  let safe = finalText;
+  const desiredType = draft.heavyAp ? 'mr' : draft.heavyAd ? 'armor' : '';
+  if (!desiredType) return safe;
+
+  const defenseItems = desiredType === 'mr' ? MAGIC_RESIST_CORE_ITEMS : ARMOR_CORE_ITEMS;
+  const reason = desiredType === 'mr'
+    ? 'frontline defense budget vs heavy AP damage'
+    : 'frontline defense budget vs heavy AD damage';
+  const preferred = replacementCandidatesForBuild(body, draft, mechanicsMap).filter(item => exactItemMatch(item, defenseItems));
+
+  for (let guard = 0; guard < 3; guard++) {
+    const coreItems = sectionItems(safe, 'CORE BUILD');
+    if (countCoreDefenseItems(coreItems, defenseItems) >= 2) return safe;
+    const used = new Set(coreItems.map(itemKey));
+    const candidate = preferred.find(item => !used.has(itemKey(item)));
+    const target = chooseReplaceableGreedItem(coreItems);
+    if (!candidate || !target) return safe;
+    const next = replaceCoreItemByName(safe, [target], candidate, reason);
+    if (next === safe) return safe;
+    safe = next;
+  }
+  return safe;
+}
+
 function firstAvailableItem(candidates, used, blocked = []) {
   const blockedKeys = new Set(blocked.map(itemKey));
   return candidates.find(candidate => !used.has(itemKey(candidate)) && !blockedKeys.has(itemKey(candidate)));
@@ -3356,6 +3429,8 @@ function enforceDraftCounterLogic(finalText, body, mechanicsMap = null) {
       'high magic resist vs AP-heavy enemy team'
     );
   }
+
+  safe = enforceFrontlineDefenseBudget(safe, body, draft, mechanicsMap);
 
   safe = enforceAntiHealClassFit(safe, body, draft, mechanicsMap);
   safe = enforceExclusiveItemGroups(safe, body, draft, mechanicsMap);
@@ -6227,6 +6302,7 @@ function checkGameState() {
         liveAdvisorState.lastAdviceTime = 0;
         liveAdvisorState.lastPhase = '';
         liveAdvisorState.lastFedEnemies = [];
+        liveAdvisorState.lastEnemyDamageTypes = {};
         liveAdvisorState.originalBuildText = '';
         // Reset all game-specific data so next game starts fresh
         overlayData = null;
@@ -6724,8 +6800,141 @@ ipcMain.handle('lcu-game-mode', async () => {
   }
 });
 
-// In-game detection fallback via Live Client API (port 2999)
-ipcMain.handle('lcu-live-game', async () => {
+function normalizeBackendRole(value) {
+  const key = String(value || '').toLowerCase();
+  const map = {
+    top: 'top',
+    jungle: 'jungle',
+    jg: 'jungle',
+    middle: 'mid',
+    mid: 'mid',
+    bottom: 'adc',
+    bot: 'adc',
+    adc: 'adc',
+    utility: 'support',
+    support: 'support',
+  };
+  return map[key] || '';
+}
+
+function getParticipantChampionId(participant) {
+  return participant?.championId ??
+    participant?.selectedChampionId ??
+    participant?.championID ??
+    participant?.champion?.id ??
+    participant?.champion?.championId ??
+    participant?.champion?.key ??
+    null;
+}
+
+function participantMatchesSummoner(participant, summoner) {
+  if (!participant || !summoner) return false;
+  const participantIds = [
+    participant.summonerId,
+    participant.summonerID,
+    participant.summoner?.summonerId,
+    participant.accountId,
+    participant.puuid,
+    participant.puuidV4,
+  ].filter(v => v !== undefined && v !== null).map(v => String(v).toLowerCase());
+  const localIds = [
+    summoner.summonerId,
+    summoner.accountId,
+    summoner.puuid,
+    summoner.puuidV4,
+  ].filter(v => v !== undefined && v !== null).map(v => String(v).toLowerCase());
+  if (participantIds.some(id => localIds.includes(id))) return true;
+
+  const participantNames = [
+    participant.summonerName,
+    participant.gameName,
+    participant.riotIdGameName,
+    participant.name,
+  ].filter(Boolean).map(v => String(v).split('#')[0].toLowerCase().trim());
+  const localNames = [
+    summoner.displayName,
+    summoner.gameName,
+    summoner.riotIdGameName,
+    summoner.summonerName,
+  ].filter(Boolean).map(v => String(v).split('#')[0].toLowerCase().trim());
+  return participantNames.some(name => localNames.includes(name));
+}
+
+async function championNameFromParticipant(participant) {
+  const direct = participant?.championName || participant?.champion?.name || participant?.champion?.displayName;
+  if (direct) return String(direct);
+  const champId = getParticipantChampionId(participant);
+  if (!champId) return '';
+  const cache = await ensureDdragonChampCache().catch(() => null);
+  const entry = cache?.get(String(champId));
+  return entry?.name || entry?.id || '';
+}
+
+async function extractRoleSnapshotFromGameflow(gameflow) {
+  const teamOne = gameflow?.gameData?.teamOne || gameflow?.teamOne || [];
+  const teamTwo = gameflow?.gameData?.teamTwo || gameflow?.teamTwo || [];
+  if (!Array.isArray(teamOne) || !Array.isArray(teamTwo) || (!teamOne.length && !teamTwo.length)) {
+    return null;
+  }
+
+  const summoner = await lcuCall('GET', '/lol-summoner/v1/current-summoner');
+  const localOnOne = teamOne.some(p => participantMatchesSummoner(p, summoner));
+  const localOnTwo = teamTwo.some(p => participantMatchesSummoner(p, summoner));
+  if (!localOnOne && !localOnTwo) return null;
+
+  const alliesTeam = localOnOne ? teamOne : teamTwo;
+  const enemyTeam = localOnOne ? teamTwo : teamOne;
+  const allies = [];
+  const enemies = [];
+  const enemyRoles = {};
+
+  for (const p of alliesTeam) {
+    if (participantMatchesSummoner(p, summoner)) continue;
+    const champ = await championNameFromParticipant(p);
+    if (champ) allies.push(champ);
+  }
+  for (const p of enemyTeam) {
+    const champ = await championNameFromParticipant(p);
+    if (!champ) continue;
+    enemies.push(champ);
+    const enemyRole = normalizeBackendRole(
+      p.assignedPosition || p.position || p.selectedPosition || p.teamPosition || p.lane || p.role
+    );
+    if (enemyRole) enemyRoles[champ] = enemyRole;
+  }
+
+  if (!enemies.length || !Object.keys(enemyRoles).length) return null;
+  return { ok: true, source: 'gameflow-role-snapshot', allies, enemies, enemyRoles, gameTime: 0 };
+}
+
+async function extractRoleSnapshotFromChampSelect(session) {
+  if (!session?.theirTeam?.length) return null;
+  const keyMap = await ensureDdragonChampCache().catch(() => null);
+  const pickedChampByCellId = new Map();
+  for (const phase of session.actions || []) {
+    for (const action of phase || []) {
+      if (action.type === 'pick' && action.championId && action.championId !== 0 && (action.completed || action.isInProgress)) {
+        pickedChampByCellId.set(action.actorCellId, action.championId);
+      }
+    }
+  }
+
+  const enemies = [];
+  const enemyRoles = {};
+  for (const p of session.theirTeam || []) {
+    const pickedId = pickedChampByCellId.get(p.cellId) || p.championId || p.championIdSelected;
+    const entry = pickedId ? keyMap?.get(String(pickedId)) : null;
+    const champ = entry?.name || entry?.id || p.championName || '';
+    const enemyRole = normalizeBackendRole(p.assignedPosition || p.position || p.selectedPosition || p.lane || p.role);
+    if (champ) enemies.push(champ);
+    if (champ && enemyRole) enemyRoles[champ] = enemyRole;
+  }
+
+  if (!enemies.length || !Object.keys(enemyRoles).length) return null;
+  return { ok: true, source: 'champ-select-role-snapshot', enemies, enemyRoles, gameTime: 0 };
+}
+
+async function readLiveGameSnapshot() {
   const nodeFetch = require('node-fetch');
   try {
     const res = await nodeFetch('https://127.0.0.1:2999/liveclientdata/allgamedata', {
@@ -6784,6 +6993,32 @@ ipcMain.handle('lcu-live-game', async () => {
   } catch {
     return { ok: false, error: 'Game not running' };
   }
+}
+
+// In-game detection fallback via Live Client API (port 2999)
+ipcMain.handle('lcu-live-game', async () => {
+  return readLiveGameSnapshot();
+});
+
+ipcMain.handle('lcu-role-snapshot', async () => {
+  const live = await readLiveGameSnapshot();
+  if (live?.ok && Object.keys(live.enemyRoles || {}).length > 0) {
+    return { ...live, roleSource: 'live-client-position' };
+  }
+
+  const gameflow = await lcuCall('GET', '/lol-gameflow/v1/session');
+  if (gameflow && !gameflow.__lcuError && !gameflow.__lcuOk) {
+    const snapshot = await extractRoleSnapshotFromGameflow(gameflow);
+    if (snapshot?.ok) return snapshot;
+  }
+
+  const champSelect = await lcuCall('GET', '/lol-champ-select/v1/session');
+  if (champSelect && !champSelect.__lcuError && !champSelect.__lcuOk) {
+    const snapshot = await extractRoleSnapshotFromChampSelect(champSelect);
+    if (snapshot?.ok) return snapshot;
+  }
+
+  return { ok: false, error: 'No confirmed enemy roles available yet' };
 });
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ Live Game AI Advisor Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -6800,6 +7035,7 @@ let liveAdvisorState = {
   lastDeaths: 0,            // #2: death trigger
   lastGold: 0,              // #2: gold spike trigger
   lastEnemyItemCounts: {},  // #2: enemy major item completion trigger
+  lastEnemyDamageTypes: {}, // live itemization can override champion default damage type
 };
 
 // Ã¢â€â‚¬Ã¢â€â‚¬ DDragon Champion Cache (for class-based item filtering) Ã¢â€â‚¬Ã¢â€â‚¬
@@ -6823,6 +7059,7 @@ async function ensureDdragonChampCache() {
           cache.set(c.name, entry);
           cache.set(c.id, entry);
           cache.set(key, entry);
+          if (c.key) cache.set(String(c.key), entry);
         }
         ddragonChampCache = cache;
         ddragonChampCachePromise = null;
@@ -6872,6 +7109,90 @@ function getGamePhase(gameTime) {
   return 'late';
 }
 
+function classifyLiveEnemyDamage(enemy) {
+  const rawDefault = inferDamageFromTagsAndInfo(enemy?.championName);
+  const defaultType = rawDefault === 'HYBRID' ? 'MIXED' : (rawDefault || 'UNKNOWN');
+  let apGold = 0;
+  let adGold = 0;
+  const apItems = [];
+  const adItems = [];
+
+  for (const item of enemy?.items || []) {
+    const d = ddragonItemCache?.byId?.get(String(item.itemID));
+    if (!d) continue;
+    const tags = d.tags || [];
+    const gold = Number(d.gold || 0);
+    const name = d.name || item.displayName || '';
+    const isAP = tags.some(t => ['SpellDamage', 'MagicPenetration', 'ManaRegen'].includes(t));
+    const isAD = tags.some(t => ['Damage', 'CriticalStrike', 'AttackSpeed', 'ArmorPenetration', 'LifeSteal'].includes(t));
+
+    if (isAP) {
+      apGold += gold;
+      if (name) apItems.push(name);
+    }
+    if (isAD) {
+      adGold += gold;
+      if (name) adItems.push(name);
+    }
+  }
+
+  let type = defaultType === 'UNKNOWN' ? 'MIXED' : defaultType;
+  let source = 'champion default';
+  const evidenceGold = apGold + adGold;
+  if (evidenceGold >= 1200) {
+    if (apGold >= 1200 && apGold >= adGold * 1.35) {
+      type = 'AP';
+      source = `live AP items: ${apItems.slice(0, 3).join(', ')}`;
+    } else if (adGold >= 1200 && adGold >= apGold * 1.35) {
+      type = 'AD';
+      source = `live AD items: ${adItems.slice(0, 3).join(', ')}`;
+    } else if (apGold >= 900 && adGold >= 900) {
+      type = 'MIXED';
+      source = `mixed live items: ${[...apItems.slice(0, 2), ...adItems.slice(0, 2)].join(', ')}`;
+    }
+  }
+
+  const diverged = source !== 'champion default' && defaultType !== 'UNKNOWN' && type !== defaultType;
+  return {
+    name: enemy?.championName || 'Unknown',
+    type,
+    defaultType,
+    source,
+    evidenceGold,
+    diverged,
+  };
+}
+
+function buildLiveEnemyDamageProfile(enemies) {
+  const entries = (enemies || []).map(classifyLiveEnemyDamage);
+  const adCount = entries.filter(d => d.type === 'AD').length;
+  const apCount = entries.filter(d => d.type === 'AP').length;
+  const mixedCount = entries.filter(d => d.type === 'MIXED').length;
+  let verdict = 'balanced';
+  if (adCount >= 4) verdict = 'heavily AD - prioritize armor';
+  else if (apCount >= 4) verdict = 'heavily AP - prioritize MR';
+  else if (adCount >= 3) verdict = 'AD-leaning - consider armor';
+  else if (apCount >= 3) verdict = 'AP-leaning - consider MR';
+
+  const profileStr = entries.map(d => {
+    const suffix = d.diverged ? ` live-overrides-${d.defaultType}` : '';
+    return `${d.name}=${d.type}${suffix}`;
+  }).join(', ');
+  const divergenceText = entries
+    .filter(d => d.diverged)
+    .map(d => `- ${d.name}: expected ${d.defaultType}, but current items indicate ${d.type} (${d.source}).`)
+    .join('\n');
+
+  return {
+    entries,
+    adCount,
+    apCount,
+    mixedCount,
+    verdict,
+    text: `ENEMY DAMAGE PROFILE: ${adCount} AD / ${apCount} AP / ${mixedCount} Mixed - ${verdict}\n  [${profileStr}]${divergenceText ? `\nLIVE ITEMIZATION OVERRIDES:\n${divergenceText}` : ''}`,
+  };
+}
+
 function checkLiveAdvisorTriggers(gameData) {
   const now = Date.now();
   if (now - liveAdvisorState.lastAdviceTime < liveAdvisorState.advisorCooldown) return null;
@@ -6892,6 +7213,19 @@ function checkLiveAdvisorTriggers(gameData) {
 
   const myTeam = myPlayer.team;
   const enemies = players.filter(p => p.team !== myTeam);
+
+  const damageProfile = buildLiveEnemyDamageProfile(enemies);
+  const currentDamageTypes = Object.fromEntries(damageProfile.entries.map(e => [e.name, e.type]));
+  const previousDamageTypes = liveAdvisorState.lastEnemyDamageTypes || {};
+  const shiftedDamage = damageProfile.entries.filter(e =>
+    previousDamageTypes[e.name] &&
+    previousDamageTypes[e.name] !== e.type &&
+    e.evidenceGold >= 1200
+  );
+  liveAdvisorState.lastEnemyDamageTypes = currentDamageTypes;
+  if (shiftedDamage.length > 0 && Object.keys(previousDamageTypes).length > 0) {
+    return `Enemy live itemization changed damage profile: ${shiftedDamage.map(e => `${e.name} ${previousDamageTypes[e.name]} -> ${e.type}`).join(', ')}`;
+  }
 
   // Trigger 1: Phase change
   if (currentPhase !== liveAdvisorState.lastPhase && liveAdvisorState.lastPhase !== '') {
@@ -6970,6 +7304,9 @@ async function pollLiveClient() {
   if (gt < 60 && !scoutingState.hasRun) {
     runScoutingReport(gameData);
   }
+
+  await ensureDdragonItemCacheLoaded();
+  await ensureDdragonChampCache().catch(() => null);
 
   const triggerReason = checkLiveAdvisorTriggers(gameData);
   if (!triggerReason) {
@@ -7149,37 +7486,9 @@ async function pollLiveClient() {
     // Use ID-based boots detection (catches quest slot boots that may not be in displayName list)
     const hasBoots = advisorHasBoots;
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ #3: Enemy Damage-Type Classification Ã¢â€â‚¬Ã¢â€â‚¬
-    const classifyDamageType = (enemy) => {
-      const inferred = inferDamageFromTagsAndInfo(enemy.championName);
-      if (inferred === 'AP' || inferred === 'AD' || inferred === 'HYBRID') return inferred;
-      const champInfo = ddragonChampCache?.get(enemy.championName);
-      const tags = champInfo?.tags || [];
-      const enemyItems = (enemy.items || []).map(i => {
-        const d = ddragonItemCache?.byId?.get(String(i.itemID));
-        return d?.tags || [];
-      }).flat();
-      const hasAPItems = enemyItems.some(t => t === 'SpellDamage');
-      const hasADItems = enemyItems.some(t => t === 'Damage' || t === 'CriticalStrike' || t === 'AttackSpeed');
-      if (tags.includes('Mage') || (hasAPItems && !hasADItems)) return 'AP';
-      if (tags.includes('Marksman') || tags.includes('Assassin') || (hasADItems && !hasAPItems)) return 'AD';
-      if (hasAPItems && hasADItems) return 'MIXED';
-      if (tags.includes('Tank') || tags.includes('Fighter')) return 'AD';
-      return 'MIXED';
-    };
-    // Pre-warm champion cache
-    await ensureDdragonChampCache();
-    const enemyDamageProfile = enemies.map(e => ({ name: e.championName, type: classifyDamageType(e) }));
-    const adCount = enemyDamageProfile.filter(d => d.type === 'AD').length;
-    const apCount = enemyDamageProfile.filter(d => d.type === 'AP').length;
-    const mixedCount = enemyDamageProfile.filter(d => d.type === 'MIXED').length;
-    let damageVerdict = 'balanced';
-    if (adCount >= 4) damageVerdict = 'heavily AD Ã¢â‚¬â€ prioritize armor';
-    else if (apCount >= 4) damageVerdict = 'heavily AP Ã¢â‚¬â€ prioritize MR';
-    else if (adCount >= 3) damageVerdict = 'AD-leaning Ã¢â‚¬â€ consider armor';
-    else if (apCount >= 3) damageVerdict = 'AP-leaning Ã¢â‚¬â€ consider MR';
-    const damageProfileStr = enemyDamageProfile.map(d => `${d.name}=${d.type}`).join(', ');
-    const damageSection = `ENEMY DAMAGE PROFILE: ${adCount} AD / ${apCount} AP / ${mixedCount} Mixed Ã¢â‚¬â€ ${damageVerdict}\n  [${damageProfileStr}]`;
+    // Live itemization beats champion defaults: AP Ezreal, AD Kai'Sa, etc.
+    const enemyDamageProfile = buildLiveEnemyDamageProfile(enemies);
+    const damageSection = enemyDamageProfile.text;
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ #4: Gold Efficiency Context Ã¢â€â‚¬Ã¢â€â‚¬
     const currentGold = activePlayer.currentGold || 0;
@@ -7346,6 +7655,7 @@ RULES:
 - Keep each section short (1-3 lines max)
 - NEXT ITEMS must be a numbered list of completed item goals only, never components
 - Treat VALIDATED LIVE BUILD PLAN as the source of truth.
+- Treat LIVE ITEMIZATION OVERRIDES as facts. If a champion is building AP/AD differently than their default class, adapt defenses to the live items, not champion stereotypes.
 - Default action is CONTINUE: keep the build plan and list the next 1-2 unowned items from it.
 - Only add a brand-new item to the build plan by writing an explicit CHANGES line. NEXT ITEMS may reorder unowned items that already exist in the validated build plan, but must not introduce a new item unless it also appears as OldItem -> NewItem under CHANGES.
 - If CURRENTLY BUILDING is specified, it should remain NEXT ITEM 1 unless CHANGES explicitly swaps that exact item for an emergency counter.
@@ -7839,6 +8149,7 @@ function startLiveAdvisor() {
   liveAdvisorState.lastAdviceTime = 0;
   liveAdvisorState.lastPhase = '';
   liveAdvisorState.lastFedEnemies = [];
+  liveAdvisorState.lastEnemyDamageTypes = {};
   if (liveAdvisorInterval) clearInterval(liveAdvisorInterval);
   liveAdvisorInterval = setInterval(pollLiveClient, 15000);
   // Do an immediate first poll

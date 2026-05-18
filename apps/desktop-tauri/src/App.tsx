@@ -495,6 +495,10 @@ export function App() {
   const overlayHasDataRef = useRef<boolean>(false); // ref mirror for use in pollLCU callback
   const statusRef = useRef<Status>('idle');
   const draftCompleteRef = useRef<boolean>(false);
+  const enemiesRef = useRef<string[]>([]);
+  const enemyRolesRef = useRef<Record<string, Role>>({});
+  const gameModeRef = useRef<GameMode>('sr');
+  const roleResolvedKeyRef = useRef<string>('');
 
   // ── New UI state: RAG, overlay, settings ───────────────────────
   const [ragStatus, setRagStatus] = useState<RagStatus>({ isUpdating: false, patch: null, updatedAt: null });
@@ -526,6 +530,9 @@ export function App() {
 
   statusRef.current = status;
   draftCompleteRef.current = Boolean(myChampion && allies.length >= 4 && enemies.length >= 5);
+  enemiesRef.current = enemies;
+  enemyRolesRef.current = enemyRoles;
+  gameModeRef.current = gameMode;
 
   useEffect(() => {
     const handler = (_event: any, advice: any) => { setLiveAdvice(advice); };
@@ -1151,12 +1158,16 @@ export function App() {
     // Don't auto-generate until DDragon data is loaded
     if (!patchVersion || patchVersion === '...') return;
     // Build a key so we don't re-trigger for the same exact draft
-    const comboKey = `${gameMode}|${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}`;
+    const rolesKey = Object.entries(enemyRoles)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([champ, champRole]) => `${champ}:${champRole}`)
+      .join('|');
+    const comboKey = `${gameMode}|${myChampion}|${role}|${[...allies].sort().join(',')}|${[...enemies].sort().join(',')}|roles=${rolesKey}`;
     if (autoGenKeyRef.current === comboKey) return;
     autoGenKeyRef.current = comboKey;
     console.log('[App] All 10 champions detected — auto-generating build');
     handleGenerate();
-  }, [autoDetect, myChampion, role, gameMode, allies, enemies, status, handleGenerate, patchVersion]);
+  }, [autoDetect, myChampion, role, gameMode, allies, enemies, enemyRoles, status, handleGenerate, patchVersion]);
 
   useEffect(() => {
     if (!myChampion) {
@@ -1199,7 +1210,91 @@ export function App() {
     setMetaStatus(null);
     setStatus('idle');
     metaPreviewKeyRef.current = '';
+    roleResolvedKeyRef.current = '';
   }, []);
+
+  const resolveDetectedChampion = useCallback((name: string): string | null => {
+    const keyMap = champKeyMapRef.current;
+    const nameToId = new Map<string, string>();
+    for (const [, val] of keyMap) {
+      nameToId.set(val.name.toLowerCase(), val.id);
+      nameToId.set(val.id.toLowerCase(), val.id);
+    }
+    const lower = String(name || '').toLowerCase();
+    if (nameToId.has(lower)) return nameToId.get(lower)!;
+    const stripped = lower.replace(/['.\s]/g, '');
+    for (const [key, id] of nameToId) {
+      if (key.replace(/['.\s]/g, '') === stripped) return id;
+    }
+    return null;
+  }, []);
+
+  const normalizeDetectedRole = useCallback((value: any): Role | null => {
+    const key = String(value || '').toLowerCase();
+    const map: Record<string, Role> = {
+      top: 'top',
+      jungle: 'jungle',
+      jg: 'jungle',
+      middle: 'mid',
+      mid: 'mid',
+      bottom: 'adc',
+      bot: 'adc',
+      adc: 'adc',
+      utility: 'support',
+      support: 'support',
+    };
+    return map[key] || null;
+  }, []);
+
+  const roleSnapshotKey = useCallback((roles: Record<string, Role>) => {
+    return Object.entries(roles)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([champ, champRole]) => `${champ}:${champRole}`)
+      .join('|');
+  }, []);
+
+  const applyConfirmedEnemyRoles = useCallback((snapshot: any) => {
+    if (!snapshot?.ok || gameModeRef.current !== 'sr') return false;
+    const currentEnemies = enemiesRef.current;
+    if (currentEnemies.length < 5) return false;
+    const currentEnemySet = new Set(currentEnemies);
+    const sourceEnemies: string[] = Array.isArray(snapshot.enemies) ? snapshot.enemies : [];
+    const sourceRoles = snapshot.enemyRoles || {};
+    const resolvedRoles: Record<string, Role> = {};
+
+    for (const name of sourceEnemies) {
+      const id = resolveDetectedChampion(name);
+      if (!id || !currentEnemySet.has(id)) continue;
+      const rawRole =
+        sourceRoles[name] ||
+        sourceRoles[id] ||
+        sourceRoles[String(name).toLowerCase()] ||
+        sourceRoles[String(id).toLowerCase()];
+      const mapped = normalizeDetectedRole(rawRole);
+      if (mapped) resolvedRoles[id] = mapped;
+    }
+
+    if (Object.keys(resolvedRoles).length < currentEnemies.length) return false;
+    const nextKey = roleSnapshotKey(resolvedRoles);
+    const currentKey = roleSnapshotKey(enemyRolesRef.current);
+    if (!nextKey || nextKey === currentKey || nextKey === roleResolvedKeyRef.current) return false;
+
+    roleResolvedKeyRef.current = nextKey;
+    setEnemyRoles(resolvedRoles);
+    setLiveUpdatedItems(null);
+    console.log('[App] Confirmed enemy roles from live/loading screen:', nextKey);
+
+    if (buildGeneratedRef.current && draftCompleteRef.current) {
+      buildGeneratedRef.current = false;
+      autoGenKeyRef.current = '';
+      metaPreviewKeyRef.current = '';
+      setStatus('idle');
+      setRefinementSummary([]);
+      setMetaStatus(null);
+      console.log('[App] Enemy roles confirmed after draft - regenerating with real lane assignments');
+    }
+    return true;
+  }, [normalizeDetectedRole, resolveDetectedChampion, roleSnapshotKey]);
 
   // Auto-detect: poll LCU for champ select session, with in-game fallback
   const pollLCU = useCallback(async () => {
@@ -1225,6 +1320,7 @@ export function App() {
           buildGeneratedRef.current = false;
           autoGenKeyRef.current = '';
           metaPreviewKeyRef.current = '';
+          roleResolvedKeyRef.current = '';
           // Clear stale data from previous session
           setMyChampion('');
           setAllies([]);
@@ -1300,11 +1396,12 @@ export function App() {
       // IMPORTANT: Once a build is generated, do NOT update champions from live game.
       // Viego's passive changes his championName mid-game, which would trigger re-generation.
       if (buildGeneratedRef.current) {
-        // Build already generated — just maintain connection status, don't update champs
+        // Keep champion identity locked, but accept confirmed enemy roles from live/loading evidence.
         try {
-          const liveResult = await ipcInvoke('lcu-live-game');
+          const liveResult = await ipcInvoke('lcu-role-snapshot').catch(() => ipcInvoke('lcu-live-game'));
           if (liveResult?.ok) {
             setAutoDetectStatus('connected');
+            applyConfirmedEnemyRoles(liveResult);
             // Show overlay when in-game (reliable fallback for SSE)
             if (!overlayShownRef.current && overlayHasDataRef.current) {
               overlayShownRef.current = true;

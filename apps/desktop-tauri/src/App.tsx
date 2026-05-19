@@ -1118,11 +1118,21 @@ export function App() {
 
         if (data.text) {
           const overlayPayload = extractOverlayData(data.text, role, iconLookups, ddragonVersion, myChampion);
+          const overlayPayloadHasData = Boolean(
+            overlayPayload.buildItems.length || overlayPayload.junglePath.length
+          );
+          const sendOverlayPayload = () => ipcSend('overlay-data', overlayPayload);
           ipcInvoke('overlay-ensure').then(() => {
-            ipcSend('overlay-data', overlayPayload);
+            sendOverlayPayload();
+            window.setTimeout(sendOverlayPayload, 250);
+            window.setTimeout(sendOverlayPayload, 1000);
+            if (overlayPayloadHasData && roleConfirmationRef.current === 'confirmed') {
+              overlayShownRef.current = true;
+              ipcInvoke('overlay-show');
+            }
           });
-          setOverlayHasData(true);
-          overlayHasDataRef.current = true;
+          setOverlayHasData(overlayPayloadHasData);
+          overlayHasDataRef.current = overlayPayloadHasData;
           console.log('[App] 🧠 Build sent to overlay');
 
           // Store build text for live advisor and auto-start it

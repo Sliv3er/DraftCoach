@@ -303,8 +303,13 @@ function runStaticAdvisorChecks() {
   const overlaySource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src/Overlay.tsx'), 'utf8');
   const bridgeSource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src/bridge.ts'), 'utf8');
   const tauriSource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src-tauri/src/lib.rs'), 'utf8');
+  const tauriAppSource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src/App.tsx'), 'utf8');
+  const sidecarSource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/sidecar/backend.js'), 'utf8');
   if (!overlaySource.includes("ipcInvoke('get-overlay-data')") || !bridgeSource.includes("case 'get-overlay-data'")) issues.push('Tauri overlay does not hydrate cached sidecar build data');
   if (!bridgeSource.includes("case 'overlay-toggle'") || !tauriSource.includes('async fn toggle_window')) issues.push('overlay hotkey toggle path is missing');
+  if (!tauriAppSource.includes("window.setTimeout(sendOverlayPayload, 250)") || !tauriAppSource.includes("roleConfirmationRef.current === 'confirmed'")) issues.push('overlay data is not replayed/shown after loading-screen-confirmed generation');
+  if (!overlaySource.includes('cacheHydrateTimer') || !overlaySource.includes('hasDataRef.current')) issues.push('overlay window cannot recover if it mounted before build data existed');
+  if (!sidecarSource.includes("label = 'overlay'") || !sidecarSource.includes("title.includes('overlay')")) issues.push('Tauri sidecar overlay visibility shim cannot identify overlay windows');
   if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with validated full items');
   for (const [key, template] of Object.entries(buildTemplates.data || {})) {
     for (const [label, variant] of Object.entries(template.variants || {})) {

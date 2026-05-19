@@ -132,7 +132,17 @@ const electronShim = {
     getVersion: () => '1.1.0',
   },
   BrowserWindow: class FakeBrowserWindow {
-    constructor() { return createFakeWindow('dynamic'); }
+    constructor(options = {}) {
+      const title = String(options.title || '').toLowerCase();
+      let label = 'dynamic';
+      if (title.includes('overlay')) label = 'overlay';
+      else if (title.includes('scout')) label = 'scout';
+      else if (title.includes('stats')) label = 'stats';
+      else if (title.includes('scoreboard')) label = 'scoreboard';
+      else if (title.includes('tracker')) label = 'tracker';
+      else if (title.includes('draftcoach')) label = 'main';
+      return createFakeWindow(label);
+    }
     static getAllWindows() { return []; }
   },
   ipcMain: {

@@ -84,6 +84,7 @@ export function Overlay() {
     const [trackerOpen, setTrackerOpen] = useState(true);
     const [sbGameTime, setSbGameTime] = useState(0);
     const generationRef = useRef(0); // Track overlay data generation to reject stale updates
+    const hasDataRef = useRef(false);
 
     // Fetch auto-detected HUD periodically if enabled
     useEffect(() => {
@@ -112,6 +113,7 @@ export function Overlay() {
             console.log('[Overlay] Received data:', payload);
             const gen = payload._generation || 0;
             generationRef.current = gen;
+            hasDataRef.current = true;
             setData(payload);
             setCurrentItemIndex(0);
         };
@@ -121,14 +123,25 @@ export function Overlay() {
         };
         ipcOn('overlay-data-update', handler);
         ipcOn('settings-update', settingsHandler);
-        ipcInvoke('get-overlay-data').then((cached: OverlayData | null) => {
+        const hydrateCachedOverlayData = () => ipcInvoke('get-overlay-data').then((cached: OverlayData | null) => {
             if (cached && ((cached.buildItems && cached.buildItems.length) || (cached.junglePath && cached.junglePath.length))) {
                 console.log('[Overlay] Hydrated cached overlay data:', cached);
                 generationRef.current = (cached as any)._generation || 0;
+                hasDataRef.current = true;
                 setData(cached);
                 setCurrentItemIndex(0);
             }
         }).catch(() => {});
+        hydrateCachedOverlayData();
+        let cacheHydrateAttempts = 0;
+        const cacheHydrateTimer = window.setInterval(() => {
+            cacheHydrateAttempts += 1;
+            if (hasDataRef.current || cacheHydrateAttempts > 20) {
+                window.clearInterval(cacheHydrateTimer);
+                return;
+            }
+            hydrateCachedOverlayData();
+        }, 500);
         // Partial item update — merges into existing data, with generation check
         const itemHandler = (_event: any, newItems: BuildItem[], incomingGen?: number) => {
             // Reject stale updates from earlier generations
@@ -138,6 +151,7 @@ export function Overlay() {
             }
             if (incomingGen !== undefined) generationRef.current = incomingGen;
             console.log('[Overlay] Items updated:', newItems.length, 'gen:', incomingGen || 'none');
+            hasDataRef.current = true;
             setData(prev => prev ? { ...prev, buildItems: newItems } : { buildItems: newItems, junglePath: [], championName: '' });
             // Don't reset currentItemIndex — preserve purchase progress
             // The item-purchase-update handler will recalculate the correct index
@@ -167,6 +181,7 @@ export function Overlay() {
             ipcRemoveListener('overlay-items-update', itemHandler);
             ipcRemoveListener('cooldown-tick', cdHandler);
             ipcRemoveListener('scoreboard-data', sbHandler);
+            window.clearInterval(cacheHydrateTimer);
         };
     }, []);
 

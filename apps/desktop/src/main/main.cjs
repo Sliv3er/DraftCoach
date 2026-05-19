@@ -2150,6 +2150,24 @@ const KNOWN_SUPPRESSION_CHAMPIONS = new Set([
   'Sett',
 ]);
 
+const MAJOR_SELF_HEALING_CHAMPIONS = new Set([
+  'Aatrox',
+  'Briar',
+  'DrMundo',
+  'Dr. Mundo',
+  'Mundo',
+  'Vladimir',
+  'Warwick',
+  'Swain',
+  'Sylas',
+  'Fiora',
+  'Olaf',
+  'Illaoi',
+  'RedKayn',
+  'Rhaast',
+  'Zac',
+]);
+
 function analyzeEnemyDraft(enemies, mechanicsMap = null) {
   const result = {
     ap: 0,
@@ -2164,6 +2182,7 @@ function analyzeEnemyDraft(enemies, mechanicsMap = null) {
     selfHealingNames: [],
     selfHealingAd: 0,
     selfHealingAp: 0,
+    majorSelfHealingFrontliners: 0,
     healingPressure: 0,
     antiHealPressure: 0,
     healingThreats: [],
@@ -2207,6 +2226,9 @@ function analyzeEnemyDraft(enemies, mechanicsMap = null) {
       } else if (isFrontliner) {
         result.selfHealingFrontliners++;
         result.selfHealingNames.push(raw);
+        if (MAJOR_SELF_HEALING_CHAMPIONS.has(championKey(raw)) || healSpellCount >= 2) {
+          result.majorSelfHealingFrontliners++;
+        }
         if (dmg === 'AP') result.selfHealingAp++;
         else result.selfHealingAd++;
         if (dmg === 'AD' || tags.includes('Marksman') || tags.includes('Fighter')) result.basicAttackHealingNames.push(raw);
@@ -2583,6 +2605,8 @@ function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null
     ...sectionItems(finalText, 'CORE BUILD'),
     ...sectionItems(finalText, 'SITUATIONAL ITEMS'),
   ].map(item => item.toLowerCase().replace(/[â€™']/g, "'"));
+  const coreItems = sectionItems(finalText, 'CORE BUILD');
+  const coreBoot = coreItems.find(item => isBootItemName(item)) || '';
   const hasItem = (name) => allItems.some(item => item === String(name || '').toLowerCase().replace(/[â€™']/g, "'"));
   const preferredAntiHeal = antiHealItemForChampion(body.myChampion, role, mechanicsMap) || 'ally anti-heal';
   const supportUpgrade = supportQuestUpgradeForChampion(body.myChampion, tags, mechanicsMap);
@@ -2621,6 +2645,14 @@ function sanitizeNarrativeAgainstFinalItems(finalText, body, mechanicsMap = null
         if (alias === item) continue;
         const aliasEscaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/'/g, "[Ã¢â‚¬â„¢']");
         content = content.replace(new RegExp(aliasEscaped, 'gi'), replacement);
+      }
+    }
+    if (coreBoot) {
+      if (!exactItemMatch(coreBoot, ["Mercury's Treads"])) {
+        content = content.replace(/Mercury's Treads/gi, coreBoot);
+      }
+      if (!exactItemMatch(coreBoot, ['Plated Steelcaps'])) {
+        content = content.replace(/Plated Steelcaps/gi, coreBoot);
       }
     }
     content = content
@@ -2691,10 +2723,48 @@ const BOOT_ITEMS = [
   'Ionian Boots of Lucidity',
   "Sorcerer's Shoes",
   'Symbiotic Soles',
+  'Gluttonous Greaves',
+  'Mobility Boots',
+  'Synchronized Souls',
+  'Chainlaced Crushers',
+  'Armored Advance',
+  "Spellslinger's Shoes",
+  'Crimson Lucidity',
+  'Swiftmarch',
+  'Forever Forward',
+  'Immortal Path',
 ];
 
 function isBootItemName(name) {
-  return exactItemMatch(name, BOOT_ITEMS);
+  if (exactItemMatch(name, BOOT_ITEMS)) return true;
+  const key = normalizeItemNameKey(name);
+  if (ddragonItemCache?.byId) {
+    for (const [id, item] of ddragonItemCache.byId) {
+      if (normalizeItemNameKey(item.name) !== key) continue;
+      if (item.tags?.includes('Boots') && item.gold > 300 && String(id) !== '1001') return true;
+    }
+  }
+  return /\b(boots|greaves|treads|steelcaps|shoes|soles|souls|swiftmarch|lucidity|advance|path)\b/i.test(String(name || ''));
+}
+
+function isDefensiveBootName(name) {
+  return exactItemMatch(name, [
+    'Plated Steelcaps',
+    "Mercury's Treads",
+    'Chainlaced Crushers',
+    'Armored Advance',
+  ]);
+}
+
+function marksmanShouldForceDefensiveBoots(draft) {
+  if (!draft) return false;
+  const ap = Number(draft.effectiveAp || draft.ap || 0);
+  const ad = Number(draft.effectiveAd || draft.ad || 0);
+  const hardCc = Number(draft.hardCc || 0);
+  const suppression = Number(draft.suppression || 0);
+  const overwhelmingAutoPhysical = ad >= 4.5 && ap < 1.5 && Number(draft.ad || 0) >= 4;
+  const unavoidableApLockdown = ap >= 4 && hardCc >= 4 && suppression > 0;
+  return overwhelmingAutoPhysical || unavoidableApLockdown;
 }
 
 function chooseBootsForBuild(body, mechanicsMap = null) {
@@ -2706,10 +2776,15 @@ function chooseBootsForBuild(body, mechanicsMap = null) {
   const isApChampion = champDmg === 'AP' || tags.includes('Mage');
   const isSupport = /support|utility/.test(role);
 
+  if (isMarksman) {
+    if (marksmanShouldForceDefensiveBoots(draft)) {
+      return draft.heavyAd && draft.effectiveAp < 1.5 ? 'Plated Steelcaps' : "Mercury's Treads";
+    }
+    return "Berserker's Greaves";
+  }
   if (draft.heavyAd && draft.effectiveAp < 1.5) return 'Plated Steelcaps';
   if (draft.heavyAp || draft.highCc) return "Mercury's Treads";
   if (draft.ad >= 3) return 'Plated Steelcaps';
-  if (isMarksman) return "Berserker's Greaves";
   if (isApChampion) return "Sorcerer's Shoes";
   if (isSupport) return 'Ionian Boots of Lucidity';
   return 'Plated Steelcaps';
@@ -2726,9 +2801,16 @@ function enforceBootInvariant(finalText, body, mechanicsMap = null) {
   const originalLines = core.split('\n').filter(line => line.trim());
   const bootLines = originalLines.filter(line => isBootItemName(normalizeBuildLine(line)));
   const hasDesired = bootLines.some(line => itemKey(normalizeBuildLine(line)) === itemKey(desiredBoots));
-  const chosenBoots = hasDesired ? desiredBoots : (bootLines[0] ? normalizeBuildLine(bootLines[0]) : desiredBoots);
+  let chosenBoots = hasDesired ? desiredBoots : (bootLines[0] ? normalizeBuildLine(bootLines[0]) : desiredBoots);
   const draft = analyzeEnemyDraft(body?.enemies || [], mechanicsMap);
-  const shouldForceCounterBoots = draft.heavyAd || draft.heavyAp || draft.highCc || draft.ad >= 3;
+  const tags = getChampionTags(body?.myChampion);
+  const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+  const shouldForceCounterBoots = isMarksman
+    ? marksmanShouldForceDefensiveBoots(draft)
+    : (draft.heavyAd || draft.heavyAp || draft.highCc || draft.ad >= 3);
+  if (isMarksman && !shouldForceCounterBoots && isDefensiveBootName(chosenBoots)) {
+    chosenBoots = desiredBoots;
+  }
   const finalBoots = shouldForceCounterBoots ? desiredBoots : chosenBoots;
   const bootReason = finalBoots === 'Plated Steelcaps'
     ? 'armor vs physical pressure'
@@ -2846,8 +2928,17 @@ function isTankItemChampion(champion, tags = getChampionTags(champion)) {
 
 function antiHealPressureLevel(draft = null) {
   const pressure = Number(draft?.antiHealPressure || 0);
-  if (pressure >= 2.2 || (draft?.selfHealingFrontliners || 0) >= 2 || ((draft?.selfHealingFrontliners || 0) >= 1 && (draft?.enchanterHealing || 0) >= 1)) return 'core';
-  if (pressure >= 1.15 || (draft?.enchanterHealing || 0) >= 2) return 'situational';
+  const selfFrontliners = Number(draft?.selfHealingFrontliners || 0);
+  const majorSelfFrontliners = Number(draft?.majorSelfHealingFrontliners || 0);
+  const enchanters = Number(draft?.enchanterHealing || 0);
+  if (
+    pressure >= 2.35 ||
+    selfFrontliners >= 2 ||
+    majorSelfFrontliners >= 2 ||
+    (majorSelfFrontliners >= 1 && enchanters >= 1) ||
+    (majorSelfFrontliners >= 1 && pressure >= 1.65)
+  ) return 'core';
+  if (pressure >= 1.15 || enchanters >= 2 || selfFrontliners >= 1 || majorSelfFrontliners >= 1) return 'situational';
   if (pressure > 0) return 'watch';
   return 'none';
 }
@@ -3368,39 +3459,44 @@ function enforceDraftCounterLogic(finalText, body, mechanicsMap = null) {
   if (!finalText || !body) return finalText;
   const role = String(body.role || '').toLowerCase();
   const draft = analyzeEnemyDraft(body.enemies || [], mechanicsMap);
+  const tags = getChampionTags(body.myChampion);
+  const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+  const forceMarksmanDefensiveBoots = isMarksman && marksmanShouldForceDefensiveBoots(draft);
   let safe = normalizeKnownItemTypos(finalText);
   const before = finalText;
   let desiredBoots = null;
   let desiredBootsReason = '';
 
   const fullAdPressure = draft.heavyAd && draft.effectiveAp < 1.5;
-  if (fullAdPressure) {
-    desiredBoots = 'Plated Steelcaps';
-    desiredBootsReason = 'armor vs AD-heavy enemy team';
-    safe = replaceCoreItemByName(
-      safe,
-      BOOT_ITEMS.filter(item => item !== desiredBoots),
-      'Plated Steelcaps',
-      'armor vs AD-heavy enemy team'
-    );
-  } else if (draft.heavyAp || draft.highCc) {
-    desiredBoots = "Mercury's Treads";
-    desiredBootsReason = draft.highCc ? 'tenacity vs heavy crowd control' : 'magic resist vs AP-heavy enemy team';
-    safe = replaceCoreItemByName(
-      safe,
-      BOOT_ITEMS.filter(item => item !== desiredBoots),
-      "Mercury's Treads",
-      draft.highCc ? 'tenacity vs heavy crowd control' : 'magic resist vs AP-heavy enemy team'
-    );
-  } else if (draft.heavyAd) {
-    desiredBoots = 'Plated Steelcaps';
-    desiredBootsReason = 'armor vs AD-heavy enemy team';
-    safe = replaceCoreItemByName(
-      safe,
-      BOOT_ITEMS.filter(item => item !== desiredBoots),
-      'Plated Steelcaps',
-      'armor vs AD-heavy enemy team'
-    );
+  if (!isMarksman || forceMarksmanDefensiveBoots) {
+    if (fullAdPressure) {
+      desiredBoots = 'Plated Steelcaps';
+      desiredBootsReason = 'armor vs AD-heavy enemy team';
+      safe = replaceCoreItemByName(
+        safe,
+        BOOT_ITEMS.filter(item => item !== desiredBoots),
+        'Plated Steelcaps',
+        'armor vs AD-heavy enemy team'
+      );
+    } else if (draft.heavyAp || draft.highCc) {
+      desiredBoots = "Mercury's Treads";
+      desiredBootsReason = draft.highCc ? 'tenacity vs heavy crowd control' : 'magic resist vs AP-heavy enemy team';
+      safe = replaceCoreItemByName(
+        safe,
+        BOOT_ITEMS.filter(item => item !== desiredBoots),
+        "Mercury's Treads",
+        draft.highCc ? 'tenacity vs heavy crowd control' : 'magic resist vs AP-heavy enemy team'
+      );
+    } else if (draft.heavyAd) {
+      desiredBoots = 'Plated Steelcaps';
+      desiredBootsReason = 'armor vs AD-heavy enemy team';
+      safe = replaceCoreItemByName(
+        safe,
+        BOOT_ITEMS.filter(item => item !== desiredBoots),
+        'Plated Steelcaps',
+        'armor vs AD-heavy enemy team'
+      );
+    }
   }
   if (desiredBoots) {
     safe = ensureCoreItem(safe, desiredBoots, desiredBootsReason, /support/.test(role) ? 1 : 0);
@@ -3428,6 +3524,17 @@ function enforceDraftCounterLogic(finalText, body, mechanicsMap = null) {
       role.includes('adc') || role.includes('bot') ? 'Maw of Malmortius' : 'Kaenic Rookern',
       'high magic resist vs AP-heavy enemy team'
     );
+    if (isMarksman) {
+      const hasMrCore = sectionItems(safe, 'CORE BUILD').some(item => MAGIC_RESIST_CORE_ITEMS.some(mr => itemKey(item) === itemKey(mr)));
+      if (!hasMrCore) {
+        safe = replaceCoreItemByName(
+          safe,
+          ['Guardian Angel', 'Bloodthirster', "Runaan's Hurricane", 'Rapid Firecannon', 'Spear of Shojin', 'Endless Hunger'],
+          'Maw of Malmortius',
+          'magic shield vs AP poke and burst'
+        );
+      }
+    }
   }
 
   safe = enforceFrontlineDefenseBudget(safe, body, draft, mechanicsMap);
@@ -4537,7 +4644,244 @@ COMMON MISTAKES Ã¢â‚¬â€ NEVER DO THESE:
       return out;
     }
 
-    async function validateAndCorrectBuild(text) {
+    function normalizeRuneKey(name) {
+      return String(name || '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+    }
+
+    function cleanRuneName(value) {
+      return String(value || '')
+        .replace(/\*\*/g, '')
+        .replace(/^\s*\d+[.)]\s*/, '')
+        .replace(/^[-*]\s*/, '')
+        .replace(/\s*\([^)]*\)\s*$/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function runeTreeByName(runeData, name) {
+      const trees = runeData?.trees || [];
+      const exact = trees.find(tree => normalizeRuneKey(tree.name) === normalizeRuneKey(name));
+      if (exact) return exact;
+      const closest = findClosestMatch(String(name || ''), trees.map(tree => tree.name), 4);
+      return closest ? trees.find(tree => tree.name === closest) : null;
+    }
+
+    function runeInOptions(name, options, maxDist = 3) {
+      const cleaned = cleanRuneName(name);
+      const exact = options.find(rune => normalizeRuneKey(rune.name) === normalizeRuneKey(cleaned));
+      if (exact) return exact;
+      const closest = findClosestMatch(cleaned, options.map(rune => rune.name), maxDist);
+      return closest ? options.find(rune => rune.name === closest) : null;
+    }
+
+    function pickRuneFromPreferences(options, preferences) {
+      for (const preference of preferences || []) {
+        const found = options.find(rune => normalizeRuneKey(rune.name) === normalizeRuneKey(preference));
+        if (found) return found;
+      }
+      return options[0] || null;
+    }
+
+    function defaultRuneForPrimarySlot(tree, slotKey, body = null) {
+      const role = String(body?.role || '').toLowerCase();
+      const tags = getChampionTags(body?.myChampion);
+      const dmg = inferDamageFromTagsAndInfo(body?.myChampion);
+      const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+      const isTank = tags.includes('Tank') || isTankItemChampion(body?.myChampion, tags);
+      const isSupport = /support/.test(role);
+      const treeName = tree.name;
+      const slot = tree[slotKey] || [];
+      const defaults = {
+        Precision: {
+          slot1: isMarksman ? ['Presence of Mind', 'Absorb Life', 'Triumph'] : ['Triumph', 'Absorb Life', 'Presence of Mind'],
+          slot2: isMarksman ? ['Legend: Alacrity', 'Legend: Bloodline', 'Legend: Haste'] : ['Legend: Haste', 'Legend: Alacrity', 'Legend: Bloodline'],
+          slot3: isMarksman ? ['Cut Down', 'Coup de Grace', 'Last Stand'] : ['Last Stand', 'Coup de Grace', 'Cut Down'],
+        },
+        Domination: {
+          slot1: ['Sudden Impact', 'Taste of Blood', 'Cheap Shot'],
+          slot2: ['Grisly Mementos', 'Sixth Sense', 'Deep Ward'],
+          slot3: ['Treasure Hunter', 'Ultimate Hunter', 'Relentless Hunter'],
+        },
+        Sorcery: {
+          slot1: ['Manaflow Band', 'Axiom Arcanist', 'Nimbus Cloak'],
+          slot2: isMarksman ? ['Absolute Focus', 'Celerity', 'Transcendence'] : ['Transcendence', 'Celerity', 'Absolute Focus'],
+          slot3: isMarksman ? ['Gathering Storm', 'Scorch', 'Waterwalking'] : ['Scorch', 'Gathering Storm', 'Waterwalking'],
+        },
+        Resolve: {
+          slot1: isSupport ? ['Font of Life', 'Shield Bash', 'Demolish'] : ['Demolish', 'Shield Bash', 'Font of Life'],
+          slot2: ['Second Wind', 'Bone Plating', 'Conditioning'],
+          slot3: isTank ? ['Overgrowth', 'Unflinching', 'Revitalize'] : ['Unflinching', 'Overgrowth', 'Revitalize'],
+        },
+        Inspiration: {
+          slot1: ['Magical Footwear', 'Cash Back', 'Hextech Flashtraption'],
+          slot2: ['Biscuit Delivery', 'Triple Tonic', 'Time Warp Tonic'],
+          slot3: ['Cosmic Insight', 'Jack Of All Trades', 'Approach Velocity'],
+        },
+      };
+      const treeDefaults = defaults[treeName] || {};
+      if (dmg === 'AP' && treeName === 'Sorcery' && slotKey === 'slot1') {
+        return pickRuneFromPreferences(slot, ['Manaflow Band', 'Axiom Arcanist', 'Nimbus Cloak']);
+      }
+      return pickRuneFromPreferences(slot, treeDefaults[slotKey]) || slot[0] || null;
+    }
+
+    function defaultKeystoneForTree(tree, body = null) {
+      const role = String(body?.role || '').toLowerCase();
+      const tags = getChampionTags(body?.myChampion);
+      const dmg = inferDamageFromTagsAndInfo(body?.myChampion);
+      const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+      const isSupport = /support/.test(role);
+      const defaults = {
+        Precision: isMarksman ? ['Lethal Tempo', 'Press the Attack', 'Fleet Footwork'] : ['Conqueror', 'Press the Attack', 'Fleet Footwork'],
+        Domination: ['Electrocute', 'Dark Harvest', 'Hail of Blades'],
+        Sorcery: isSupport ? ['Summon Aery', 'Arcane Comet', "Stormraider's Surge"] : ['Arcane Comet', "Stormraider's Surge", 'Deathfire Touch', 'Summon Aery'],
+        Resolve: isSupport ? ['Guardian', 'Aftershock', 'Grasp of the Undying'] : ['Grasp of the Undying', 'Aftershock', 'Guardian'],
+        Inspiration: dmg === 'AP' ? ['First Strike', 'Unsealed Spellbook', 'Glacial Augment'] : ['First Strike', 'Glacial Augment', 'Unsealed Spellbook'],
+      };
+      return pickRuneFromPreferences(tree.keystones || [], defaults[tree.name]) || tree.keystones?.[0] || null;
+    }
+
+    function defaultSecondaryTreeName(primaryTreeName, body = null) {
+      const role = String(body?.role || '').toLowerCase();
+      const tags = getChampionTags(body?.myChampion);
+      const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+      const isSupport = /support/.test(role);
+      if (primaryTreeName === 'Precision') return isMarksman ? 'Sorcery' : 'Resolve';
+      if (primaryTreeName === 'Domination') return isSupport ? 'Inspiration' : 'Precision';
+      if (primaryTreeName === 'Sorcery') return isSupport ? 'Resolve' : 'Domination';
+      if (primaryTreeName === 'Resolve') return isSupport ? 'Inspiration' : 'Precision';
+      return primaryTreeName === 'Inspiration' ? (isMarksman ? 'Precision' : 'Sorcery') : 'Precision';
+    }
+
+    function defaultSecondaryPreferences(treeName, body = null) {
+      const role = String(body?.role || '').toLowerCase();
+      const tags = getChampionTags(body?.myChampion);
+      const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+      const isSupport = /support/.test(role);
+      return {
+        Precision: isMarksman
+          ? { slot1: ['Presence of Mind', 'Absorb Life'], slot2: ['Legend: Alacrity', 'Legend: Bloodline'], slot3: ['Cut Down', 'Coup de Grace'] }
+          : { slot1: ['Triumph', 'Absorb Life'], slot2: ['Legend: Haste', 'Legend: Alacrity'], slot3: ['Last Stand', 'Coup de Grace'] },
+        Domination: { slot1: ['Sudden Impact', 'Taste of Blood'], slot2: ['Grisly Mementos', 'Sixth Sense'], slot3: ['Treasure Hunter', 'Ultimate Hunter'] },
+        Sorcery: isMarksman
+          ? { slot2: ['Absolute Focus', 'Celerity'], slot3: ['Gathering Storm', 'Scorch'], slot1: ['Nimbus Cloak', 'Manaflow Band'] }
+          : { slot1: ['Manaflow Band', 'Axiom Arcanist'], slot2: ['Transcendence', 'Celerity'], slot3: ['Scorch', 'Gathering Storm'] },
+        Resolve: isSupport
+          ? { slot1: ['Font of Life', 'Shield Bash'], slot2: ['Bone Plating', 'Second Wind'], slot3: ['Revitalize', 'Unflinching'] }
+          : { slot2: ['Bone Plating', 'Second Wind'], slot3: ['Overgrowth', 'Unflinching'], slot1: ['Demolish', 'Shield Bash'] },
+        Inspiration: { slot1: ['Magical Footwear', 'Cash Back'], slot2: ['Biscuit Delivery', 'Triple Tonic'], slot3: ['Cosmic Insight', 'Approach Velocity'] },
+      }[treeName] || {};
+    }
+
+    function repairRuneSectionWithDdragon(text, runeData, body = null) {
+      const block = extractBuildSection(text, 'RUNES');
+      if (!block || !runeData?.trees?.length) return { text, changed: false };
+
+      const lines = block.split('\n').map(line => line.trim()).filter(Boolean);
+      let requestedPrimary = '';
+      let requestedSecondary = '';
+      let requestedKeystone = '';
+      let requestedShards = [];
+      const primaryCandidates = [];
+      const secondaryCandidates = [];
+      let inSecondary = false;
+
+      for (const line of lines) {
+        const primaryMatch = line.match(/^Primary:\s*(.+)$/i);
+        const secondaryMatch = line.match(/^Secondary:\s*(.+)$/i);
+        const keystoneMatch = line.match(/^Keystone:\s*(.+)$/i);
+        const shardsMatch = line.match(/^Shards:\s*(.+)$/i);
+        if (primaryMatch) { requestedPrimary = cleanRuneName(primaryMatch[1]); inSecondary = false; continue; }
+        if (secondaryMatch) { requestedSecondary = cleanRuneName(secondaryMatch[1]); inSecondary = true; continue; }
+        if (keystoneMatch) { requestedKeystone = cleanRuneName(keystoneMatch[1]); continue; }
+        if (shardsMatch) { requestedShards = shardsMatch[1].split(',').map(cleanRuneName).filter(Boolean); continue; }
+        const runeName = cleanRuneName(line);
+        if (!runeName) continue;
+        if (inSecondary) secondaryCandidates.push(runeName);
+        else primaryCandidates.push(runeName);
+      }
+
+      const allKeystones = runeData.trees.flatMap(tree => tree.keystones || []);
+      let primaryTree = runeTreeByName(runeData, requestedPrimary);
+      if (!primaryTree && requestedKeystone) {
+        primaryTree = runeData.trees.find(tree => (tree.keystones || []).some(rune => normalizeRuneKey(rune.name) === normalizeRuneKey(requestedKeystone)));
+      }
+      if (!primaryTree) {
+        const fallback = defaultSecondaryTreeName('Inspiration', body);
+        primaryTree = runeTreeByName(runeData, fallback) || runeData.trees[0];
+      }
+
+      let secondaryTree = runeTreeByName(runeData, requestedSecondary);
+      if (!secondaryTree || normalizeRuneKey(secondaryTree.name) === normalizeRuneKey(primaryTree.name)) {
+        secondaryTree = runeTreeByName(runeData, defaultSecondaryTreeName(primaryTree.name, body))
+          || runeData.trees.find(tree => normalizeRuneKey(tree.name) !== normalizeRuneKey(primaryTree.name));
+      }
+
+      const keystone = runeInOptions(requestedKeystone, primaryTree.keystones || [], 4)
+        || defaultKeystoneForTree(primaryTree, body)
+        || allKeystones[0];
+
+      const primaryPicks = ['slot1', 'slot2', 'slot3'].map(slotKey => {
+        const slot = primaryTree[slotKey] || [];
+        const picked = primaryCandidates.map(name => runeInOptions(name, slot, 3)).find(Boolean);
+        return picked || defaultRuneForPrimarySlot(primaryTree, slotKey, body);
+      }).filter(Boolean);
+
+      const secondaryPrefs = defaultSecondaryPreferences(secondaryTree.name, body);
+      const secondaryPicks = [];
+      const usedRows = new Set();
+      for (const slotKey of ['slot1', 'slot2', 'slot3']) {
+        const slot = secondaryTree[slotKey] || [];
+        const picked = secondaryCandidates.map(name => runeInOptions(name, slot, 3)).find(Boolean);
+        if (picked && !usedRows.has(slotKey)) {
+          secondaryPicks.push(picked);
+          usedRows.add(slotKey);
+        }
+      }
+      for (const slotKey of ['slot1', 'slot2', 'slot3']) {
+        if (secondaryPicks.length >= 2) break;
+        if (usedRows.has(slotKey)) continue;
+        const pick = pickRuneFromPreferences(secondaryTree[slotKey] || [], secondaryPrefs[slotKey])
+          || defaultRuneForPrimarySlot(secondaryTree, slotKey, body);
+        if (pick) {
+          secondaryPicks.push(pick);
+          usedRows.add(slotKey);
+        }
+      }
+
+      const role = String(body?.role || '').toLowerCase();
+      const tags = getChampionTags(body?.myChampion);
+      const isMarksman = /^(adc|bot|bottom)$/.test(role) || tags.includes('Marksman');
+      const shardRows = [
+        ['Adaptive Force', 'Attack Speed', 'Ability Haste'],
+        ['Adaptive Force', 'Move Speed', 'Health Scaling'],
+        ['Health', 'Tenacity and Slow Resist', 'Health Scaling'],
+      ];
+      const shardDefaults = isMarksman
+        ? ['Attack Speed', 'Adaptive Force', 'Health Scaling']
+        : ['Adaptive Force', 'Adaptive Force', 'Health Scaling'];
+      const shards = shardRows.map((row, index) => {
+        const exact = requestedShards.find(shard => row.some(valid => normalizeRuneKey(valid) === normalizeRuneKey(shard)));
+        if (exact) return row.find(valid => normalizeRuneKey(valid) === normalizeRuneKey(exact)) || exact;
+        const closest = requestedShards.map(shard => findClosestMatch(shard, row, 4)).find(Boolean);
+        return closest || shardDefaults[index] || row[0];
+      });
+
+      const repaired = [
+        `Primary: ${primaryTree.name}`,
+        `Keystone: ${keystone.name}`,
+        ...primaryPicks.map(rune => rune.name),
+        `Secondary: ${secondaryTree.name}`,
+        ...secondaryPicks.slice(0, 2).map(rune => rune.name),
+        `Shards: ${shards.join(', ')}`,
+      ].join('\n');
+
+      const normalizeBlock = value => String(value || '').replace(/\s+/g, ' ').trim();
+      const changed = normalizeBlock(block) !== normalizeBlock(repaired);
+      return { text: changed ? replaceBuildSection(text, 'RUNES', repaired) : text, changed };
+    }
+
+    async function validateAndCorrectBuild(text, body = null) {
       if (!text || text.trim() === 'NEED_RETRY') return text;
 
       // Step 0: Normalize AI output format (fix Row N:, Primary Tree:, etc.)
@@ -4731,6 +5075,14 @@ COMMON MISTAKES Ã¢â‚¬â€ NEVER DO THESE:
             corrections.push(`Secondary tree "${secondaryTreeMatch[1]}" same as primary "${primaryTreeMatch[1]}" Ã¢â€ â€™ changed to "${replacement}"`);
             corrected = corrected.replace(/Secondary:\s*\w+/, `Secondary: ${replacement}`);
           }
+        }
+      }
+
+      if (runeData?.trees?.length) {
+        const repairedRunes = repairRuneSectionWithDdragon(corrected, runeData, body);
+        if (repairedRunes.changed) {
+          corrections.push('Rune page repaired to legal DDragon tree/row structure');
+          corrected = repairedRunes.text;
         }
       }
 
@@ -4951,7 +5303,7 @@ ${userMessage.slice(0, 2000)}`;
             const result = await generateBuild(body, false);
 
             // Ã¢â€â‚¬Ã¢â€â‚¬ Build Validation & Correction Pass Ã¢â€â‚¬Ã¢â€â‚¬
-            result.text = sanitizeEnemyRoleClaims(await validateAndCorrectBuild(result.text), body);
+            result.text = sanitizeEnemyRoleClaims(await validateAndCorrectBuild(result.text, body), body);
 
             if (result.text.trim() === 'NEED_RETRY') {
               console.log('[backend] Got NEED_RETRY, trying short prompt...');
@@ -4960,7 +5312,7 @@ ${userMessage.slice(0, 2000)}`;
                 lastError = 'AI returned NEED_RETRY on all attempts';
                 break;
               }
-              retry.text = sanitizeEnemyRoleClaims(await validateAndCorrectBuild(retry.text), body);
+              retry.text = sanitizeEnemyRoleClaims(await validateAndCorrectBuild(retry.text, body), body);
               setCache(cacheKey, retry.text, retry.patchUsed);
               return res.json({ ok: true, source: 'grounded', patchDetected: retry.patchUsed, text: retry.text });
             }
@@ -5062,7 +5414,7 @@ ${userMessage.slice(0, 2000)}`;
           let fullText = fullStreamText;
 
           // Validate & correct
-          const corrected = await validateAndCorrectBuild(fullText);
+          const corrected = await validateAndCorrectBuild(fullText, body);
 
           // Debug: log the raw JUNGLE PATH section before corrections
           const rawJungleMatch = fullText.match(/JUNGLE PATH\n([\s\S]*?)(?=\n(?:ENEMY|YOUR|WIN|\n\n))/);
@@ -5264,7 +5616,7 @@ ${userMessage.slice(0, 2000)}`;
             sendSSE({ phase: 'full', chunk });
           });
 
-          let validated = await validateAndCorrectBuild(fullText);
+          let validated = await validateAndCorrectBuild(fullText, body);
           if (hasMetaBaseline) {
             validated = stabilizeAgainstMetaBaseline(validated, instantMetaText);
           }

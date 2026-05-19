@@ -28,10 +28,11 @@ if (!MODELS.length) {
 }
 
 const SCENARIOS = [
-  { name: 'Darius vs AP CC heal', myChampion: 'Darius', role: 'top', allies: ['Mordekaiser', 'Viktor', 'Zilean', 'Ezreal'], enemies: ['Katarina', 'Nami', 'Kennen', 'LeeSin', 'Lissandra'], expect: { boots: ['Mercury'], mr: 2, noCore: ['Plated Steelcaps', 'Thornmail', 'Mortal Reminder'], antiHeal: ['Chempunk Chainsword'] } },
+  { name: 'Darius vs AP CC heal', myChampion: 'Darius', role: 'top', allies: ['Mordekaiser', 'Viktor', 'Zilean', 'Ezreal'], enemies: ['Katarina', 'Nami', 'Kennen', 'LeeSin', 'Lissandra'], expect: { boots: ['Mercury'], mr: 2, noCore: ['Plated Steelcaps', 'Thornmail', 'Mortal Reminder'] } },
   { name: 'Rammus jungle full AD crit', myChampion: 'Rammus', role: 'jungle', allies: ['Orianna', 'Jinx', 'Lulu', 'Garen'], enemies: ['Tryndamere', 'MasterYi', 'Yasuo', 'Draven', 'Pyke'], expect: { boots: ['Plated Steelcaps'], armor: 2, noCore: ["Mercury's Treads"] } },
   { name: 'Ahri vs suppress AP', myChampion: 'Ahri', role: 'mid', allies: ['Jinx', 'Thresh', 'Vi', 'Garen'], enemies: ['Malzahar', 'Warwick', 'Kaisa', 'Nautilus', 'Gwen'], expect: { mr: 1, mustText: ['suppression'], noCore: ['Thornmail', 'Mortal Reminder'] } },
   { name: 'Jinx ADC vs assassins CC', myChampion: 'Jinx', role: 'adc', allies: ['Lulu', 'Orianna', 'Sejuani', 'Gwen'], enemies: ['Zed', 'Rengar', 'Leona', 'Syndra', 'Jhin'], expect: { adcItems: true, noCore: ["Zhonya's Hourglass", 'Thornmail', 'Heartsteel', 'Kaenic Rookern'], defensiveAny: ['Guardian Angel', 'Mercurial Scimitar', 'Maw of Malmortius'] } },
+  { name: 'Jinx ADC AP burst keeps DPS boots and valid runes', myChampion: 'Jinx', role: 'adc', allies: ['Lulu', 'Orianna', 'Sejuani', 'Garen'], enemies: ['Evelynn', 'Katarina', 'Smolder', 'Nami', 'Kled'], expect: { adcItems: true, noDefensiveBoots: true, noRuneText: ['Legend: Tenacity'], noCore: ['Thornmail', 'Mortal Reminder', 'Chempunk Chainsword', 'Morellonomicon', 'Heartsteel', 'Kaenic Rookern'] } },
   { name: 'Soraka support vs dive healing', myChampion: 'Soraka', role: 'support', allies: ['Jinx', 'Ahri', 'Sejuani', 'Garen'], enemies: ['Draven', 'Pyke', 'Katarina', 'Aatrox', 'Vladimir'], expect: { supportStart: true, supportItems: true, noCore: ['Thornmail', 'Mortal Reminder', 'Infinity Edge', 'Bloodthirster'] } },
   { name: 'Mordekaiser vs ranged kite', myChampion: 'Mordekaiser', role: 'top', allies: ['Jinx', 'Lulu', 'Vi', 'Ahri'], enemies: ['Vayne', 'Kindred', 'Azir', 'Janna', 'Camille'], expect: { noCore: ['Thornmail'], situationalAny: ['Randuin', 'Dead Man', 'Rylai', 'Force of Nature', 'Spirit Visage'] } },
   { name: 'Ezreal ADC poke AP', myChampion: 'Ezreal', role: 'adc', allies: ['Karma', 'Graves', 'Azir', 'Ornn'], enemies: ['Caitlyn', 'Lux', 'Jayce', 'Nidalee', 'Xerath'], expect: { adcItems: true, mr: 1, noCore: ['Thornmail', 'Heartsteel', "Zhonya's Hourglass"] } },
@@ -59,7 +60,8 @@ const COMPONENT_NAMES = ['Null-Magic Mantle', 'Kindlegem', 'Ruby Crystal', 'Long
 const GRIEVOUS_ITEMS = ['Thornmail', 'Mortal Reminder', 'Morellonomicon', 'Chempunk Chainsword'];
 const ARMOR_PEN_EXCLUSIVE_ITEMS = ['Black Cleaver', "Lord Dominik's Regards", 'Mortal Reminder', "Serylda's Grudge", 'Terminus'];
 const AP_ITEMS = ["Zhonya's Hourglass", "Rabadon's Deathcap", 'Shadowflame', 'Void Staff', 'Cryptbloom', "Banshee's Veil", 'Morellonomicon', 'Lich Bane', 'Stormsurge', 'Cosmic Drive', "Nashor's Tooth", 'Malignance', "Luden's Echo", "Liandry's Torment", "Rylai's Crystal Scepter", "Mejai's Soulstealer", "Zaz'Zak's Realmspike"];
-const BOOTS = ['Plated Steelcaps', "Mercury's Treads", 'Boots of Swiftness', "Berserker's Greaves", 'Ionian Boots of Lucidity', "Sorcerer's Shoes", 'Symbiotic Soles'];
+const BOOTS = ['Plated Steelcaps', "Mercury's Treads", 'Boots of Swiftness', "Berserker's Greaves", 'Ionian Boots of Lucidity', "Sorcerer's Shoes", 'Symbiotic Soles', 'Gluttonous Greaves', 'Mobility Boots', 'Synchronized Souls', 'Chainlaced Crushers', 'Armored Advance', "Spellslinger's Shoes", 'Crimson Lucidity', 'Swiftmarch', 'Forever Forward', 'Immortal Path'];
+const DEFENSIVE_BOOTS = ['Plated Steelcaps', "Mercury's Treads", 'Chainlaced Crushers', 'Armored Advance'];
 
 function section(text, header) {
   const others = HEADERS.filter(h => h !== header).join('|');
@@ -155,7 +157,9 @@ function audit(text, scenario) {
   if (e.armor && core.filter(x => ARMOR.some(m => x.toLowerCase().includes(m.toLowerCase()))).length < e.armor) issues.push(`armor items below ${e.armor}`);
   if (e.noCore) for (const bad of e.noCore) if (core.some(x => x.toLowerCase() === bad.toLowerCase())) issues.push(`bad core ${bad}`);
   if (e.noText) for (const bad of e.noText) if (new RegExp(bad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(text)) issues.push(`bad narrative ${bad}`);
+  if (e.noRuneText) for (const bad of e.noRuneText) if (new RegExp(bad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(runes)) issues.push(`bad rune ${bad}`);
   if (e.mustText) for (const good of e.mustText) if (!new RegExp(good.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(text)) issues.push(`missing narrative ${good}`);
+  if (e.noDefensiveBoots && core.some(x => DEFENSIVE_BOOTS.some(boot => boot.toLowerCase() === x.toLowerCase()))) issues.push('ADC defensive boots forced without extreme trigger');
   if (/Sundered Sky\s*\([^)]*(anti-heal|grievous|damage reduction|true damage|%HP|shield)/i.test(text)) issues.push('false Sundered Sky item reasoning');
   if (/Mercurial Scimitar:.*stasis/i.test(text)) issues.push('false Mercurial Scimitar stasis reasoning');
   if (/Maw of Malmort(?!ius)\w*/i.test(text)) issues.push('uncorrected Maw typo');
@@ -290,6 +294,8 @@ function runStaticAdvisorChecks() {
   if (!source.includes('scoreGrievousItemForBuild') || !source.includes('antiHealPressureLevel') || !source.includes('Core anti-heal only for multiple/major sustain threats') || !source.includes('Do not buy full Grievous Wounds for one low-impact or incidental heal')) issues.push('anti-heal selection is not draft/class aware enough');
   if (!source.includes('scoreKBBuildVariantForDraft') || !source.includes('Draft-scored recommendation')) issues.push('U.GG variant selection is not draft-scored');
   if (!source.includes('enforceFrontlineDefenseBudget') || !source.includes('frontline defense budget')) issues.push('frontline heavy-damage defense budget guard is missing');
+  if (!source.includes('repairRuneSectionWithDdragon') || !source.includes('Rune page repaired to legal DDragon tree/row structure')) issues.push('rune validator can still leave illegal tree/row pages');
+  if (!source.includes('marksmanShouldForceDefensiveBoots') || !source.includes('isDefensiveBootName(chosenBoots)')) issues.push('marksman boot forcing guard is missing');
   if (!source.includes('reorderPlanFromNextItems') || !source.includes('NEXT ITEMS may reorder unowned items')) issues.push('live advisor NEXT ITEMS cannot reorder the validated build queue');
   if (!source.includes('isTankItemChampion') || !source.includes('TANK_COMPLETION_CANDIDATES') || !source.includes('resolveLCUGameModePayload')) issues.push('tank item fallback or robust LCU mode detection is missing');
   if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');

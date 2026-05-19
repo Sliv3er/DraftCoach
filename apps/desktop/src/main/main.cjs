@@ -6974,6 +6974,10 @@ ipcMain.on('overlay-data', (_event, data) => {
   }
 });
 
+ipcMain.handle('get-overlay-data', async () => {
+  return overlayData ? cloneOverlayItem(overlayData) : null;
+});
+
 // Partial item update Ã¢â‚¬â€ merges new items into existing overlay data
 ipcMain.on('update-overlay-items', (_event, newItems) => {
   log('INFO', `[main] Overlay items updated: ${newItems.length} items`);

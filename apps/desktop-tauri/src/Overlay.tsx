@@ -121,6 +121,14 @@ export function Overlay() {
         };
         ipcOn('overlay-data-update', handler);
         ipcOn('settings-update', settingsHandler);
+        ipcInvoke('get-overlay-data').then((cached: OverlayData | null) => {
+            if (cached && ((cached.buildItems && cached.buildItems.length) || (cached.junglePath && cached.junglePath.length))) {
+                console.log('[Overlay] Hydrated cached overlay data:', cached);
+                generationRef.current = (cached as any)._generation || 0;
+                setData(cached);
+                setCurrentItemIndex(0);
+            }
+        }).catch(() => {});
         // Partial item update — merges into existing data, with generation check
         const itemHandler = (_event: any, newItems: BuildItem[], incomingGen?: number) => {
             // Reject stale updates from earlier generations

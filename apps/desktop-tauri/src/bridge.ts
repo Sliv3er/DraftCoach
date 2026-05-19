@@ -231,6 +231,8 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
       return invoke('show_window', { label: 'overlay' }).catch(() => {});
     case 'overlay-hide':
       return invoke('hide_window', { label: 'overlay' }).catch(() => {});
+    case 'overlay-toggle':
+      return invoke('toggle_window', { label: 'overlay' }).catch(() => {});
 
     // Backend API calls (direct Express endpoints)
     case 'get-ddragon-version':
@@ -271,6 +273,7 @@ export async function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     case 'export-runes':
     case 'set-settings':
     case 'get-settings':
+    case 'get-overlay-data':
     case 'save-setting':
     case 'get-setting':
     case 'set-setting':

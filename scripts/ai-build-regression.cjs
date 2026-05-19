@@ -290,6 +290,7 @@ function runStaticAdvisorChecks() {
   if (!source.includes('judgeReasoningQuality')) issues.push('backend reasoning judge is missing');
   if (!source.includes('enforceBootInvariant') || !source.includes('coreItems.length === expectedCore && coreItems.some(isBootItemName)')) issues.push('core build boot invariant is missing');
   if (!source.includes('preserveCanonicalBootSlot') || !source.includes('_canonicalBuildItems')) issues.push('live advisor can still drop canonical boots from full plan');
+  if (!source.includes("ipcMain.handle('get-overlay-data'")) issues.push('overlay cannot replay cached build data after Tauri window loads');
   if (!source.includes('scoreKBBuildTemplateData') || !source.includes('kbGeneratedAtMs')) issues.push('KB loader can still prefer stale incomplete same-patch cache data');
   if (!source.includes('scoreGrievousItemForBuild') || !source.includes('antiHealPressureLevel') || !source.includes('Core anti-heal only for multiple/major sustain threats') || !source.includes('Do not buy full Grievous Wounds for one low-impact or incidental heal')) issues.push('anti-heal selection is not draft/class aware enough');
   if (!source.includes('scoreKBBuildVariantForDraft') || !source.includes('Draft-scored recommendation')) issues.push('U.GG variant selection is not draft-scored');
@@ -299,6 +300,11 @@ function runStaticAdvisorChecks() {
   if (!source.includes('reorderPlanFromNextItems') || !source.includes('NEXT ITEMS may reorder unowned items')) issues.push('live advisor NEXT ITEMS cannot reorder the validated build queue');
   if (!source.includes('isTankItemChampion') || !source.includes('TANK_COMPLETION_CANDIDATES') || !source.includes('resolveLCUGameModePayload')) issues.push('tank item fallback or robust LCU mode detection is missing');
   if (!buildOutputSource.includes('liveUpdatedItemsContainBoots')) issues.push('main UI can still render bootless live-updated core builds');
+  const overlaySource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src/Overlay.tsx'), 'utf8');
+  const bridgeSource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src/bridge.ts'), 'utf8');
+  const tauriSource = fs.readFileSync(path.resolve(__dirname, '..', 'apps/desktop-tauri/src-tauri/src/lib.rs'), 'utf8');
+  if (!overlaySource.includes("ipcInvoke('get-overlay-data')") || !bridgeSource.includes("case 'get-overlay-data'")) issues.push('Tauri overlay does not hydrate cached sidecar build data');
+  if (!bridgeSource.includes("case 'overlay-toggle'") || !tauriSource.includes('async fn toggle_window')) issues.push('overlay hotkey toggle path is missing');
   if (!uggSyncSource.includes('defaultBootChoice') || !uggSyncSource.includes('padCoreItems') || !uggSyncSource.includes('itemAllowedForChampion')) issues.push('U.GG sync no longer pads sparse builds with validated full items');
   for (const [key, template] of Object.entries(buildTemplates.data || {})) {
     for (const [label, variant] of Object.entries(template.variants || {})) {

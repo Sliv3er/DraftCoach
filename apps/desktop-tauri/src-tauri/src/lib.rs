@@ -178,7 +178,28 @@ async fn hide_window(app: AppHandle, label: String) -> Result<(), String> {
 #[tauri::command]
 async fn show_window(app: AppHandle, label: String) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(&label) {
+        if label == "overlay" {
+            let _ = window.set_ignore_cursor_events(true);
+            let _ = window.set_always_on_top(true);
+        }
         window.show().map_err(|e| format!("{e}"))?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn toggle_window(app: AppHandle, label: String) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window(&label) {
+        let visible = window.is_visible().unwrap_or(false);
+        if visible {
+            window.hide().map_err(|e| format!("{e}"))?;
+        } else {
+            if label == "overlay" {
+                let _ = window.set_ignore_cursor_events(true);
+                let _ = window.set_always_on_top(true);
+            }
+            window.show().map_err(|e| format!("{e}"))?;
+        }
     }
     Ok(())
 }
@@ -427,6 +448,7 @@ pub fn run() {
             minimize_window,
             hide_window,
             show_window,
+            toggle_window,
             set_ignore_mouse,
             create_overlay_window,
 

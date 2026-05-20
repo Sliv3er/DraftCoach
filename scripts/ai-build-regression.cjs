@@ -6,6 +6,7 @@ const path = require('path');
 const API = process.env.DRAFTCOACH_BUILD_API || 'http://127.0.0.1:3210/api/build-dual';
 const MODEL_ARG = (process.argv.find(arg => arg.startsWith('--model=')) || '').split('=')[1];
 const OUT_ARG = (process.argv.find(arg => arg.startsWith('--out=')) || '').split('=')[1];
+const SCENARIO_ARG = (process.argv.find(arg => arg.startsWith('--scenario=')) || '').split('=')[1];
 const STATIC_ONLY = process.argv.includes('--no-live') || process.argv.includes('--static-only');
 const REQUEST_TIMEOUT_MS = Number(process.env.DRAFTCOACH_AI_REGRESSION_TIMEOUT_MS || 180000);
 
@@ -13,6 +14,7 @@ const ALL_MODELS = [
   { id: 'qwen/qwen3.6-flash', name: 'Qwen3.6 Flash' },
   { id: 'deepseek/deepseek-v4-flash', name: 'DeepSeek V4 Flash' },
   { id: 'google/gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite' },
+  { id: 'google/gemini-3.5-flash', name: 'Gemini 3.5 Flash' },
   { id: 'google/gemini-3-flash-preview', name: 'Gemini 3 Flash' },
   { id: 'google/gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro' },
   { id: 'google/gemini-3.1-pro-preview-customtools', name: 'Gemini 3.1 Pro Custom Tools' },
@@ -49,6 +51,17 @@ const SCENARIOS = [
   { name: 'Fizz mid AP assassin class safety', myChampion: 'Fizz', role: 'mid', allies: ['Camille', 'XinZhao', 'Ezreal', 'Malphite'], enemies: ['Milio', 'Kaisa', 'Akshan', 'Tryndamere', 'Kayn'], enemyRoles: { Milio: 'support', Kaisa: 'adc', Akshan: 'top', Tryndamere: 'mid', Kayn: 'jungle' }, expect: { apItems: 3, noCore: ['Chempunk Chainsword', "Sterak's Gage", 'Guardian Angel', 'Maw of Malmortius', 'Black Cleaver', 'Sundered Sky'], noText: ['off-class AP item removed', 'class-appropriate Grievous Wounds'] } },
   { name: 'Ornn Mayhem tank fallback stays tank', myChampion: 'Ornn', role: 'mid', gameMode: 'aram-mayhem', allies: ['Hwei', 'XinZhao'], enemies: [], expect: { boots: ['Mercury'], noCore: ["Death's Dance", 'Chempunk Chainsword', 'Mortal Reminder'], noText: ["Death's Dance"] } },
 ];
+const SCENARIO_FILTERS = SCENARIO_ARG
+  ? SCENARIO_ARG.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+  : [];
+const SCENARIOS_TO_RUN = SCENARIO_FILTERS.length
+  ? SCENARIOS.filter(s => SCENARIO_FILTERS.some(filter => s.name.toLowerCase().includes(filter)))
+  : SCENARIOS;
+
+if (!SCENARIOS_TO_RUN.length) {
+  console.error(`No scenario matched --scenario=${SCENARIO_ARG}`);
+  process.exit(2);
+}
 
 const HEADERS = ['ANALYSIS', 'RUNES', 'SUMMONERS', 'SKILL ORDER', 'STARTING ITEMS', 'CORE BUILD', 'SITUATIONAL ITEMS', 'JUNGLE PATH', 'ENEMY POWER SPIKES', 'WIN CONDITION', 'YOUR POWER SPIKES'];
 const MR = ["Mercury's Treads", 'Kaenic Rookern', 'Force of Nature', 'Spirit Visage', 'Maw of Malmortius', "Wit's End", "Banshee's Veil", 'Mercurial Scimitar'];
@@ -338,7 +351,7 @@ function runStaticAdvisorChecks() {
 
   await assertServer();
   const results = [];
-  for (const scenario of SCENARIOS) {
+  for (const scenario of SCENARIOS_TO_RUN) {
     for (const model of MODELS) {
       process.stdout.write(`[${model.name}] ${scenario.name}... `);
       try {

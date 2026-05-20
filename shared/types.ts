@@ -48,7 +48,7 @@ export interface CacheEntry {
 
 export interface AppConfig {
   aiProvider: 'openrouter';
-  aiModel: 'deepseek/deepseek-v4-flash' | 'qwen/qwen3.6-flash' | 'google/gemini-3-flash-preview';
+  aiModel: 'deepseek/deepseek-v4-flash' | 'qwen/qwen3.6-flash' | 'google/gemini-3.5-flash' | 'google/gemini-3-flash-preview';
   backendPort: number;
 }
 

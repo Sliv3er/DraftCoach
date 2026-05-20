@@ -140,7 +140,8 @@ const ROLE_ICON_URLS: Record<Role, string> = {
 };
 
 const MODEL_OPTIONS: { value: AiModel; label: string; tone: string }[] = [
-  { value: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash', tone: 'Best' },
+  { value: 'google/gemini-3.5-flash', label: 'Gemini 3.5 Flash', tone: 'Best' },
+  { value: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash', tone: 'Value' },
   { value: 'deepseek/deepseek-v4-flash', label: 'DeepSeek V4 Flash', tone: 'Balanced' },
   { value: 'qwen/qwen3.6-flash', label: 'Qwen3.6 Flash', tone: 'Fast' },
 ];

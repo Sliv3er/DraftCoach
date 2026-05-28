@@ -1,7 +1,7 @@
 {
-    "patch": "16.10",
+    "patch": "16.11",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-05-17T17:04:09.266Z",
+    "generatedAt": "2026-05-28T00:05:36.749Z",
     "augments": [
         {
             "id": 404,

@@ -1,7 +1,7 @@
 {
-    "patch": "16.11",
+    "patch": "16.12",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-05-28T00:05:36.749Z",
+    "generatedAt": "2026-06-10T00:05:01.173Z",
     "augments": [
         {
             "id": 404,
@@ -74,6 +74,24 @@
             "effect": "Your Heals and Shields are % stronger when used on an ally.",
             "iconSmall": "assets/ux/cherry/augments/icons/allforyou_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/allforyou_large.png"
+        },
+        {
+            "id": 361,
+            "name": "Ally Demon",
+            "apiName": "GoHVoteAllyDemon",
+            "tier": "Silver",
+            "effect": "Vote for your team to ally with the Demons. Allying with Demons grants an %i:AugmentLevel% Augment Level when a Hunter team is eliminated.",
+            "iconSmall": "assets/ux/cherry/augments/icons/yonedemon_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/yonedemon_large.arena_2026_s2_a2.png"
+        },
+        {
+            "id": 362,
+            "name": "Ally Hunter",
+            "apiName": "GoHVoteAllyHunter",
+            "tier": "Silver",
+            "effect": "Vote for your team to ally with the Demon Hunters. Allying with Demon Hunters grants you +%i:goldCoins% bonus gold when you defeat a Demon team.",
+            "iconSmall": "assets/ux/cherry/augments/icons/yonehunter_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/yonehunter_large.arena_2026_s2_a2.png"
         },
         {
             "id": 309,
@@ -155,6 +173,15 @@
             "effect": "Gain Darius's Passive Hemorrhage. Attacks and damaging Abilities cause the target to Hemorrhage, dealing physical damage over seconds, stacking up to times. Draven gains Attack Damage at Hemorrhage stacks.",
             "iconSmall": "assets/ux/cherry/augments/icons/bloodbrother_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/bloodbrother_large.png"
+        },
+        {
+            "id": 348,
+            "name": "Bloodrazor",
+            "apiName": "GoHBloodrazor",
+            "tier": "Silver",
+            "effect": "Dealing damage deals an additional % max health physical damage.",
+            "iconSmall": "assets/ux/cherry/augments/icons/bloodrazor_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bloodrazor_large.arena_2026_s2_a2.png"
         },
         {
             "id": 7,
@@ -310,6 +337,15 @@
             "iconLarge": "assets/ux/cherry/augments/icons/chauffeur_large.png"
         },
         {
+            "id": 347,
+            "name": "Chemtech Putrifier",
+            "apiName": "GoHChemtechPutrifier",
+            "tier": "Silver",
+            "effect": "Dealing damage to champions applies % Wounds for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/chemtechpurifier_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/chemtechpurifier_large.arena_2026_s2_a2.png"
+        },
+        {
             "id": 15,
             "name": "Circle of Death",
             "apiName": "CircleofDeath",
@@ -431,7 +467,7 @@
             "name": "Dark Blessing",
             "apiName": "DarkBlessing",
             "tier": "Gold",
-            "effect": "When you Heal or Shield an allied champion, gain Cursed Power. Gain Ability Haste (% of your Cursed Power). {{ Cherry_CurseShared }}",
+            "effect": "When you Heal or Shield an allied champion, gain Cursed Power. Gain Ability Haste (% of your Cursed Power). second cooldown per cast. {{ Cherry_CurseShared }}",
             "iconSmall": "assets/ux/cherry/augments/icons/darkblessing_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/darkblessing_large.png"
         },
@@ -488,6 +524,15 @@
             "effect": "{{Cherry_Dematerialize_Summary}}",
             "iconSmall": "assets/ux/cherry/augments/icons/dematerialize_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/dematerialize_large.png"
+        },
+        {
+            "id": 349,
+            "name": "Dematerializer",
+            "apiName": "GoHDematerializer",
+            "tier": "Silver",
+            "effect": "Your damage executes champions that are below % Health.",
+            "iconSmall": "assets/ux/cherry/augments/icons/dematerializer_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dematerializer_large.arena_2026_s2_a2.png"
         },
         {
             "id": 23,
@@ -605,6 +650,15 @@
             "effect": "Your dash, leap, blink, or teleport Abilities leave behind a trail that detonates after 1 second, dealing physical damage. Damage Dealt This Round: Damage Dealt Total:",
             "iconSmall": "assets/ux/cherry/augments/icons/earthwake_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/earthwake_large.png"
+        },
+        {
+            "id": 350,
+            "name": "Enchanted Flask",
+            "apiName": "GoHEnchantedFlask",
+            "tier": "Silver",
+            "effect": "Gain a Spell Shield every seconds that blocks the next enemy Ability.",
+            "iconSmall": "assets/ux/cherry/augments/icons/crystallineflask_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/crystallineflask_large.arena_2026_s2_a2.png"
         },
         {
             "id": 344,
@@ -769,13 +823,13 @@
             "iconLarge": "assets/ux/cherry/augments/icons/frostwraith_large.png"
         },
         {
-            "id": 40,
-            "name": "Frozen Foundations",
-            "apiName": "FrozenFoundations",
+            "id": 351,
+            "name": "Frozen Mallet",
+            "apiName": "GoHFrozenMallet",
             "tier": "Silver",
-            "effect": "Summon a wall of ice at target location.",
-            "iconSmall": "assets/ux/cherry/augments/icons/frozenfoundations_small.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/frozenfoundations_large.png"
+            "effect": "Dealing damage applies a % Slow for seconds.",
+            "iconSmall": "assets/ux/cherry/augments/icons/frozenmallet_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/frozenmallet_large.arena_2026_s2_a2.png"
         },
         {
             "id": 222,
@@ -851,7 +905,7 @@
         },
         {
             "id": 316,
-            "name": "Grevious Venom",
+            "name": "Grievous Venom",
             "apiName": "GrievousVenom",
             "tier": "Silver",
             "effect": "Dealing damage to an enemy champion reduces any shields they gain by %, and applies % Grievous Wounds for seconds. If an enemy heals for more than % of their maximum health while continously affected by Grievous Wounds, it is increased to % Grievous Wounds. {{ Item_Grievous_Wounds }} Only reduces General and Physical Damage shields, but not purely Magical Damage blocking shields.",
@@ -1426,6 +1480,15 @@
             "iconLarge": "assets/ux/cherry/augments/icons/recursion_large.png"
         },
         {
+            "id": 354,
+            "name": "Remnant of the Watchers",
+            "apiName": "GoHRemnantOfTheWatchers",
+            "tier": "Silver",
+            "effect": "Reduce the Attack Speed of nearby champions by @ASPDSlow*-100@%.",
+            "iconSmall": "assets/ux/cherry/augments/icons/remnantofthewatchers_small.arena_2026_s2_a2.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/remnantofthewatchers_large.arena_2026_s2_a2.png"
+        },
+        {
             "id": 364,
             "name": "Replace Augment",
             "apiName": "ReplaceAugment",
@@ -1610,7 +1673,7 @@
             "name": "Sonic Boom",
             "apiName": "SonicBoom",
             "tier": "Silver",
-            "effect": "Buffing, Healing, or Shielding your ally deals true damage and Slows enemies surrounding them by @SlowAmount*-100@% for seconds. Damage Dealt This Round: Damage Dealt Total:",
+            "effect": "Buffing, Healing, or Shielding your ally deals true damage and Slows enemies surrounding them by @SlowAmount*-100@% for seconds. second cooldown per cast. Damage Dealt This Round: Damage Dealt Total:",
             "iconSmall": "assets/ux/cherry/augments/icons/sonicboom_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/sonicboom_large.png"
         },

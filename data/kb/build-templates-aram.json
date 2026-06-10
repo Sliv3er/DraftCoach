@@ -1,15 +1,15 @@
 {
     "meta": {
-        "patch": "16.11",
+        "patch": "16.12",
         "source": "mobalytics-gql+cdragon",
-        "generatedAt": "2026-05-28T00:05:36.749Z",
-        "buildHash": "moba-modes-1779926736749",
+        "generatedAt": "2026-06-10T00:05:01.173Z",
+        "buildHash": "moba-modes-1781049901173",
         "stats": {
             "champions": 172,
             "aramBuilds": 0,
             "mayhemBuilds": 0,
             "augmentChampions": 0,
-            "augmentMasterCount": 220,
+            "augmentMasterCount": 227,
             "failed": 172
         }
     },

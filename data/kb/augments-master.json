@@ -1,7 +1,7 @@
 {
-    "patch": "16.12",
+    "patch": "16.13",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-06-10T00:05:01.173Z",
+    "generatedAt": "2026-06-24T00:05:02.440Z",
     "augments": [
         {
             "id": 404,
@@ -89,7 +89,7 @@
             "name": "Ally Hunter",
             "apiName": "GoHVoteAllyHunter",
             "tier": "Silver",
-            "effect": "Vote for your team to ally with the Demon Hunters. Allying with Demon Hunters grants you +%i:goldCoins% bonus gold when you defeat a Demon team.",
+            "effect": "Vote for your team to ally with the Demon Hunters. Allying with Demon Hunters grants you +%i:goldCoins% bonus gold when you beat a Demon team.",
             "iconSmall": "assets/ux/cherry/augments/icons/yonehunter_small.arena_2026_s2_a2.png",
             "iconLarge": "assets/ux/cherry/augments/icons/yonehunter_large.arena_2026_s2_a2.png"
         },
@@ -368,7 +368,7 @@
             "name": "Clown College",
             "apiName": "ClownCollege",
             "tier": "Prismatic",
-            "effect": "Backstab: You deal bonus physical damage when striking from behind. Deceive: You teleport and become Invisible for seconds. Your next Attack while Invisible deals an additional physical damage. If striking from behind, this Attack critically strikes for damage. Hallucinate: Death: On death, deal % maximum Health true damage and fear for s around you.",
+            "effect": "Backstab: You deal bonus physical damage when striking from behind. Deceive: You teleport and become Invisible for seconds. Your next Attack while Invisible deals an additional physical damage. If striking from behind, this Attack critically strikes for damage. Hallucinate: Death: On death, deal % maximum Health magic damage and fear for s around you.",
             "iconSmall": "assets/ux/cherry/augments/icons/clowncollege_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/clowncollege_large.png"
         },
@@ -1565,7 +1565,7 @@
             "name": "Scopiest Weapons",
             "apiName": "ScopiestWeapons",
             "tier": "Prismatic",
-            "effect": "Gain Attack Range, reduced to if you are Ranged.",
+            "effect": "Gain Attack Range.",
             "iconSmall": "assets/ux/cherry/augments/icons/scopiestweapons_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/scopiestweapons_large.png"
         },
@@ -1718,7 +1718,7 @@
             "name": "Stackosaurus Rex",
             "apiName": "StackosaurusRex",
             "tier": "Silver",
-            "effect": "When you gain permanent Stacks of an Ability, gain % more!",
+            "effect": "When you gain permanent Stacks of an Ability, Augment, or Item gain % more!",
             "iconSmall": "assets/ux/cherry/augments/icons/stackosaurusrex_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/stackosaurusrex_large.png"
         },
@@ -1766,6 +1766,15 @@
             "effect": "Replace your Summoner Spells with random ones. When you use a Summoner Spell, replace it with another random one on a second Cooldown.",
             "iconSmall": "assets/ux/cherry/augments/icons/summonersroulette_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/summonersroulette_large.png"
+        },
+        {
+            "id": 392,
+            "name": "Swindler's Orb",
+            "apiName": "GoHSwindlersOrb",
+            "tier": "Silver",
+            "effect": "Dealing damage to an enemy champion reduces any shields they have or gain by % for seconds. Affects General and Physical Damage shields, but not purely Magical Damage blocking shields.",
+            "iconSmall": "assets/ux/cherry/augments/icons/swindlers_orb_item_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/swindlers_orb_item_large.png"
         },
         {
             "id": 239,

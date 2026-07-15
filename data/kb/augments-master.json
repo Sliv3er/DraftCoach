@@ -1,7 +1,7 @@
 {
-    "patch": "16.13",
+    "patch": "16.14",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-06-24T00:05:02.440Z",
+    "generatedAt": "2026-07-15T00:05:00.132Z",
     "augments": [
         {
             "id": 404,
@@ -256,15 +256,6 @@
             "iconLarge": "assets/ux/cherry/augments/icons/buffbuddies_large.png"
         },
         {
-            "id": 320,
-            "name": "Calculated Risk",
-            "apiName": "CalculatedRisk",
-            "tier": "Silver",
-            "effect": "{{ Cherry_CalculatedRisk_Summary }}",
-            "iconSmall": "assets/ux/cherry/augments/icons/calculated_risk_small.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/calculated_risk_large.png"
-        },
-        {
             "id": 11,
             "name": "Can't Touch This",
             "apiName": "CantTouchThis",
@@ -317,15 +308,6 @@
             "effect": "Gain the Hail of Blades and Press the Attack Keystone Runes. Hail of Blades - Your first 3 Attacks have massively increased Attack Speed. Press the Attack - Hitting 3 Attacks against the same enemy deals a burst of damage and increases your damage until you leave combat.",
             "iconSmall": "assets/ux/cherry/augments/icons/cerberus_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/cerberus_large.png"
-        },
-        {
-            "id": 166,
-            "name": "Chain Lightning",
-            "apiName": "ChainLightning",
-            "tier": "Prismatic",
-            "effect": "{{Cherry_ChainLightning_Summary}}",
-            "iconSmall": "assets/ux/cherry/augments/icons/chainlightning_small.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/chainlightning_large.png"
         },
         {
             "id": 14,
@@ -872,7 +854,7 @@
             "name": "Gamba Anvil",
             "apiName": "GambaAnvil",
             "tier": "Prismatic",
-            "effect": "Gain +%i:goldCoins% gold and reduce the price of all anvils. Prismatic Anvils: -%i:goldCoins%gold Legendary Anvils: -%i:goldCoins%gold Stat Anvils: -%i:goldCoins%gold Items acquired from anvils resell for -%i:goldCoins%500 gold less.",
+            "effect": "Gain +%i:goldCoins% gold and reduce the price of all anvils. Prismatic Anvils: -%i:goldCoins% gold Legendary Anvils: -%i:goldCoins% gold Stat Anvils: -%i:goldCoins% gold Items acquired from anvils resell for -%i:goldCoins%500 gold less.",
             "iconSmall": "assets/ux/cherry/augments/icons/thiefsgloves_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/thiefsgloves_large.png"
         },
@@ -1070,7 +1052,7 @@
             "name": "Lamb's Respite",
             "apiName": "GoHLamb",
             "tier": "Silver",
-            "effect": "Gain additional revives, and cuts the time needed to revive in half.",
+            "effect": "Gain additional revive, and cuts the time needed to revive in half.",
             "iconSmall": "assets/ux/cherry/augments/icons/lamb_small.arena_2026_s2.png",
             "iconLarge": "assets/ux/cherry/augments/icons/lamb_large.arena_2026_s2.png"
         },
@@ -1222,7 +1204,7 @@
             "id": 177,
             "name": "Nesting Doll",
             "apiName": "NestingDoll",
-            "tier": "Gold",
+            "tier": "Prismatic",
             "effect": "You automatically begin Reviving yourself after seconds and you can be Revived additional times. Each time you Revive, come back smaller and with % max Health. When you revive, knockback enemies around you.",
             "iconSmall": "assets/ux/cherry/augments/icons/nesting_doll_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/nesting_doll.png"

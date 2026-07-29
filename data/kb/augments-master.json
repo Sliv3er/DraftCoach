@@ -1,7 +1,7 @@
 {
-    "patch": "16.14",
+    "patch": "16.15",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-07-15T00:05:00.132Z",
+    "generatedAt": "2026-07-29T00:06:59.017Z",
     "augments": [
         {
             "id": 404,
@@ -1700,7 +1700,7 @@
             "name": "Stackosaurus Rex",
             "apiName": "StackosaurusRex",
             "tier": "Silver",
-            "effect": "When you gain permanent Stacks of an Ability, Augment, or Item gain % more!",
+            "effect": "When you gain permanent Stacks of an Ability, gain % more!",
             "iconSmall": "assets/ux/cherry/augments/icons/stackosaurusrex_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/stackosaurusrex_large.png"
         },

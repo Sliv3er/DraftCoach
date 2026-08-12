@@ -1,7 +1,7 @@
 {
-    "patch": "16.15",
+    "patch": "16.16",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-07-29T00:06:59.017Z",
+    "generatedAt": "2026-08-12T00:04:29.266Z",
     "augments": [
         {
             "id": 404,
@@ -18,8 +18,8 @@
             "apiName": "GoHAbstainFromPower",
             "tier": "Silver",
             "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Gain Silver Stat Anvil.",
-            "iconSmall": "assets/ux/cherry/augments/icons/power_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/power_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/power_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/power_large.png"
         },
         {
             "id": 367,
@@ -27,8 +27,8 @@
             "apiName": "GoHAbstainFromRisk",
             "tier": "Silver",
             "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Instantly gain a %i:Augment% Silver Augment.",
-            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.png"
         },
         {
             "id": 365,
@@ -36,8 +36,8 @@
             "apiName": "GoHAbstainFromWealth",
             "tier": "Silver",
             "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Gain +%i:goldCoins% gold.",
-            "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.png"
         },
         {
             "id": 1,
@@ -81,8 +81,8 @@
             "apiName": "GoHVoteAllyDemon",
             "tier": "Silver",
             "effect": "Vote for your team to ally with the Demons. Allying with Demons grants an %i:AugmentLevel% Augment Level when a Hunter team is eliminated.",
-            "iconSmall": "assets/ux/cherry/augments/icons/yonedemon_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/yonedemon_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/yonedemon_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/yonedemon_large.png"
         },
         {
             "id": 362,
@@ -90,8 +90,8 @@
             "apiName": "GoHVoteAllyHunter",
             "tier": "Silver",
             "effect": "Vote for your team to ally with the Demon Hunters. Allying with Demon Hunters grants you +%i:goldCoins% bonus gold when you beat a Demon team.",
-            "iconSmall": "assets/ux/cherry/augments/icons/yonehunter_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/yonehunter_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/yonehunter_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/yonehunter_large.png"
         },
         {
             "id": 309,
@@ -180,8 +180,8 @@
             "apiName": "GoHBloodrazor",
             "tier": "Silver",
             "effect": "Dealing damage deals an additional % max health physical damage.",
-            "iconSmall": "assets/ux/cherry/augments/icons/bloodrazor_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/bloodrazor_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/bloodrazor_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/bloodrazor_large.png"
         },
         {
             "id": 7,
@@ -324,8 +324,8 @@
             "apiName": "GoHChemtechPutrifier",
             "tier": "Silver",
             "effect": "Dealing damage to champions applies % Wounds for seconds.",
-            "iconSmall": "assets/ux/cherry/augments/icons/chemtechpurifier_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/chemtechpurifier_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/chemtechpurifier_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/chemtechpurifier_large.png"
         },
         {
             "id": 15,
@@ -369,8 +369,8 @@
             "apiName": "GoHCompulsionForPower",
             "tier": "Silver",
             "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain Prismatic Stat Anvils.",
-            "iconSmall": "assets/ux/cherry/augments/icons/power_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/power_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/power_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/power_large.png"
         },
         {
             "id": 373,
@@ -378,8 +378,8 @@
             "apiName": "GoHCompulsionForRisk",
             "tier": "Silver",
             "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain a %i:Augment% Prismatic Augment.",
-            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.png"
         },
         {
             "id": 371,
@@ -387,8 +387,8 @@
             "apiName": "GoHCompulsionForWealth",
             "tier": "Silver",
             "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain +%i:goldCoins% gold.",
-            "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.png"
         },
         {
             "id": 17,
@@ -414,8 +414,8 @@
             "apiName": "GoHCravingForPower",
             "tier": "Silver",
             "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain Gold Stat Anvil.",
-            "iconSmall": "assets/ux/cherry/augments/icons/power_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/power_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/power_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/power_large.png"
         },
         {
             "id": 370,
@@ -423,8 +423,8 @@
             "apiName": "GoHCravingForRisk",
             "tier": "Silver",
             "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain a %i:Augment% Gold Augment.",
-            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/risk_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/risk_large.png"
         },
         {
             "id": 368,
@@ -432,8 +432,8 @@
             "apiName": "GoHCravingForWealth",
             "tier": "Silver",
             "effect": "Sacrifice % of your max health to Tahm Kench. Your total sacrifice will increase to -% max health. Gain +%i:goldCoins% gold.",
-            "iconSmall": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/wealth_large.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.png"
         },
         {
             "id": 118,
@@ -513,8 +513,8 @@
             "apiName": "GoHDematerializer",
             "tier": "Silver",
             "effect": "Your damage executes champions that are below % Health.",
-            "iconSmall": "assets/ux/cherry/augments/icons/dematerializer_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/dematerializer_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/dematerializer_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/dematerializer_large.png"
         },
         {
             "id": 23,
@@ -639,8 +639,8 @@
             "apiName": "GoHEnchantedFlask",
             "tier": "Silver",
             "effect": "Gain a Spell Shield every seconds that blocks the next enemy Ability.",
-            "iconSmall": "assets/ux/cherry/augments/icons/crystallineflask_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/crystallineflask_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/crystallineflask_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/crystallineflask_large.png"
         },
         {
             "id": 344,
@@ -810,8 +810,8 @@
             "apiName": "GoHFrozenMallet",
             "tier": "Silver",
             "effect": "Dealing damage applies a % Slow for seconds.",
-            "iconSmall": "assets/ux/cherry/augments/icons/frozenmallet_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/frozenmallet_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/frozenmallet_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/frozenmallet_large.png"
         },
         {
             "id": 222,
@@ -1053,8 +1053,8 @@
             "apiName": "GoHLamb",
             "tier": "Silver",
             "effect": "Gain additional revive, and cuts the time needed to revive in half.",
-            "iconSmall": "assets/ux/cherry/augments/icons/lamb_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/lamb_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/lamb_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/lamb_large.png"
         },
         {
             "id": 174,
@@ -1467,8 +1467,8 @@
             "apiName": "GoHRemnantOfTheWatchers",
             "tier": "Silver",
             "effect": "Reduce the Attack Speed of nearby champions by @ASPDSlow*-100@%.",
-            "iconSmall": "assets/ux/cherry/augments/icons/remnantofthewatchers_small.arena_2026_s2_a2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/remnantofthewatchers_large.arena_2026_s2_a2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/remnantofthewatchers_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/remnantofthewatchers_large.png"
         },
         {
             "id": 364,
@@ -1631,15 +1631,6 @@
             "effect": "Every seconds Autocast a burst slime from your body, dealing plus max Health magic damage to nearby enemies. If you hit a champion, secrete a blob nearby. Walking over the blob restores Health, while enemies destroy the blob.",
             "iconSmall": "assets/ux/cherry/augments/icons/slimetime_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/slimetime_large.png"
-        },
-        {
-            "id": 250,
-            "name": "Slow and Steady",
-            "apiName": "SlowAndSteady",
-            "tier": "Gold",
-            "effect": "Your Attack Speed can not go above . All bonus Attack Speed is converted to Attack Damage ( AD per 1% AS). Currently Gaining: Attack Damage",
-            "iconSmall": "assets/ux/cherry/augments/icons/slowandsteady_small.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/slowandsteady_large.png"
         },
         {
             "id": 75,
@@ -2034,8 +2025,8 @@
             "apiName": "GoHWolf",
             "tier": "Silver",
             "effect": "Lose your innate revive. Increase your Health by %. If you deal damage that would leave a champion below below % maximum health, execute them.",
-            "iconSmall": "assets/ux/cherry/augments/icons/wolf_small.arena_2026_s2.png",
-            "iconLarge": "assets/ux/cherry/augments/icons/wolf_large.arena_2026_s2.png"
+            "iconSmall": "assets/ux/cherry/augments/icons/wolf_small.png",
+            "iconLarge": "assets/ux/cherry/augments/icons/wolf_large.png"
         }
     ]
 }

@@ -1,14 +1,14 @@
 {
-  "patch": "16.15",
-  "generatedAt": "2026-07-29T00:06:59.626Z",
-  "champCount": 859,
+  "patch": "16.16",
+  "generatedAt": "2026-08-12T00:04:29.368Z",
+  "champCount": 0,
   "modes": {
-    "sr": 859,
+    "sr": 0,
     "aram": 0,
     "aramMayhem": 0,
     "augmentChampions": 0
   },
-  "qcPassed": 859,
+  "qcPassed": 0,
   "qcFailed": 0,
   "source": "ugg-auto-sync"
 }

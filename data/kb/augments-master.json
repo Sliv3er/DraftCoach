@@ -1,7 +1,7 @@
 {
-    "patch": "16.16",
+    "patch": "16.17",
     "source": "communitydragon-arena",
-    "generatedAt": "2026-08-12T00:04:29.266Z",
+    "generatedAt": "2026-08-26T00:04:31.649Z",
     "augments": [
         {
             "id": 404,
@@ -17,7 +17,7 @@
             "name": "Abstain From Power",
             "apiName": "GoHAbstainFromPower",
             "tier": "Silver",
-            "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Gain Silver Stat Anvil.",
+            "effect": "Restore % of the health you've sacrificed to Tahm Kench. Gain Silver Stat Anvil.",
             "iconSmall": "assets/ux/cherry/augments/icons/power_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/power_large.png"
         },
@@ -26,7 +26,7 @@
             "name": "Abstain From Risk",
             "apiName": "GoHAbstainFromRisk",
             "tier": "Silver",
-            "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Instantly gain a %i:Augment% Silver Augment.",
+            "effect": "Restore % of the health you've sacrificed to Tahm Kench. Instantly gain a %i:Augment% Silver Augment.",
             "iconSmall": "assets/ux/cherry/augments/icons/risk_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/risk_large.png"
         },
@@ -35,7 +35,7 @@
             "name": "Abstain From Wealth",
             "apiName": "GoHAbstainFromWealth",
             "tier": "Silver",
-            "effect": "Restore % of of the health you've sacrificed to Tahm Kench. Gain +%i:goldCoins% gold.",
+            "effect": "Restore % of the health you've sacrificed to Tahm Kench. Gain +%i:goldCoins% gold.",
             "iconSmall": "assets/ux/cherry/augments/icons/wealth_small.png",
             "iconLarge": "assets/ux/cherry/augments/icons/wealth_large.png"
         },

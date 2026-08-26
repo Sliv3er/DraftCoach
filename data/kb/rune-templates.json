@@ -1,9 +1,9 @@
 {
     "meta": {
-        "patch": "16.16",
+        "patch": "16.17",
         "source": "ugg-ssr",
-        "generatedAt": "2026-08-12T00:00:58.332Z",
-        "buildHash": "ugg-1786492858333",
+        "generatedAt": "2026-08-26T00:00:57.094Z",
+        "buildHash": "ugg-1787702457094",
         "stats": {
             "champions": 173,
             "roles": 0,

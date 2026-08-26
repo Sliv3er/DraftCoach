@@ -1,9 +1,9 @@
 {
     "meta": {
-        "patch": "16.16",
+        "patch": "16.17",
         "source": "mobalytics-gql+cdragon",
-        "generatedAt": "2026-08-12T00:04:29.266Z",
-        "buildHash": "moba-modes-1786493069267",
+        "generatedAt": "2026-08-26T00:04:31.649Z",
+        "buildHash": "moba-modes-1787702671649",
         "stats": {
             "champions": 173,
             "aramBuilds": 0,
